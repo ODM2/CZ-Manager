@@ -18,12 +18,13 @@ from odm2testapp.models import Variables
 from odm2testapp.models import Relatedactions
 from odm2testapp.models import CvActiontype
 from odm2testapp.models import Actions
+from odm2testapp.models import Datasets
 from odm2testapp.models import Featureactions
 from odm2testapp.models import Samplingfeatures
 from odm2testapp.models import Organizations
 from odm2testapp.models import CvOrganizationtype
 from odm2testapp.models import CvRelationshiptype
-
+from odm2testapp.models import CvDatasettypecv
 from django.forms import ModelChoiceField
 
 #custom fields to populate form dropdownlists.
@@ -108,9 +109,18 @@ class OrganizationsAdmin(admin.ModelAdmin):
 
 
 class FeatureactionsAdminForm(ModelForm):
-    samplingfeatureid= TermModelChoiceField(Samplingfeatures.objects.all().order_by('samplingfeaturename'))
+    samplingfeatureid= SamplingfeaturesModelChoiceField(Samplingfeatures.objects.all().order_by('samplingfeaturename'))
     class Meta:
-        model= Taxonomicclassifiers
+        model= Featureactions
 
 class FeatureactionsAdmin(admin.ModelAdmin):
-    form=TaxonomicclassifiersAdminForm
+    form=FeatureactionsAdminForm
+
+
+class DatasetsAdminForm(ModelForm):
+    datasettypecv= TermModelChoiceField(CvDatasettypecv.objects.all().order_by('term'))
+    class Meta:
+        model= Datasets
+
+class DatasetsAdmin(admin.ModelAdmin):
+    form=DatasetsAdminForm
