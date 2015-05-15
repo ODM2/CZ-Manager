@@ -14,6 +14,7 @@ from .models import Variables
 from .forms import VariablesAdmin
 from .models import Units
 from .models import Taxonomicclassifiers
+from .forms import TaxonomicclassifiersAdmin
 from .models import Datasets
 from .models import Datasetsresults
 from .models import Processinglevels
@@ -29,7 +30,7 @@ admin.site.register(Results)
 admin.site.register(Relatedactions)
 admin.site.register(Variables, VariablesAdmin)
 admin.site.register(Units)
-admin.site.register(Taxonomicclassifiers)
+admin.site.register(Taxonomicclassifiers,TaxonomicclassifiersAdmin)
 admin.site.register(Datasets)
 admin.site.register(Datasetsresults)
 admin.site.register(Processinglevels)
