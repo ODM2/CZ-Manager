@@ -24,7 +24,7 @@ class TermModelChoiceField(ModelChoiceField):
 
 class VariableNameModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
-        return "%s"%(obj.variablenamecv)
+        return "%s"%(obj.variablenamecv.term)
     
 class VariablesAdminForm(ModelForm):
     variabletypecv= TermModelChoiceField(CvVariabletype.objects.all().order_by('term'))
