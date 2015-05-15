@@ -9,6 +9,7 @@ from .models import Organizations
 from .models import Featureactions
 from .models import Actions
 from .models import Results
+from .forms import ResultsAdmin
 from .models import Relatedactions
 from .models import Methods
 from .models import Variables
@@ -27,7 +28,7 @@ admin.site.register(Actionby)
 admin.site.register(Organizations)
 admin.site.register(Featureactions)
 admin.site.register(Actions)
-admin.site.register(Results)
+admin.site.register(Results,ResultsAdmin)
 admin.site.register(Relatedactions)
 admin.site.register(Variables, VariablesAdmin)
 admin.site.register(Units)

@@ -1742,15 +1742,7 @@ class Variables(models.Model):
     variabledefinition = models.CharField(max_length=500, blank=True)
     speciationcv = models.ForeignKey(CvSpeciation, db_column='speciationcv', blank=True, null=True)
     nodatavalue = models.FloatField()
-    #def my_term(self):
-    #    return "hello"
-    #my_term.short_description = "variable term"
-    #variable_type_term=property(my_term)
 
-	#def get_add_form(self):
-        #return VariablesForm()
-    #def _str_(self):
-    #    return self.name
 
 
     class Meta:

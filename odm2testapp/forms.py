@@ -12,16 +12,24 @@ from odm2testapp.models import Samplingfeatures
 from odm2testapp.models import CvSamplingfeaturetype
 from odm2testapp.models import CvSamplingfeaturegeotype
 from odm2testapp.models import CvElevationdatum
+from odm2testapp.models import Results
+from odm2testapp.models import CvResulttype
+from odm2testapp.models import Variables
+
 from django.forms import ModelChoiceField
 
-class VariableModelChoiceField(ModelChoiceField):
+class TermModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return "%s"%(obj.term)
 
+class VariableNameModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return "%s"%(obj.variablenamecv)
+    
 class VariablesAdminForm(ModelForm):
-    variabletypecv= VariableModelChoiceField(CvVariabletype.objects.all().order_by('term'))
-    variablenamecv= VariableModelChoiceField(CvVariablename.objects.all().order_by('term'))
-    speciationcv= VariableModelChoiceField(CvSpeciation.objects.all().order_by('term'))
+    variabletypecv= TermModelChoiceField(CvVariabletype.objects.all().order_by('term'))
+    variablenamecv= TermModelChoiceField(CvVariablename.objects.all().order_by('term'))
+    speciationcv= TermModelChoiceField(CvSpeciation.objects.all().order_by('term'))
     class Meta:
         model=Variables
        
@@ -29,7 +37,7 @@ class VariablesAdmin(admin.ModelAdmin):
     form=VariablesAdminForm
 
 class TaxonomicclassifiersAdminForm(ModelForm):
-    taxonomicclassifiertypecv= VariableModelChoiceField(CvTaxonomicclassifiertype.objects.all().order_by('term'))
+    taxonomicclassifiertypecv= TermModelChoiceField(CvTaxonomicclassifiertype.objects.all().order_by('term'))
     class Meta:
         model= Taxonomicclassifiers
 
@@ -38,11 +46,21 @@ class TaxonomicclassifiersAdmin(admin.ModelAdmin):
 
 
 class SamplingfeaturesAdminForm(ModelForm):
-    samplingfeaturetypecv= VariableModelChoiceField(CvSamplingfeaturetype.objects.all().order_by('term'))
-    samplingfeaturegeotypecv=VariableModelChoiceField(CvSamplingfeaturegeotype.objects.all().order_by('term'))
-    elevationdatumcv = VariableModelChoiceField(CvElevationdatum.objects.all().order_by('term'))
+    samplingfeaturetypecv= TermModelChoiceField(CvSamplingfeaturetype.objects.all().order_by('term'))
+    samplingfeaturegeotypecv=TermModelChoiceField(CvSamplingfeaturegeotype.objects.all().order_by('term'))
+    elevationdatumcv = TermModelChoiceField(CvElevationdatum.objects.all().order_by('term'))
     class Meta:
         model= Samplingfeatures
 
 class SamplingfeaturesAdmin(admin.ModelAdmin):
     form=SamplingfeaturesAdminForm
+
+
+class ResultsAdminForm(ModelForm):
+    resulttypecv= TermModelChoiceField(CvResulttype.objects.all().order_by('term'))
+    variableid= VariableNameModelChoiceField(Variables.objects.all().order_by('variablenamecv'))
+    class Meta:
+        model= Results
+
+class ResultsAdmin(admin.ModelAdmin):
+    form=ResultsAdminForm
