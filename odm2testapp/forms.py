@@ -16,6 +16,9 @@ from odm2testapp.models import Results
 from odm2testapp.models import CvResulttype
 from odm2testapp.models import Variables
 from odm2testapp.models import Relatedactions
+from odm2testapp.models import CvActiontype
+from odm2testapp.models import Actions
+from odm2testapp.models import CvRelationshiptype
 
 from django.forms import ModelChoiceField
 
