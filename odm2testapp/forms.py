@@ -6,6 +6,7 @@ from odm2testapp.models import Variables
 from odm2testapp.models import CvVariabletype
 from odm2testapp.models import CvVariablename
 from odm2testapp.models import CvSpeciation
+from odm2testapp.models import Taxonomicclassifiers
 from odm2testapp.models import CvTaxonomicclassifiertype
 
 from django.forms import ModelChoiceField
