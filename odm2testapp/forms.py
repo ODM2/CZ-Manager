@@ -23,3 +23,11 @@ class VariablesAdminForm(ModelForm):
        
 class VariablesAdmin(admin.ModelAdmin):
     form=VariablesAdminForm
+
+class TaxonomicclassifiersAdminForm(ModelForm):
+    taxonomicclassifiertypecv= VariableModelChoiceField(CvTaxonomicclassifiertype.objects.all().order_by('term'))
+    class Meta:
+        model= Taxonomicclassifiers
+
+class TaxonomicclassifiersAdmin(admin.ModelAdmin):
+    form=TaxonomicclassifiersAdminForm
