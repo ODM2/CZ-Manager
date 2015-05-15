@@ -18,6 +18,7 @@ from odm2testapp.models import Variables
 from odm2testapp.models import Relatedactions
 from odm2testapp.models import CvActiontype
 from odm2testapp.models import Actions
+from odm2testapp.models import Organizations
 from odm2testapp.models import CvRelationshiptype
 
 from django.forms import ModelChoiceField
@@ -33,6 +34,10 @@ class VariableNameModelChoiceField(ModelChoiceField):
 class ActionsModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return "%s"%(obj.actiontypecv.term)
+
+class OrganizationsModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return "%s"%(obj.organizationname)
 
 class VariablesAdminForm(ModelForm):
     variabletypecv= TermModelChoiceField(CvVariabletype.objects.all().order_by('term'))
@@ -83,3 +88,12 @@ class RelatedactionsAdminForm(ModelForm):
 
 class RelatedactionsAdmin(admin.ModelAdmin):
     form=RelatedactionsAdminForm
+
+class OrganizationsAdminForm(ModelForm):
+    organizationtypecv= TermModelChoiceField(CvOrganizationtype.objects.all().order_by('term'))
+    parentorganizationid = TermModelChoiceField(Organizations.objects.all().order_by('organizationname'))
+    class Meta:
+        model= Organizations
+
+class OrganizationsAdmin(admin.ModelAdmin):
+    form=OrganizationsAdminForm

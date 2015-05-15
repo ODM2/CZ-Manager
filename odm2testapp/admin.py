@@ -6,6 +6,7 @@ from .models import Affiliations
 from .models import People
 from .models import Actionby
 from .models import Organizations
+from .forms import OrganizationsAdmin
 from .models import Featureactions
 from .models import Actions
 from .models import Results
@@ -26,7 +27,7 @@ admin.site.register(Samplingfeatures,SamplingfeaturesAdmin)
 admin.site.register(Affiliations)
 admin.site.register(People)
 admin.site.register(Actionby)
-admin.site.register(Organizations)
+admin.site.register(Organizations,OrganizationsAdmin)
 admin.site.register(Featureactions)
 admin.site.register(Actions)
 admin.site.register(Results,ResultsAdmin)
