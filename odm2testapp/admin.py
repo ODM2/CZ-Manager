@@ -11,6 +11,7 @@ from .models import Actions
 from .models import Results
 from .forms import ResultsAdmin
 from .models import Relatedactions
+from .models import RelatedactionsAdmin
 from .models import Methods
 from .models import Variables
 from .forms import VariablesAdmin
@@ -29,7 +30,7 @@ admin.site.register(Organizations)
 admin.site.register(Featureactions)
 admin.site.register(Actions)
 admin.site.register(Results,ResultsAdmin)
-admin.site.register(Relatedactions)
+admin.site.register(Relatedactions,RelatedactionsAdmin)
 admin.site.register(Variables, VariablesAdmin)
 admin.site.register(Units)
 admin.site.register(Taxonomicclassifiers,TaxonomicclassifiersAdmin)

@@ -15,6 +15,7 @@ from odm2testapp.models import CvElevationdatum
 from odm2testapp.models import Results
 from odm2testapp.models import CvResulttype
 from odm2testapp.models import Variables
+from odm2testapp.models import Relatedactions
 
 from django.forms import ModelChoiceField
 
@@ -25,7 +26,11 @@ class TermModelChoiceField(ModelChoiceField):
 class VariableNameModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return "%s"%(obj.variablenamecv.term)
-    
+
+class ActionsModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return "%s"%(obj.actiontypecv.term)
+
 class VariablesAdminForm(ModelForm):
     variabletypecv= TermModelChoiceField(CvVariabletype.objects.all().order_by('term'))
     variablenamecv= TermModelChoiceField(CvVariablename.objects.all().order_by('term'))
@@ -64,3 +69,14 @@ class ResultsAdminForm(ModelForm):
 
 class ResultsAdmin(admin.ModelAdmin):
     form=ResultsAdminForm
+
+
+class RelatedactionsAdminForm(ModelForm):
+    actionid= ActionsModelChoiceField(Actions.objects.all().order_by('begindatetime'))
+    relationshiptypecv= TermModelChoiceField(CvRelationshiptype.objects.all().order_by('term'))
+    relatedactionid= ActionsModelChoiceField(Actions.objects.all().order_by('begindatetime'))
+    class Meta:
+        model= Relatedactions
+
+class RelatedactionsAdmin(admin.ModelAdmin):
+    form=RelatedactionsAdminForm
