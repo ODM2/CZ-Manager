@@ -11,7 +11,7 @@ from .models import Actions
 from .models import Results
 from .forms import ResultsAdmin
 from .models import Relatedactions
-from .models import RelatedactionsAdmin
+from .forms import RelatedactionsAdmin
 from .models import Methods
 from .models import Variables
 from .forms import VariablesAdmin
