@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>odm2testapp</title>
+    </head>
+
+    <body>
+        <h1>Add a Variable</h1>
+
+        <form id="variable_form" method="post" action="/odm2testapp/add_variable/">
+
+            {% csrf_token %}
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+
+            {% for field in form.visible_fields %}
+                {{ field.errors }}
+                {{ field.help_text }}
+                {{ field }}
+            {% endfor %}
+
+            <input type="submit" name="submit" value="Create Variable" />
+        </form>
+    </body>
+
+</html>
