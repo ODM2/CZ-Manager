@@ -92,7 +92,7 @@ class RelatedactionsAdmin(admin.ModelAdmin):
 
 class OrganizationsAdminForm(ModelForm):
     organizationtypecv= TermModelChoiceField(CvOrganizationtype.objects.all().order_by('term'))
-    parentorganizationid = TermModelChoiceField(Organizations.objects.all().order_by('organizationname'))
+    #parentorganizationid = TermModelChoiceField(Organizations.objects.all().order_by('organizationname'))
     class Meta:
         model= Organizations
 
