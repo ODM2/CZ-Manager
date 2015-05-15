@@ -19,6 +19,7 @@ from odm2testapp.models import Relatedactions
 from odm2testapp.models import CvActiontype
 from odm2testapp.models import Actions
 from odm2testapp.models import Organizations
+from odm2testapp.models import CvOrganizationtype
 from odm2testapp.models import CvRelationshiptype
 
 from django.forms import ModelChoiceField
