@@ -18,12 +18,15 @@ from odm2testapp.models import Variables
 from odm2testapp.models import Relatedactions
 from odm2testapp.models import CvActiontype
 from odm2testapp.models import Actions
+from odm2testapp.models import Featureactions
+from odm2testapp.models import Samplingfeatures
 from odm2testapp.models import Organizations
 from odm2testapp.models import CvOrganizationtype
 from odm2testapp.models import CvRelationshiptype
 
 from django.forms import ModelChoiceField
 
+#custom fields to populate form dropdownlists.
 class TermModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return "%s"%(obj.term)
@@ -40,6 +43,10 @@ class OrganizationsModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return "%s"%(obj.organizationname)
 
+class SamplingfeaturesModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return "%s"%(obj.samplingfeaturename)
+#the following define what fields should be overridden so that dropdown lists can be populated with useful information
 class VariablesAdminForm(ModelForm):
     variabletypecv= TermModelChoiceField(CvVariabletype.objects.all().order_by('term'))
     variablenamecv= TermModelChoiceField(CvVariablename.objects.all().order_by('term'))
@@ -92,9 +99,18 @@ class RelatedactionsAdmin(admin.ModelAdmin):
 
 class OrganizationsAdminForm(ModelForm):
     organizationtypecv= TermModelChoiceField(CvOrganizationtype.objects.all().order_by('term'))
-    #parentorganizationid = TermModelChoiceField(Organizations.objects.all().order_by('organizationname'))
+    parentorganizationid = TermModelChoiceField(Organizations.objects.all().order_by('organizationname'))
     class Meta:
         model= Organizations
 
 class OrganizationsAdmin(admin.ModelAdmin):
     form=OrganizationsAdminForm
+
+
+class FeatureactionsAdminForm(ModelForm):
+    samplingfeatureid= TermModelChoiceField(Samplingfeatures.objects.all().order_by('samplingfeaturename'))
+    class Meta:
+        model= Taxonomicclassifiers
+
+class FeatureactionsAdmin(admin.ModelAdmin):
+    form=TaxonomicclassifiersAdminForm

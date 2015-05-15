@@ -8,6 +8,7 @@ from .models import Actionby
 from .models import Organizations
 from .forms import OrganizationsAdmin
 from .models import Featureactions
+from .forms import FeatureactionsAdmin
 from .models import Actions
 from .models import Results
 from .forms import ResultsAdmin
@@ -28,7 +29,7 @@ admin.site.register(Affiliations)
 admin.site.register(People)
 admin.site.register(Actionby)
 admin.site.register(Organizations,OrganizationsAdmin)
-admin.site.register(Featureactions)
+admin.site.register(Featureactions,FeatureactionsAdmin)
 admin.site.register(Actions)
 admin.site.register(Results,ResultsAdmin)
 admin.site.register(Relatedactions,RelatedactionsAdmin)
