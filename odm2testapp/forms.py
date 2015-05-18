@@ -133,7 +133,7 @@ class DatasetsAdmin(admin.ModelAdmin):
     form=DatasetsAdminForm
 
 class AffiliationsAdmin(admin.ModelAdmin):
-    form=DatasetsAdminForm
+    form=AffiliationsAdminForm
 
 class AffiliationsAdminForm(ModelForm):
     organizationid= OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
