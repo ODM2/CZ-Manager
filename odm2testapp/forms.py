@@ -148,7 +148,7 @@ class AffiliationsAdmin(admin.ModelAdmin):
     form=AffiliationsAdminForm
 
 class ActionsAdminForm(ModelForm):
-    Methodid= MethodsModelChoiceField(Methods.objects.all().order_by('methodname'))
+    methodid= MethodsModelChoiceField(Methods.objects.all().order_by('methodname'))
     actiontypecv= TermModelChoiceField(CvActiontype.objects.all().order_by('term'))
     class Meta:
         model= Actions
