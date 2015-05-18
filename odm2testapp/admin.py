@@ -3,6 +3,7 @@ from django.contrib import admin
 from .models import Samplingfeatures
 from .forms import SamplingfeaturesAdmin
 from .models import Affiliations
+from .forms import AffiliationsAdmin
 from .models import People
 from .models import Actionby
 from .models import Organizations
@@ -26,7 +27,7 @@ from .models import Datasetsresults
 from .models import Processinglevels
 
 admin.site.register(Samplingfeatures,SamplingfeaturesAdmin)
-admin.site.register(Affiliations)
+admin.site.register(Affiliations,AffiliationsAdmin)
 admin.site.register(People)
 admin.site.register(Actionby)
 admin.site.register(Organizations,OrganizationsAdmin)

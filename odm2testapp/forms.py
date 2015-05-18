@@ -25,12 +25,19 @@ from odm2testapp.models import Organizations
 from odm2testapp.models import CvOrganizationtype
 from odm2testapp.models import CvRelationshiptype
 from odm2testapp.models import CvDatasettypecv
+from odm2testapp.models import Affiliations
+from odm2testapp.models import People
 from django.forms import ModelChoiceField
+
 
 #custom fields to populate form dropdownlists.
 class TermModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return "%s"%(obj.term)
+
+class PersonModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return "%s %s"%(obj.personlastname, obj.personfirstname)
 
 class VariableNameModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
@@ -124,3 +131,13 @@ class DatasetsAdminForm(ModelForm):
 
 class DatasetsAdmin(admin.ModelAdmin):
     form=DatasetsAdminForm
+
+class AffiliationsAdmin(admin.ModelAdmin):
+    form=DatasetsAdminForm
+
+class AffiliationsAdminForm(ModelForm):
+    organizationid= OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
+    personid = PersonModelChoiceField(People.objects.all().order_by('personlastname'))
+    class Meta:
+        model= Affiliations
+
