@@ -27,8 +27,13 @@ from odm2testapp.models import CvRelationshiptype
 from odm2testapp.models import CvDatasettypecv
 from odm2testapp.models import Affiliations
 from odm2testapp.models import People
+from odm2testapp.models import Actions
+from odm2testapp.models import Methods
 from django.forms import ModelChoiceField
 
+class MethodsModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return "%s"%(obj.methodname)
 
 #custom fields to populate form dropdownlists.
 class TermModelChoiceField(ModelChoiceField):
@@ -37,7 +42,7 @@ class TermModelChoiceField(ModelChoiceField):
 
 class PersonModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
-        return "%s %s"%(obj.personlastname, obj.personfirstname)
+        return "%s, %s"%(obj.personlastname, obj.personfirstname)
 
 class VariableNameModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
@@ -141,3 +146,12 @@ class AffiliationsAdminForm(ModelForm):
 
 class AffiliationsAdmin(admin.ModelAdmin):
     form=AffiliationsAdminForm
+
+class ActionsAdminForm(ModelForm):
+    Methodid= MethodsModelChoiceField(Methods.objects.all().order_by('methodname'))
+    actiontypecv= TermModelChoiceField(CvActiontype.objects.all().order_by('term'))
+    class Meta:
+        model= Actions
+
+class ActionsAdmin(admin.ModelAdmin):
+    form=ActionsAdminForm

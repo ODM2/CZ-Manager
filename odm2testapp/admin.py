@@ -23,6 +23,7 @@ from .models import Taxonomicclassifiers
 from .forms import TaxonomicclassifiersAdmin
 from .models import Datasets
 from .forms import DatasetsAdmin
+from .forms import ActionsAdmin
 from .models import Datasetsresults
 from .models import Processinglevels
 
@@ -32,7 +33,7 @@ admin.site.register(People)
 admin.site.register(Actionby)
 admin.site.register(Organizations,OrganizationsAdmin)
 admin.site.register(Featureactions,FeatureactionsAdmin)
-admin.site.register(Actions)
+admin.site.register(Actions,ActionsAdmin)
 admin.site.register(Results,ResultsAdmin)
 admin.site.register(Relatedactions,RelatedactionsAdmin)
 admin.site.register(Variables, VariablesAdmin)
