@@ -37,7 +37,7 @@ from django.forms import ModelChoiceField
 
 class AffiliationsChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
-        return "%s, %s "%(obj.personlastname, obj.personfirstname)
+        return "%s, %s "%(obj.personlink)
 
 class MethodsModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
@@ -170,7 +170,7 @@ class ActionsAdmin(admin.ModelAdmin):
 
 
 class ActionByAdminForm(ModelForm):
-    affiliationid= AffiliationsChoiceField(People.objects.all().order_by('personlastname'))
+    affiliationid= AffiliationsChoiceField(Affiliations.objects.all().order_by('personllink'))
     actionid= ActionByChoiceField(Actions.objects.all().order_by('actiondescription'))
     class Meta:
         model= Actionby
