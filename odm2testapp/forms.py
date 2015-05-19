@@ -187,7 +187,7 @@ class ActionByAdminForm(ModelForm):
         model= Actionby
 
 class ActionByAdmin(admin.ModelAdmin):
-    list_display=('affiliationid','actionid')
+    list_display=('__str__','affiliationid','actionid')
     form=ActionByAdminForm
     list_select_related = True
     #def queryset(self, request):
