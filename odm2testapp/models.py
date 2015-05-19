@@ -94,8 +94,8 @@ class Affiliations(models.Model):
     personlink = models.CharField(max_length=255, blank=True)
     def __str__(self):
         s = str(self.personlink)
-        if self.label:
-            s += ' {0}'.format(self.label)
+        if self.primaryemail:
+            s += ', {0}'.format(self.primaryemail)
         return s
     class Meta:
         managed = False
