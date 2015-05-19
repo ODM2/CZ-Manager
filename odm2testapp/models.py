@@ -20,7 +20,7 @@ from django.utils.html import format_html
 
 
 class Actionannotations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     actionid = models.ForeignKey('Actions', db_column='actionid')
     annotationid = models.ForeignKey('Annotations', db_column='annotationid')
 
@@ -30,7 +30,7 @@ class Actionannotations(models.Model):
 
 
 class Actionby(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     actionid = models.ForeignKey('Actions', db_column='actionid')
     affiliationid = models.ForeignKey('Affiliations', db_column='affiliationid')
     isactionlead = models.BooleanField()
@@ -42,7 +42,7 @@ class Actionby(models.Model):
 
 
 class Actiondirectives(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     actionid = models.ForeignKey('Actions', db_column='actionid')
     directiveid = models.ForeignKey('Directives', db_column='directiveid')
 
@@ -52,7 +52,7 @@ class Actiondirectives(models.Model):
 
 
 class Actionextensionpropertyvalues(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     actionid = models.ForeignKey('Actions', db_column='actionid')
     propertyid = models.ForeignKey('Extensionproperties', db_column='propertyid')
     propertyvalue = models.CharField(max_length=255)
@@ -96,7 +96,7 @@ class Affiliations(models.Model):
 
 
 class Annotations(models.Model):
-    annotationid = models.IntegerField(primary_key=True)
+    annotationid = models.AutoField(primary_key=True)
     annotationtypecv = models.ForeignKey('CvAnnotationtype', db_column='annotationtypecv')
     annotationcode = models.CharField(max_length=50, blank=True)
     annotationtext = models.CharField(max_length=500)
@@ -112,7 +112,7 @@ class Annotations(models.Model):
 
 
 class Authorlists(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     citationid = models.ForeignKey('Citations', db_column='citationid')
     personid = models.ForeignKey('People', db_column='personid')
     authororder = models.IntegerField()
@@ -134,7 +134,7 @@ class Calibrationactions(models.Model):
 
 
 class Calibrationreferenceequipment(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     actionid = models.ForeignKey(Calibrationactions, db_column='actionid')
     equipmentid = models.ForeignKey('Equipment', db_column='equipmentid')
 
@@ -144,7 +144,7 @@ class Calibrationreferenceequipment(models.Model):
 
 
 class Calibrationstandards(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     actionid = models.ForeignKey(Calibrationactions, db_column='actionid')
     referencematerialid = models.ForeignKey('Referencematerials', db_column='referencematerialid')
 
@@ -170,7 +170,7 @@ class Categoricalresults(models.Model):
 
 
 class Categoricalresultvalueannotations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     valueid = models.ForeignKey('Categoricalresultvalues', db_column='valueid')
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
 
@@ -180,7 +180,7 @@ class Categoricalresultvalueannotations(models.Model):
 
 
 class Categoricalresultvalues(models.Model):
-    valueid = models.BigIntegerField(primary_key=True)
+    valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Categoricalresults, db_column='resultid')
     datavalue = models.CharField(max_length=255)
     valuedatetime = models.DateTimeField()
@@ -192,7 +192,7 @@ class Categoricalresultvalues(models.Model):
 
 
 class Citationextensionpropertyvalues(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     citationid = models.ForeignKey('Citations', db_column='citationid')
     propertyid = models.ForeignKey('Extensionproperties', db_column='propertyid')
     propertyvalue = models.CharField(max_length=255)
@@ -203,7 +203,7 @@ class Citationextensionpropertyvalues(models.Model):
 
 
 class Citationexternalidentifiers(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     citationid = models.ForeignKey('Citations', db_column='citationid')
     externalidentifiersystemid = models.ForeignKey('Externalidentifiersystems', db_column='externalidentifiersystemid')
     citationexternalidentifer = models.CharField(max_length=255)
@@ -215,7 +215,7 @@ class Citationexternalidentifiers(models.Model):
 
 
 class Citations(models.Model):
-    citationid = models.IntegerField(primary_key=True)
+    citationid = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
     publisher = models.CharField(max_length=255)
     publicationyear = models.IntegerField()
@@ -578,7 +578,7 @@ class CvVariabletype(models.Model):
 
 
 class Dataloggerfilecolumns(models.Model):
-    dataloggerfilecolumnid = models.IntegerField(primary_key=True)
+    dataloggerfilecolumnid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey('Results', db_column='resultid', blank=True, null=True)
     dataloggerfileid = models.ForeignKey('Dataloggerfiles', db_column='dataloggerfileid')
     instrumentoutputvariableid = models.ForeignKey('Instrumentoutputvariables', db_column='instrumentoutputvariableid')
@@ -597,7 +597,7 @@ class Dataloggerfilecolumns(models.Model):
 
 
 class Dataloggerfiles(models.Model):
-    dataloggerfileid = models.IntegerField(primary_key=True)
+    dataloggerfileid = models.AutoField(primary_key=True)
     programid = models.ForeignKey('Dataloggerprogramfiles', db_column='programid')
     dataloggerfilename = models.CharField(max_length=255)
     dataloggerfiledescription = models.CharField(max_length=500, blank=True)
@@ -609,7 +609,7 @@ class Dataloggerfiles(models.Model):
 
 
 class Dataloggerprogramfiles(models.Model):
-    programid = models.IntegerField(primary_key=True)
+    programid = models.AutoField(primary_key=True)
     affiliationid = models.ForeignKey(Affiliations, db_column='affiliationid')
     programname = models.CharField(max_length=255)
     programdescription = models.CharField(max_length=500, blank=True)
@@ -622,7 +622,7 @@ class Dataloggerprogramfiles(models.Model):
 
 
 class Dataquality(models.Model):
-    dataqualityid = models.IntegerField(primary_key=True)
+    dataqualityid = models.AutoField(primary_key=True)
     dataqualitytypecv = models.ForeignKey(CvDataqualitytype, db_column='dataqualitytypecv')
     dataqualitycode = models.CharField(max_length=255)
     dataqualityvalue = models.FloatField(blank=True, null=True)
@@ -636,7 +636,7 @@ class Dataquality(models.Model):
 
 
 class Datasetcitations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     datasetid = models.ForeignKey('Datasets', db_column='datasetid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
     citationid = models.ForeignKey(Citations, db_column='citationid')
@@ -647,7 +647,7 @@ class Datasetcitations(models.Model):
 
 
 class Datasets(models.Model):
-    datasetid = models.IntegerField(primary_key=True)
+    datasetid = models.AutoField(primary_key=True)
     datasetuuid = models.TextField()  # This field type is a guess.
     datasettypecv = models.ForeignKey(CvDatasettypecv, db_column='datasettypecv')
     datasetcode = models.CharField(max_length=50)
@@ -660,7 +660,7 @@ class Datasets(models.Model):
 
 
 class Datasetsresults(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     datasetid = models.ForeignKey(Datasets, db_column='datasetid')
     resultid = models.ForeignKey('Results', db_column='resultid')
 
@@ -670,7 +670,7 @@ class Datasetsresults(models.Model):
 
 
 class Derivationequations(models.Model):
-    derivationequationid = models.IntegerField(primary_key=True)
+    derivationequationid = models.AutoField(primary_key=True)
     derivationequation = models.CharField(max_length=255)
 
     class Meta:
@@ -679,7 +679,7 @@ class Derivationequations(models.Model):
 
 
 class Directives(models.Model):
-    directiveid = models.IntegerField(primary_key=True)
+    directiveid = models.AutoField(primary_key=True)
     directivetypecv = models.ForeignKey(CvDirectivetype, db_column='directivetypecv')
     directivedescription = models.CharField(max_length=500)
 
@@ -689,7 +689,7 @@ class Directives(models.Model):
 
 
 class Equipment(models.Model):
-    equipmentid = models.IntegerField(primary_key=True)
+    equipmentid = models.AutoField(primary_key=True)
     equipmentcode = models.CharField(max_length=50)
     equipmentname = models.CharField(max_length=255)
     equipmenttypecv = models.ForeignKey(CvEquipmenttype, db_column='equipmenttypecv')
@@ -708,7 +708,7 @@ class Equipment(models.Model):
 
 
 class Equipmentannotations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     equipmentid = models.ForeignKey(Equipment, db_column='equipmentid')
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
 
@@ -718,7 +718,7 @@ class Equipmentannotations(models.Model):
 
 
 class Equipmentmodels(models.Model):
-    equipmentmodelid = models.IntegerField(primary_key=True)
+    equipmentmodelid = models.AutoField(primary_key=True)
     modelmanufacturerid = models.ForeignKey('Organizations', db_column='modelmanufacturerid')
     modelpartnumber = models.CharField(max_length=50, blank=True)
     modelname = models.CharField(max_length=255)
@@ -733,7 +733,7 @@ class Equipmentmodels(models.Model):
 
 
 class Equipmentused(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     actionid = models.ForeignKey(Actions, db_column='actionid')
     equipmentid = models.ForeignKey(Equipment, db_column='equipmentid')
 
@@ -743,7 +743,7 @@ class Equipmentused(models.Model):
 
 
 class Extensionproperties(models.Model):
-    propertyid = models.IntegerField(primary_key=True)
+    propertyid = models.AutoField(primary_key=True)
     propertyname = models.CharField(max_length=255)
     propertydescription = models.CharField(max_length=500, blank=True)
     propertydatatypecv = models.ForeignKey(CvPropertydatatype, db_column='propertydatatypecv')
@@ -755,7 +755,7 @@ class Extensionproperties(models.Model):
 
 
 class Externalidentifiersystems(models.Model):
-    externalidentifiersystemid = models.IntegerField(primary_key=True)
+    externalidentifiersystemid = models.AutoField(primary_key=True)
     externalidentifiersystemname = models.CharField(max_length=255)
     identifiersystemorganizationid = models.ForeignKey('Organizations', db_column='identifiersystemorganizationid')
     externalidentifiersystemdescription = models.CharField(max_length=500, blank=True)
@@ -767,7 +767,7 @@ class Externalidentifiersystems(models.Model):
 
 
 class Featureactions(models.Model):
-    featureactionid = models.IntegerField(primary_key=True)
+    featureactionid = models.AutoField(primary_key=True)
     samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     actionid = models.ForeignKey(Actions, db_column='actionid')
 
@@ -777,7 +777,7 @@ class Featureactions(models.Model):
 
 
 class Instrumentoutputvariables(models.Model):
-    instrumentoutputvariableid = models.IntegerField(primary_key=True)
+    instrumentoutputvariableid = models.AutoField(primary_key=True)
     modelid = models.ForeignKey(Equipmentmodels, db_column='modelid')
     variableid = models.ForeignKey('Variables', db_column='variableid')
     instrumentmethodid = models.ForeignKey('Methods', db_column='instrumentmethodid')
@@ -822,7 +822,7 @@ class Measurementresults(models.Model):
 
 
 class Measurementresultvalueannotations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     valueid = models.ForeignKey('Measurementresultvalues', db_column='valueid')
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
 
@@ -832,7 +832,7 @@ class Measurementresultvalueannotations(models.Model):
 
 
 class Measurementresultvalues(models.Model):
-    valueid = models.BigIntegerField(primary_key=True)
+    valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Measurementresults, db_column='resultid')
     datavalue = models.FloatField()
     valuedatetime = models.DateTimeField()
@@ -844,7 +844,7 @@ class Measurementresultvalues(models.Model):
 
 
 class Methodannotations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     methodid = models.ForeignKey('Methods', db_column='methodid')
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
 
@@ -854,7 +854,7 @@ class Methodannotations(models.Model):
 
 
 class Methodcitations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     methodid = models.ForeignKey('Methods', db_column='methodid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
     citationid = models.ForeignKey(Citations, db_column='citationid')
@@ -865,7 +865,7 @@ class Methodcitations(models.Model):
 
 
 class Methodextensionpropertyvalues(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     methodid = models.ForeignKey('Methods', db_column='methodid')
     propertyid = models.ForeignKey(Extensionproperties, db_column='propertyid')
     propertyvalue = models.CharField(max_length=255)
@@ -876,7 +876,7 @@ class Methodextensionpropertyvalues(models.Model):
 
 
 class Methodexternalidentifiers(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     methodid = models.ForeignKey('Methods', db_column='methodid')
     externalidentifiersystemid = models.ForeignKey(Externalidentifiersystems, db_column='externalidentifiersystemid')
     methodexternalidentifier = models.CharField(max_length=255)
@@ -888,7 +888,7 @@ class Methodexternalidentifiers(models.Model):
 
 
 class Methods(models.Model):
-    methodid = models.IntegerField(primary_key=True)
+    methodid = models.AutoField(primary_key=True)
     methodtypecv = models.ForeignKey(CvMethodtype, db_column='methodtypecv')
     methodcode = models.CharField(max_length=50)
     methodname = models.CharField(max_length=255)
@@ -902,7 +902,7 @@ class Methods(models.Model):
 
 
 class Modelaffiliations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     modelid = models.ForeignKey('Models', db_column='modelid')
     affiliationid = models.ForeignKey(Affiliations, db_column='affiliationid')
     isprimary = models.BooleanField()
@@ -914,7 +914,7 @@ class Modelaffiliations(models.Model):
 
 
 class Models(models.Model):
-    modelid = models.IntegerField(primary_key=True)
+    modelid = models.AutoField(primary_key=True)
     modelcode = models.CharField(max_length=50)
     modelname = models.CharField(max_length=255)
     modeldescription = models.CharField(max_length=500, blank=True)
@@ -927,7 +927,7 @@ class Models(models.Model):
 
 
 class Organizations(models.Model):
-    organizationid = models.IntegerField(primary_key=True)
+    organizationid = models.AutoField(primary_key=True)
     organizationtypecv = models.ForeignKey(CvOrganizationtype, db_column='organizationtypecv')
     organizationcode = models.CharField(max_length=50)
     organizationname = models.CharField(max_length=255)
@@ -941,7 +941,7 @@ class Organizations(models.Model):
 
 
 class People(models.Model):
-    personid = models.IntegerField(primary_key=True)
+    personid = models.AutoField(primary_key=True)
     personfirstname = models.CharField(max_length=255)
     personmiddlename = models.CharField(max_length=255, blank=True)
     personlastname = models.CharField(max_length=255)
@@ -952,7 +952,7 @@ class People(models.Model):
 
 
 class Personexternalidentifiers(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     personid = models.ForeignKey(People, db_column='personid')
     externalidentifiersystemid = models.ForeignKey(Externalidentifiersystems, db_column='externalidentifiersystemid')
     personexternalidentifier = models.CharField(max_length=255)
@@ -982,7 +982,7 @@ class Pointcoverageresults(models.Model):
 
 
 class Pointcoverageresultvalueannotations(models.Model):
-    bridgeid = models.BigIntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     valueid = models.ForeignKey('Pointcoverageresultvalues', db_column='valueid')
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
 
@@ -992,7 +992,7 @@ class Pointcoverageresultvalueannotations(models.Model):
 
 
 class Pointcoverageresultvalues(models.Model):
-    valueid = models.BigIntegerField(primary_key=True)
+    valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Pointcoverageresults, db_column='resultid')
     datavalue = models.BigIntegerField()
     valuedatetime = models.DateTimeField()
@@ -1010,7 +1010,7 @@ class Pointcoverageresultvalues(models.Model):
 
 
 class Processinglevels(models.Model):
-    processinglevelid = models.IntegerField(primary_key=True)
+    processinglevelid = models.AutoField(primary_key=True)
     processinglevelcode = models.CharField(max_length=50)
     definition = models.CharField(max_length=500, blank=True)
     explanation = models.CharField(max_length=500, blank=True)
@@ -1039,7 +1039,7 @@ class Profileresults(models.Model):
 
 
 class Profileresultvalueannotations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     valueid = models.ForeignKey('Profileresultvalues', db_column='valueid')
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
 
@@ -1049,7 +1049,7 @@ class Profileresultvalueannotations(models.Model):
 
 
 class Profileresultvalues(models.Model):
-    valueid = models.BigIntegerField(primary_key=True)
+    valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Profileresults, db_column='resultid')
     datavalue = models.FloatField()
     valuedatetime = models.DateTimeField()
@@ -1068,7 +1068,7 @@ class Profileresultvalues(models.Model):
 
 
 class Referencematerialexternalidentifiers(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     referencematerialid = models.ForeignKey('Referencematerials', db_column='referencematerialid')
     externalidentifiersystemid = models.ForeignKey(Externalidentifiersystems, db_column='externalidentifiersystemid')
     referencematerialexternalidentifier = models.CharField(max_length=255)
@@ -1080,7 +1080,7 @@ class Referencematerialexternalidentifiers(models.Model):
 
 
 class Referencematerials(models.Model):
-    referencematerialid = models.IntegerField(primary_key=True)
+    referencematerialid = models.AutoField(primary_key=True)
     referencematerialmediumcv = models.ForeignKey(CvReferencematerialmedium, db_column='referencematerialmediumcv')
     referencematerialorganizationid = models.ForeignKey(Organizations, db_column='referencematerialorganizationid')
     referencematerialcode = models.CharField(max_length=50)
@@ -1096,7 +1096,7 @@ class Referencematerials(models.Model):
 
 
 class Referencematerialvalues(models.Model):
-    referencematerialvalueid = models.IntegerField(primary_key=True)
+    referencematerialvalueid = models.AutoField(primary_key=True)
     referencematerialid = models.ForeignKey(Referencematerials, db_column='referencematerialid')
     referencematerialvalue = models.FloatField()
     referencematerialaccuracy = models.FloatField(blank=True, null=True)
@@ -1110,7 +1110,7 @@ class Referencematerialvalues(models.Model):
 
 
 class Relatedactions(models.Model):
-    relationid = models.IntegerField(primary_key=True)
+    relationid = models.AutoField(primary_key=True)
     actionid = models.ForeignKey(Actions, db_column='actionid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
     relatedactionid = models.ForeignKey(Actions, related_name='Related actions',db_column='relatedactionid')
@@ -1121,7 +1121,7 @@ class Relatedactions(models.Model):
 
 
 class Relatedannotations(models.Model):
-    relationid = models.IntegerField(primary_key=True)
+    relationid = models.AutoField(primary_key=True)
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
     relatedannotationid = models.ForeignKey(Annotations,related_name='Related annotations', db_column='relatedannotationid')
@@ -1132,7 +1132,7 @@ class Relatedannotations(models.Model):
 
 
 class Relatedcitations(models.Model):
-    relationid = models.IntegerField(primary_key=True)
+    relationid = models.AutoField(primary_key=True)
     citationid = models.ForeignKey(Citations, db_column='citationid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
     relatedcitationid = models.ForeignKey(Citations,related_name='Related citations', db_column='relatedcitationid')
@@ -1143,7 +1143,7 @@ class Relatedcitations(models.Model):
 
 
 class Relateddatasets(models.Model):
-    relationid = models.IntegerField(primary_key=True)
+    relationid = models.AutoField(primary_key=True)
     datasetid = models.ForeignKey(Datasets, db_column='datasetid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
     relateddatasetid = models.ForeignKey(Datasets, related_name='related dataset',db_column='relateddatasetid')
@@ -1155,7 +1155,7 @@ class Relateddatasets(models.Model):
 
 
 class Relatedequipment(models.Model):
-    relationid = models.IntegerField(primary_key=True)
+    relationid = models.AutoField(primary_key=True)
     equipmentid = models.ForeignKey(Equipment, db_column='equipmentid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
     relatedequipmentid = models.ForeignKey(Equipment, related_name='Related equipment', db_column='relatedequipmentid')
@@ -1170,7 +1170,7 @@ class Relatedequipment(models.Model):
 
 
 class Relatedfeatures(models.Model):
-    relationid = models.IntegerField(primary_key=True)
+    relationid = models.AutoField(primary_key=True)
     samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
     relatedfeatureid = models.ForeignKey('Samplingfeatures', related_name='Related features', db_column='relatedfeatureid')
@@ -1182,7 +1182,7 @@ class Relatedfeatures(models.Model):
 
 
 class Relatedmodels(models.Model):
-    relatedid = models.IntegerField(primary_key=True)
+    relatedid = models.AutoField(primary_key=True)
     modelid = models.ForeignKey(Models, db_column='modelid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
     relatedmodelid = models.IntegerField()
@@ -1193,7 +1193,7 @@ class Relatedmodels(models.Model):
 
 
 class Relatedresults(models.Model):
-    relationid = models.IntegerField(primary_key=True)
+    relationid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey('Results', db_column='resultid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
     relatedresultid = models.ForeignKey('Results', related_name='related result', db_column='relatedresultid')
@@ -1206,7 +1206,7 @@ class Relatedresults(models.Model):
 
 
 class Resultannotations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey('Results', db_column='resultid')
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
     begindatetime = models.DateTimeField()
@@ -1227,7 +1227,7 @@ class Resultderivationequations(models.Model):
 
 
 class Resultextensionpropertyvalues(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey('Results', db_column='resultid')
     propertyid = models.ForeignKey(Extensionproperties, db_column='propertyid')
     propertyvalue = models.CharField(max_length=255)
@@ -1247,7 +1247,7 @@ class Resultnormalizationvalues(models.Model):
 
 
 class Results(models.Model):
-    resultid = models.BigIntegerField(primary_key=True)
+    resultid = models.AutoField(primary_key=True)
     resultuuid = models.TextField()  # This field type is a guess.
     featureactionid = models.ForeignKey(Featureactions, db_column='featureactionid')
     resulttypecv = models.ForeignKey(CvResulttype, db_column='resulttypecv')
@@ -1269,7 +1269,7 @@ class Results(models.Model):
 
 
 class Resultsdataquality(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Results, db_column='resultid')
     dataqualityid = models.ForeignKey(Dataquality, db_column='dataqualityid')
 
@@ -1279,7 +1279,7 @@ class Resultsdataquality(models.Model):
 
 
 class Samplingfeatureannotations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
 
@@ -1289,7 +1289,7 @@ class Samplingfeatureannotations(models.Model):
 
 
 class Samplingfeatureextensionpropertyvalues(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     propertyid = models.ForeignKey(Extensionproperties, db_column='propertyid')
     propertyvalue = models.CharField(max_length=255)
@@ -1300,7 +1300,7 @@ class Samplingfeatureextensionpropertyvalues(models.Model):
 
 
 class Samplingfeatureexternalidentifiers(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     externalidentifiersystemid = models.ForeignKey(Externalidentifiersystems, db_column='externalidentifiersystemid')
     samplingfeatureexternalidentifier = models.CharField(max_length=255)
@@ -1312,7 +1312,7 @@ class Samplingfeatureexternalidentifiers(models.Model):
 
 
 class Samplingfeatures(models.Model):
-    samplingfeatureid = models.IntegerField(primary_key=True)
+    samplingfeatureid = models.AutoField(primary_key=True)
     samplingfeatureuuid = models.TextField()  # This field type is a guess.
     samplingfeaturetypecv = models.ForeignKey(CvSamplingfeaturetype, db_column='samplingfeaturetypecv')
     samplingfeaturecode = models.CharField(max_length=50)
@@ -1347,7 +1347,7 @@ class Sectionresults(models.Model):
 
 
 class Sectionresultvalueannotations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     valueid = models.ForeignKey('Sectionresultvalues', db_column='valueid')
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
 
@@ -1357,7 +1357,7 @@ class Sectionresultvalueannotations(models.Model):
 
 
 class Sectionresultvalues(models.Model):
-    valueid = models.BigIntegerField(primary_key=True)
+    valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Sectionresults, db_column='resultid')
     datavalue = models.FloatField()
     valuedatetime = models.BigIntegerField()
@@ -1380,7 +1380,7 @@ class Sectionresultvalues(models.Model):
 
 
 class Simulations(models.Model):
-    simulationid = models.IntegerField(primary_key=True)
+    simulationid = models.AutoField(primary_key=True)
     actionid = models.ForeignKey(Actions, db_column='actionid')
     simulationname = models.CharField(max_length=255)
     simulationdescription = models.CharField(max_length=500, blank=True)
@@ -1411,7 +1411,7 @@ class Sites(models.Model):
 
 
 class Spatialoffsets(models.Model):
-    spatialoffsetid = models.IntegerField(primary_key=True)
+    spatialoffsetid = models.AutoField(primary_key=True)
     spatialoffsettypecv = models.ForeignKey(CvSpatialoffsettype, db_column='spatialoffsettypecv')
     offset1value = models.FloatField()
     offset1unitid = models.ForeignKey('Units', related_name='+', db_column='offset1unitid')
@@ -1426,7 +1426,7 @@ class Spatialoffsets(models.Model):
 
 
 class Spatialreferenceexternalidentifiers(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     spatialreferenceid = models.ForeignKey('Spatialreferences', db_column='spatialreferenceid')
     externalidentifiersystemid = models.ForeignKey(Externalidentifiersystems, db_column='externalidentifiersystemid')
     spatialreferenceexternalidentifier = models.CharField(max_length=255)
@@ -1438,7 +1438,7 @@ class Spatialreferenceexternalidentifiers(models.Model):
 
 
 class Spatialreferences(models.Model):
-    spatialreferenceid = models.IntegerField(primary_key=True)
+    spatialreferenceid = models.AutoField(primary_key=True)
     srscode = models.CharField(max_length=50, blank=True)
     srsname = models.CharField(max_length=255)
     srsdescription = models.CharField(max_length=500, blank=True)
@@ -1471,7 +1471,7 @@ class Specimens(models.Model):
 
 
 class Specimentaxonomicclassifiers(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     samplingfeatureid = models.ForeignKey(Specimens, db_column='samplingfeatureid')
     taxonomicclassifierid = models.ForeignKey('Taxonomicclassifiers', db_column='taxonomicclassifierid')
     citationid = models.ForeignKey(Citations, db_column='citationid', blank=True, null=True)
@@ -1500,7 +1500,7 @@ class Spectraresults(models.Model):
 
 
 class Spectraresultvalueannotations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     valueid = models.ForeignKey('Spectraresultvalues', db_column='valueid')
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
 
@@ -1510,7 +1510,7 @@ class Spectraresultvalueannotations(models.Model):
 
 
 class Spectraresultvalues(models.Model):
-    valueid = models.BigIntegerField(primary_key=True)
+    valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Spectraresults, db_column='resultid')
     datavalue = models.FloatField()
     valuedatetime = models.DateTimeField()
@@ -1529,7 +1529,7 @@ class Spectraresultvalues(models.Model):
 
 
 class Taxonomicclassifierexternalidentifiers(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     taxonomicclassifierid = models.ForeignKey('Taxonomicclassifiers', db_column='taxonomicclassifierid')
     externalidentifiersystemid = models.ForeignKey(Externalidentifiersystems, db_column='externalidentifiersystemid')
     taxonomicclassifierexternalidentifier = models.CharField(max_length=255)
@@ -1541,7 +1541,7 @@ class Taxonomicclassifierexternalidentifiers(models.Model):
 
 
 class Taxonomicclassifiers(models.Model):
-    taxonomicclassifierid = models.IntegerField(primary_key=True)
+    taxonomicclassifierid = models.AutoField(primary_key=True)
     taxonomicclassifiertypecv = models.ForeignKey(CvTaxonomicclassifiertype, db_column='taxonomicclassifiertypecv')
     taxonomicclassifiername = models.CharField(max_length=255)
     taxonomicclassifiercommonname = models.CharField(max_length=255, blank=True)
@@ -1572,7 +1572,7 @@ class Timeseriesresults(models.Model):
 
 
 class Timeseriesresultvalueannotations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     valueid = models.ForeignKey('Timeseriesresultvalues', db_column='valueid')
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
 
@@ -1582,7 +1582,7 @@ class Timeseriesresultvalueannotations(models.Model):
 
 
 class Timeseriesresultvalues(models.Model):
-    valueid = models.BigIntegerField(primary_key=True)
+    valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Timeseriesresults, db_column='resultid')
     datavalue = models.FloatField()
     valuedatetime = models.DateTimeField()
@@ -1612,7 +1612,7 @@ class Trajectoryresults(models.Model):
 
 
 class Trajectoryresultvalueannotations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     valueid = models.ForeignKey('Trajectoryresultvalues', db_column='valueid')
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
 
@@ -1622,7 +1622,7 @@ class Trajectoryresultvalueannotations(models.Model):
 
 
 class Trajectoryresultvalues(models.Model):
-    valueid = models.BigIntegerField(primary_key=True)
+    valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Trajectoryresults, db_column='resultid')
     datavalue = models.FloatField()
     valuedatetime = models.DateTimeField()
@@ -1663,7 +1663,7 @@ class Transectresults(models.Model):
 
 
 class Transectresultvalueannotations(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     valueid = models.ForeignKey('Transectresultvalues', db_column='valueid')
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
 
@@ -1673,7 +1673,7 @@ class Transectresultvalueannotations(models.Model):
 
 
 class Transectresultvalues(models.Model):
-    valueid = models.BigIntegerField(primary_key=True)
+    valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Transectresults, db_column='resultid')
     datavalue = models.FloatField()
     valuedatetime = models.DateTimeField()
@@ -1697,7 +1697,7 @@ class Transectresultvalues(models.Model):
 
 
 class Units(models.Model):
-    unitsid = models.IntegerField(primary_key=True)
+    unitsid = models.AutoField(primary_key=True)
     unitstypecv = models.ForeignKey(CvUnitstype, db_column='unitstypecv')
     unitsabbreviation = models.CharField(max_length=50)
     unitsname = models.CharField(max_length=255)
@@ -1709,7 +1709,7 @@ class Units(models.Model):
 
 
 class Variableextensionpropertyvalues(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     variableid = models.ForeignKey('Variables', db_column='variableid')
     propertyid = models.ForeignKey(Extensionproperties, db_column='propertyid')
     propertyvalue = models.CharField(max_length=255)
@@ -1720,7 +1720,7 @@ class Variableextensionpropertyvalues(models.Model):
 
 
 class Variableexternalidentifiers(models.Model):
-    bridgeid = models.IntegerField(primary_key=True)
+    bridgeid = models.AutoField(primary_key=True)
     variableid = models.ForeignKey('Variables', db_column='variableid')
     externalidentifiersystemid = models.ForeignKey(Externalidentifiersystems, db_column='externalidentifiersystemid')
     variableexternalidentifer = models.CharField(max_length=255)
@@ -1734,7 +1734,7 @@ class Variableexternalidentifiers(models.Model):
 
 class Variables(models.Model):
     #form = VariablesForm
-    variableid = models.IntegerField(primary_key=True)
+    variableid = models.AutoField(primary_key=True)
     variabletypecv = models.ForeignKey(CvVariabletype, db_column='variabletypecv')
     #variabletypecv = models.ModelChoiceField(CvVariabletype, db_column='variabletypecv')
     variablecode = models.CharField(max_length=50)
