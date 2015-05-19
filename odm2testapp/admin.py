@@ -16,6 +16,7 @@ from .forms import ResultsAdmin
 from .models import Relatedactions
 from .forms import RelatedactionsAdmin
 from .models import Methods
+from .forms import MethodsAdmin
 from .models import Variables
 from .forms import VariablesAdmin
 from .models import Units
@@ -31,6 +32,7 @@ from .models import Processinglevels
 admin.site.register(Samplingfeatures,SamplingfeaturesAdmin)
 admin.site.register(Affiliations,AffiliationsAdmin)
 admin.site.register(People)
+admin.site.register(Methods,MethodsAdmin)
 admin.site.register(Actionby, ActionByAdmin)
 admin.site.register(Organizations,OrganizationsAdmin)
 admin.site.register(Featureactions,FeatureactionsAdmin)

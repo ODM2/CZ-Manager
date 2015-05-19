@@ -176,3 +176,16 @@ class ActionByAdminForm(ModelForm):
 
 class ActionByAdmin(admin.ModelAdmin):
     form=ActionByAdminForm
+
+
+# methodtypecv = models.ForeignKey(CvMethodtype, db_column='methodtypecv')
+# organizationid = models.ForeignKey('Organizations', db_column='organizationid', blank=True, null=True)
+
+class MethodsAdminForm(ModelForm):
+    methodtypecv= TermModelChoiceField(CvMethodtype.objects.all().order_by('term'))
+    organizationid= OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
+    class Meta:
+        model= Methods
+
+class MethodsAdmin(admin.ModelAdmin):
+    form=MethodsAdminForm
