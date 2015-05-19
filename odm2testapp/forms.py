@@ -170,7 +170,7 @@ class ActionsAdmin(admin.ModelAdmin):
 
 
 class ActionByAdminForm(ModelForm):
-    affiliationid= AffiliationsChoiceField(Affiliations.objects.all().order_by('personllink'))
+    affiliationid= AffiliationsChoiceField(Affiliations.objects.all().order_by('personlink'))
     actionid= ActionByChoiceField(Actions.objects.all().order_by('actiondescription'))
     class Meta:
         model= Actionby
