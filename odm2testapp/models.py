@@ -35,7 +35,8 @@ class Actionby(models.Model):
     affiliationid = models.ForeignKey('Affiliations', db_column='affiliationid')
     isactionlead = models.BooleanField()
     roledescription = models.CharField(max_length=500, blank=True)
-
+    def affiliationsForActionBy(self):
+        return self.Affiliations.objects.all().order_by('personlink')
     class Meta:
         managed = False
         db_table = 'actionby'
