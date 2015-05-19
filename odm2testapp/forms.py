@@ -187,7 +187,7 @@ class ActionByAdminForm(ModelForm):
         model= Actionby
 
 class ActionByAdmin(admin.ModelAdmin):
-    list_display=('affiliationid','actionid')
+    list_display=('affiliationid.personlink','actionid')
     form=ActionByAdminForm
 
 
