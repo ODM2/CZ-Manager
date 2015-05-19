@@ -39,6 +39,13 @@ class Actionby(models.Model):
     roledescription = models.CharField(max_length=500, blank=True)
     #def affiliationsForActionBy(self):
         #return self.affiliationid.objects.all().order_by('personlink')
+    def __str__(self):
+        s = str(self.actionid)
+        if self.affiliationid:
+            s += ', {0}'.format(self.affiliationid)
+        if self.roledescription:
+            s += ', {0}'.format(self.roledescription)
+        return s
     class Meta:
         managed = False
         db_table = 'actionby'
@@ -906,7 +913,11 @@ class Methods(models.Model):
     methoddescription = models.CharField(max_length=500, blank=True)
     methodlink = models.CharField(max_length=255, blank=True)
     organizationid = models.ForeignKey('Organizations', db_column='organizationid', blank=True, null=True)
-
+    def __str__(self):
+        s = str(self.methodcode)
+        if self.methodname:
+            s += ', {0}'.format(self.methodname)
+        return s
     class Meta:
         managed = False
         db_table = 'methods'
@@ -945,7 +956,11 @@ class Organizations(models.Model):
     organizationdescription = models.CharField(max_length=500, blank=True)
     organizationlink = models.CharField(max_length=255, blank=True)
     parentorganizationid = models.ForeignKey('self', db_column='parentorganizationid', blank=True, null=True)
-
+    def __str__(self):
+        s = str(self.organizationcode)
+        if self.organizationname:
+            s += ', {0}'.format(self.organizationname)
+        return s
     class Meta:
         managed = False
         db_table = 'organizations'
@@ -956,7 +971,11 @@ class People(models.Model):
     personfirstname = models.CharField(max_length=255)
     personmiddlename = models.CharField(max_length=255, blank=True)
     personlastname = models.CharField(max_length=255)
-
+    def __str__(self):
+        s = str(self.personlastname)
+        if self.personfirstname:
+            s += ', {0}'.format(self.personfirstname)
+        return s
     class Meta:
         managed = False
         db_table = 'people'
@@ -1025,7 +1044,11 @@ class Processinglevels(models.Model):
     processinglevelcode = models.CharField(max_length=50)
     definition = models.CharField(max_length=500, blank=True)
     explanation = models.CharField(max_length=500, blank=True)
-
+    def __str__(self):
+        s = str(self.processinglevelcode)
+        if self.definition:
+            s += ', {0}'.format(self.definition)
+        return s
     class Meta:
         managed = False
         db_table = 'processinglevels'
@@ -1125,7 +1148,13 @@ class Relatedactions(models.Model):
     actionid = models.ForeignKey(Actions, db_column='actionid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
     relatedactionid = models.ForeignKey(Actions, related_name='Related actions',db_column='relatedactionid')
-
+    def __str__(self):
+        s = str(self.actionid)
+        if self.relationshiptypecv:
+            s += ', {0}'.format(self.relationshiptypecv)
+        if self.relatedactionid:
+            s += ', {0}'.format(self.relatedactionid)
+        return s
     class Meta:
         managed = False
         db_table = 'relatedactions'
@@ -1273,7 +1302,15 @@ class Results(models.Model):
     statuscv = models.ForeignKey(CvStatus, db_column='statuscv', blank=True, null=True)
     sampledmediumcv = models.ForeignKey(CvSampledmedium, db_column='sampledmediumcv')
     valuecount = models.IntegerField()
-
+    def __str__(self):
+        s = str(self.variableid)
+        if self.featureactionid:
+            s += ', {0}'.format(self.featureactionid)
+        if self.resulttypecv:
+            s += ', {0}'.format(self.resulttypecv)
+        if self.processinglevelid:
+            s += ', {0}'.format(self.processinglevelid)
+        return s
     class Meta:
         managed = False
         db_table = 'results'
@@ -1293,7 +1330,11 @@ class Samplingfeatureannotations(models.Model):
     bridgeid = models.AutoField(primary_key=True)
     samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
-
+    def __str__(self):
+        s = str(self.samplingfeatureid)
+        if self.annotationid:
+            s += ', {0}'.format(self.annotationid)
+        return s
     class Meta:
         managed = False
         db_table = 'samplingfeatureannotations'
@@ -1558,7 +1599,11 @@ class Taxonomicclassifiers(models.Model):
     taxonomicclassifiercommonname = models.CharField(max_length=255, blank=True)
     taxonomicclassifierdescription = models.CharField(max_length=500, blank=True)
     parenttaxonomicclassifierid = models.ForeignKey('self', db_column='parenttaxonomicclassifierid', blank=True, null=True)
-
+    def __str__(self):
+        s = str(self.taxonomicclassifiername)
+        if self.taxonomicclassifiercommonname:
+            s += ', {0}'.format(self.taxonomicclassifiercommonname)
+        return s
     class Meta:
         managed = False
         db_table = 'taxonomicclassifiers'
@@ -1713,7 +1758,11 @@ class Units(models.Model):
     unitsabbreviation = models.CharField(max_length=50)
     unitsname = models.CharField(max_length=255)
     unitslink = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s = str(self.unitsabbreviation)
+        if self.unitsname:
+            s += ', {0}'.format(self.unitsname)
+        return s
     class Meta:
         managed = False
         db_table = 'units'
@@ -1753,8 +1802,11 @@ class Variables(models.Model):
     variabledefinition = models.CharField(max_length=500, blank=True)
     speciationcv = models.ForeignKey(CvSpeciation, db_column='speciationcv', blank=True, null=True)
     nodatavalue = models.FloatField()
-
-
+    def __str__(self):
+        s = str(self.variablecode)
+        if self.variabledefinition:
+            s += ', {0}'.format(self.variabledefinition)
+        return s
 
     class Meta:
         managed = False
