@@ -187,9 +187,11 @@ class ActionByAdminForm(ModelForm):
         model= Actionby
 
 class ActionByAdmin(admin.ModelAdmin):
-    list_display=('affiliationid.personlink','actionid')
+    list_display=('affiliationid','actionid')
     form=ActionByAdminForm
-
+    list_select_related = True
+    #def queryset(self, request):
+        #return super(ActionByAdmin, self).queryset(request).select_related('Affiliations')
 
 # methodtypecv = models.ForeignKey(CvMethodtype, db_column='methodtypecv')
 # organizationid = models.ForeignKey('Organizations', db_column='organizationid', blank=True, null=True)
