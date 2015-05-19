@@ -8,6 +8,7 @@ from odm2testapp.models import CvVariablename
 from odm2testapp.models import CvSpeciation
 from odm2testapp.models import Taxonomicclassifiers
 from odm2testapp.models import CvTaxonomicclassifiertype
+from odm2testapp.models import CvMethodtype
 from odm2testapp.models import Samplingfeatures
 from odm2testapp.models import CvSamplingfeaturetype
 from odm2testapp.models import CvSamplingfeaturegeotype
