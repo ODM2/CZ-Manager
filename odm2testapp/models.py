@@ -79,7 +79,7 @@ class Actions(models.Model):
 
 
 class Affiliations(models.Model):
-    affiliationid = models.IntegerField(primary_key=True)
+    #affiliationid = models.IntegerField(primary_key=True)
     personid = models.ForeignKey('People', db_column='personid')
     organizationid = models.ForeignKey('Organizations', db_column='organizationid', blank=True, null=True)
     isprimaryorganizationcontact = models.NullBooleanField()
