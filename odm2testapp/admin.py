@@ -24,13 +24,14 @@ from .forms import TaxonomicclassifiersAdmin
 from .models import Datasets
 from .forms import DatasetsAdmin
 from .forms import ActionsAdmin
+from .forms import ActionByAdmin
 from .models import Datasetsresults
 from .models import Processinglevels
 
 admin.site.register(Samplingfeatures,SamplingfeaturesAdmin)
 admin.site.register(Affiliations,AffiliationsAdmin)
 admin.site.register(People)
-admin.site.register(Actionby)
+admin.site.register(Actionby, ActionByAdmin)
 admin.site.register(Organizations,OrganizationsAdmin)
 admin.site.register(Featureactions,FeatureactionsAdmin)
 admin.site.register(Actions,ActionsAdmin)
