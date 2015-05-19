@@ -33,10 +33,12 @@ class Actionby(models.Model):
     bridgeid = models.AutoField(primary_key=True)
     actionid = models.ForeignKey('Actions', db_column='actionid')
     affiliationid = models.ForeignKey('Affiliations', db_column='affiliationid')
+    #affiliationpersonlink= models.TextField('Affiliations',db_column='personlink' )
+    #Membership.objects.filter(person__name="x").select_related('person', depth=1)
     isactionlead = models.BooleanField()
     roledescription = models.CharField(max_length=500, blank=True)
-    def affiliationsForActionBy(self):
-        return self.Affiliations.objects.all().order_by('personlink')
+    #def affiliationsForActionBy(self):
+        #return self.affiliationid.objects.all().order_by('personlink')
     class Meta:
         managed = False
         db_table = 'actionby'
