@@ -75,7 +75,11 @@ class Actions(models.Model):
     enddatetimeutcoffset = models.IntegerField(blank=True, null=True)
     actiondescription = models.CharField(max_length=500, blank=True)
     actionfilelink = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s = str(self.actiondescription)
+        if self.actiontypecv:
+            s += ', {0}'.format(self.actiontypecv)
+        return s
     class Meta:
         managed = False
         db_table = 'actions'
