@@ -27,7 +27,7 @@ from odm2testapp.models import CvRelationshiptype
 from odm2testapp.models import CvDatasettypecv
 from odm2testapp.models import Affiliations
 from odm2testapp.models import People
-from odm2testapp.models import ActionBy
+from odm2testapp.models import Actionby
 from odm2testapp.models import Actions
 from odm2testapp.models import Methods
 from django.forms import ModelChoiceField
@@ -172,7 +172,7 @@ class ActionByAdminForm(ModelForm):
     affiliationid= AffiliationsChoiceField(People.objects.all().order_by('personlastname'))
     actionid= ActionByChoiceField(Actions.objects.all().order_by('actiondescription'))
     class Meta:
-        model= ActionBy
+        model= Actionby
 
 class ActionByAdmin(admin.ModelAdmin):
     form=ActionByAdminForm
