@@ -151,7 +151,7 @@ class DatasetsAdmin(admin.ModelAdmin):
     form=DatasetsAdminForm
 
 class AffiliationsAdminForm(ModelForm):
-    affiliationid = models.AutoField(primary_key=True, widget=HiddenInput)
+    affiliationid = models.AutoField(primary_key=True, type=HiddenInput)
     organizationid= OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
     personid = PersonModelChoiceField(People.objects.all().order_by('personlastname'))
     class Meta:
