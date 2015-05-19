@@ -173,10 +173,16 @@ class ActionsAdmin(admin.ModelAdmin):
 
 
 class ActionByAdminForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(ActionByAdminForm, self).__init__(*args, **kwargs)
+        # access object through self.instance...
+        self.fields['personlink'].queryset = Affiliations.objects.filter(affiliationid=self.instance.affiliationid)
+
     affiliationid= AffiliationsChoiceField(Affiliations.objects.all().order_by('personlink'))
     actionid= ActionByChoiceField(Actions.objects.all().order_by('actiondescription'))
     #person__name
-    affiliationsForActionBy= Actionby.objects.filter(Affiliations__affiliationid=affiliationid).values('personlink')
+    #affiliationsForActionBy= Actionby.objects.filter(Affiliations__affiliationid=affiliationid).values('personlink')
+
     class Meta:
         model= Actionby
 
