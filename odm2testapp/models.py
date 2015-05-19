@@ -33,7 +33,7 @@ class Actionby(models.Model):
     bridgeid = models.AutoField(primary_key=True)
     actionid = models.ForeignKey('Actions', db_column='actionid')
     affiliationid = models.ForeignKey('Affiliations', db_column='affiliationid')
-    #affiliationpersonlink= models.TextField('Affiliations',db_column='personlink' )
+    affiliationpersonlink= models.TextField()
     #Membership.objects.filter(person__name="x").select_related('person', depth=1)
     isactionlead = models.BooleanField()
     roledescription = models.CharField(max_length=500, blank=True)
