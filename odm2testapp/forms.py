@@ -125,11 +125,12 @@ class RelatedactionsAdmin(admin.ModelAdmin):
 
 class OrganizationsAdminForm(ModelForm):
     organizationtypecv= TermModelChoiceField(CvOrganizationtype.objects.all().order_by('term'))
-    parentorganizationid = TermModelChoiceField(Organizations.objects.all().order_by('organizationname'))
+    parentorganizationid =OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
     class Meta:
         model= Organizations
 
 class OrganizationsAdmin(admin.ModelAdmin):
+    list_display=('organizationname','organizationdescription')
     form=OrganizationsAdminForm
 
 
@@ -152,7 +153,7 @@ class DatasetsAdmin(admin.ModelAdmin):
 
 class AffiliationsAdminForm(ModelForm):
     #affiliationid = models.AutoField(primary_key=True)
-    organizationid= OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
+    organizationid= OrganizationsModelChoiceField(Organizations.objects.all().order_by('organizationname'))
     personid = PersonModelChoiceField(People.objects.all().order_by('personlastname'))
     class Meta:
         model= Affiliations
