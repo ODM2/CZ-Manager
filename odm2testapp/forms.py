@@ -1,5 +1,6 @@
 #from __future__ import unicode_literals
 from django.forms import ModelForm
+from django.forms import HiddenInput
 from django.contrib import admin
 from django.db import models
 from odm2testapp.models import Variables
@@ -150,6 +151,7 @@ class DatasetsAdmin(admin.ModelAdmin):
     form=DatasetsAdminForm
 
 class AffiliationsAdminForm(ModelForm):
+    affiliationid = models.AutoField(primary_key=True, widget=HiddenInput)
     organizationid= OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
     personid = PersonModelChoiceField(People.objects.all().order_by('personlastname'))
     class Meta:
