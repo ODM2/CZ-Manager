@@ -176,7 +176,7 @@ class ActionByAdminForm(ModelForm):
     affiliationid= AffiliationsChoiceField(Affiliations.objects.all().order_by('personlink'))
     actionid= ActionByChoiceField(Actions.objects.all().order_by('actiondescription'))
     #person__name
-    affiliationsForActionBy= Actionby.objects.filter(Affiliations__affiliationid=affiliationid).select_related('personlink', depth=1)
+    affiliationsForActionBy= Actionby.objects.filter(Affiliations__affiliationid=affiliationid).values('personlink')
     class Meta:
         model= Actionby
 
