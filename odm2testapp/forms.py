@@ -37,7 +37,7 @@ from django.forms import ModelChoiceField
 
 class AffiliationsChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
-        return "%s, %s "%(obj.personlink)
+        return "%s "%(obj.personlink)
 
 class MethodsModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
