@@ -38,7 +38,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 	'odm2testapp',
-	'rango',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -64,7 +63,7 @@ DATABASES = {
         'NAME': 'odm2',
         'USER': 'postgres',
         'PASSWORD': '7jmftUpata',
-        'HOST': '127.0.0.1',
+        'HOST': '52.6.182.117',
         'PORT': '5432',
      'OPTIONS': {
       'options': '-c search_path=odm2'

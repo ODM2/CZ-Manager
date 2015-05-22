@@ -1145,7 +1145,7 @@ class Relatedactions(models.Model):
     relationid = models.AutoField(primary_key=True)
     actionid = models.ForeignKey(Actions, db_column='actionid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
-    relatedactionid = models.ForeignKey(Actions, related_name='Related actions',db_column='relatedactionid')
+    relatedactionid = models.ForeignKey(Actions, related_name='RelatedActions',db_column='relatedactionid')
     def __str__(self):
         s = str(self.actionid)
         if self.relationshiptypecv:
@@ -1162,7 +1162,7 @@ class Relatedannotations(models.Model):
     relationid = models.AutoField(primary_key=True)
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
-    relatedannotationid = models.ForeignKey(Annotations,related_name='Related annotations', db_column='relatedannotationid')
+    relatedannotationid = models.ForeignKey(Annotations,related_name='RelatedAnnotations', db_column='relatedannotationid')
 
     class Meta:
         managed = False
@@ -1173,7 +1173,7 @@ class Relatedcitations(models.Model):
     relationid = models.AutoField(primary_key=True)
     citationid = models.ForeignKey(Citations, db_column='citationid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
-    relatedcitationid = models.ForeignKey(Citations,related_name='Related citations', db_column='relatedcitationid')
+    relatedcitationid = models.ForeignKey(Citations,related_name='RelatedCitations', db_column='relatedcitationid')
 
     class Meta:
         managed = False
@@ -1184,7 +1184,7 @@ class Relateddatasets(models.Model):
     relationid = models.AutoField(primary_key=True)
     datasetid = models.ForeignKey(Datasets, db_column='datasetid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
-    relateddatasetid = models.ForeignKey(Datasets, related_name='related dataset',db_column='relateddatasetid')
+    relateddatasetid = models.ForeignKey(Datasets, related_name='relatedDataset',db_column='relateddatasetid')
     versioncode = models.CharField(max_length=50, blank=True)
 
     class Meta:
@@ -1196,7 +1196,7 @@ class Relatedequipment(models.Model):
     relationid = models.AutoField(primary_key=True)
     equipmentid = models.ForeignKey(Equipment, db_column='equipmentid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
-    relatedequipmentid = models.ForeignKey(Equipment, related_name='Related equipment', db_column='relatedequipmentid')
+    relatedequipmentid = models.ForeignKey(Equipment, related_name='RelatedEquipment', db_column='relatedequipmentid')
     relationshipstartdatetime = models.DateTimeField()
     relationshipstartdatetimeutcoffset = models.IntegerField()
     relationshipenddatetime = models.DateTimeField(blank=True, null=True)
@@ -1211,7 +1211,7 @@ class Relatedfeatures(models.Model):
     relationid = models.AutoField(primary_key=True)
     samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
-    relatedfeatureid = models.ForeignKey('Samplingfeatures', related_name='Related features', db_column='relatedfeatureid')
+    relatedfeatureid = models.ForeignKey('Samplingfeatures', related_name='RelatedFeatures', db_column='relatedfeatureid')
     spatialoffsetid = models.ForeignKey('Spatialoffsets', db_column='spatialoffsetid', blank=True, null=True)
 
     class Meta:
@@ -1234,7 +1234,7 @@ class Relatedresults(models.Model):
     relationid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey('Results', db_column='resultid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
-    relatedresultid = models.ForeignKey('Results', related_name='related result', db_column='relatedresultid')
+    relatedresultid = models.ForeignKey('Results', related_name='RelatedResult', db_column='relatedresultid')
     versioncode = models.CharField(max_length=50, blank=True)
     relatedresultsequencenumber = models.IntegerField(blank=True, null=True)
 

@@ -79,6 +79,7 @@ class VariablesAdminForm(ModelForm):
     speciationcv= TermModelChoiceField(CvSpeciation.objects.all().order_by('term'))
     class Meta:
         model=Variables
+        fields = '__all__'
        
 class VariablesAdmin(admin.ModelAdmin):
     form=VariablesAdminForm
@@ -87,9 +88,11 @@ class TaxonomicclassifiersAdminForm(ModelForm):
     taxonomicclassifiertypecv= TermModelChoiceField(CvTaxonomicclassifiertype.objects.all().order_by('term'))
     class Meta:
         model= Taxonomicclassifiers
+        fields = '__all__'
 
 class TaxonomicclassifiersAdmin(admin.ModelAdmin):
     form=TaxonomicclassifiersAdminForm
+
 
 
 class SamplingfeaturesAdminForm(ModelForm):
@@ -98,7 +101,7 @@ class SamplingfeaturesAdminForm(ModelForm):
     elevationdatumcv = TermModelChoiceField(CvElevationdatum.objects.all().order_by('term'))
     class Meta:
         model= Samplingfeatures
-
+        fields = '__all__'
 class SamplingfeaturesAdmin(admin.ModelAdmin):
     form=SamplingfeaturesAdminForm
 
@@ -108,7 +111,7 @@ class ResultsAdminForm(ModelForm):
     variableid= VariableNameModelChoiceField(Variables.objects.all().order_by('variablenamecv'))
     class Meta:
         model= Results
-
+        fields = '__all__'
 class ResultsAdmin(admin.ModelAdmin):
     form=ResultsAdminForm
 
@@ -119,7 +122,7 @@ class RelatedactionsAdminForm(ModelForm):
     relatedactionid= ActionsModelChoiceField(Actions.objects.all().order_by('begindatetime'))
     class Meta:
         model= Relatedactions
-
+        fields = '__all__'
 class RelatedactionsAdmin(admin.ModelAdmin):
     form=RelatedactionsAdminForm
 
@@ -128,7 +131,7 @@ class OrganizationsAdminForm(ModelForm):
     parentorganizationid =OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
     class Meta:
         model= Organizations
-
+        fields = '__all__'
 class OrganizationsAdmin(admin.ModelAdmin):
     list_display=('organizationname','organizationdescription')
     form=OrganizationsAdminForm
@@ -138,7 +141,7 @@ class FeatureactionsAdminForm(ModelForm):
     samplingfeatureid= SamplingfeaturesModelChoiceField(Samplingfeatures.objects.all().order_by('samplingfeaturename'))
     class Meta:
         model= Featureactions
-
+        fields = '__all__'
 class FeatureactionsAdmin(admin.ModelAdmin):
     form=FeatureactionsAdminForm
 
@@ -147,7 +150,7 @@ class DatasetsAdminForm(ModelForm):
     datasettypecv= TermModelChoiceField(CvDatasettypecv.objects.all().order_by('term'))
     class Meta:
         model= Datasets
-
+        fields = '__all__'
 class DatasetsAdmin(admin.ModelAdmin):
     form=DatasetsAdminForm
 
@@ -157,7 +160,7 @@ class AffiliationsAdminForm(ModelForm):
     personid = PersonModelChoiceField(People.objects.all().order_by('personlastname'))
     class Meta:
         model= Affiliations
-
+        fields = '__all__'
 
 class AffiliationsAdmin(admin.ModelAdmin):
     form=AffiliationsAdminForm
@@ -167,7 +170,7 @@ class ActionsAdminForm(ModelForm):
     actiontypecv= TermModelChoiceField(CvActiontype.objects.all().order_by('term'))
     class Meta:
         model= Actions
-
+        fields = '__all__'
 class ActionsAdmin(admin.ModelAdmin):
     form=ActionsAdminForm
 
@@ -181,7 +184,7 @@ class ActionByAdminForm(ModelForm):
 
     class Meta:
         model= Actionby
-
+        fields = '__all__'
 class ActionByAdmin(admin.ModelAdmin):
     list_display=('__str__','affiliationid','actionid')
     form=ActionByAdminForm
@@ -197,6 +200,6 @@ class MethodsAdminForm(ModelForm):
     organizationid= OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
     class Meta:
         model= Methods
-
+        fields = '__all__'
 class MethodsAdmin(admin.ModelAdmin):
     form=MethodsAdminForm
