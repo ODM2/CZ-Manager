@@ -33,8 +33,6 @@ class Actionby(models.Model):
     bridgeid = models.AutoField(primary_key=True)
     actionid = models.ForeignKey('Actions', db_column='actionid')
     affiliationid = models.ForeignKey('Affiliations', db_column='affiliationid')
-    #affiliationpersonlink= models.CharField(max_length=500, blank=True)
-    #Membership.objects.filter(person__name="x").select_related('person', depth=1)
     isactionlead = models.BooleanField()
     roledescription = models.CharField(max_length=500, blank=True)
     #def affiliationsForActionBy(self):
@@ -104,7 +102,7 @@ class Affiliations(models.Model):
     primaryaddress = models.CharField(max_length=255, blank=True)
     personlink = models.CharField(max_length=255, blank=True)
     def __str__(self):
-        s = str(self.personlink)
+        s = str(self.personid)
         if self.primaryemail:
             s += ', {0}'.format(self.primaryemail)
         return s
