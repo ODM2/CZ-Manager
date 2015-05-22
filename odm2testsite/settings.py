@@ -61,9 +61,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'odm2',
-        'USER': 'postgres',
-        'PASSWORD': '7jmftUpata',
-        'HOST': '52.6.182.117',
+        'USER': 'XXXX',
+        'PASSWORD': 'XXXX',
+        'HOST': '127.0.0.1',
         'PORT': '5432',
      'OPTIONS': {
       'options': '-c search_path=odm2'
