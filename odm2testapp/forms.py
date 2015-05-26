@@ -177,8 +177,8 @@ class ActionsAdmin(admin.ModelAdmin):
 
 class ActionByAdminForm(ModelForm):
 
-    affiliationid= AffiliationsChoiceField(Affiliations.objects.all().order_by('personlink'))
-    actionid= ActionByChoiceField(Actions.objects.all().order_by('actiondescription'))
+    #affiliationid= AffiliationsChoiceField(Affiliations.objects.all().order_by('personlink'))
+    #actionid= ActionByChoiceField(Actions.objects.all().order_by('actiondescription'))
     #person__name
     #affiliationsForActionBy= Actionby.objects.filter(Affiliations__affiliationid=affiliationid).values('personlink')
 
@@ -186,14 +186,10 @@ class ActionByAdminForm(ModelForm):
         model= Actionby
         fields = '__all__'
 class ActionByAdmin(admin.ModelAdmin):
-    list_display=('__str__','affiliationid','actionid')
+    #list_display=('__str__',) #'affiliationid','actionid'
     form=ActionByAdminForm
-    list_select_related = True
-    #def queryset(self, request):
-        #return super(ActionByAdmin, self).queryset(request).select_related('Affiliations')
+    #list_select_related = True
 
-# methodtypecv = models.ForeignKey(CvMethodtype, db_column='methodtypecv')
-# organizationid = models.ForeignKey('Organizations', db_column='organizationid', blank=True, null=True)
 
 class MethodsAdminForm(ModelForm):
     methodtypecv= TermModelChoiceField(CvMethodtype.objects.all().order_by('term'))

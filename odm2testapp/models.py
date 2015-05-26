@@ -9,7 +9,7 @@
 # Also note: You'll have to insert the output of 'django-admin.py sqlcustom [app_label]'
 # into your database.
 from __future__ import unicode_literals
-
+from uuidfield import UUIDField
 from django.db import models
 from django import forms
 from django.contrib import admin
@@ -40,9 +40,9 @@ class Actionby(models.Model):
     def __str__(self):
         s = str(self.actionid)
         if self.affiliationid:
-            s += ', {0}'.format(self.affiliationid)
+            s += '- {0}'.format(self.affiliationid)
         if self.roledescription:
-            s += ', {0}'.format(self.roledescription)
+            s += '- {0},'.format(self.roledescription)
         return s
     class Meta:
         managed = False
@@ -81,9 +81,11 @@ class Actions(models.Model):
     actiondescription = models.CharField(max_length=500, blank=True)
     actionfilelink = models.CharField(max_length=255, blank=True)
     def __str__(self):
-        s = str(self.actiondescription)
-        if self.actiontypecv:
-            s += ', {0}'.format(self.actiontypecv)
+        s = str(self.actiontypecv)
+        #if self.methodid:
+        #    s += '- {0},'.format(self.methodid)
+        if self.actiondescription:
+            s += '- {0},'.format(self.actiondescription)
         return s
     class Meta:
         managed = False
@@ -103,8 +105,8 @@ class Affiliations(models.Model):
     personlink = models.CharField(max_length=255, blank=True)
     def __str__(self):
         s = str(self.personid)
-        if self.primaryemail:
-            s += ', {0}'.format(self.primaryemail)
+        if self.organizationid:
+            s += '- {0},'.format(self.organizationid)
         return s
     class Meta:
         managed = False
@@ -248,7 +250,13 @@ class CvActiontype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s = str(self.term)
+        if self.name:
+            s += ' - {0}'.format(self.name)
+        #if self.definition:
+        #    s += ' - {0},'.format(self.definition)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_actiontype'
@@ -416,7 +424,10 @@ class CvRelationshiptype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_relationshiptype'
@@ -464,7 +475,10 @@ class CvSamplingfeaturetype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_samplingfeaturetype'
@@ -602,9 +616,9 @@ class Dataloggerfilecolumns(models.Model):
     columndescription = models.CharField(max_length=500, blank=True)
     measurementequation = models.CharField(max_length=255, blank=True)
     scaninterval = models.FloatField(blank=True, null=True)
-    scanintervalunitsid = models.ForeignKey('Units', related_name='+', db_column='scanintervalunitsid', blank=True, null=True)
+    scanintervalunitsid = models.ForeignKey('Units', related_name='relatedScanIntervalUnitsid', db_column='scanintervalunitsid', blank=True, null=True)
     recordinginterval = models.FloatField(blank=True, null=True)
-    recordingintervalunitsid = models.ForeignKey('Units', related_name='+', db_column='recordingintervalunitsid', blank=True, null=True)
+    recordingintervalunitsid = models.ForeignKey('Units', related_name='relatedRecordingintervalunitsid', db_column='recordingintervalunitsid', blank=True, null=True)
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, db_column='aggregationstatisticcv', blank=True, null=True)
 
     class Meta:
@@ -664,12 +678,16 @@ class Datasetcitations(models.Model):
 
 class Datasets(models.Model):
     datasetid = models.AutoField(primary_key=True)
-    datasetuuid = models.TextField()  # This field type is a guess.
+    datasetuuid = UUIDField(auto=True)
     datasettypecv = models.ForeignKey(CvDatasettypecv, db_column='datasettypecv')
     datasetcode = models.CharField(max_length=50)
     datasettitle = models.CharField(max_length=255)
     datasetabstract = models.CharField(max_length=500)
-
+    def __str__(self):
+        s = str(self.datasetcode)
+        if self.datasettitle:
+            s += ' - {0}'.format(self.datasettitle)
+        return s
     class Meta:
         managed = False
         db_table = 'datasets'
@@ -820,11 +838,11 @@ class Maintenanceactions(models.Model):
 class Measurementresults(models.Model):
     resultid = models.ForeignKey('Results', db_column='resultid', primary_key=True)
     xlocation = models.FloatField(blank=True, null=True)
-    xlocationunitsid = models.ForeignKey('Units', related_name='+',  db_column='xlocationunitsid', blank=True, null=True)
+    xlocationunitsid = models.ForeignKey('Units', related_name='relatedXlocationUnits',  db_column='xlocationunitsid', blank=True, null=True)
     ylocation = models.FloatField(blank=True, null=True)
-    ylocationunitsid = models.ForeignKey('Units', related_name='+',  db_column='ylocationunitsid', blank=True, null=True)
+    ylocationunitsid = models.ForeignKey('Units', related_name='relatedYlocationUnits',  db_column='ylocationunitsid', blank=True, null=True)
     zlocation = models.FloatField(blank=True, null=True)
-    zlocationunitsid = models.ForeignKey('Units', related_name='+', db_column='zlocationunitsid', blank=True, null=True)
+    zlocationunitsid = models.ForeignKey('Units', related_name='relatedZlocationUnits', db_column='zlocationunitsid', blank=True, null=True)
     spatialreferenceid = models.ForeignKey('Spatialreferences', db_column='spatialreferenceid', blank=True, null=True)
     censorcodecv = models.ForeignKey(CvCensorcode, db_column='censorcodecv')
     qualitycodecv = models.ForeignKey(CvQualitycode, db_column='qualitycodecv')
@@ -953,7 +971,7 @@ class Organizations(models.Model):
     organizationname = models.CharField(max_length=255)
     organizationdescription = models.CharField(max_length=500, blank=True)
     organizationlink = models.CharField(max_length=255, blank=True)
-    parentorganizationid = models.ForeignKey('self', db_column='parentorganizationid', blank=True, null=True)
+    parentorganizationid = models.ForeignKey('self', db_column='parentorganizationid', null=True, default=1)
     def __str__(self):
         s = str(self.organizationcode)
         if self.organizationname:
@@ -1286,7 +1304,7 @@ class Resultnormalizationvalues(models.Model):
 
 class Results(models.Model):
     resultid = models.AutoField(primary_key=True)
-    resultuuid = models.TextField()  # This field type is a guess.
+    resultuuid = UUIDField(auto=True)
     featureactionid = models.ForeignKey(Featureactions, db_column='featureactionid')
     resulttypecv = models.ForeignKey(CvResulttype, db_column='resulttypecv')
     variableid = models.ForeignKey('Variables', db_column='variableid')
@@ -1343,7 +1361,11 @@ class Samplingfeatureextensionpropertyvalues(models.Model):
     samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     propertyid = models.ForeignKey(Extensionproperties, db_column='propertyid')
     propertyvalue = models.CharField(max_length=255)
-
+    def __str__(self):
+        s = str(self.samplingfeatureid)
+        if self.propertyvalue:
+            s += '- {0}'.format(self.propertyvalue)
+        return s
     class Meta:
         managed = False
         db_table = 'samplingfeatureextensionpropertyvalues'
@@ -1363,7 +1385,7 @@ class Samplingfeatureexternalidentifiers(models.Model):
 
 class Samplingfeatures(models.Model):
     samplingfeatureid = models.AutoField(primary_key=True)
-    samplingfeatureuuid = models.TextField()  # This field type is a guess.
+    samplingfeatureuuid = UUIDField(auto=True)
     samplingfeaturetypecv = models.ForeignKey(CvSamplingfeaturetype, db_column='samplingfeaturetypecv')
     samplingfeaturecode = models.CharField(max_length=50)
     samplingfeaturename = models.CharField(max_length=255, blank=True)
@@ -1372,7 +1394,12 @@ class Samplingfeatures(models.Model):
     featuregeometry = models.TextField(blank=True)  # This field type is a guess.
     elevation_m = models.FloatField(blank=True, null=True)
     elevationdatumcv = models.ForeignKey(CvElevationdatum, db_column='elevationdatumcv', blank=True, null=True)
-
+    def __str__(self):
+        s = str(self.samplingfeaturecode)
+        s += '- {0} '.format(self.samplingfeaturetypecv)
+        if self.samplingfeaturename:
+            s += '- {0},'.format(self.samplingfeaturename)
+        return s
     class Meta:
         managed = False
         db_table = 'samplingfeatures'
@@ -1589,6 +1616,20 @@ class Taxonomicclassifierexternalidentifiers(models.Model):
         managed = False
         db_table = 'taxonomicclassifierexternalidentifiers'
 
+# I needed to add a sequence and set it as the default for the primary key to make the Taxonomic Classifiers class work
+# this is the SQL
+
+# CREATE SEQUENCE odm2.taxonomicclassifiers_taxonomicclassifiersid_seq
+#   INCREMENT 1
+#   MINVALUE 2
+#   MAXVALUE 9223372036854775807
+#   START 3
+#   CACHE 1;
+# ALTER TABLE odm2.taxonomicclassifiers_taxonomicclassifiersid_seq
+#   OWNER TO postgres;
+
+#ALTER TABLE odm2.taxonomicclassifiers
+ #  ALTER COLUMN taxonomicclassifierid SET DEFAULT nextval('odm2.taxonomicclassifiers_taxonomicclassifiersid_seq'::regclass);
 
 class Taxonomicclassifiers(models.Model):
     taxonomicclassifierid = models.AutoField(primary_key=True)
