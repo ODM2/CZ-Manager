@@ -28,7 +28,13 @@ from .forms import ActionsAdmin
 from .forms import ActionByAdmin
 from .models import Datasetsresults
 from .models import Processinglevels
+from .models import Dataloggerprogramfiles
+from .forms import DataloggerprogramfilesAdmin
+from .models import Dataloggerfiles
+from .forms import DataloggerfilesAdmin
 
+admin.site.register(Dataloggerprogramfiles,DataloggerprogramfilesAdmin)
+admin.site.register(Dataloggerfiles, DataloggerfilesAdmin)
 admin.site.register(Samplingfeatures,SamplingfeaturesAdmin)
 admin.site.register(Affiliations,AffiliationsAdmin)
 admin.site.register(People)

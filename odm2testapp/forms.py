@@ -3,6 +3,14 @@ from django.forms import ModelForm
 from django.forms import HiddenInput
 from django.contrib import admin
 from django.db import models
+from django.forms import ModelChoiceField
+import django.forms
+from django.forms import FileField
+from .forms import ModelForm
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+
+
 from odm2testapp.models import Variables
 from odm2testapp.models import CvVariabletype
 from odm2testapp.models import CvVariablename
@@ -31,8 +39,11 @@ from odm2testapp.models import Affiliations
 from odm2testapp.models import People
 from odm2testapp.models import Actionby
 from odm2testapp.models import Actions
+from odm2testapp.models import Dataloggerprogramfiles
+from odm2testapp.models import Dataloggerfiles
 from odm2testapp.models import Methods
-from django.forms import ModelChoiceField
+
+
 
 # AffiliationsChoiceField(People.objects.all().order_by('personlastname'),Organizations.objects.all().order_by('organizationname'))
 
@@ -68,6 +79,9 @@ class ActionsModelChoiceField(ModelChoiceField):
 class OrganizationsModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return "%s"%(obj.organizationname)
+class programFilesModelChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return "%s"%(obj.programname)
 
 class SamplingfeaturesModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
@@ -199,3 +213,31 @@ class MethodsAdminForm(ModelForm):
         fields = '__all__'
 class MethodsAdmin(admin.ModelAdmin):
     form=MethodsAdminForm
+
+
+class DataloggerfilesAdminForm(ModelForm):
+    #programid= programFilesModelChoiceField( Dataloggerprogramfiles.objects.all().order_by('programname'))
+    class Meta:
+        model= Dataloggerfiles
+        fields = '__all__'
+class DataloggerfilesAdmin(admin.ModelAdmin):
+    form=DataloggerfilesAdminForm
+
+
+class DataloggerprogramfilesAdminForm(ModelForm):
+    def upload_file(request):
+        if request.method == 'POST':
+            form = DataloggerprogramfilesAdminForm(request.POST, request.FILES)
+            if form.is_valid():
+                # file is saved
+                form.save()
+                return HttpResponseRedirect('/success/url/')
+        else:
+            form = DataloggerprogramfilesAdminForm()
+        return render(request, 'upload.html', {'form': form})
+    class Meta:
+        model= Dataloggerprogramfiles
+        fields = '__all__'
+
+class DataloggerprogramfilesAdmin(admin.ModelAdmin):
+    form=DataloggerprogramfilesAdminForm

@@ -11,9 +11,14 @@
 from __future__ import unicode_literals
 from uuidfield import UUIDField
 from django.db import models
+from django.conf import settings
 from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+#from django.forms import ModelFormWithFileField
+#from .forms import DataloggerprogramfilesAdminForm
 #from odm2testapp.forms import VariablesForm
 
 
@@ -620,7 +625,10 @@ class Dataloggerfilecolumns(models.Model):
     recordinginterval = models.FloatField(blank=True, null=True)
     recordingintervalunitsid = models.ForeignKey('Units', related_name='relatedRecordingintervalunitsid', db_column='recordingintervalunitsid', blank=True, null=True)
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, db_column='aggregationstatisticcv', blank=True, null=True)
-
+    def __str__(self):
+        s=str(self.columnlabel)
+        s += '- {0},'.format(self.columndescription)
+        return s
     class Meta:
         managed = False
         db_table = 'dataloggerfilecolumns'
@@ -631,11 +639,20 @@ class Dataloggerfiles(models.Model):
     programid = models.ForeignKey('Dataloggerprogramfiles', db_column='programid')
     dataloggerfilename = models.CharField(max_length=255)
     dataloggerfiledescription = models.CharField(max_length=500, blank=True)
-    dataloggerfilelink = models.CharField(max_length=255, blank=True)
-
+    #dataloggerfilelink = models.CharField(max_length=255, blank=True)
+    dataloggerfilelink = models.FileField(upload_to='dataloggerfiles') #upload_to='.'
+    def __str__(self):
+        s=str(self.dataloggerfilename)
+        return s
     class Meta:
         managed = False
         db_table = 'dataloggerfiles'
+
+#
+# class programnameField(models.Field):
+#  def __str__(self):
+#     s=str(self.)
+#     return s
 
 
 class Dataloggerprogramfiles(models.Model):
@@ -644,11 +661,16 @@ class Dataloggerprogramfiles(models.Model):
     programname = models.CharField(max_length=255)
     programdescription = models.CharField(max_length=500, blank=True)
     programversion = models.CharField(max_length=50, blank=True)
-    programfilelink = models.CharField(max_length=255, blank=True)
-
+    #programfilelink = models.CharField(max_length=255, blank=True)
+    programfilelink = models.FileField(upload_to='dataloggerprogramfiles') #+ '/' + programname.__str__() settings.MEDIA_ROOT upload_to='/upfiles/'
+    def __str__(self):
+        s=str(self.programname)
+        s += '- Version {0}'.format(self.programversion)
+        return s
     class Meta:
         managed = False
         db_table = 'dataloggerprogramfiles'
+
 
 
 class Dataquality(models.Model):
