@@ -32,6 +32,10 @@ from .models import Dataloggerprogramfiles
 from .forms import DataloggerprogramfilesAdmin
 from .models import Dataloggerfiles
 from .forms import DataloggerfilesAdmin
+from .models import Units
+from .models import Measurementresultvalues
+from .models import Measurementresults
+from .forms import UnitsAdmin
 
 admin.site.register(Dataloggerprogramfiles,DataloggerprogramfilesAdmin)
 admin.site.register(Dataloggerfiles, DataloggerfilesAdmin)
@@ -39,6 +43,7 @@ admin.site.register(Samplingfeatures,SamplingfeaturesAdmin)
 admin.site.register(Affiliations,AffiliationsAdmin)
 admin.site.register(People)
 admin.site.register(Methods,MethodsAdmin)
+admin.site.register(Units,UnitsAdmin)
 admin.site.register(Actionby, ActionByAdmin)
 admin.site.register(Organizations,OrganizationsAdmin)
 admin.site.register(Featureactions,FeatureactionsAdmin)
@@ -46,8 +51,9 @@ admin.site.register(Actions,ActionsAdmin)
 admin.site.register(Results,ResultsAdmin)
 admin.site.register(Relatedactions,RelatedactionsAdmin)
 admin.site.register(Variables, VariablesAdmin)
-admin.site.register(Units)
 admin.site.register(Taxonomicclassifiers,TaxonomicclassifiersAdmin)
 admin.site.register(Datasets,DatasetsAdmin)
 admin.site.register(Datasetsresults)
 admin.site.register(Processinglevels)
+admin.site.register(Measurementresults)
+admin.site.register(Measurementresultvalues)

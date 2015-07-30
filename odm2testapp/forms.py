@@ -42,7 +42,8 @@ from odm2testapp.models import Actions
 from odm2testapp.models import Dataloggerprogramfiles
 from odm2testapp.models import Dataloggerfiles
 from odm2testapp.models import Methods
-
+from odm2testapp.models import Units
+from odm2testapp.models import CvUnitstype
 
 
 # AffiliationsChoiceField(People.objects.all().order_by('personlastname'),Organizations.objects.all().order_by('organizationname'))
@@ -224,6 +225,15 @@ class DataloggerfilesAdmin(admin.ModelAdmin):
     form=DataloggerfilesAdminForm
 
 
+class UnitsAdminForm(ModelForm):
+    #programid= programFilesModelChoiceField( Dataloggerprogramfiles.objects.all().order_by('programname'))
+    #unitstypecv = CvUnitstype.objects.all().order_by('term')
+    class Meta:
+        model= Units
+        fields = '__all__'
+class UnitsAdmin(admin.ModelAdmin):
+    form=UnitsAdminForm
+
 class DataloggerprogramfilesAdminForm(ModelForm):
     def upload_file(request):
         if request.method == 'POST':
@@ -241,3 +251,4 @@ class DataloggerprogramfilesAdminForm(ModelForm):
 
 class DataloggerprogramfilesAdmin(admin.ModelAdmin):
     form=DataloggerprogramfilesAdminForm
+

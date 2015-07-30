@@ -273,10 +273,15 @@ class CvAggregationstatistic(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0}'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_aggregationstatistic'
+        ordering = ['term','name']
+
 
 
 class CvAnnotationtype(models.Model):
@@ -297,10 +302,15 @@ class CvCensorcode(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0}'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_censorcode'
+        ordering = ['term','name']
+
 
 
 class CvDataqualitytype(models.Model):
@@ -405,10 +415,15 @@ class CvQualitycode(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0}'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_qualitycode'
+        ordering = ['term','name']
+
 
 
 class CvReferencematerialmedium(models.Model):
@@ -456,10 +471,15 @@ class CvSampledmedium(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_sampledmedium'
+        ordering  = ['term']
+
 
 
 class CvSamplingfeaturegeotype(models.Model):
@@ -555,10 +575,14 @@ class CvStatus(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_status'
+        ordering  = ['term']
 
 
 class CvTaxonomicclassifiertype(models.Model):
@@ -579,10 +603,14 @@ class CvUnitstype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_unitstype'
+        ordering  = ['term']
 
 
 class CvVariablename(models.Model):
@@ -826,7 +854,10 @@ class Featureactions(models.Model):
     featureactionid = models.AutoField(primary_key=True)
     samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     actionid = models.ForeignKey(Actions, db_column='actionid')
-
+    def __str__(self):
+        s=str(self.samplingfeatureid)
+        s += '- {0}'.format(self.actionid)
+        return s
     class Meta:
         managed = False
         db_table = 'featureactions'
@@ -871,10 +902,14 @@ class Measurementresults(models.Model):
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, db_column='aggregationstatisticcv')
     timeaggregationinterval = models.FloatField()
     timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+', db_column='timeaggregationintervalunitsid')
-
+    def __str__(self):
+        s=str(self.resultid)
+        s += '- {0}'.format(self.censorcodecv)
+        return s
     class Meta:
         managed = False
         db_table = 'measurementresults'
+        ordering = ['censorcodecv','resultid']
 
 
 class Measurementresultvalueannotations(models.Model):
@@ -893,7 +928,14 @@ class Measurementresultvalues(models.Model):
     datavalue = models.FloatField()
     valuedatetime = models.DateTimeField()
     valuedatetimeutcoffset = models.IntegerField()
-
+    def __str__(self):
+        s=str(self.datavalue)
+        s += '- {0}'.format(self.valuedatetime)
+        return s
+    class Meta:
+        managed = False
+        db_table = 'measurementresults'
+        ordering = ['valuedatetime']
     class Meta:
         managed = False
         db_table = 'measurementresultvalues'
@@ -1815,7 +1857,7 @@ class Transectresultvalues(models.Model):
 
 class Units(models.Model):
     unitsid = models.AutoField(primary_key=True)
-    unitstypecv = models.ForeignKey(CvUnitstype, db_column='unitstypecv')
+    unitstypecv = models.ForeignKey(CvUnitstype, db_column='unitstypecv') #CvUnitstype
     unitsabbreviation = models.CharField(max_length=50)
     unitsname = models.CharField(max_length=255)
     unitslink = models.CharField(max_length=255, blank=True)
