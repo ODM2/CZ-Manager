@@ -79,16 +79,16 @@ class Actionextensionpropertyvalues(models.Model):
 
 class Actions(models.Model):
     actionid = models.AutoField(primary_key=True)
-    actiontypecv = models.ForeignKey('CvActiontype', db_column='actiontypecv')
-    methodid = models.ForeignKey('Methods', db_column='methodid')
-    begindatetime = models.DateTimeField()
-    begindatetimeutcoffset = models.IntegerField()
-    enddatetime = models.DateTimeField(blank=True, null=True)
-    enddatetimeutcoffset = models.IntegerField(blank=True, null=True)
-    actiondescription = models.CharField(max_length=500, blank=True)
-    actionfilelink = models.CharField(max_length=255, blank=True)
+    action_type = models.ForeignKey('CvActiontype', db_column='actiontypecv')
+    method = models.ForeignKey('Methods', db_column='methodid')
+    begindatetime = models.DateTimeField(verbose_name='begin date time')
+    begindatetimeutcoffset = models.IntegerField(verbose_name='begin date time clock off set (from GMT)', default=4)
+    enddatetime = models.DateTimeField(verbose_name='end date time',blank=True, null=True)
+    enddatetimeutcoffset = models.IntegerField(verbose_name='end date time clock off set (from GMT)', default=4)
+    actiondescription = models.CharField(verbose_name='action description',max_length=500, blank=True)
+    actionfilelink = models.CharField(verbose_name='action file link',max_length=255, blank=True)
     def __str__(self):
-        s = str(self.actiontypecv)
+        s = str(self.action_type)
         #if self.methodid:
         #    s += '- {0},'.format(self.methodid)
         if self.actiondescription:
@@ -270,6 +270,7 @@ class CvActiontype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_actiontype'
+        ordering = ['term','name']
 
 
 class CvAggregationstatistic(models.Model):
@@ -299,6 +300,7 @@ class CvAnnotationtype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_annotationtype'
+        ordering = ['term','name']
 
 
 class CvCensorcode(models.Model):
@@ -328,6 +330,7 @@ class CvDataqualitytype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_dataqualitytype'
+        ordering = ['term','name']
 
 
 class CvDatasettypecv(models.Model):
@@ -340,6 +343,7 @@ class CvDatasettypecv(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_datasettypecv'
+        ordering = ['term','name']
 
 
 class CvDirectivetype(models.Model):
@@ -352,6 +356,7 @@ class CvDirectivetype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_directivetype'
+        ordering = ['term','name']
 
 
 class CvElevationdatum(models.Model):
@@ -368,6 +373,7 @@ class CvElevationdatum(models.Model):
         managed = False
         db_table = 'cv_elevationdatum'
         verbose_name='elevation datum'
+        ordering = ['term','name']
 
 
 class CvEquipmenttype(models.Model):
@@ -380,6 +386,7 @@ class CvEquipmenttype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_equipmenttype'
+        ordering = ['term','name']
 
 
 class CvMethodtype(models.Model):
@@ -392,6 +399,7 @@ class CvMethodtype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_methodtype'
+        ordering = ['term','name']
 
 
 class CvOrganizationtype(models.Model):
@@ -404,6 +412,7 @@ class CvOrganizationtype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_organizationtype'
+        ordering = ['term','name']
 
 
 class CvPropertydatatype(models.Model):
@@ -460,6 +469,7 @@ class CvRelationshiptype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_relationshiptype'
+        ordering = ['term','name']
 
 
 class CvResulttype(models.Model):
@@ -468,10 +478,14 @@ class CvResulttype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_resulttype'
+        ordering = ['term','name']
 
 
 class CvSampledmedium(models.Model):
@@ -487,7 +501,7 @@ class CvSampledmedium(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_sampledmedium'
-        ordering  = ['term']
+        ordering = ['term','name']
 
 
 
@@ -505,6 +519,7 @@ class CvSamplingfeaturegeotype(models.Model):
         managed = False
         db_table = 'cv_samplingfeaturegeotype'
         verbose_name='sampling feature geo type'
+        ordering = ['term','name']
 
 
 class CvSamplingfeaturetype(models.Model):
@@ -521,6 +536,7 @@ class CvSamplingfeaturetype(models.Model):
         managed = False
         db_table = 'cv_samplingfeaturetype'
         verbose_name='sampling feature type'
+        ordering = ['term','name']
 
 
 class CvSitetype(models.Model):
@@ -533,6 +549,7 @@ class CvSitetype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_sitetype'
+        ordering = ['term','name']
 
 
 class CvSpatialoffsettype(models.Model):
@@ -560,6 +577,7 @@ class CvSpeciation(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_speciation'
+        ordering = ['term','name']
 
 
 class CvSpecimenmedium(models.Model):
@@ -575,6 +593,7 @@ class CvSpecimenmedium(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_specimenmedium'
+        ordering = ['term','name']
 
 
 class CvSpecimentype(models.Model):
@@ -590,6 +609,7 @@ class CvSpecimentype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_specimentype'
+        ordering = ['term','name']
 
 
 class CvStatus(models.Model):
@@ -605,7 +625,7 @@ class CvStatus(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_status'
-        ordering  = ['term']
+        ordering = ['term','name']
 
 
 class CvTaxonomicclassifiertype(models.Model):
@@ -636,7 +656,7 @@ class CvUnitstype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_unitstype'
-        ordering  = ['term']
+        ordering = ['term','name']
 
 
 class CvVariablename(models.Model):
@@ -1417,27 +1437,25 @@ class Resultnormalizationvalues(models.Model):
 class Results(models.Model):
     resultid = models.AutoField(primary_key=True)
     resultuuid = UUIDField(auto=True)
-    featureactionid = models.ForeignKey(Featureactions, db_column='featureactionid')
-    resulttypecv = models.ForeignKey(CvResulttype,verbose_name='result type',related_name='+', db_column='resulttypecv')
-    variableid = models.ForeignKey('Variables', verbose_name='variable',related_name='+', db_column='variableid')
+    feature_action = models.ForeignKey(Featureactions, db_column='featureactionid')
+    result_type = models.ForeignKey(CvResulttype,verbose_name='result type', db_column='resulttypecv')
+    variable = models.ForeignKey('Variables', verbose_name='variable', db_column='variableid')
     unitsid = models.ForeignKey('Units', verbose_name='units', related_name='+', db_column='unitsid')
-    taxonomicclassifierid = models.ForeignKey('Taxonomicclassifiers', db_column='taxonomicclassifierid', blank=True, null=True)
-    processinglevelid = models.ForeignKey(Processinglevels, db_column='processinglevelid')
-    resultdatetime = models.DateTimeField(blank=True, null=True)
-    resultdatetimeutcoffset = models.BigIntegerField(blank=True, null=True)
-    validdatetime = models.DateTimeField(blank=True, null=True)
-    validdatetimeutcoffset = models.BigIntegerField(blank=True, null=True)
-    statuscv = models.ForeignKey(CvStatus, db_column='statuscv', blank=True, null=True)
-    sampledmediumcv = models.ForeignKey(CvSampledmedium, db_column='sampledmediumcv')
+    taxonomicclassifierid = models.ForeignKey('Taxonomicclassifiers', db_column='taxonomicclassifierid',blank=True, null=True)
+    processing_level = models.ForeignKey(Processinglevels, db_column='processinglevelid')
+    resultdatetime = models.DateTimeField(verbose_name='result date time',blank=True, null=True)
+    resultdatetimeutcoffset = models.BigIntegerField(verbose_name='result date time UTC offset', default=4, null=True)
+    #validdatetime>> Date and time for which the result is valid (e.g., for a forecast result).
+    # Should probably be expressed as a duration
+    validdatetime = models.DateTimeField(verbose_name= 'valid date time- Date and time for which the result is valid', blank=True, null=True)
+    validdatetimeutcoffset = models.BigIntegerField(verbose_name='valid date time UTC offset', default=4, null=True)
+    statuscv = models.ForeignKey(CvStatus, verbose_name='status',db_column='statuscv', blank=True, null=True)
+    sampledmediumcv = models.ForeignKey(CvSampledmedium, verbose_name= 'sampled medium', db_column='sampledmediumcv')
     valuecount = models.IntegerField()
     def __str__(self):
-        s = str(self.variableid)
-        if self.featureactionid:
-            s += ', {0}'.format(self.featureactionid)
-        if self.resulttypecv:
-            s += ', {0}'.format(self.resulttypecv)
-        if self.processinglevelid:
-            s += ', {0}'.format(self.processinglevelid)
+        s = str(self.variable)
+        if self.result_type:
+            s += ', {0}'.format(self.result_type)
         return s
     class Meta:
         managed = False

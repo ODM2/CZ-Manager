@@ -50,6 +50,8 @@ from .models import Measurementresultvalues
 
 # AffiliationsChoiceField(People.objects.all().order_by('personlastname'),Organizations.objects.all().order_by('organizationname'))
 
+#a complicated use of search_fields described in ResultsAdminForm
+
 class AffiliationsChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return "%s "%(obj.personlink)
@@ -129,14 +131,16 @@ class SamplingfeaturesAdmin(admin.ModelAdmin):
 
 
 class ResultsAdminForm(ModelForm):
-    resulttypecv= TermModelChoiceField(CvResulttype.objects.all().order_by('term'))
-    variableid= VariableNameModelChoiceField(Variables.objects.all().order_by('variablenamecv'))
     class Meta:
         model= Results
         fields = '__all__'
 class ResultsAdmin(admin.ModelAdmin):
     form=ResultsAdminForm
-
+    list_display = ['feature_action','processing_level']
+    #'feature_action__sampling_feature__samplingfeaturename' >> looks at the feature action, then the related
+    # sampling feature of the feature action and searchs on the sampling feature name on the related sampling feature.
+    search_fields= ['variable__variable_name__name','feature_action__sampling_feature__samplingfeaturename',
+                    'result_type__name','processing_level__definition__name']
 
 class RelatedactionsAdminForm(ModelForm):
     actionid= ActionsModelChoiceField(Actions.objects.all().order_by('begindatetime'))
@@ -187,8 +191,7 @@ class AffiliationsAdmin(admin.ModelAdmin):
     form=AffiliationsAdminForm
 
 class ActionsAdminForm(ModelForm):
-    methodid= MethodsModelChoiceField(Methods.objects.all().order_by('methodname'))
-    actiontypecv= TermModelChoiceField(CvActiontype.objects.all().order_by('term'))
+
     class Meta:
         model= Actions
         fields = '__all__'
@@ -197,11 +200,6 @@ class ActionsAdmin(admin.ModelAdmin):
 
 
 class ActionByAdminForm(ModelForm):
-
-    #affiliationid= AffiliationsChoiceField(Affiliations.objects.all().order_by('personlink'))
-    #actionid= ActionByChoiceField(Actions.objects.all().order_by('actiondescription'))
-    #person__name
-    #affiliationsForActionBy= Actionby.objects.filter(Affiliations__affiliationid=affiliationid).values('personlink')
 
     class Meta:
         model= Actionby
