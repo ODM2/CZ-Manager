@@ -52,6 +52,8 @@ class Actionby(models.Model):
     class Meta:
         managed = False
         db_table = 'actionby'
+        verbose_name='action by'
+        verbose_name_plural='action by'
 
 
 class Actiondirectives(models.Model):
@@ -95,6 +97,7 @@ class Actions(models.Model):
     class Meta:
         managed = False
         db_table = 'actions'
+        verbose_name='action'
 
 
 class Affiliations(models.Model):
@@ -116,6 +119,8 @@ class Affiliations(models.Model):
     class Meta:
         managed = False
         db_table = 'affiliations'
+        verbose_name='affiliation (relate people and organizations)'
+        verbose_name_plural='affiliation (relate people and organizations)'
 
 
 class Annotations(models.Model):
@@ -539,7 +544,10 @@ class CvSpeciation(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_speciation'
@@ -551,7 +559,10 @@ class CvSpecimenmedium(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_specimenmedium'
@@ -563,7 +574,10 @@ class CvSpecimentype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_specimentype'
@@ -591,7 +605,10 @@ class CvTaxonomicclassifiertype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_taxonomicclassifiertype'
@@ -620,9 +637,15 @@ class CvVariablename(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_variablename'
+
+
 
 
 class CvVariabletype(models.Model):
@@ -632,9 +655,11 @@ class CvVariabletype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     
-    def __unicode__(self):
-        return self.term
-    
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
+
     class Meta:
         managed = False
         db_table = 'cv_variabletype'
@@ -675,6 +700,7 @@ class Dataloggerfiles(models.Model):
     class Meta:
         managed = False
         db_table = 'dataloggerfiles'
+        verbose_name='data logger file'
 
 #
 # class programnameField(models.Field):
@@ -698,6 +724,7 @@ class Dataloggerprogramfiles(models.Model):
     class Meta:
         managed = False
         db_table = 'dataloggerprogramfiles'
+        verbose_name= 'data logger program file'
 
 
 
@@ -741,6 +768,7 @@ class Datasets(models.Model):
     class Meta:
         managed = False
         db_table = 'datasets'
+        verbose_name= 'dataset'
 
 
 class Datasetsresults(models.Model):
@@ -751,6 +779,7 @@ class Datasetsresults(models.Model):
     class Meta:
         managed = False
         db_table = 'datasetsresults'
+        verbose_name='data set result'
 
 
 class Derivationequations(models.Model):
@@ -861,6 +890,8 @@ class Featureactions(models.Model):
     class Meta:
         managed = False
         db_table = 'featureactions'
+        verbose_name='sampling feature action (links sampling features to actions to results)'
+        verbose_name_plural='sampling feature action (links sampling features to actions to results)'
 
 
 class Instrumentoutputvariables(models.Model):
@@ -910,6 +941,7 @@ class Measurementresults(models.Model):
         managed = False
         db_table = 'measurementresults'
         ordering = ['censorcodecv','resultid']
+        verbose_name='measurement result'
 
 
 class Measurementresultvalueannotations(models.Model):
@@ -939,6 +971,7 @@ class Measurementresultvalues(models.Model):
     class Meta:
         managed = False
         db_table = 'measurementresultvalues'
+        verbose_name='Measurement result value'
 
 
 class Methodannotations(models.Model):
@@ -1001,6 +1034,7 @@ class Methods(models.Model):
     class Meta:
         managed = False
         db_table = 'methods'
+        verbose_name='method'
 
 
 class Modelaffiliations(models.Model):
@@ -1044,6 +1078,7 @@ class Organizations(models.Model):
     class Meta:
         managed = False
         db_table = 'organizations'
+        verbose_name='organization'
 
 
 class People(models.Model):
@@ -1059,6 +1094,7 @@ class People(models.Model):
     class Meta:
         managed = False
         db_table = 'people'
+        verbose_name='people'
 
 
 class Personexternalidentifiers(models.Model):
@@ -1132,6 +1168,7 @@ class Processinglevels(models.Model):
     class Meta:
         managed = False
         db_table = 'processinglevels'
+        verbose_name='processing level'
 
 
 class Profileresults(models.Model):
@@ -1238,6 +1275,8 @@ class Relatedactions(models.Model):
     class Meta:
         managed = False
         db_table = 'relatedactions'
+        verbose_name='related action (associates one action with another)'
+        verbose_name_plural='related action (associates one action with another)'
 
 
 class Relatedannotations(models.Model):
@@ -1370,9 +1409,9 @@ class Results(models.Model):
     resultid = models.AutoField(primary_key=True)
     resultuuid = UUIDField(auto=True)
     featureactionid = models.ForeignKey(Featureactions, db_column='featureactionid')
-    resulttypecv = models.ForeignKey(CvResulttype, db_column='resulttypecv')
-    variableid = models.ForeignKey('Variables', db_column='variableid')
-    unitsid = models.ForeignKey('Units', related_name='+', db_column='unitsid')
+    resulttypecv = models.ForeignKey(CvResulttype,verbose_name='result type',related_name='+', db_column='resulttypecv')
+    variableid = models.ForeignKey('Variables', verbose_name='variable',related_name='+', db_column='variableid')
+    unitsid = models.ForeignKey('Units', verbose_name='units', related_name='+', db_column='unitsid')
     taxonomicclassifierid = models.ForeignKey('Taxonomicclassifiers', db_column='taxonomicclassifierid', blank=True, null=True)
     processinglevelid = models.ForeignKey(Processinglevels, db_column='processinglevelid')
     resultdatetime = models.DateTimeField(blank=True, null=True)
@@ -1394,6 +1433,7 @@ class Results(models.Model):
     class Meta:
         managed = False
         db_table = 'results'
+        verbose_name='result'
 
 
 class Resultsdataquality(models.Model):
@@ -1467,6 +1507,7 @@ class Samplingfeatures(models.Model):
     class Meta:
         managed = False
         db_table = 'samplingfeatures'
+        verbose_name='sampling feature'
 
 
 class Sectionresults(models.Model):
@@ -1697,11 +1738,11 @@ class Taxonomicclassifierexternalidentifiers(models.Model):
 
 class Taxonomicclassifiers(models.Model):
     taxonomicclassifierid = models.AutoField(primary_key=True)
-    taxonomicclassifiertypecv = models.ForeignKey(CvTaxonomicclassifiertype, db_column='taxonomicclassifiertypecv')
-    taxonomicclassifiername = models.CharField(max_length=255)
-    taxonomicclassifiercommonname = models.CharField(max_length=255, blank=True)
-    taxonomicclassifierdescription = models.CharField(max_length=500, blank=True)
-    parenttaxonomicclassifierid = models.ForeignKey('self', db_column='parenttaxonomicclassifierid', blank=True, null=True)
+    taxonomic_classifier_type = models.ForeignKey(CvTaxonomicclassifiertype, db_column='taxonomicclassifiertypecv')
+    taxonomicclassifiername = models.CharField(verbose_name='taxonomic classifier name', max_length=255)
+    taxonomicclassifiercommonname = models.CharField(verbose_name='taxonomic classifier common name',max_length=255, blank=True)
+    taxonomicclassifierdescription = models.CharField(verbose_name='taxonomic classifier description',max_length=500, blank=True)
+    parent_taxonomic_classifier = models.ForeignKey('self', db_column='parenttaxonomicclassifierid', blank=True, null=True)
     def __str__(self):
         s = str(self.taxonomicclassifiername)
         if self.taxonomicclassifiercommonname:
@@ -1710,6 +1751,7 @@ class Taxonomicclassifiers(models.Model):
     class Meta:
         managed = False
         db_table = 'taxonomicclassifiers'
+        verbose_name='taxonomic classifier'
 
 
 class Timeseriesresults(models.Model):
@@ -1857,10 +1899,10 @@ class Transectresultvalues(models.Model):
 
 class Units(models.Model):
     unitsid = models.AutoField(primary_key=True)
-    unitstypecv = models.ForeignKey(CvUnitstype, db_column='unitstypecv') #CvUnitstype
-    unitsabbreviation = models.CharField(max_length=50)
-    unitsname = models.CharField(max_length=255)
-    unitslink = models.CharField(max_length=255, blank=True)
+    unit_type = models.ForeignKey(CvUnitstype, db_column='unitstypecv') #CvUnitstype
+    unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
+    unitsname = models.CharField(verbose_name='unit name',max_length=255)
+    unitslink = models.CharField(verbose_name='reference for the unit (web link)',max_length=255, blank=True)
     def __str__(self):
         s = str(self.unitsabbreviation)
         if self.unitsname:
@@ -1869,6 +1911,7 @@ class Units(models.Model):
     class Meta:
         managed = False
         db_table = 'units'
+        verbose_name='unit'
 
 
 class Variableextensionpropertyvalues(models.Model):
@@ -1898,20 +1941,21 @@ class Variableexternalidentifiers(models.Model):
 class Variables(models.Model):
     #form = VariablesForm
     variableid = models.AutoField(primary_key=True)
-    variabletypecv = models.ForeignKey(CvVariabletype, db_column='variabletypecv')
+    variable_type = models.ForeignKey(CvVariabletype, db_column='variabletypecv')
     #variabletypecv = models.ModelChoiceField(CvVariabletype, db_column='variabletypecv')
-    variablecode = models.CharField(max_length=50)
-    variablenamecv = models.ForeignKey(CvVariablename, db_column='variablenamecv')
-    variabledefinition = models.CharField(max_length=500, blank=True)
-    speciationcv = models.ForeignKey(CvSpeciation, db_column='speciationcv', blank=True, null=True)
-    nodatavalue = models.FloatField()
+    variablecode = models.CharField(verbose_name='variable code', max_length=50)
+    variable_name = models.ForeignKey(CvVariablename, db_column='variablenamecv')
+    variabledefinition = models.CharField(verbose_name='variable definition', max_length=500, blank=True)
+    #variabledefinition.name = 'variable_definition'
+    speciation = models.ForeignKey(CvSpeciation, db_column='speciationcv', blank=True, null=True)
+    nodatavalue = models.FloatField(verbose_name='no data value')
     def __str__(self):
         s = str(self.variablecode)
         if self.variabledefinition:
             s += ', {0}'.format(self.variabledefinition)
         return s
-
     class Meta:
         managed = False
         db_table = 'variables'
+        verbose_name='variable'
     

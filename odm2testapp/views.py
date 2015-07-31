@@ -1,5 +1,9 @@
 from django.http import HttpResponse
 #from odm2testapp.forms import VariablesForm
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
+#from .forms import MeasurementresultvaluesForm
+#form .forms import MeasurementresultsForm
 
 def index(request):
     return HttpResponse("odm2testsite says hello world!")
@@ -7,6 +11,9 @@ def index(request):
 def about(request):
     return HttpResponse("odm2testsite about page.")
 	
+#def get_measurements(request):
+    #if request.method == 'POST':
+
 
 # def add_variable(request):
     # # Get the context from the request.

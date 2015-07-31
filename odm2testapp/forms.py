@@ -44,6 +44,8 @@ from odm2testapp.models import Dataloggerfiles
 from odm2testapp.models import Methods
 from odm2testapp.models import Units
 from odm2testapp.models import CvUnitstype
+from .models import Measurementresults
+from .models import Measurementresultvalues
 
 
 # AffiliationsChoiceField(People.objects.all().order_by('personlastname'),Organizations.objects.all().order_by('organizationname'))
@@ -89,18 +91,23 @@ class SamplingfeaturesModelChoiceField(ModelChoiceField):
         return "%s"%(obj.samplingfeaturename)
 #the following define what fields should be overridden so that dropdown lists can be populated with useful information
 class VariablesAdminForm(ModelForm):
-    variabletypecv= TermModelChoiceField(CvVariabletype.objects.all().order_by('term'))
-    variablenamecv= TermModelChoiceField(CvVariablename.objects.all().order_by('term'))
-    speciationcv= TermModelChoiceField(CvSpeciation.objects.all().order_by('term'))
+    #variabletypecv= TermModelChoiceField(CvVariabletype.objects.all().order_by('term'))
+   # variablenamecv= TermModelChoiceField(CvVariablename.objects.all().order_by('term'))
+    #speciationcv= TermModelChoiceField(CvSpeciation.objects.all().order_by('term'))
+
     class Meta:
         model=Variables
         fields = '__all__'
+
        
 class VariablesAdmin(admin.ModelAdmin):
     form=VariablesAdminForm
+    list_display =('variable_type','variable_name','speciation')
+    search_fields = ['variable_type__name','variable_name__name','speciation__name']
+
 
 class TaxonomicclassifiersAdminForm(ModelForm):
-    taxonomicclassifiertypecv= TermModelChoiceField(CvTaxonomicclassifiertype.objects.all().order_by('term'))
+    taxonomic_classifier_type= TermModelChoiceField(CvTaxonomicclassifiertype.objects.all().order_by('term'))
     class Meta:
         model= Taxonomicclassifiers
         fields = '__all__'
@@ -223,7 +230,20 @@ class DataloggerfilesAdminForm(ModelForm):
         fields = '__all__'
 class DataloggerfilesAdmin(admin.ModelAdmin):
     form=DataloggerfilesAdminForm
+from .models import Measurementresults
+from .models import Measurementresultvalues
 
+class MeasurementresultsForm(ModelForm):
+    #programid= programFilesModelChoiceField( Dataloggerprogramfiles.objects.all().order_by('programname'))
+    class Meta:
+        model= Measurementresults
+        fields = '__all__'
+
+class MeasurementresultvaluesForm(ModelForm):
+    #programid= programFilesModelChoiceField( Dataloggerprogramfiles.objects.all().order_by('programname'))
+    class Meta:
+        model= Measurementresultvalues
+        fields = '__all__'
 
 class UnitsAdminForm(ModelForm):
     #programid= programFilesModelChoiceField( Dataloggerprogramfiles.objects.all().order_by('programname'))
@@ -233,6 +253,7 @@ class UnitsAdminForm(ModelForm):
         fields = '__all__'
 class UnitsAdmin(admin.ModelAdmin):
     form=UnitsAdminForm
+    search_fields = ['units_type__name','unitsabbreviation__name','unitsname__name']
 
 class DataloggerprogramfilesAdminForm(ModelForm):
     def upload_file(request):
