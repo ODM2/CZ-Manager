@@ -360,10 +360,14 @@ class CvElevationdatum(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_elevationdatum'
+        verbose_name='elevation datum'
 
 
 class CvEquipmenttype(models.Model):
@@ -493,10 +497,14 @@ class CvSamplingfeaturegeotype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_samplingfeaturegeotype'
+        verbose_name='sampling feature geo type'
 
 
 class CvSamplingfeaturetype(models.Model):
@@ -512,6 +520,7 @@ class CvSamplingfeaturetype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_samplingfeaturetype'
+        verbose_name='sampling feature type'
 
 
 class CvSitetype(models.Model):
@@ -881,17 +890,17 @@ class Externalidentifiersystems(models.Model):
 
 class Featureactions(models.Model):
     featureactionid = models.AutoField(primary_key=True)
-    samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
-    actionid = models.ForeignKey(Actions, db_column='actionid')
+    sampling_feature = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
+    action = models.ForeignKey(Actions, db_column='actionid')
     def __str__(self):
-        s=str(self.samplingfeatureid)
-        s += '- {0}'.format(self.actionid)
+        s=str(self.sampling_feature)
+        s += '- {0}'.format(self.action)
         return s
     class Meta:
         managed = False
         db_table = 'featureactions'
-        verbose_name='sampling feature action (links sampling features to actions to results)'
-        verbose_name_plural='sampling feature action (links sampling features to actions to results)'
+        verbose_name='sampling feature action (link sampling features and actions)'
+        verbose_name_plural='sampling feature action (link sampling features and actions)'
 
 
 class Instrumentoutputvariables(models.Model):
@@ -1490,17 +1499,17 @@ class Samplingfeatureexternalidentifiers(models.Model):
 class Samplingfeatures(models.Model):
     samplingfeatureid = models.AutoField(primary_key=True)
     samplingfeatureuuid = UUIDField(auto=True)
-    samplingfeaturetypecv = models.ForeignKey(CvSamplingfeaturetype, db_column='samplingfeaturetypecv')
-    samplingfeaturecode = models.CharField(max_length=50)
-    samplingfeaturename = models.CharField(max_length=255, blank=True)
-    samplingfeaturedescription = models.CharField(max_length=500, blank=True)
-    samplingfeaturegeotypecv = models.ForeignKey(CvSamplingfeaturegeotype, db_column='samplingfeaturegeotypecv', blank=True, null=True)
-    featuregeometry = models.TextField(blank=True)  # This field type is a guess.
-    elevation_m = models.FloatField(blank=True, null=True)
-    elevationdatumcv = models.ForeignKey(CvElevationdatum, db_column='elevationdatumcv', blank=True, null=True)
+    sampling_feature_type = models.ForeignKey(CvSamplingfeaturetype, db_column='samplingfeaturetypecv')
+    samplingfeaturecode = models.CharField(verbose_name='sampling feature code',max_length=50)
+    samplingfeaturename = models.CharField(verbose_name='sampling feature name',max_length=255, blank=True)
+    samplingfeaturedescription = models.CharField(verbose_name='sampling feature description', max_length=500, blank=True)
+    sampling_feature_geo_type = models.ForeignKey(CvSamplingfeaturegeotype, db_column='samplingfeaturegeotypecv', blank=True, null=True)
+    featuregeometry = models.TextField(verbose_name='feature geometry',blank=True)  # This field type is a guess.
+    elevation_m = models.FloatField(verbose_name='elevation',blank=True, null=True)
+    elevation_datum = models.ForeignKey(CvElevationdatum, db_column='elevationdatumcv', blank=True, null=True)
     def __str__(self):
         s = str(self.samplingfeaturecode)
-        s += '- {0} '.format(self.samplingfeaturetypecv)
+        s += '- {0} '.format(self.sampling_feature_type)
         if self.samplingfeaturename:
             s += '- {0},'.format(self.samplingfeaturename)
         return s

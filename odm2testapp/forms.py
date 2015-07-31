@@ -114,18 +114,18 @@ class TaxonomicclassifiersAdminForm(ModelForm):
 
 class TaxonomicclassifiersAdmin(admin.ModelAdmin):
     form=TaxonomicclassifiersAdminForm
+    search_fields = ['taxonomicclassifiername','taxonomicclassifiercommonname',
+                     'taxonomicclassifierdescription','taxonomic_classifier_type__name']
 
 
 
 class SamplingfeaturesAdminForm(ModelForm):
-    samplingfeaturetypecv= TermModelChoiceField(CvSamplingfeaturetype.objects.all().order_by('term'))
-    samplingfeaturegeotypecv=TermModelChoiceField(CvSamplingfeaturegeotype.objects.all().order_by('term'))
-    elevationdatumcv = TermModelChoiceField(CvElevationdatum.objects.all().order_by('term'))
     class Meta:
         model= Samplingfeatures
         fields = '__all__'
 class SamplingfeaturesAdmin(admin.ModelAdmin):
     form=SamplingfeaturesAdminForm
+    search_fields = ['sampling_feature_type__name','sampling_feature_geo_type__name','samplingfeaturename','samplingfeaturecode']
 
 
 class ResultsAdminForm(ModelForm):
@@ -160,7 +160,6 @@ class OrganizationsAdmin(admin.ModelAdmin):
 
 
 class FeatureactionsAdminForm(ModelForm):
-    samplingfeatureid= SamplingfeaturesModelChoiceField(Samplingfeatures.objects.all().order_by('samplingfeaturename'))
     class Meta:
         model= Featureactions
         fields = '__all__'
