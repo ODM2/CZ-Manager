@@ -11,12 +11,19 @@
 from __future__ import unicode_literals
 from uuidfield import UUIDField
 from django.db import models
+import csv
+import binascii
+import unicodedata
+from io import TextIOWrapper
 from django.conf import settings
 from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.shortcuts import render_to_response
+from django.core.exceptions import ValidationError
+import time
 #from django.forms import ModelFormWithFileField
 #from .forms import DataloggerprogramfilesAdminForm
 #from odm2testapp.forms import VariablesForm
@@ -804,7 +811,11 @@ class Datasetsresults(models.Model):
     bridgeid = models.AutoField(primary_key=True)
     datasetid = models.ForeignKey(Datasets, db_column='datasetid')
     resultid = models.ForeignKey('Results', db_column='resultid')
-
+    def __str__(self):
+        s = str(self.datasetid)
+        if self.resultid:
+            s += ' - {0}'.format(self.resultid)
+        return s
     class Meta:
         managed = False
         db_table = 'datasetsresults'
@@ -986,22 +997,58 @@ class Measurementresultvalueannotations(models.Model):
 class Measurementresultvalues(models.Model):
     valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Measurementresults, db_column='resultid')
-    datavalue = models.FloatField()
-    valuedatetime = models.DateTimeField()
-    valuedatetimeutcoffset = models.IntegerField()
+    datavalue = models.FloatField(verbose_name='datavalue')
+    valuedatetime = models.DateTimeField(verbose_name='value date time')
+    valuedatetimeutcoffset = models.IntegerField(verbose_name='value date time UTC offset', default=4)
     def __str__(self):
-        s=str(self.datavalue)
+        s=str(self.resultid)
+        s += '- {0}'.format(str(self.datavalue))
         s += '- {0}'.format(self.valuedatetime)
         return s
-    class Meta:
-        managed = False
-        db_table = 'measurementresults'
-        ordering = ['valuedatetime']
     class Meta:
         managed = False
         db_table = 'measurementresultvalues'
         verbose_name='Measurement result value'
 
+
+def handle_uploaded_file(f,id):
+    destination = open('C:/Users/leonmi/Google Drive/ODM2Djangoadmin/odm2testapp/upfiles/resultvalues/testwrite.csv', 'wb+')
+    # data = open(f)
+    for chunk in f.chunks():
+        #g= binascii.b2a_uu(chunk)
+    #g = TextIOWrapper(f,encoding='ascii', errors='replace')
+    #g = unicodedata.normalize('NFKD', f).encode('ascii', 'ignore')
+        #for row in file_reader:
+    #for line in f:
+        destination.write(chunk)
+        #Measurementresultvalues
+
+    destination.close()
+    #file_reader = csv.reader('C:/Users/leonmi/Google Drive/ODM2Djangoadmin/odm2testapp/upfiles/resultvalues/testwrite.csv')
+    try:
+        with open('C:/Users/leonmi/Google Drive/ODM2Djangoadmin/odm2testapp/upfiles/resultvalues/testwrite.csv', 'rt', encoding='ascii') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                #raise ValidationError(row) #print the current row
+                dateT = time.strptime(row[0],"%m/%d/%Y %H:%M")#'1/1/2013 0:10
+                datestr = time.strftime("%Y-%m-%d %H:%M",dateT)
+                Measurementresultvalues(resultid=id,datavalue=row[1],valuedatetime=datestr,valuedatetimeutcoffset=4).save()
+    except IndexError:
+        raise ValidationError(row)
+
+class MeasurementresultvalueFile(models.Model):
+    valueFileid = models.AutoField(primary_key=True)
+    resultid = models.ForeignKey(Measurementresults, db_column='resultid')
+    valueFile = models.FileField(upload_to='resultvalues')
+    def __str__(self):
+        s=str(self.resultid)
+        return s
+    class Meta:
+        db_table = 'Measurementresultvaluefile'
+    def save(self, *args, **kwargs):
+        handle_uploaded_file(self.valueFile.file,self.resultid)
+
+        super(MeasurementresultvalueFile, self).save(*args, **kwargs)
 
 class Methodannotations(models.Model):
     bridgeid = models.AutoField(primary_key=True)
@@ -1453,7 +1500,8 @@ class Results(models.Model):
     sampledmediumcv = models.ForeignKey(CvSampledmedium, verbose_name= 'sampled medium', db_column='sampledmediumcv')
     valuecount = models.IntegerField()
     def __str__(self):
-        s = str(self.variable)
+        s = str(self.resultid)
+        s +=  '- {0}'.format(self.variable)
         if self.result_type:
             s += ', {0}'.format(self.result_type)
         return s

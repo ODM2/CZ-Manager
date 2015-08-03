@@ -9,7 +9,7 @@ from django.forms import FileField
 from .forms import ModelForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-
+from django.shortcuts import render_to_response
 
 from odm2testapp.models import Variables
 from odm2testapp.models import CvVariabletype
@@ -43,6 +43,7 @@ from odm2testapp.models import Dataloggerprogramfiles
 from odm2testapp.models import Dataloggerfiles
 from odm2testapp.models import Methods
 from odm2testapp.models import Units
+from odm2testapp.models import MeasurementresultvalueFile
 from odm2testapp.models import CvUnitstype
 from .models import Measurementresults
 from .models import Measurementresultvalues
@@ -241,6 +242,26 @@ class MeasurementresultvaluesForm(ModelForm):
     class Meta:
         model= Measurementresultvalues
         fields = '__all__'
+
+
+class MeasurementresultvalueFileForm(ModelForm):
+    class Meta:
+        model= MeasurementresultvalueFile
+        fields = '__all__'
+    #def save_model(self, request, obj, form, change):
+    #    form.save()
+    #    handle_uploaded_file(obj.file)
+    # def upload_file(request):
+    #     if request.method == 'POST':
+    #         form = MeasurementresultvalueFileForm(request.POST, request.FILES)
+    #         if form.is_valid():
+    #             handle_uploaded_file(request.FILES['file'])
+    #             return HttpResponseRedirect('/success/url/')
+    #     else:
+    #         form = MeasurementresultvalueFileForm()
+    #     return render_to_response('upload.html', {'form': form})
+
+
 
 class UnitsAdminForm(ModelForm):
     #programid= programFilesModelChoiceField( Dataloggerprogramfiles.objects.all().order_by('programname'))

@@ -36,6 +36,7 @@ from .models import Units
 from .models import Measurementresultvalues
 from .models import Measurementresults
 from .forms import UnitsAdmin
+from .models import MeasurementresultvalueFile
 
 admin.site.register(Dataloggerprogramfiles,DataloggerprogramfilesAdmin)
 admin.site.register(Dataloggerfiles, DataloggerfilesAdmin)
@@ -57,3 +58,4 @@ admin.site.register(Datasetsresults)
 admin.site.register(Processinglevels)
 admin.site.register(Measurementresults)
 admin.site.register(Measurementresultvalues)
+admin.site.register(MeasurementresultvalueFile)
