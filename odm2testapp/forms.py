@@ -49,49 +49,11 @@ from .models import Measurementresults
 from .models import Measurementresultvalues
 
 
+
 # AffiliationsChoiceField(People.objects.all().order_by('personlastname'),Organizations.objects.all().order_by('organizationname'))
 
 #a complicated use of search_fields described in ResultsAdminForm
 
-class AffiliationsChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return "%s "%(obj.personlink)
-
-class MethodsModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return "%s"%(obj.methodname)
-
-class ActionByChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return "%s"%(obj.actiondescription)
-
-#custom fields to populate form dropdownlists.
-class TermModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return "%s"%(obj.term)
-
-class PersonModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return "%s, %s"%(obj.personlastname, obj.personfirstname)
-
-class VariableNameModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return "%s"%(obj.variablenamecv.term)
-
-class ActionsModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return "%s"%(obj.actiontypecv.term)
-
-class OrganizationsModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return "%s"%(obj.organizationname)
-class programFilesModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return "%s"%(obj.programname)
-
-class SamplingfeaturesModelChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj):
-        return "%s"%(obj.samplingfeaturename)
 #the following define what fields should be overridden so that dropdown lists can be populated with useful information
 class VariablesAdminForm(ModelForm):
     #variabletypecv= TermModelChoiceField(CvVariabletype.objects.all().order_by('term'))
@@ -110,7 +72,6 @@ class VariablesAdmin(admin.ModelAdmin):
 
 
 class TaxonomicclassifiersAdminForm(ModelForm):
-    taxonomic_classifier_type= TermModelChoiceField(CvTaxonomicclassifiertype.objects.all().order_by('term'))
     class Meta:
         model= Taxonomicclassifiers
         fields = '__all__'
@@ -138,15 +99,13 @@ class ResultsAdminForm(ModelForm):
 class ResultsAdmin(admin.ModelAdmin):
     form=ResultsAdminForm
     list_display = ['feature_action','processing_level']
-    #'feature_action__sampling_feature__samplingfeaturename' >> looks at the feature action, then the related
-    # sampling feature of the feature action and searchs on the sampling feature name on the related sampling feature.
     search_fields= ['variable__variable_name__name','feature_action__sampling_feature__samplingfeaturename',
                     'result_type__name','processing_level__definition__name']
 
 class RelatedactionsAdminForm(ModelForm):
-    actionid= ActionsModelChoiceField(Actions.objects.all().order_by('begindatetime'))
-    relationshiptypecv= TermModelChoiceField(CvRelationshiptype.objects.all().order_by('term'))
-    relatedactionid= ActionsModelChoiceField(Actions.objects.all().order_by('begindatetime'))
+    #actionid= ActionsModelChoiceField(Actions.objects.all().order_by('begindatetime'))
+    #relationshiptypecv= TermModelChoiceField(CvRelationshiptype.objects.all().order_by('term'))
+    #relatedactionid= ActionsModelChoiceField(Actions.objects.all().order_by('begindatetime'))
     class Meta:
         model= Relatedactions
         fields = '__all__'
@@ -154,8 +113,8 @@ class RelatedactionsAdmin(admin.ModelAdmin):
     form=RelatedactionsAdminForm
 
 class OrganizationsAdminForm(ModelForm):
-    organizationtypecv= TermModelChoiceField(CvOrganizationtype.objects.all().order_by('term'))
-    parentorganizationid =OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
+    #organizationtypecv= TermModelChoiceField(CvOrganizationtype.objects.all().order_by('term'))
+    #parentorganizationid =OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
     class Meta:
         model= Organizations
         fields = '__all__'
@@ -173,7 +132,6 @@ class FeatureactionsAdmin(admin.ModelAdmin):
 
 
 class DatasetsAdminForm(ModelForm):
-    datasettypecv= TermModelChoiceField(CvDatasettypecv.objects.all().order_by('term'))
     class Meta:
         model= Datasets
         fields = '__all__'
@@ -181,9 +139,8 @@ class DatasetsAdmin(admin.ModelAdmin):
     form=DatasetsAdminForm
 
 class AffiliationsAdminForm(ModelForm):
-    #affiliationid = models.AutoField(primary_key=True)
-    organizationid= OrganizationsModelChoiceField(Organizations.objects.all().order_by('organizationname'))
-    personid = PersonModelChoiceField(People.objects.all().order_by('personlastname'))
+    #organizationid= OrganizationsModelChoiceField(Organizations.objects.all().order_by('organizationname'))
+    #personid = PersonModelChoiceField(People.objects.all().order_by('personlastname'))
     class Meta:
         model= Affiliations
         fields = '__all__'
@@ -212,8 +169,8 @@ class ActionByAdmin(admin.ModelAdmin):
 
 
 class MethodsAdminForm(ModelForm):
-    methodtypecv= TermModelChoiceField(CvMethodtype.objects.all().order_by('term'))
-    organizationid= OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
+    #methodtypecv= TermModelChoiceField(CvMethodtype.objects.all().order_by('term'))
+    #organizationid= OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
     class Meta:
         model= Methods
         fields = '__all__'
@@ -222,50 +179,43 @@ class MethodsAdmin(admin.ModelAdmin):
 
 
 class DataloggerfilesAdminForm(ModelForm):
-    #programid= programFilesModelChoiceField( Dataloggerprogramfiles.objects.all().order_by('programname'))
     class Meta:
         model= Dataloggerfiles
         fields = '__all__'
 class DataloggerfilesAdmin(admin.ModelAdmin):
     form=DataloggerfilesAdminForm
-from .models import Measurementresults
-from .models import Measurementresultvalues
+
 
 class MeasurementresultsForm(ModelForm):
-    #programid= programFilesModelChoiceField( Dataloggerprogramfiles.objects.all().order_by('programname'))
     class Meta:
         model= Measurementresults
         fields = '__all__'
 
-class MeasurementresultvaluesForm(ModelForm):
-    #programid= programFilesModelChoiceField( Dataloggerprogramfiles.objects.all().order_by('programname'))
+class MeasurementresultvaluesAdminForm(ModelForm):
     class Meta:
         model= Measurementresultvalues
         fields = '__all__'
-
+class MeasurementresultvaluesAdmin(admin.ModelAdmin):
+    form=MeasurementresultvaluesAdminForm
+    list_display = ['datavalue','valuedatetime','resultid','feature_action_link'] #,'resultid__feature_action__name', 'resultid__variable__name'
+    list_display_links = ['resultid','feature_action_link']
+    search_fields= ['resultid__resultid__feature_action__sampling_feature__samplingfeaturename','resultid__resultid__variable__variable_name__name',
+                    'resultid__resultid__variable__variable_type__name']
+    def feature_action_link(self,obj):
+        return u'<a href="/admin/odm2testapp/featureactions/%s/">%s</a>' % (obj.resultid.resultid.feature_action.featureactionid,obj.resultid.resultid.feature_action)
+    feature_action_link.short_description = 'feature action'
+    feature_action_link.allow_tags = True
+    feature_action_link.admin_order_field = 'resultid__resultid__feature_action__sampling_feature'
+    #get_feature_action = 'resultid__resultid__feature_action'
 
 class MeasurementresultvalueFileForm(ModelForm):
     class Meta:
         model= MeasurementresultvalueFile
         fields = '__all__'
-    #def save_model(self, request, obj, form, change):
-    #    form.save()
-    #    handle_uploaded_file(obj.file)
-    # def upload_file(request):
-    #     if request.method == 'POST':
-    #         form = MeasurementresultvalueFileForm(request.POST, request.FILES)
-    #         if form.is_valid():
-    #             handle_uploaded_file(request.FILES['file'])
-    #             return HttpResponseRedirect('/success/url/')
-    #     else:
-    #         form = MeasurementresultvalueFileForm()
-    #     return render_to_response('upload.html', {'form': form})
 
 
 
 class UnitsAdminForm(ModelForm):
-    #programid= programFilesModelChoiceField( Dataloggerprogramfiles.objects.all().order_by('programname'))
-    #unitstypecv = CvUnitstype.objects.all().order_by('term')
     class Meta:
         model= Units
         fields = '__all__'

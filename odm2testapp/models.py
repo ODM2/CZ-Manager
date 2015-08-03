@@ -333,7 +333,10 @@ class CvDataqualitytype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_dataqualitytype'
@@ -346,7 +349,10 @@ class CvDatasettypecv(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0},'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_datasettypecv'
@@ -402,7 +408,10 @@ class CvMethodtype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0}'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_methodtype'
@@ -996,8 +1005,8 @@ class Measurementresultvalueannotations(models.Model):
 
 class Measurementresultvalues(models.Model):
     valueid = models.AutoField(primary_key=True)
-    resultid = models.ForeignKey(Measurementresults, db_column='resultid')
-    datavalue = models.FloatField(verbose_name='datavalue')
+    resultid = models.ForeignKey(Measurementresults, verbose_name='result',db_column='resultid')
+    datavalue = models.FloatField(verbose_name='data value')
     valuedatetime = models.DateTimeField(verbose_name='value date time')
     valuedatetimeutcoffset = models.IntegerField(verbose_name='value date time UTC offset', default=4)
     def __str__(self):
@@ -1008,7 +1017,7 @@ class Measurementresultvalues(models.Model):
     class Meta:
         managed = False
         db_table = 'measurementresultvalues'
-        verbose_name='Measurement result value'
+        verbose_name='measurement result value'
 
 
 def handle_uploaded_file(f,id):
@@ -1034,20 +1043,20 @@ def handle_uploaded_file(f,id):
                 datestr = time.strftime("%Y-%m-%d %H:%M",dateT)
                 Measurementresultvalues(resultid=id,datavalue=row[1],valuedatetime=datestr,valuedatetimeutcoffset=4).save()
     except IndexError:
-        raise ValidationError(row)
+        raise ValidationError('encountered a problem with row '+row)
 
 class MeasurementresultvalueFile(models.Model):
     valueFileid = models.AutoField(primary_key=True)
-    resultid = models.ForeignKey(Measurementresults, db_column='resultid')
-    valueFile = models.FileField(upload_to='resultvalues')
+    resultid = models.ForeignKey(Measurementresults, verbose_name='result',db_column='resultid')
+    valueFile = models.FileField(upload_to='resultvalues', verbose_name="value file ")
     def __str__(self):
         s=str(self.resultid)
         return s
     class Meta:
         db_table = 'Measurementresultvaluefile'
+        verbose_name='measurement result value file'
     def save(self, *args, **kwargs):
         handle_uploaded_file(self.valueFile.file,self.resultid)
-
         super(MeasurementresultvalueFile, self).save(*args, **kwargs)
 
 class Methodannotations(models.Model):
@@ -1096,12 +1105,12 @@ class Methodexternalidentifiers(models.Model):
 
 class Methods(models.Model):
     methodid = models.AutoField(primary_key=True)
-    methodtypecv = models.ForeignKey(CvMethodtype, db_column='methodtypecv')
-    methodcode = models.CharField(max_length=50)
-    methodname = models.CharField(max_length=255)
-    methoddescription = models.CharField(max_length=500, blank=True)
-    methodlink = models.CharField(max_length=255, blank=True)
-    organizationid = models.ForeignKey('Organizations', db_column='organizationid', blank=True, null=True)
+    methodtypecv = models.ForeignKey(CvMethodtype,verbose_name='method type', db_column='methodtypecv')
+    methodcode = models.CharField(verbose_name='method code',max_length=50)
+    methodname = models.CharField(verbose_name='method name',max_length=255)
+    methoddescription = models.CharField(verbose_name='method description', max_length=500, blank=True)
+    methodlink = models.CharField(verbose_name='web link for method', max_length=255, blank=True)
+    organizationid = models.ForeignKey('Organizations', verbose_name='organization', db_column='organizationid', blank=True, null=True)
     def __str__(self):
         s = str(self.methodcode)
         if self.methodname:
@@ -1171,6 +1180,7 @@ class People(models.Model):
         managed = False
         db_table = 'people'
         verbose_name='people'
+        verbose_name_plural='people'
 
 
 class Personexternalidentifiers(models.Model):
@@ -1233,7 +1243,7 @@ class Pointcoverageresultvalues(models.Model):
 
 class Processinglevels(models.Model):
     processinglevelid = models.AutoField(primary_key=True)
-    processinglevelcode = models.CharField(max_length=50)
+    processinglevelcode = models.CharField(verbose_name='processing level code',max_length=50)
     definition = models.CharField(max_length=500, blank=True)
     explanation = models.CharField(max_length=500, blank=True)
     def __str__(self):
@@ -1338,9 +1348,9 @@ class Referencematerialvalues(models.Model):
 
 class Relatedactions(models.Model):
     relationid = models.AutoField(primary_key=True)
-    actionid = models.ForeignKey(Actions, db_column='actionid')
-    relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
-    relatedactionid = models.ForeignKey(Actions, related_name='RelatedActions',db_column='relatedactionid')
+    actionid = models.ForeignKey(Actions,verbose_name='action', db_column='actionid')
+    relationshiptypecv = models.ForeignKey(CvRelationshiptype, verbose_name='relationship type', db_column='relationshiptypecv')
+    relatedactionid = models.ForeignKey(Actions, verbose_name='related action',related_name='RelatedActions',db_column='relatedactionid')
     def __str__(self):
         s = str(self.actionid)
         if self.relationshiptypecv:
@@ -1502,8 +1512,8 @@ class Results(models.Model):
     def __str__(self):
         s = str(self.resultid)
         s +=  '- {0}'.format(self.variable)
-        if self.result_type:
-            s += ', {0}'.format(self.result_type)
+        #if self.result_type:
+            #s += ', {0}'.format(self.result_type)
         return s
     class Meta:
         managed = False
