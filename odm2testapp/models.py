@@ -811,10 +811,10 @@ class Datasetcitations(models.Model):
 class Datasets(models.Model):
     datasetid = models.AutoField(primary_key=True)
     datasetuuid = UUIDField(auto=True)
-    datasettypecv = models.ForeignKey(CvDatasettypecv, db_column='datasettypecv')
-    datasetcode = models.CharField(max_length=50)
-    datasettitle = models.CharField(max_length=255)
-    datasetabstract = models.CharField(max_length=500)
+    datasettypecv = models.ForeignKey(CvDatasettypecv, verbose_name="dataset type", db_column='datasettypecv')
+    datasetcode = models.CharField(verbose_name="dataset code", max_length=50)
+    datasettitle = models.CharField(verbose_name="dataset title", max_length=255)
+    datasetabstract = models.CharField(verbose_name = "dataset abstract", max_length=500)
     def __str__(self):
         s = str(self.datasetcode)
         if self.datasettitle:
@@ -828,8 +828,8 @@ class Datasets(models.Model):
 
 class Datasetsresults(models.Model):
     bridgeid = models.AutoField(primary_key=True)
-    datasetid = models.ForeignKey(Datasets, db_column='datasetid')
-    resultid = models.ForeignKey('Results', db_column='resultid')
+    datasetid = models.ForeignKey(Datasets, verbose_name="dataset",db_column='datasetid')
+    resultid = models.ForeignKey('Results',verbose_name="add the dataset to the result", db_column='resultid')
     def __str__(self):
         s = str(self.datasetid)
         if self.resultid:
@@ -980,18 +980,18 @@ class Maintenanceactions(models.Model):
 
 class Measurementresults(models.Model):
     resultid = models.ForeignKey('Results', db_column='resultid', primary_key=True)
-    xlocation = models.FloatField(blank=True, null=True)
-    xlocationunitsid = models.ForeignKey('Units', related_name='relatedXlocationUnits',  db_column='xlocationunitsid', blank=True, null=True)
-    ylocation = models.FloatField(blank=True, null=True)
-    ylocationunitsid = models.ForeignKey('Units', related_name='relatedYlocationUnits',  db_column='ylocationunitsid', blank=True, null=True)
-    zlocation = models.FloatField(blank=True, null=True)
-    zlocationunitsid = models.ForeignKey('Units', related_name='relatedZlocationUnits', db_column='zlocationunitsid', blank=True, null=True)
-    spatialreferenceid = models.ForeignKey('Spatialreferences', db_column='spatialreferenceid', blank=True, null=True)
-    censorcodecv = models.ForeignKey(CvCensorcode, db_column='censorcodecv')
-    qualitycodecv = models.ForeignKey(CvQualitycode, db_column='qualitycodecv')
-    aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, db_column='aggregationstatisticcv')
-    timeaggregationinterval = models.FloatField()
-    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+', db_column='timeaggregationintervalunitsid')
+    xlocation = models.FloatField(verbose_name="x location",blank=True, null=True)
+    xlocationunitsid = models.ForeignKey('Units',verbose_name="x location units", related_name='relatedXlocationUnits',  db_column='xlocationunitsid', blank=True, null=True)
+    ylocation = models.FloatField(blank=True,verbose_name="y location", null=True)
+    ylocationunitsid = models.ForeignKey('Units',verbose_name="y location units", related_name='relatedYlocationUnits',  db_column='ylocationunitsid', blank=True, null=True)
+    zlocation = models.FloatField(blank=True, verbose_name="z location", null=True)
+    zlocationunitsid = models.ForeignKey('Units', verbose_name="z location units",related_name='relatedZlocationUnits', db_column='zlocationunitsid', blank=True, null=True)
+    spatialreferenceid = models.ForeignKey('Spatialreferences', verbose_name="spatial reference", db_column='spatialreferenceid', blank=True, null=True)
+    censorcodecv = models.ForeignKey(CvCensorcode, verbose_name="censor code", db_column='censorcodecv')
+    qualitycodecv = models.ForeignKey(CvQualitycode, verbose_name="quality code", db_column='qualitycodecv')
+    aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, verbose_name="aggregation statistic", db_column='aggregationstatisticcv')
+    timeaggregationinterval = models.FloatField(verbose_name="time aggregation interval")
+    timeaggregationintervalunitsid = models.ForeignKey('Units',verbose_name="time aggregation interval unit", related_name='+', db_column='timeaggregationintervalunitsid')
     def __str__(self):
         s=str(self.resultid)
         s += '- {0}'.format(self.censorcodecv)

@@ -9,6 +9,7 @@ from django.forms import FileField
 from .forms import ModelForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+
 from django.shortcuts import render_to_response
 
 from odm2testapp.models import Variables
@@ -132,6 +133,7 @@ class FeatureactionsAdmin(admin.ModelAdmin):
 
 
 class DatasetsAdminForm(ModelForm):
+    datasetabstract = django.forms.CharField(max_length=500, widget=django.forms.Textarea )
     class Meta:
         model= Datasets
         fields = '__all__'
