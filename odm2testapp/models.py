@@ -828,7 +828,7 @@ class Datasetsresults(models.Model):
     class Meta:
         managed = False
         db_table = 'datasetsresults'
-        verbose_name='data set result'
+        verbose_name='dataset result'
 
 
 class Derivationequations(models.Model):

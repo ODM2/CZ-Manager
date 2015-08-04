@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 TEMPLATE_DIR =os.path.dirname(__file__)
-TEMPLATE_PATH = os.path.join(TEMPLATE_DIR, 'templates')
+TEMPLATE_PATH = os.path.join(TEMPLATE_DIR, 'templates/admin')
 print(TEMPLATE_PATH)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -27,9 +27,22 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+MEDIA_ROOT = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin/odm2testapp/upfiles/'
+MEDIA_URL = '/odm2testapp/upfiles/'
 # Application definition
 
+
+#https://github.com/mishbahr/django-modeladmin-reorder
+#{'app': 'auth', 'models': ('auth.User', 'auth.Group')},
+# ADMIN_REORDER = ('odm2testsite',
+#                  {'app':'Odm2Testapp',
+#                   'auth':'staff',
+#                   'models':("People", "Organizations","Affiliations", "Variables","Units",
+#                       "Taxonomicclassifiers","Methods","Actions","Relatedactions","Actionby","Samplingfeatures",
+#                       "Featureactions","Datatsets","Results","Datasetsresults","Processinglevels","Measurementresults",
+#                       "Measurementresultvalues","MeasurementresultvalueFile", "Dataloggerfiles",
+#                       "Dataloggerprogramfiles")},
+# )
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,6 +50,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #'admin_reorder',
 	'odm2testapp',
 )
 
@@ -48,6 +62,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #'admin_reorder.middleware.ModelAdminReorder',
 )
 
 ROOT_URLCONF = 'odm2testsite.urls'
@@ -61,9 +76,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'odm2',
-        'USER': 'XXXX',
-        'PASSWORD': 'XXXX',
-        'HOST': '127.0.0.1',
+        'USER': 'postgres',
+        'PASSWORD': 'AronieTh3Cow',
+        'HOST': '52.6.182.117',
         'PORT': '5432',
      'OPTIONS': {
       'options': '-c search_path=odm2'
