@@ -1,3 +1,4 @@
+<!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/-->
 {% extends "admin/index.html" %}
 {% load admin_extras %}
 {% load i18n admin_static %}
@@ -244,7 +245,6 @@
             {% if model.add_url %}
                 <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
             {% else %}
-                <td>&nbsp;</td>
             {% endif %}
             {% if model.admin_url %}
                 <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
@@ -322,9 +322,30 @@
 
         {% assign varnotfound True %}
         {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Dataset results' and varnotfound %}
+            {% if model.admin_url and model.name == 'Datasets' and varnotfound %}
                 <tr class="model-{{ model.object_name|lower }}">
                 <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+                {% assign varnotfound False %}
+            {% if model.add_url %}
+                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+            {% if model.admin_url %}
+                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+            </tr>
+        {% endif %}
+        {% endfor %}
+
+        {% assign varnotfound True %}
+        {% for model in app.models %}
+            {% if model.admin_url and model.name == 'Dataset results' and varnotfound %}
+                <tr class="model-{{ model.object_name|lower }}">
+                <th scope="row"><a href="{{ model.admin_url }}">dataset attributed to results
+                    (results can have different datasets with different processing levels)</a></th>
                 {% assign varnotfound False %}
             {% if model.add_url %}
                 <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>

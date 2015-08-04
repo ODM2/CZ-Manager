@@ -139,8 +139,7 @@ class DatasetsAdmin(admin.ModelAdmin):
     form=DatasetsAdminForm
 
 class AffiliationsAdminForm(ModelForm):
-    #organizationid= OrganizationsModelChoiceField(Organizations.objects.all().order_by('organizationname'))
-    #personid = PersonModelChoiceField(People.objects.all().order_by('personlastname'))
+
     class Meta:
         model= Affiliations
         fields = '__all__'
@@ -154,6 +153,9 @@ class ActionsAdminForm(ModelForm):
         model= Actions
         fields = '__all__'
 class ActionsAdmin(admin.ModelAdmin):
+    list_display=('action_type','method')
+    list_display_links =('action_type','method')
+    search_fields=['action_type__name','method__methodname']#,
     form=ActionsAdminForm
 
 
@@ -163,7 +165,8 @@ class ActionByAdminForm(ModelForm):
         model= Actionby
         fields = '__all__'
 class ActionByAdmin(admin.ModelAdmin):
-    #list_display=('__str__',) #'affiliationid','actionid'
+    list_display=('affiliationid','actionid')
+    list_display_links =('affiliationid','actionid')#
     form=ActionByAdminForm
     #list_select_related = True
 

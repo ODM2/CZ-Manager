@@ -43,10 +43,10 @@ class Actionannotations(models.Model):
 
 class Actionby(models.Model):
     bridgeid = models.AutoField(primary_key=True)
-    actionid = models.ForeignKey('Actions', db_column='actionid')
-    affiliationid = models.ForeignKey('Affiliations', db_column='affiliationid')
-    isactionlead = models.BooleanField()
-    roledescription = models.CharField(max_length=500, blank=True)
+    actionid = models.ForeignKey('Actions',verbose_name="action", db_column='actionid')
+    affiliationid = models.ForeignKey('Affiliations',verbose_name="person by affiliation", db_column='affiliationid')
+    isactionlead = models.BooleanField(verbose_name="is lead person on action")
+    roledescription = models.CharField(max_length=500,verbose_name="person's role on this action", blank=True)
     #def affiliationsForActionBy(self):
         #return self.affiliationid.objects.all().order_by('personlink')
     def __str__(self):
@@ -96,10 +96,10 @@ class Actions(models.Model):
     actionfilelink = models.CharField(verbose_name='action file link',max_length=255, blank=True)
     def __str__(self):
         s = str(self.action_type)
-        #if self.methodid:
-        #    s += '- {0},'.format(self.methodid)
-        if self.actiondescription:
-            s += '- {0},'.format(self.actiondescription)
+        if self.method:
+            s += '- {0},'.format(self.method)
+        #if self.actiondescription:
+            #s += '- {0},'.format(self.actiondescription)
         return s
     class Meta:
         managed = False
@@ -109,14 +109,14 @@ class Actions(models.Model):
 
 class Affiliations(models.Model):
     affiliationid = models.AutoField(primary_key=True)
-    personid = models.ForeignKey('People', db_column='personid')
-    organizationid = models.ForeignKey('Organizations', db_column='organizationid', blank=True, null=True)
-    isprimaryorganizationcontact = models.NullBooleanField()
-    affiliationstartdate = models.DateField()
-    affiliationenddate = models.DateField(blank=True, null=True)
-    primaryphone = models.CharField(max_length=50, blank=True)
-    primaryemail = models.CharField(max_length=255)
-    primaryaddress = models.CharField(max_length=255, blank=True)
+    personid = models.ForeignKey('People', verbose_name='person', db_column='personid')
+    organizationid = models.ForeignKey('Organizations', verbose_name='organization', db_column='organizationid', blank=True, null=True)
+    isprimaryorganizationcontact = models.NullBooleanField(verbose_name='primary organization contact? ')
+    affiliationstartdate = models.DateField(verbose_name="When affiliation began ")
+    affiliationenddate = models.DateField(verbose_name="When affiliation ended",blank=True, null=True)
+    primaryphone = models.CharField(verbose_name="primary phone",max_length=50, blank=True)
+    primaryemail = models.CharField(verbose_name="primary email",max_length=255)
+    primaryaddress = models.CharField(verbose_name="primary address", max_length=255, blank=True)
     personlink = models.CharField(max_length=255, blank=True)
     def __str__(self):
         s = str(self.personid)
@@ -259,6 +259,7 @@ class Citations(models.Model):
     class Meta:
         managed = False
         db_table = 'citations'
+        ordering = ['title']
 
 
 class CvActiontype(models.Model):
@@ -424,7 +425,10 @@ class CvOrganizationtype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __str__(self):
+        s=str(self.term)
+        s += '- {0}'.format(self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_organizationtype'
@@ -441,6 +445,7 @@ class CvPropertydatatype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_propertydatatype'
+        ordering = ['term','name']
 
 
 class CvQualitycode(models.Model):
@@ -470,6 +475,7 @@ class CvReferencematerialmedium(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_referencematerialmedium'
+        ordering = ['term','name']
 
 
 class CvRelationshiptype(models.Model):
@@ -578,6 +584,7 @@ class CvSpatialoffsettype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_spatialoffsettype'
+        ordering = ['term','name']
 
 
 class CvSpeciation(models.Model):
@@ -657,6 +664,8 @@ class CvTaxonomicclassifiertype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_taxonomicclassifiertype'
+        ordering = ['term','name']
+        verbose_name="taxonomic classifier"
 
 
 class CvUnitstype(models.Model):
@@ -689,7 +698,7 @@ class CvVariablename(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_variablename'
-
+        ordering = ['term','name']
 
 
 
@@ -708,6 +717,7 @@ class CvVariabletype(models.Model):
     class Meta:
         managed = False
         db_table = 'cv_variabletype'
+        ordering = ['term','name']
 
 
 class Dataloggerfilecolumns(models.Model):
@@ -1149,12 +1159,12 @@ class Models(models.Model):
 
 class Organizations(models.Model):
     organizationid = models.AutoField(primary_key=True)
-    organizationtypecv = models.ForeignKey(CvOrganizationtype, db_column='organizationtypecv')
-    organizationcode = models.CharField(max_length=50)
-    organizationname = models.CharField(max_length=255)
-    organizationdescription = models.CharField(max_length=500, blank=True)
-    organizationlink = models.CharField(max_length=255, blank=True)
-    parentorganizationid = models.ForeignKey('self', db_column='parentorganizationid', null=True, default=1)
+    organizationtypecv = models.ForeignKey( CvOrganizationtype, verbose_name="organization type", db_column='organizationtypecv')
+    organizationcode = models.CharField(verbose_name="organization code", max_length=50)
+    organizationname = models.CharField(verbose_name="organization name", max_length=255)
+    organizationdescription = models.CharField(verbose_name="organization description", max_length=500, blank=True)
+    organizationlink = models.CharField(verbose_name="organization web link", max_length=255, blank=True)
+    parentorganizationid = models.ForeignKey('self',verbose_name="parent organization", db_column='parentorganizationid', null=True, default=1)
     def __str__(self):
         s = str(self.organizationcode)
         if self.organizationname:
@@ -1823,7 +1833,8 @@ class Taxonomicclassifierexternalidentifiers(models.Model):
 
 class Taxonomicclassifiers(models.Model):
     taxonomicclassifierid = models.AutoField(primary_key=True)
-    taxonomic_classifier_type = models.ForeignKey(CvTaxonomicclassifiertype, db_column='taxonomicclassifiertypecv')
+    taxonomic_classifier_type = models.ForeignKey(CvTaxonomicclassifiertype, db_column='taxonomicclassifiertypecv',
+                    help_text="check http://vocabulary.odm2.org/taxonomicclassifiertype/  for more info")
     taxonomicclassifiername = models.CharField(verbose_name='taxonomic classifier name', max_length=255)
     taxonomicclassifiercommonname = models.CharField(verbose_name='taxonomic classifier common name',max_length=255, blank=True)
     taxonomicclassifierdescription = models.CharField(verbose_name='taxonomic classifier description',max_length=500, blank=True)
