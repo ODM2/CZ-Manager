@@ -11,7 +11,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
 from django.shortcuts import render_to_response
-
+#from odm2testapp.lookups import CvVariableNameLookup
 from odm2testapp.models import Variables
 from odm2testapp.models import CvVariabletype
 from odm2testapp.models import CvVariablename
@@ -42,10 +42,14 @@ from odm2testapp.models import Actionby
 from odm2testapp.models import Actions
 from odm2testapp.models import Dataloggerprogramfiles
 from odm2testapp.models import Dataloggerfiles
+from odm2testapp.models import Dataloggerfilecolumns
 from odm2testapp.models import Methods
 from odm2testapp.models import Units
 from odm2testapp.models import MeasurementresultvalueFile
 from odm2testapp.models import CvUnitstype
+from odm2testapp.models import Instrumentoutputvariables
+from odm2testapp.models import Equipmentmodels
+from ajax_select import make_ajax_field
 from .models import Measurementresults
 from .models import Measurementresultvalues
 
@@ -60,7 +64,7 @@ class VariablesAdminForm(ModelForm):
     #variabletypecv= TermModelChoiceField(CvVariabletype.objects.all().order_by('term'))
    # variablenamecv= TermModelChoiceField(CvVariablename.objects.all().order_by('term'))
     #speciationcv= TermModelChoiceField(CvSpeciation.objects.all().order_by('term'))
-
+    variable_name = make_ajax_field(Variables,'variable_name','cv_variable_name')
     class Meta:
         model=Variables
         fields = '__all__'
@@ -190,6 +194,15 @@ class DataloggerfilesAdminForm(ModelForm):
 class DataloggerfilesAdmin(admin.ModelAdmin):
     form=DataloggerfilesAdminForm
 
+class DataloggerfilecolumnsAdminForm(ModelForm):
+    class Meta:
+        model= Dataloggerfilecolumns
+        fields = '__all__'
+class DataloggerfilecolumnsAdmin(admin.ModelAdmin):
+    form=DataloggerfilecolumnsAdminForm
+
+
+
 
 class MeasurementresultsForm(ModelForm):
     class Meta:
@@ -246,3 +259,20 @@ class DataloggerprogramfilesAdminForm(ModelForm):
 class DataloggerprogramfilesAdmin(admin.ModelAdmin):
     form=DataloggerprogramfilesAdminForm
 
+
+
+class InstrumentoutputvariablesAdminForm(ModelForm):
+    class Meta:
+        model= Instrumentoutputvariables
+        fields = '__all__'
+class InstrumentoutputvariablesAdmin(admin.ModelAdmin):
+    form=InstrumentoutputvariablesAdminForm
+
+
+
+class EquipmentmodelsAdminForm(ModelForm):
+    class Meta:
+        model= Equipmentmodels
+        fields = '__all__'
+class EquipmentmodelsAdmin(admin.ModelAdmin):
+    form=EquipmentmodelsAdminForm

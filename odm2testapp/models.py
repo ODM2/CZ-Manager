@@ -86,7 +86,10 @@ class Actionextensionpropertyvalues(models.Model):
 
 class Actions(models.Model):
     actionid = models.AutoField(primary_key=True)
-    action_type = models.ForeignKey('CvActiontype', db_column='actiontypecv')
+    action_type = models.ForeignKey('CvActiontype',
+            help_text= "A vocabulary for describing the type of actions performed in making observations. Depending" +
+            " on the action type, the action may or may not produce an observation result. view action type "+
+            "details here http://vocabulary.odm2.org/actiontype/",db_column='actiontypecv')
     method = models.ForeignKey('Methods', db_column='methodid')
     begindatetime = models.DateTimeField(verbose_name='begin date time')
     begindatetimeutcoffset = models.IntegerField(verbose_name='begin date time clock off set (from GMT)', default=4)
@@ -722,17 +725,21 @@ class CvVariabletype(models.Model):
 
 class Dataloggerfilecolumns(models.Model):
     dataloggerfilecolumnid = models.AutoField(primary_key=True)
-    resultid = models.ForeignKey('Results', db_column='resultid', blank=True, null=True)
-    dataloggerfileid = models.ForeignKey('Dataloggerfiles', db_column='dataloggerfileid')
-    instrumentoutputvariableid = models.ForeignKey('Instrumentoutputvariables', db_column='instrumentoutputvariableid')
-    columnlabel = models.CharField(max_length=50)
-    columndescription = models.CharField(max_length=500, blank=True)
-    measurementequation = models.CharField(max_length=255, blank=True)
-    scaninterval = models.FloatField(blank=True, null=True)
-    scanintervalunitsid = models.ForeignKey('Units', related_name='relatedScanIntervalUnitsid', db_column='scanintervalunitsid', blank=True, null=True)
-    recordinginterval = models.FloatField(blank=True, null=True)
-    recordingintervalunitsid = models.ForeignKey('Units', related_name='relatedRecordingintervalunitsid', db_column='recordingintervalunitsid', blank=True, null=True)
-    aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, db_column='aggregationstatisticcv', blank=True, null=True)
+    resultid = models.ForeignKey('Results',verbose_name="result", db_column='resultid', blank=True, null=True)
+    dataloggerfileid = models.ForeignKey('Dataloggerfiles', verbose_name="data logger file", db_column='dataloggerfileid')
+    instrumentoutputvariableid = models.ForeignKey('Instrumentoutputvariables',
+                                verbose_name="instrument output variable", db_column='instrumentoutputvariableid')
+    columnlabel = models.CharField(verbose_name="column label", max_length=50)
+    columndescription = models.CharField(verbose_name = "column description", max_length=500, blank=True)
+    measurementequation = models.CharField(verbose_name="measurement equation", max_length=255, blank=True)
+    scaninterval = models.FloatField(verbose_name="scan interval (time)", blank=True, null=True)
+    scanintervalunitsid = models.ForeignKey('Units', verbose_name="scan interval units",
+                    related_name='relatedScanIntervalUnitsid', db_column='scanintervalunitsid', blank=True, null=True)
+    recordinginterval = models.FloatField(verbose_name="recording interval",blank=True, null=True)
+    recordingintervalunitsid = models.ForeignKey('Units',verbose_name="recording interval units",
+    related_name='relatedRecordingintervalunitsid', db_column='recordingintervalunitsid', blank=True, null=True)
+    aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, verbose_name="aggregation statistic",
+                                               db_column='aggregationstatisticcv', blank=True, null=True)
     def __str__(self):
         s=str(self.columnlabel)
         s += '- {0},'.format(self.columndescription)
@@ -740,6 +747,7 @@ class Dataloggerfilecolumns(models.Model):
     class Meta:
         managed = False
         db_table = 'dataloggerfilecolumns'
+        verbose_name='data logger file column'
 
 
 class Dataloggerfiles(models.Model):
@@ -891,17 +899,24 @@ class Equipmentannotations(models.Model):
 
 class Equipmentmodels(models.Model):
     equipmentmodelid = models.AutoField(primary_key=True)
-    modelmanufacturerid = models.ForeignKey('Organizations', db_column='modelmanufacturerid')
-    modelpartnumber = models.CharField(max_length=50, blank=True)
-    modelname = models.CharField(max_length=255)
-    modeldescription = models.CharField(max_length=500, blank=True)
-    isinstrument = models.BooleanField()
-    modelspecificationsfilelink = models.CharField(max_length=255, blank=True)
-    modellink = models.CharField(max_length=255, blank=True)
-
+    modelmanufacturerid = models.ForeignKey('Organizations', verbose_name="model manufacturer",
+                                            db_column='modelmanufacturerid')
+    modelpartnumber = models.CharField(max_length=50, blank=True, verbose_name="model part number")
+    modelname = models.CharField(max_length=255, verbose_name="model name")
+    modeldescription = models.CharField(max_length=500, blank=True, verbose_name="model dscription")
+    isinstrument = models.BooleanField(verbose_name="Is this an instrument?")
+    modelspecificationsfilelink = models.CharField(max_length=255,
+                                verbose_name="link to manual for equipment", blank=True)
+    modellink = models.CharField(max_length=255, verbose_name="link to website for model", blank=True)
+    def __str__(self):
+        s=str(self.modelname)
+        if self.modelpartnumber:
+            s += '- {0}'.format(self.modelpartnumber)
+        return s
     class Meta:
         managed = False
         db_table = 'equipmentmodels'
+        verbose_name="equipment model"
 
 
 class Equipmentused(models.Model):
@@ -955,16 +970,21 @@ class Featureactions(models.Model):
 
 class Instrumentoutputvariables(models.Model):
     instrumentoutputvariableid = models.AutoField(primary_key=True)
-    modelid = models.ForeignKey(Equipmentmodels, db_column='modelid')
-    variableid = models.ForeignKey('Variables', db_column='variableid')
-    instrumentmethodid = models.ForeignKey('Methods', db_column='instrumentmethodid')
-    instrumentresolution = models.CharField(max_length=255, blank=True)
-    instrumentaccuracy = models.CharField(max_length=255, blank=True)
-    instrumentrawoutputunitsid = models.ForeignKey('Units', related_name='+',  db_column='instrumentrawoutputunitsid')
-
+    modelid = models.ForeignKey(Equipmentmodels,verbose_name="equipment model", db_column='modelid')
+    variableid = models.ForeignKey('Variables',verbose_name="variable", db_column='variableid')
+    instrumentmethodid = models.ForeignKey('Methods',verbose_name="instrument method", db_column='instrumentmethodid')
+    instrumentresolution = models.CharField(max_length=255, verbose_name="instrument resolution", blank=True)
+    instrumentaccuracy = models.CharField(max_length=255, verbose_name="instrument accuracy", blank=True)
+    instrumentrawoutputunitsid = models.ForeignKey('Units', related_name='+',verbose_name="instrument raw output unit",
+                                                   db_column='instrumentrawoutputunitsid')
+    def __str__(self):
+        s=str(self.modelid)
+        s += '- {0}'.format(self.variableid)
+        return s
     class Meta:
         managed = False
         db_table = 'instrumentoutputvariables'
+        verbose_name="instrument output variable"
 
 
 class Maintenanceactions(models.Model):
@@ -1115,7 +1135,12 @@ class Methodexternalidentifiers(models.Model):
 
 class Methods(models.Model):
     methodid = models.AutoField(primary_key=True)
-    methodtypecv = models.ForeignKey(CvMethodtype,verbose_name='method type', db_column='methodtypecv')
+    methodtypecv = models.ForeignKey(CvMethodtype,verbose_name='method type',
+            help_text="A vocabulary for describing types of Methods associated with creating observations. " +
+                      "MethodTypes correspond with ActionTypes in ODM2. An Action must be performed using an " +
+                      "appropriate MethodType - e.g., a specimen collection Action should be associated with a "+
+                      "specimen collection method. details for individual values " +
+                      "here: http://vocabulary.odm2.org/methodtype/", db_column='methodtypecv')
     methodcode = models.CharField(verbose_name='method code',max_length=50)
     methodname = models.CharField(verbose_name='method name',max_length=255)
     methoddescription = models.CharField(verbose_name='method description', max_length=500, blank=True)
@@ -1834,7 +1859,10 @@ class Taxonomicclassifierexternalidentifiers(models.Model):
 class Taxonomicclassifiers(models.Model):
     taxonomicclassifierid = models.AutoField(primary_key=True)
     taxonomic_classifier_type = models.ForeignKey(CvTaxonomicclassifiertype, db_column='taxonomicclassifiertypecv',
-                    help_text="check http://vocabulary.odm2.org/taxonomicclassifiertype/  for more info")
+                    help_text="A vocabulary for describing types of taxonomies from which descriptive terms used "+
+                              "in an ODM2 database have been drawn. Taxonomic classifiers provide a way to classify"+
+                              " Results and Specimens according to terms from a formal taxonomy.. Check "+
+                              "http://vocabulary.odm2.org/taxonomicclassifiertype/  for more info")
     taxonomicclassifiername = models.CharField(verbose_name='taxonomic classifier name', max_length=255)
     taxonomicclassifiercommonname = models.CharField(verbose_name='taxonomic classifier common name',max_length=255, blank=True)
     taxonomicclassifierdescription = models.CharField(verbose_name='taxonomic classifier description',max_length=500, blank=True)
@@ -1995,7 +2023,8 @@ class Transectresultvalues(models.Model):
 
 class Units(models.Model):
     unitsid = models.AutoField(primary_key=True)
-    unit_type = models.ForeignKey(CvUnitstype, db_column='unitstypecv') #CvUnitstype
+    unit_type = models.ForeignKey(CvUnitstype,
+            help_text="view unit type details here http://vocabulary.odm2.org/unitstype/",db_column='unitstypecv')
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
     unitsname = models.CharField(verbose_name='unit name',max_length=255)
     unitslink = models.CharField(verbose_name='reference for the unit (web link)',max_length=255, blank=True)
@@ -2037,10 +2066,12 @@ class Variableexternalidentifiers(models.Model):
 class Variables(models.Model):
     #form = VariablesForm
     variableid = models.AutoField(primary_key=True)
-    variable_type = models.ForeignKey(CvVariabletype, db_column='variabletypecv')
+    variable_type = models.ForeignKey(CvVariabletype,
+        help_text="view variable types here http://vocabulary.odm2.org/variabletype/ ", db_column='variabletypecv')
     #variabletypecv = models.ModelChoiceField(CvVariabletype, db_column='variabletypecv')
     variablecode = models.CharField(verbose_name='variable code', max_length=50)
-    variable_name = models.ForeignKey(CvVariablename, db_column='variablenamecv')
+    variable_name = models.ForeignKey(CvVariablename,
+        help_text="view variable names here http://vocabulary.odm2.org/variablename/", db_column='variablenamecv')
     variabledefinition = models.CharField(verbose_name='variable definition', max_length=500, blank=True)
     #variabledefinition.name = 'variable_definition'
     speciation = models.ForeignKey(CvSpeciation, db_column='speciationcv', blank=True, null=True)

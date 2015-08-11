@@ -52,7 +52,14 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     #'admin_reorder',
 	'odm2testapp',
+    'ajax_select',
 )
+#https://github.com/crucialfelix/django-ajax-selects
+AJAX_LOOKUP_CHANNELS = {
+    #  simple: search Person.objects.filter(name__icontains=q)
+    'cv_variable_name': ('odm2testapp.lookups',  'CvVariableNameLookup'),
+    # define a custom lookup channel
+}
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
