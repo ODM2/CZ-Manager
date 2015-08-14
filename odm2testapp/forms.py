@@ -64,7 +64,9 @@ class VariablesAdminForm(ModelForm):
     #variabletypecv= TermModelChoiceField(CvVariabletype.objects.all().order_by('term'))
    # variablenamecv= TermModelChoiceField(CvVariablename.objects.all().order_by('term'))
     #speciationcv= TermModelChoiceField(CvSpeciation.objects.all().order_by('term'))
+    #make these fields ajax type ahead fields with links to odm2 controlled vocabulary
     variable_name = make_ajax_field(Variables,'variable_name','cv_variable_name')
+    variable_type = make_ajax_field(Variables,'variable_type','cv_variable_type')
     class Meta:
         model=Variables
         fields = '__all__'
@@ -204,10 +206,17 @@ class DataloggerfilecolumnsAdmin(admin.ModelAdmin):
 
 
 
-class MeasurementresultsForm(ModelForm):
+class MeasurementresultsAdminForm(ModelForm):
     class Meta:
         model= Measurementresults
         fields = '__all__'
+class MeasurementresultsAdmin(admin.ModelAdmin):
+    form=MeasurementresultsAdminForm
+    list_display = ['resultid','censorcodecv','data_link']
+    list_display_links = ['resultid','censorcodecv','data_link']
+    def data_link(self,obj):
+        return u'<a href="/admin/odm2testapp/measurementresultvalues/%s/">%s</a>' % (obj.resultid, obj.resultid)
+    data_link.short_description = 'feature action'
 
 class MeasurementresultvaluesAdminForm(ModelForm):
     class Meta:
@@ -234,6 +243,7 @@ class MeasurementresultvalueFileForm(ModelForm):
 
 
 class UnitsAdminForm(ModelForm):
+    unit_type = make_ajax_field(Units,'unit_type','cv_unit_type')
     class Meta:
         model= Units
         fields = '__all__'

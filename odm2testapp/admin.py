@@ -37,6 +37,7 @@ from .models import Units
 from .models import Measurementresultvalues
 from .forms import MeasurementresultvaluesAdmin
 from .models import Measurementresults
+from .forms import MeasurementresultsAdmin
 from .forms import UnitsAdmin
 from .models import MeasurementresultvalueFile
 from .models import Dataloggerfilecolumns
@@ -69,7 +70,7 @@ admin.site.register(Taxonomicclassifiers,TaxonomicclassifiersAdmin)
 admin.site.register(Datasets,DatasetsAdmin)
 admin.site.register(Datasetsresults)
 admin.site.register(Processinglevels)
-admin.site.register(Measurementresults)
+admin.site.register(Measurementresults, MeasurementresultsAdmin)
 admin.site.register(Measurementresultvalues,MeasurementresultvaluesAdmin)
 admin.site.register(MeasurementresultvalueFile)
 admin.site.index_template = "my_index.html"

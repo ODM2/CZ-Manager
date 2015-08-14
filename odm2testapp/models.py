@@ -1544,6 +1544,8 @@ class Results(models.Model):
     statuscv = models.ForeignKey(CvStatus, verbose_name='status',db_column='statuscv', blank=True, null=True)
     sampledmediumcv = models.ForeignKey(CvSampledmedium, verbose_name= 'sampled medium', db_column='sampledmediumcv')
     valuecount = models.IntegerField()
+    #def __unicode__(self):
+    #    return u'%s - %s' % (self.resultid, self.feature_action)
     def __str__(self):
         s = str(self.resultid)
         s +=  '- {0}'.format(self.variable)
@@ -2024,7 +2026,9 @@ class Transectresultvalues(models.Model):
 class Units(models.Model):
     unitsid = models.AutoField(primary_key=True)
     unit_type = models.ForeignKey(CvUnitstype,
-            help_text="view unit type details here http://vocabulary.odm2.org/unitstype/",db_column='unitstypecv')
+            help_text="A vocabulary for describing the type of the Unit or the more general quantity that the Unit " +
+                      "represents. View unit type details here http://vocabulary.odm2.org/unitstype/"
+            ,db_column='unitstypecv')
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
     unitsname = models.CharField(verbose_name='unit name',max_length=255)
     unitslink = models.CharField(verbose_name='reference for the unit (web link)',max_length=255, blank=True)
