@@ -513,7 +513,7 @@ class CvResulttype(models.Model):
         ordering = ['term','name']
 
 
-class CvSampledmedium(models.Model):
+class CvMedium(models.Model):
     term = models.CharField(max_length=255)
     name = models.CharField(primary_key=True, max_length=255)
     definition = models.CharField(max_length=1000, blank=True)
@@ -525,7 +525,7 @@ class CvSampledmedium(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_sampledmedium'
+        db_table = 'cv_medium'
         ordering = ['term','name']
 
 
@@ -1189,7 +1189,7 @@ class Organizations(models.Model):
     organizationname = models.CharField(verbose_name="organization name", max_length=255)
     organizationdescription = models.CharField(verbose_name="organization description", max_length=500, blank=True)
     organizationlink = models.CharField(verbose_name="organization web link", max_length=255, blank=True)
-    parentorganizationid = models.ForeignKey('self',verbose_name="parent organization", db_column='parentorganizationid', null=True, default=1)
+    parentorganizationid = models.ForeignKey('self',verbose_name="parent organization", db_column='parentorganizationid',blank=True, null=True, default=1)
     def __str__(self):
         s = str(self.organizationcode)
         if self.organizationname:
@@ -1542,7 +1542,7 @@ class Results(models.Model):
     validdatetime = models.DateTimeField(verbose_name= 'valid date time- Date and time for which the result is valid', blank=True, null=True)
     validdatetimeutcoffset = models.BigIntegerField(verbose_name='valid date time UTC offset', default=4, null=True)
     statuscv = models.ForeignKey(CvStatus, verbose_name='status',db_column='statuscv', blank=True, null=True)
-    sampledmediumcv = models.ForeignKey(CvSampledmedium, verbose_name= 'sampled medium', db_column='sampledmediumcv')
+    sampledmediumcv = models.ForeignKey(CvMedium, verbose_name= 'sampled medium', db_column='sampledmediumcv')
     valuecount = models.IntegerField()
     #def __unicode__(self):
     #    return u'%s - %s' % (self.resultid, self.feature_action)

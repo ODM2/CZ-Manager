@@ -132,7 +132,7 @@
         {% for model in app.models %}
             {% if model.admin_url and model.name == 'Taxonomic classifiers' and varnotfound %}
                 <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+                <th scope="row"><a href="{{ model.admin_url }}">Taxonomic classifiers- to describe Results and Specimens</a></th>
                 {% assign varnotfound False %}
             {% if model.add_url %}
                 <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
@@ -346,7 +346,7 @@
             {% if model.admin_url and model.name == 'Dataset results' and varnotfound %}
                 <tr class="model-{{ model.object_name|lower }}">
                 <th scope="row"><a href="{{ model.admin_url }}">associate datasets and results-
-                    results can be described as with many datasets, and datasets can be made of many results.</a></th>
+                    results can be described with many datasets, and datasets can be made of many results.</a></th>
                 {% assign varnotfound False %}
             {% if model.add_url %}
                 <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
@@ -598,7 +598,7 @@
 </div>
 {% endblock %}
 
-{% block sidebar %}
+<!-- {% block sidebar %}
 <div id="content-main">
     <div class="module" id="recent-actions-module">
         <h2>{% trans 'Recent Actions' %}</h2>
@@ -628,4 +628,4 @@
             {% endif %}
     </div>
 </div>
-{% endblock %}
+{% endblock %} -->
