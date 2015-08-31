@@ -18,9 +18,11 @@ develop-eggs
 .installed.cfg
 lib
 lib64
+odm2testsite/__pycache__
 __pycache__
 upfiles
 migrations
+odm2djangoadmin.git
 
 #  Installer logs
 pip-log.txt
@@ -43,5 +45,3 @@ log
 *.log
 .idea
 
-#
-settings.py

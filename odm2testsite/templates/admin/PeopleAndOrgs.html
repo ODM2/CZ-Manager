@@ -1,0 +1,64 @@
+<!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/
+
+
+
+
+-->
+
+{% extends "admin/base_site.html" %}
+{% load admin_extras %}
+{% load static %}
+{% load i18n admin_static admin_shortcuts_tags %}
+
+{# django-admin-shortcuts changes these blocks #}
+
+{% block breadcrumbs %}
+	<div class="admin_shortcuts">
+		{% admin_shortcuts %}
+	</div>
+{% endblock %}
+
+ {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
+{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+
+
+{% block extrahead %}{{ block.super }}{% admin_shortcuts_js %}{% endblock %}
+
+{# end changes #}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+
+
+
+{% block content %}
+<div id="content-main">
+
+
+        <table>
+        <caption>
+            <a href="/admin/PeopleAndOrgs.html" class="section" title="People and Organizations">{{ app.name }}</a>
+        </caption>
+                {% assign prefixpath '/admin/odm2testapp/' %}
+                <tr ><td class="section"><h2>People and Organizations</h3></td></tr>
+                <tr class="model-{{ model.object_name|lower }}">
+                <th scope="row"><a href= "{{prefixpath }}people/">{% trans 'People' %}</a></th>
+                <td><a href="{{prefixpath }}people/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}people/" class="changelink">{% trans 'Change' %}</a></td>
+
+                <tr class="model-{{ model.object_name|lower }}">
+                <th scope="row"><a href="{{prefixpath }}organizations/">{% trans 'Organizations' %}</a></th>
+                <td><a href="{{prefixpath }}organizations/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}organizations/" class="changelink">{% trans 'Change' %}</a></td>
+
+                <tr class="model-{{ model.object_name|lower }}">
+                <th scope="row"><a href="{{prefixpath }}affiliations/">{% trans 'Affiliation (relate people and organizations)' %}</a></th>
+                <td><a href="{{prefixpath }}affiliations/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}affiliations/" class="changelink">{% trans 'Change' %}</a></td>
+            </tr>
+        </table>
+
+
+{% endblock %}

@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.template.response import TemplateResponse
 #from odm2testapp.forms import VariablesForm
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
@@ -7,7 +8,11 @@ from django.http import HttpResponseRedirect
 
 def index(request):
     return HttpResponse("odm2testsite says hello world!")
-	
+
+def PeopleAndOrgs(request):
+    #return HttpResponse("odm2testsite says hello world!")
+    return TemplateResponse(request, 'PeopleAndOrgs.html', {})
+
 def about(request):
     return HttpResponse("odm2testsite about page.")
 	
