@@ -11,6 +11,7 @@
 from __future__ import unicode_literals
 from uuidfield import UUIDField
 from django.db import models
+#from django.contrib.gis.db import models
 import csv
 import binascii
 import unicodedata
@@ -903,7 +904,7 @@ class Equipmentmodels(models.Model):
                                             db_column='modelmanufacturerid')
     modelpartnumber = models.CharField(max_length=50, blank=True, verbose_name="model part number")
     modelname = models.CharField(max_length=255, verbose_name="model name")
-    modeldescription = models.CharField(max_length=500, blank=True, verbose_name="model dscription")
+    modeldescription = models.CharField(max_length=500, blank=True, verbose_name="model description")
     isinstrument = models.BooleanField(verbose_name="Is this an instrument?")
     modelspecificationsfilelink = models.CharField(max_length=255,
                                 verbose_name="link to manual for equipment", blank=True)
@@ -1451,14 +1452,15 @@ class Relatedequipment(models.Model):
 
 class Relatedfeatures(models.Model):
     relationid = models.AutoField(primary_key=True)
-    samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
-    relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
-    relatedfeatureid = models.ForeignKey('Samplingfeatures', related_name='RelatedFeatures', db_column='relatedfeatureid')
-    spatialoffsetid = models.ForeignKey('Spatialoffsets', db_column='spatialoffsetid', blank=True, null=True)
+    samplingfeatureid = models.ForeignKey('Samplingfeatures', verbose_name="first feature", db_column='samplingfeatureid')
+    relationshiptypecv = models.ForeignKey(CvRelationshiptype, verbose_name= "relationship type", db_column='relationshiptypecv')
+    relatedfeatureid = models.ForeignKey('Samplingfeatures', verbose_name="second feature", related_name='RelatedFeatures', db_column='relatedfeatureid')
+    spatialoffsetid = models.ForeignKey('Spatialoffsets',verbose_name="spatial offset", db_column='spatialoffsetid', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'relatedfeatures'
+        verbose_name= 'relate two feature'
 
 
 class Relatedmodels(models.Model):
@@ -1614,10 +1616,10 @@ class Samplingfeatures(models.Model):
     samplingfeatureuuid = UUIDField(auto=True)
     sampling_feature_type = models.ForeignKey(CvSamplingfeaturetype, db_column='samplingfeaturetypecv')
     samplingfeaturecode = models.CharField(verbose_name='sampling feature code',max_length=50)
-    samplingfeaturename = models.CharField(verbose_name='sampling feature name',max_length=255, blank=True)
+    samplingfeaturename = models.CharField(verbose_name='sampling feature name',max_length=255, blank=True, null=True)
     samplingfeaturedescription = models.CharField(verbose_name='sampling feature description', max_length=500, blank=True)
-    sampling_feature_geo_type = models.ForeignKey(CvSamplingfeaturegeotype, db_column='samplingfeaturegeotypecv', blank=True, null=True)
-    featuregeometry = models.TextField(verbose_name='feature geometry',blank=True)  # This field type is a guess.
+    sampling_feature_geo_type = models.ForeignKey(CvSamplingfeaturegeotype,db_column='samplingfeaturegeotypecv', default= "Point", null=True)
+    featuregeometry = models.TextField(verbose_name='feature geometry',blank=True, null=True)  #GeometryField This field type is a guess.
     elevation_m = models.FloatField(verbose_name='elevation',blank=True, null=True)
     elevation_datum = models.ForeignKey(CvElevationdatum, db_column='elevationdatumcv', blank=True, null=True)
     def __str__(self):

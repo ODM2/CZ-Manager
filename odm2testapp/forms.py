@@ -1,12 +1,13 @@
 #from __future__ import unicode_literals
-from django.forms import ModelForm
 from django.forms import HiddenInput
 from django.contrib import admin
 from django.db import models
 from django.forms import ModelChoiceField
-import django.forms
 from django.forms import FileField
-from .forms import ModelForm
+from django import forms
+from django.forms import  CharField
+from django.forms import TypedChoiceField
+from django.forms import ModelForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 
@@ -60,6 +61,7 @@ from .models import Measurementresultvalues
 #a complicated use of search_fields described in ResultsAdminForm
 
 #the following define what fields should be overridden so that dropdown lists can be populated with useful information
+
 class VariablesAdminForm(ModelForm):
     #variabletypecv= TermModelChoiceField(CvVariabletype.objects.all().order_by('term'))
    # variablenamecv= TermModelChoiceField(CvVariablename.objects.all().order_by('term'))
@@ -91,6 +93,12 @@ class TaxonomicclassifiersAdmin(admin.ModelAdmin):
 
 
 class SamplingfeaturesAdminForm(ModelForm):
+    featuregeometry = CharField(label="feature geometry (to add a point format is POINT(long, lat)"+
+                                    " where long and lat are in decimal degrees. If you don't want to add a location"+
+                                      " leave default value of POINT(0 0).",
+                                    max_length=500, widget=forms.Textarea(),) #attrs={'readonly':'readonly'}
+    featuregeometry.initial = "POINT(0 0)"
+    featuregeometry.required=False
     class Meta:
         model= Samplingfeatures
         fields = '__all__'
@@ -139,7 +147,7 @@ class FeatureactionsAdmin(admin.ModelAdmin):
 
 
 class DatasetsAdminForm(ModelForm):
-    datasetabstract = django.forms.CharField(max_length=500, widget=django.forms.Textarea )
+    datasetabstract = forms.CharField(max_length=500, widget=forms.Textarea )
     class Meta:
         model= Datasets
         fields = '__all__'
@@ -281,6 +289,13 @@ class InstrumentoutputvariablesAdmin(admin.ModelAdmin):
 
 
 class EquipmentmodelsAdminForm(ModelForm):
+    modeldescription = CharField(max_length=500, label= "model description", widget=forms.Textarea)
+    #change from a check box to a yes no choice with radio buttons.
+    isinstrument = TypedChoiceField( label="Is this an instrument?",
+                   coerce=lambda x: x == 'True',
+                   choices=((False, 'Yes'), (True, 'No')),
+                   widget=forms.RadioSelect
+                )
     class Meta:
         model= Equipmentmodels
         fields = '__all__'

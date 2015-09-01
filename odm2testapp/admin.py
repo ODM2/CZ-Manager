@@ -46,6 +46,7 @@ from .models import Instrumentoutputvariables
 from .forms import InstrumentoutputvariablesAdmin
 from .models import Equipmentmodels
 from .forms import EquipmentmodelsAdmin
+from .models import Relatedfeatures
 
 admin.site.register(Equipmentmodels,EquipmentmodelsAdmin)
 admin.site.register(Instrumentoutputvariables, InstrumentoutputvariablesAdmin)
@@ -70,6 +71,7 @@ admin.site.register(Taxonomicclassifiers,TaxonomicclassifiersAdmin)
 admin.site.register(Datasets,DatasetsAdmin)
 admin.site.register(Datasetsresults)
 admin.site.register(Processinglevels)
+admin.site.register(Relatedfeatures)
 admin.site.register(Measurementresults, MeasurementresultsAdmin)
 admin.site.register(Measurementresultvalues,MeasurementresultvaluesAdmin)
 admin.site.register(MeasurementresultvalueFile)
