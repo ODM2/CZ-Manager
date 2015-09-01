@@ -113,7 +113,7 @@ class ResultsAdminForm(ModelForm):
         fields = '__all__'
 class ResultsAdmin(admin.ModelAdmin):
     form=ResultsAdminForm
-    list_display = ['feature_action','processing_level']
+    list_display = ['feature_action','variable','processing_level']
     search_fields= ['variable__variable_name__name','feature_action__sampling_feature__samplingfeaturename',
                     'result_type__name','processing_level__definition__name']
 

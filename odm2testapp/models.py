@@ -11,6 +11,7 @@
 from __future__ import unicode_literals
 from uuidfield import UUIDField
 from django.db import models
+from odm2testsite.settings import MEDIA_ROOT
 #from django.contrib.gis.db import models
 import csv
 import binascii
@@ -904,7 +905,7 @@ class Equipmentmodels(models.Model):
                                             db_column='modelmanufacturerid')
     modelpartnumber = models.CharField(max_length=50, blank=True, verbose_name="model part number")
     modelname = models.CharField(max_length=255, verbose_name="model name")
-    modeldescription = models.CharField(max_length=500, blank=True, verbose_name="model description")
+    modeldescription = models.CharField(max_length=500, blank=True,null=True, verbose_name="model description")
     isinstrument = models.BooleanField(verbose_name="Is this an instrument?")
     modelspecificationsfilelink = models.CharField(max_length=255,
                                 verbose_name="link to manual for equipment", blank=True)
@@ -1052,7 +1053,7 @@ class Measurementresultvalues(models.Model):
 
 
 def handle_uploaded_file(f,id):
-    destination = open('C:/Users/leonmi/Google Drive/ODM2Djangoadmin/odm2testapp/upfiles/resultvalues/testwrite.csv', 'wb+')
+    destination = open(MEDIA_ROOT + '/resultvalues/testwrite.csv', 'wb+')
     # data = open(f)
     for chunk in f.chunks():
         #g= binascii.b2a_uu(chunk)
@@ -1066,7 +1067,7 @@ def handle_uploaded_file(f,id):
     destination.close()
     #file_reader = csv.reader('C:/Users/leonmi/Google Drive/ODM2Djangoadmin/odm2testapp/upfiles/resultvalues/testwrite.csv')
     try:
-        with open('C:/Users/leonmi/Google Drive/ODM2Djangoadmin/odm2testapp/upfiles/resultvalues/testwrite.csv', 'rt', encoding='ascii') as f:
+        with open(MEDIA_ROOT + '/resultvalues/testwrite.csv', 'rt', encoding='ascii') as f:
             reader = csv.reader(f)
             for row in reader:
                 #raise ValidationError(row) #print the current row
@@ -1456,7 +1457,11 @@ class Relatedfeatures(models.Model):
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, verbose_name= "relationship type", db_column='relationshiptypecv')
     relatedfeatureid = models.ForeignKey('Samplingfeatures', verbose_name="second feature", related_name='RelatedFeatures', db_column='relatedfeatureid')
     spatialoffsetid = models.ForeignKey('Spatialoffsets',verbose_name="spatial offset", db_column='spatialoffsetid', blank=True, null=True)
-
+    def __str__(self):
+        s = str(self.samplingfeatureid)
+        s +=  ' - {0}'.format(self.relationshiptypecv)
+        s += ' - {0}'.format(self.relatedfeatureid)
+        return s
     class Meta:
         managed = False
         db_table = 'relatedfeatures'
@@ -1531,11 +1536,11 @@ class Resultnormalizationvalues(models.Model):
 class Results(models.Model):
     resultid = models.AutoField(primary_key=True)
     resultuuid = UUIDField(auto=True)
-    feature_action = models.ForeignKey(Featureactions, db_column='featureactionid')
+    feature_action = models.ForeignKey(Featureactions,verbose_name="sampling feature action", db_column='featureactionid')
     result_type = models.ForeignKey(CvResulttype,verbose_name='result type', db_column='resulttypecv')
     variable = models.ForeignKey('Variables', verbose_name='variable', db_column='variableid')
     unitsid = models.ForeignKey('Units', verbose_name='units', related_name='+', db_column='unitsid')
-    taxonomicclassifierid = models.ForeignKey('Taxonomicclassifiers', db_column='taxonomicclassifierid',blank=True, null=True)
+    taxonomicclassifierid = models.ForeignKey('Taxonomicclassifiers', verbose_name='taxonomic classifier', db_column='taxonomicclassifierid',blank=True, null=True)
     processing_level = models.ForeignKey(Processinglevels, db_column='processinglevelid')
     resultdatetime = models.DateTimeField(verbose_name='result date time',blank=True, null=True)
     resultdatetimeutcoffset = models.BigIntegerField(verbose_name='result date time UTC offset', default=4, null=True)
@@ -1544,13 +1549,14 @@ class Results(models.Model):
     validdatetime = models.DateTimeField(verbose_name= 'valid date time- Date and time for which the result is valid', blank=True, null=True)
     validdatetimeutcoffset = models.BigIntegerField(verbose_name='valid date time UTC offset', default=4, null=True)
     statuscv = models.ForeignKey(CvStatus, verbose_name='status',db_column='statuscv', blank=True, null=True)
-    sampledmediumcv = models.ForeignKey(CvMedium, verbose_name= 'sampled medium', db_column='sampledmediumcv')
-    valuecount = models.IntegerField()
+    sampledmediumcv = models.ForeignKey(CvMedium, verbose_name= 'sampled medium', db_column='sampledmediumcv', blank=True, null=True)
+    valuecount = models.IntegerField(verbose_name='number of recorded values')
     #def __unicode__(self):
     #    return u'%s - %s' % (self.resultid, self.feature_action)
     def __str__(self):
-        s = str(self.resultid)
-        s +=  '- {0}'.format(self.variable)
+        #s = str(self.resultid)
+        s =  str(self.variable)
+        s+='- {0}'.format(self.feature_action)
         #if self.result_type:
             #s += ', {0}'.format(self.result_type)
         return s
