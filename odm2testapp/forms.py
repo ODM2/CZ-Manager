@@ -53,8 +53,8 @@ from odm2testapp.models import Equipmentmodels
 from ajax_select import make_ajax_field
 from .models import Measurementresults
 from .models import Measurementresultvalues
-
-
+from daterange_filter.filter import DateRangeFilter
+from chartit import DataPool, Chart
 
 # AffiliationsChoiceField(People.objects.all().order_by('personlastname'),Organizations.objects.all().order_by('organizationname'))
 
@@ -143,6 +143,7 @@ class FeatureactionsAdminForm(ModelForm):
         model= Featureactions
         fields = '__all__'
 class FeatureactionsAdmin(admin.ModelAdmin):
+    list_display = ['sampling_feature','action',]
     form=FeatureactionsAdminForm
 
 
@@ -226,14 +227,21 @@ class MeasurementresultsAdmin(admin.ModelAdmin):
         return u'<a href="/admin/odm2testapp/measurementresultvalues/%s/">%s</a>' % (obj.resultid, obj.resultid)
     data_link.short_description = 'feature action'
 
+
+
 class MeasurementresultvaluesAdminForm(ModelForm):
     class Meta:
         model= Measurementresultvalues
         fields = '__all__'
 class MeasurementresultvaluesAdmin(admin.ModelAdmin):
     form=MeasurementresultvaluesAdminForm
-    list_display = ['datavalue','valuedatetime','resultid','feature_action_link'] #,'resultid__feature_action__name', 'resultid__variable__name'
-    list_display_links = ['resultid','feature_action_link']
+    list_filter = (
+         ('valuedatetime', DateRangeFilter),
+        'resultid',
+
+    )
+    list_display = ['datavalue','valuedatetime','resultid'] #'resultid','feature_action_link','resultid__feature_action__name', 'resultid__variable__name'
+    list_display_links = ['resultid',] #'feature_action_link'
     search_fields= ['resultid__resultid__feature_action__sampling_feature__samplingfeaturename','resultid__resultid__variable__variable_name__name',
                     'resultid__resultid__variable__variable_type__name']
     def feature_action_link(self,obj):

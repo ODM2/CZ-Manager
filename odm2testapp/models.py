@@ -103,7 +103,7 @@ class Actions(models.Model):
     def __str__(self):
         s = str(self.action_type)
         if self.method:
-            s += '- {0},'.format(self.method)
+           s += '- {0},'.format(self.method)
         #if self.actiondescription:
             #s += '- {0},'.format(self.actiondescription)
         return s
@@ -962,7 +962,7 @@ class Featureactions(models.Model):
     action = models.ForeignKey(Actions, db_column='actionid')
     def __str__(self):
         s=str(self.sampling_feature)
-        s += '- {0}'.format(self.action)
+        #s += '- {0}'.format(self.action)
         return s
     class Meta:
         managed = False
@@ -1017,7 +1017,7 @@ class Measurementresults(models.Model):
     timeaggregationintervalunitsid = models.ForeignKey('Units',verbose_name="time aggregation interval unit", related_name='+', db_column='timeaggregationintervalunitsid')
     def __str__(self):
         s=str(self.resultid)
-        s += '- {0}'.format(self.censorcodecv)
+        s += '- {0}'.format(self.qualitycodecv)
         return s
     class Meta:
         managed = False
@@ -1151,8 +1151,8 @@ class Methods(models.Model):
     organizationid = models.ForeignKey('Organizations', verbose_name='organization', db_column='organizationid', blank=True, null=True)
     def __str__(self):
         s = str(self.methodcode)
-        if self.methodname:
-            s += ', {0}'.format(self.methodname)
+        if self.methodtypecv:
+            s += ', {0}'.format(self.methodtypecv)
         return s
     class Meta:
         managed = False

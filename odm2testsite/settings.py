@@ -35,7 +35,7 @@ ALLOWED_HOSTS = []
 MEDIA_ROOT = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin/odm2testapp/upfiles/'
 MEDIA_URL = '/odm2testapp/upfiles/'
 # Application definition
-
+STATIC_ROOT = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin/static'
 
 #https://github.com/mishbahr/django-modeladmin-reorder
 #{'app': 'auth', 'models': ('auth.User', 'auth.Group')},
@@ -51,7 +51,11 @@ MEDIA_URL = '/odm2testapp/upfiles/'
 INSTALLED_APPS = (
     'djangocms_admin_style',
     'odm2testapp',
+    'chartit',
+    'highcharts',
+    'jquery',
     'admin_shortcuts',
+    'daterange_filter',
     'django.contrib.admin',
     #'django.contrib.gis',
     'django.contrib.auth',

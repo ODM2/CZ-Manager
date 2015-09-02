@@ -1,0 +1,51 @@
+<!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/
+
+
+
+
+-->
+
+{% extends "admin/base_site.html" %}
+{% load admin_extras %}
+{% load static %}
+{% load i18n admin_static admin_shortcuts_tags %}
+
+{# django-admin-shortcuts changes these blocks #}
+
+{% block breadcrumbs %}
+	<div class="admin_shortcuts">
+		{% admin_shortcuts %}
+	</div>
+{% endblock %}
+
+ {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
+{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+
+
+{% block extrahead %}{{ block.super }}
+ 
+ <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script src="http://code.highcharts.com/highcharts.js" type="text/javascript"></script>
+    <script src="/highcharts.js" type="text/javascript"></script>
+    {% load chartit %}
+	
+{% admin_shortcuts_js %}{% endblock %}
+
+{# end changes #}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+
+
+
+{% block content %}
+<div id="content-main">
+
+<body>
+    <div id='container'> {{ temppivchart|load_charts:"container" }}</div>
+</body>
+
+
+{% endblock %}

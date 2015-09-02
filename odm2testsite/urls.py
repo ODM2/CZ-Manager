@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     #http://127.0.0.1:8000/admin/odm2testsite/templates/odm2testapp/my_index.html
     (r'^admin/lookups/', include(ajax_select_urls)),
     url(r'^admin/AddSensor.html', views.AddSensor, name="AddSensor"),
+    url(r'^admin/chart.html', views.temp_pivot_chart_view, name="temp_pivot_chart_view"),
      #url(r'^create',  view='views.create',name='create'),
    # url(r'^ajax_lookup/(?P<channel>[-\w]+)$', 'ajax_select.views.ajax_lookup', name = 'ajax_lookup'),
 )

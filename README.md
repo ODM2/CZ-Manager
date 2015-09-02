@@ -8,3 +8,7 @@ dependency on django-ajax-selects https://github.com/crucialfelix/django-ajax-se
 dependency on django-admin-shortcuts https://github.com/alesdotio/django-admin-shortcuts/
 dependency on djangocms_admin_style https://github.com/divio/djangocms-admin-style
 dependency on django-apptemplates https://pypi.python.org/pypi/django-apptemplates/
+dependency on django-daterange-filter https://pypi.python.org/pypi/django-daterange-filter/1.1.1
+
+dependency on django_chartit https://github.com/pgollakota/django-chartit
+django_chartit needs  django-jquery and Highcharts http://django-highcharts.readthedocs.org/en/latest/
