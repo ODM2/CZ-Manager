@@ -10,10 +10,9 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-	 url(r'^odm2testapp/', include('odm2testapp.urls')),
     #http://127.0.0.1:8000/admin/odm2testsite/templates/odm2testapp/my_index.html
     (r'^admin/lookups/', include(ajax_select_urls)),
-    url(r'^admin/PeopleAndOrgs.html', views.PeopleAndOrgs, name="PeopleAndOrgs"),
+    url(r'^admin/AddSensor.html', views.AddSensor, name="AddSensor"),
      #url(r'^create',  view='views.create',name='create'),
    # url(r'^ajax_lookup/(?P<channel>[-\w]+)$', 'ajax_select.views.ajax_lookup', name = 'ajax_lookup'),
 )

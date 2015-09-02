@@ -12,8 +12,12 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 TEMPLATE_DIR =os.path.dirname(__file__)
-TEMPLATE_PATH = os.path.join(TEMPLATE_DIR, 'templates/admin')
+TEMPLATE_DIR_APP = os.path.join(os.path.dirname(__file__), '..')
+TEMPLATE_PATH = os.path.join(TEMPLATE_DIR, 'templates')
+#TEMPLATE_PATH2 = os.path.join(TEMPLATE_DIR, 'templates/odm2testapp')
 print(TEMPLATE_PATH)
+TEMPLATE_DIRS = [TEMPLATE_PATH,] #TEMPLATE_PATH2,
+
 #TEMPLATE_LOADERS = ('django.template.loaders.filesystem.Loader',)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -45,10 +49,11 @@ MEDIA_URL = '/odm2testapp/upfiles/'
 #                       "Dataloggerprogramfiles")},
 # )
 INSTALLED_APPS = (
+    'djangocms_admin_style',
     'odm2testapp',
     'admin_shortcuts',
-    'djangocms_admin_style',
     'django.contrib.admin',
+    #'django.contrib.gis',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -56,6 +61,11 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     #'admin_reorder',
     'ajax_select',
+)
+TEMPLATE_LOADERS = (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+    'apptemplates.Loader',
 )
 #find icon images here https://github.com/alesdotio/django-admin-shortcuts/blob/master/admin_shortcuts/templatetags/admin_shortcuts_tags.py#L134
 ADMIN_SHORTCUTS = [
@@ -75,10 +85,10 @@ ADMIN_SHORTCUTS = [
                 'class':'archive',
             },
             {
-                'url': '/admin/PeopleAndOrgs.html',
+                'url': '/admin/AddSensor.html',
                 'app_name': 'odm2testapp',
-                'title': 'People and Organizations',
-                'class':'user',
+                'title': 'Add Sensor Data',
+                'class':'tool',
             },
         ]
     },
@@ -113,17 +123,17 @@ ROOT_URLCONF = 'odm2testsite.urls'
 
 WSGI_APPLICATION = 'odm2testsite.wsgi.application'
 
-TEMPLATE_DIRS = [TEMPLATE_PATH,]
+
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
+        'NAME': 'x',
+        'USER': 'x',
         'PASSWORD': 'x',
-        'HOST': 'x', #micro server 'x'
-        'PORT': '5432',
+        'HOST': 'x', #micro server  '52.20.81.11'
+        'PORT': 'x',
      'OPTIONS': {
       'options': '-c search_path=odm2'
     }

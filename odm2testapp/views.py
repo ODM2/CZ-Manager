@@ -13,6 +13,10 @@ def PeopleAndOrgs(request):
     #return HttpResponse("odm2testsite says hello world!")
     return TemplateResponse(request, 'PeopleAndOrgs.html', {})
 
+def AddSensor(request):
+    #return HttpResponse("odm2testsite says hello world!")
+    return TemplateResponse(request, 'AddSensor.html', {})
+
 def about(request):
     return HttpResponse("odm2testsite about page.")
 	

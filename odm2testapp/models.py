@@ -14,6 +14,7 @@ from django.db import models
 from odm2testsite.settings import MEDIA_ROOT
 #from django.contrib.gis.db import models
 import csv
+import io
 import binascii
 import unicodedata
 from io import TextIOWrapper
@@ -1001,7 +1002,7 @@ class Maintenanceactions(models.Model):
 
 
 class Measurementresults(models.Model):
-    resultid = models.ForeignKey('Results', db_column='resultid', primary_key=True)
+    resultid = models.ForeignKey('Results', verbose_name="Result Series",db_column='resultid', primary_key=True)
     xlocation = models.FloatField(verbose_name="x location",blank=True, null=True)
     xlocationunitsid = models.ForeignKey('Units',verbose_name="x location units", related_name='relatedXlocationUnits',  db_column='xlocationunitsid', blank=True, null=True)
     ylocation = models.FloatField(blank=True,verbose_name="y location", null=True)
@@ -1053,7 +1054,7 @@ class Measurementresultvalues(models.Model):
 
 
 def handle_uploaded_file(f,id):
-    destination = open(MEDIA_ROOT + '/resultvalues/testwrite.csv', 'wb+')
+    destination = io.open(MEDIA_ROOT + '/resultvalues/' + f.name +'.csv', 'wb+')
     # data = open(f)
     for chunk in f.chunks():
         #g= binascii.b2a_uu(chunk)
@@ -1067,7 +1068,7 @@ def handle_uploaded_file(f,id):
     destination.close()
     #file_reader = csv.reader('C:/Users/leonmi/Google Drive/ODM2Djangoadmin/odm2testapp/upfiles/resultvalues/testwrite.csv')
     try:
-        with open(MEDIA_ROOT + '/resultvalues/testwrite.csv', 'rt', encoding='ascii') as f:
+        with io.open(MEDIA_ROOT + '/resultvalues/' + f.name +'.csv', 'rt', encoding='ascii') as f:
             reader = csv.reader(f)
             for row in reader:
                 #raise ValidationError(row) #print the current row

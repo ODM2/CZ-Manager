@@ -7,3 +7,4 @@ dependency on django-uuidfield https://github.com/dcramer/django-uuidfield
 dependency on django-ajax-selects https://github.com/crucialfelix/django-ajax-selects
 dependency on django-admin-shortcuts https://github.com/alesdotio/django-admin-shortcuts/
 dependency on djangocms_admin_style https://github.com/divio/djangocms-admin-style
+dependency on django-apptemplates https://pypi.python.org/pypi/django-apptemplates/

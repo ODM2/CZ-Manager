@@ -75,4 +75,4 @@ admin.site.register(Relatedfeatures)
 admin.site.register(Measurementresults, MeasurementresultsAdmin)
 admin.site.register(Measurementresultvalues,MeasurementresultvaluesAdmin)
 admin.site.register(MeasurementresultvalueFile)
-admin.site.index_template = "my_index.html"
+admin.site.index_template = "admin/my_index.html"
