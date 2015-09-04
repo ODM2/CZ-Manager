@@ -24,6 +24,7 @@ upfiles
 migrations
 odm2djangoadmin.git
 omit
+static
 
 #  Installer logs
 pip-log.txt

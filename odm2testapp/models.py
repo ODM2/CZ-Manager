@@ -768,11 +768,38 @@ class Dataloggerfiles(models.Model):
         db_table = 'dataloggerfiles'
         verbose_name='data logger file'
 
-#
-# class programnameField(models.Field):
-#  def __str__(self):
-#     s=str(self.)
-#     return s
+
+def process_datalogger_file(f,programid):
+    try:
+        with io.open(MEDIA_ROOT +  f.name , 'rt', encoding='ascii') as f:
+            reader = csv.reader(f)
+            for row in reader:
+
+                #read columns Add measurement result values for each column
+                print("hello")
+                #dateT = time.strptime(row[0],"%m/%d/%Y %H:%M")#'1/1/2013 0:10
+                #datestr = time.strftime("%Y-%m-%d %H:%M",dateT)
+                #Measurementresultvalues(resultid=programid,datavalue=row[1],valuedatetime=datestr,valuedatetimeutcoffset=4).save()
+    except IndexError:
+        raise ValidationError('encountered a problem with row '+row)
+
+
+class ProcessDataloggerfile(models.Model):
+    processdataloggerfileid = models.AutoField(primary_key=True)
+    dataloggerfileid = models.ForeignKey('dataloggerfiles', verbose_name='data logger file', db_column='dataloggerfileid')
+    processingCode = models.CharField(max_length=255, verbose_name='processing code', default="0")
+    date_processed = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        s=str(self.dataloggerfileid)
+        s += '- Processed on  {0}'.format(self.date_processed)
+        return s
+    class Meta:
+        managed = True
+        db_table = 'processdataloggerfile'
+        verbose_name= 'process data logger file'
+    def save(self, *args, **kwargs):
+        process_datalogger_file(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid)
+        super(ProcessDataloggerfile, self).save(*args, **kwargs)
 
 
 class Dataloggerprogramfiles(models.Model):
@@ -962,7 +989,7 @@ class Featureactions(models.Model):
     action = models.ForeignKey(Actions, db_column='actionid')
     def __str__(self):
         s=str(self.sampling_feature)
-        #s += '- {0}'.format(self.action)
+        s += '- {0}'.format(self.action)
         return s
     class Meta:
         managed = False
@@ -1057,16 +1084,11 @@ def handle_uploaded_file(f,id):
     destination = io.open(MEDIA_ROOT + '/resultvalues/' + f.name +'.csv', 'wb+')
     # data = open(f)
     for chunk in f.chunks():
-        #g= binascii.b2a_uu(chunk)
-    #g = TextIOWrapper(f,encoding='ascii', errors='replace')
-    #g = unicodedata.normalize('NFKD', f).encode('ascii', 'ignore')
-        #for row in file_reader:
-    #for line in f:
+
         destination.write(chunk)
         #Measurementresultvalues
 
     destination.close()
-    #file_reader = csv.reader('C:/Users/leonmi/Google Drive/ODM2Djangoadmin/odm2testapp/upfiles/resultvalues/testwrite.csv')
     try:
         with io.open(MEDIA_ROOT + '/resultvalues/' + f.name +'.csv', 'rt', encoding='ascii') as f:
             reader = csv.reader(f)
@@ -1077,6 +1099,7 @@ def handle_uploaded_file(f,id):
                 Measurementresultvalues(resultid=id,datavalue=row[1],valuedatetime=datestr,valuedatetimeutcoffset=4).save()
     except IndexError:
         raise ValidationError('encountered a problem with row '+row)
+
 
 class MeasurementresultvalueFile(models.Model):
     valueFileid = models.AutoField(primary_key=True)
@@ -1091,6 +1114,7 @@ class MeasurementresultvalueFile(models.Model):
     def save(self, *args, **kwargs):
         handle_uploaded_file(self.valueFile.file,self.resultid)
         super(MeasurementresultvalueFile, self).save(*args, **kwargs)
+
 
 class Methodannotations(models.Model):
     bridgeid = models.AutoField(primary_key=True)
@@ -1537,7 +1561,7 @@ class Resultnormalizationvalues(models.Model):
 class Results(models.Model):
     resultid = models.AutoField(primary_key=True)
     resultuuid = UUIDField(auto=True)
-    feature_action = models.ForeignKey(Featureactions,verbose_name="sampling feature action", db_column='featureactionid')
+    feature_action = models.ForeignKey( Featureactions,related_name="feature_actions",verbose_name="sampling feature action", db_column='featureactionid')
     result_type = models.ForeignKey(CvResulttype,verbose_name='result type', db_column='resulttypecv')
     variable = models.ForeignKey('Variables', verbose_name='variable', db_column='variableid')
     unitsid = models.ForeignKey('Units', verbose_name='units', related_name='+', db_column='unitsid')
@@ -1555,8 +1579,8 @@ class Results(models.Model):
     #def __unicode__(self):
     #    return u'%s - %s' % (self.resultid, self.feature_action)
     def __str__(self):
-        #s = str(self.resultid)
-        s =  str(self.variable)
+        s = str(self.resultid)
+        s += '- {0}'.format(self.variable)
         s+='- {0}'.format(self.feature_action)
         #if self.result_type:
             #s += ', {0}'.format(self.result_type)

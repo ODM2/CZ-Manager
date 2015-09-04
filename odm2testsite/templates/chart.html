@@ -33,7 +33,7 @@
 
 {# end changes #}
 
-{% block coltype %}colM{% endblock %}
+{% block coltype %}colMs{% endblock %}
 
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
 
@@ -41,11 +41,12 @@
 
 
 {% block content %}
-<div id="content-main">
 
-<body>
-    <div id='container'> {{ temppivchart|load_charts:"container" }}</div>
-</body>
 
+
+    <div id='content-main'> {% csrf_token %}{{ temppivchart|load_charts:"content-main" }}
+	</div>
+<br>
+{% include 'resultList.html' %}
 
 {% endblock %}

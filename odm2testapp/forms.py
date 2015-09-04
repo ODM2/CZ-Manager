@@ -224,9 +224,9 @@ class MeasurementresultsAdmin(admin.ModelAdmin):
     list_display = ['resultid','censorcodecv','data_link']
     list_display_links = ['resultid','censorcodecv','data_link']
     def data_link(self,obj):
-        return u'<a href="/admin/odm2testapp/measurementresultvalues/%s/">%s</a>' % (obj.resultid, obj.resultid)
+        return u'<a href="/admin/odm2testapp/featureactions/%s/">%s</a>' % (obj.resultid.feature_action.featureactionid, obj.resultid.feature_action)
     data_link.short_description = 'feature action'
-
+    data_link.allow_tags = True
 
 
 class MeasurementresultvaluesAdminForm(ModelForm):

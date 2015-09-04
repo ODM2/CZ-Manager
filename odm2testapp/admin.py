@@ -47,6 +47,7 @@ from .forms import InstrumentoutputvariablesAdmin
 from .models import Equipmentmodels
 from .forms import EquipmentmodelsAdmin
 from .models import Relatedfeatures
+from .models import ProcessDataloggerfile
 
 admin.site.register(Equipmentmodels,EquipmentmodelsAdmin)
 admin.site.register(Instrumentoutputvariables, InstrumentoutputvariablesAdmin)
@@ -65,7 +66,7 @@ admin.site.register(Actions,ActionsAdmin)
 admin.site.register(Results,ResultsAdmin)
 admin.site.register(Relatedactions,RelatedactionsAdmin)
 admin.site.register(Variables, VariablesAdmin)
-
+admin.site.register(ProcessDataloggerfile)
 
 admin.site.register(Taxonomicclassifiers,TaxonomicclassifiersAdmin)
 admin.site.register(Datasets,DatasetsAdmin)
