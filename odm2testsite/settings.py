@@ -63,6 +63,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     #'admin_reorder',
     'ajax_select',
 )
@@ -93,6 +94,12 @@ ADMIN_SHORTCUTS = [
                 'app_name': 'odm2testapp',
                 'title': 'Add Sensor Data',
                 'class':'tool',
+            },
+            {
+                'url': '/admin/chart.html',
+                'app_name': 'odm2testapp',
+                'title': 'Graph My Data',
+                'class':'monitor',
             },
         ]
     },

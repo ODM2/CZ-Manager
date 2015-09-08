@@ -25,12 +25,103 @@ from django.utils.html import format_html
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.shortcuts import render_to_response
-from django.core.exceptions import ValidationError
 import time
 #from django.forms import ModelFormWithFileField
 #from .forms import DataloggerprogramfilesAdminForm
 #from odm2testapp.forms import VariablesForm
+from odm2testsite.settings import MEDIA_ROOT
+#from django.contrib.gis.db import models
+import csv
+import io
+import binascii
+import unicodedata
+from io import TextIOWrapper
+from django.core.exceptions import ValidationError
+import itertools
+from django.utils.translation import ugettext as _
 
+def handle_uploaded_file(f,id):
+    destination = io.open(MEDIA_ROOT + '/resultvalues/' + f.name +'.csv', 'wb+')
+    # data = open(f)
+    for chunk in f.chunks():
+
+        destination.write(chunk)
+        #Measurementresultvalues
+
+    destination.close()
+    try:
+        with io.open(MEDIA_ROOT + '/resultvalues/' + f.name +'.csv', 'rt', encoding='ascii') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                #raise ValidationError(row) #print the current row
+                dateT = time.strptime(row[0],"%m/%d/%Y %H:%M")#'1/1/2013 0:10
+                datestr = time.strftime("%Y-%m-%d %H:%M",dateT)
+                Measurementresultvalues(resultid=id,datavalue=row[1],valuedatetime=datestr,valuedatetimeutcoffset=4).save()
+    except IndexError:
+        raise ValidationError('encountered a problem with row '+row)
+
+def process_datalogger_file(f,fileid):
+    try:
+        with io.open(MEDIA_ROOT +  f.name , 'rt', encoding='ascii') as f:
+            #reader = csv.reader(f)
+            reader, reader2 = itertools.tee(csv.reader(f))
+            columnsinCSV = len(next(reader2))
+            rowColumnMap = list()
+            DataloggerfilecolumnSet = Dataloggerfilecolumns.objects.filter(dataloggerfileid=fileid.dataloggerfileid)
+            i=0
+            numCols=DataloggerfilecolumnSet.count()
+            if numCols == 0:
+                raise ValidationError(_('This file has no dataloggerfilecolumns associated with it. '), code='noDataloggerfilecolumns')
+            if not numCols == columnsinCSV:
+                 raise ValidationError(_('The number of columns in the csv file do not match the number of'+
+                                       ' dataloggerfilecolumns associated with the dataloggerfile in the database. '), code='ColumnMisMatch')
+            for row in reader:
+                #map the column objects to the column in the file assumes first row in file contains columnlabel.
+                if i==0:
+
+                    for dloggerfileColumns in DataloggerfilecolumnSet:
+                        foundColumn=False
+                        for j in range(numCols):
+                            #raise ValidationError(" in file " + row[j] + " in obj column label "+dloggerfileColumns.columnlabel)
+                            if row[j] == dloggerfileColumns.columnlabel:
+                                foundColumn=True
+                                dloggerfileColumns.columnnum = j
+                                rowColumnMap += [dloggerfileColumns]
+                        if not foundColumn:
+                             raise ValidationError(_('A column exists in the CSV file with no matching dataloggerfilecolumn.'), code='ColumnMisMatch')
+                        #if you didn't find a matching name for this column amoung the dloggerfileColumns raise error
+
+                else:
+
+                    #assume date is first column for the moment
+                    dateT = time.strptime(row[0],"%m/%d/%Y %H:%M")#'1/1/2013 0:10
+                    datestr = time.strftime("%Y-%m-%d %H:%M",dateT)
+                    #for each column in the data table
+                    #raise ValidationError("".join(str(rowColumnMap)))
+                    for colnum in rowColumnMap:
+                        #x[0] for x in my_tuples
+                        #colnum[0] = column number, colnum[1] = dataloggerfilecolumn object
+
+                        if not colnum.columnnum ==0:
+                            #raise ValidationError("result: " + str(colnum.resultid) + " datavalue "+
+                                                  #str(row[colnum.columnnum])+ " dateTime " + datestr)
+                            #thisresultid = colnum.resultid #result.values('resultid')
+                            measurementresult = Measurementresults.objects.filter(resultid= colnum.resultid)
+                            #only one measurement result is allowed per result
+                            for mresults in measurementresult:
+                                Measurementresultvalues(resultid=mresults
+                                        ,datavalue=row[colnum.columnnum],
+                                        valuedatetime=datestr,valuedatetimeutcoffset=4).save()
+
+                            #row[0] is this column object
+                i+=1
+
+                #read columns Add measurement result values for each column
+                #dateT = time.strptime(row[0],"%m/%d/%Y %H:%M")#'1/1/2013 0:10
+                #datestr = time.strftime("%Y-%m-%d %H:%M",dateT)
+                #Measurementresultvalues(resultid=programid,datavalue=row[1],valuedatetime=datestr,valuedatetimeutcoffset=4).save()
+    except IndexError:
+        raise ValidationError('encountered a problem with row '+row)
 
 
 
@@ -744,8 +835,10 @@ class Dataloggerfilecolumns(models.Model):
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, verbose_name="aggregation statistic",
                                                db_column='aggregationstatisticcv', blank=True, null=True)
     def __str__(self):
-        s=str(self.columnlabel)
+        s=str(self.dataloggerfileid)
+        s += '- {0},'.format(self.columnlabel)
         s += '- {0},'.format(self.columndescription)
+        s += '- {0},'.format(self.resultid)
         return s
     class Meta:
         managed = False
@@ -769,24 +862,14 @@ class Dataloggerfiles(models.Model):
         verbose_name='data logger file'
 
 
-def process_datalogger_file(f,programid):
-    try:
-        with io.open(MEDIA_ROOT +  f.name , 'rt', encoding='ascii') as f:
-            reader = csv.reader(f)
-            for row in reader:
-
-                #read columns Add measurement result values for each column
-                print("hello")
-                #dateT = time.strptime(row[0],"%m/%d/%Y %H:%M")#'1/1/2013 0:10
-                #datestr = time.strftime("%Y-%m-%d %H:%M",dateT)
-                #Measurementresultvalues(resultid=programid,datavalue=row[1],valuedatetime=datestr,valuedatetimeutcoffset=4).save()
-    except IndexError:
-        raise ValidationError('encountered a problem with row '+row)
-
 
 class ProcessDataloggerfile(models.Model):
     processdataloggerfileid = models.AutoField(primary_key=True)
-    dataloggerfileid = models.ForeignKey('dataloggerfiles', verbose_name='data logger file', db_column='dataloggerfileid')
+    dataloggerfileid = models.ForeignKey('dataloggerfiles',help_text="CAUTION dataloggerfilecolumns must be setup" +
+                                         ", the date and time stamp is expected to be the first column, "+
+                                         " column names are expected to be in first row only and must match "+
+                                         "the column name in associated dataloggerfilecolumns. Data begins on row 2.",
+                                         verbose_name='data logger file', db_column='dataloggerfileid')
     processingCode = models.CharField(max_length=255, verbose_name='processing code', default="0")
     date_processed = models.DateTimeField(auto_now=True)
     def __str__(self):
@@ -800,6 +883,13 @@ class ProcessDataloggerfile(models.Model):
     def save(self, *args, **kwargs):
         process_datalogger_file(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid)
         super(ProcessDataloggerfile, self).save(*args, **kwargs)
+    # def get_actions(self, request):
+    #     #Disable delete
+    #     actions = super(ProcessDataloggerfile, self).get_actions(request)
+    #     del actions['delete_selected']
+    #     return actions
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
 
 
 class Dataloggerprogramfiles(models.Model):
@@ -1080,25 +1170,6 @@ class Measurementresultvalues(models.Model):
         verbose_name='measurement result value'
 
 
-def handle_uploaded_file(f,id):
-    destination = io.open(MEDIA_ROOT + '/resultvalues/' + f.name +'.csv', 'wb+')
-    # data = open(f)
-    for chunk in f.chunks():
-
-        destination.write(chunk)
-        #Measurementresultvalues
-
-    destination.close()
-    try:
-        with io.open(MEDIA_ROOT + '/resultvalues/' + f.name +'.csv', 'rt', encoding='ascii') as f:
-            reader = csv.reader(f)
-            for row in reader:
-                #raise ValidationError(row) #print the current row
-                dateT = time.strptime(row[0],"%m/%d/%Y %H:%M")#'1/1/2013 0:10
-                datestr = time.strftime("%Y-%m-%d %H:%M",dateT)
-                Measurementresultvalues(resultid=id,datavalue=row[1],valuedatetime=datestr,valuedatetimeutcoffset=4).save()
-    except IndexError:
-        raise ValidationError('encountered a problem with row '+row)
 
 
 class MeasurementresultvalueFile(models.Model):
