@@ -73,8 +73,8 @@ def process_datalogger_file(f,fileid):
             if numCols == 0:
                 raise ValidationError(_('This file has no dataloggerfilecolumns associated with it. '), code='noDataloggerfilecolumns')
             if not numCols == columnsinCSV:
-                 raise ValidationError(_('The number of columns in the csv file do not match the number of'+
-                                       ' dataloggerfilecolumns associated with the dataloggerfile in the database. '), code='ColumnMisMatch')
+                 raise ValidationError(_('The number of columns in the '+ str(columnsinCSV) +' csv file do not match the number of'+
+                                       ' dataloggerfilecolumns '+ str(numCols) + ' associated with the dataloggerfile in the database. '), code='ColumnMisMatch')
             for row in reader:
                 #map the column objects to the column in the file assumes first row in file contains columnlabel.
                 if i==0:
@@ -88,7 +88,8 @@ def process_datalogger_file(f,fileid):
                                 dloggerfileColumns.columnnum = j
                                 rowColumnMap += [dloggerfileColumns]
                         if not foundColumn:
-                             raise ValidationError(_('A column exists in the CSV file with no matching dataloggerfilecolumn.'), code='ColumnMisMatch')
+                             raise ValidationError(_('Cannot find a column in the CSV matching the dataloggerfilecolumn '+
+                                                     str(dloggerfileColumns.columnlabel) ), code='ColumnMisMatch')
                         #if you didn't find a matching name for this column amoung the dloggerfileColumns raise error
 
                 else:
@@ -1650,9 +1651,10 @@ class Results(models.Model):
     #def __unicode__(self):
     #    return u'%s - %s' % (self.resultid, self.feature_action)
     def __str__(self):
-        s = str(self.resultid)
-        s += '- {0}'.format(self.variable)
+        #s = str(self.resultid)
+        s = '{0}'.format(self.variable)
         s+='- {0}'.format(self.feature_action)
+        s += '- ID: {0}'.format(self.resultid)
         #if self.result_type:
             #s += ', {0}'.format(self.result_type)
         return s
@@ -1660,6 +1662,7 @@ class Results(models.Model):
         managed = False
         db_table = 'results'
         verbose_name='result'
+        ordering = ["variable"]
 
 
 class Resultsdataquality(models.Model):
@@ -2187,7 +2190,7 @@ class Variables(models.Model):
     def __str__(self):
         s = str(self.variablecode)
         if self.variabledefinition:
-            s += ', {0}'.format(self.variabledefinition)
+            s += ', {0}'.format(self.variabledefinition)[:20]
         return s
     class Meta:
         managed = False

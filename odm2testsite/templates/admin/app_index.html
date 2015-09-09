@@ -42,7 +42,7 @@
         {% assign varnotfound True %}
         {% for model in app.models %}
             {% if model.admin_url and model.name == 'People' and varnotfound %}
-                <tr ><td  class="model-{{ model.object_name|lower }}">People and Organizations</td></tr>
+                <tr ><td  class="model-{{ model.object_name|lower }}"><h1>People and Organizations</h1></td></tr>
                 <tr class="model-{{ model.object_name|lower }}">
                 <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
                 {% assign varnotfound False %}
@@ -104,7 +104,7 @@
         {% assign varnotfound True %}
         {% for model in app.models %}
             {% if model.admin_url and model.name == 'Variables' and varnotfound %}
-             <tr ><td  class="model-{{ model.object_name|lower }}">Variables and Units</td></tr>
+             <tr ><td  class="model-{{ model.object_name|lower }}"><h1>Variables and Units</h1></td></tr>
                 <tr class="model-{{ model.object_name|lower }}">
                 <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
                 {% assign varnotfound False %}
@@ -254,7 +254,7 @@
         {% assign varnotfound True %}
         {% for model in app.models %}
             {% if model.admin_url and model.name == 'Sampling features' and varnotfound %}
-            <tr ><td  class="model-{{ model.object_name|lower }}">Locations and Actions at Locations</td></tr>
+            <tr ><td  class="model-{{ model.object_name|lower }}"><h1>Locations and Actions at Locations</h1></td></tr>
                 <tr class="model-{{ model.object_name|lower }}">
                 <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
                 {% assign varnotfound False %}
@@ -335,7 +335,7 @@
         {% assign varnotfound True %}
         {% for model in app.models %}
             {% if model.admin_url and model.name == 'Results' and varnotfound %}
-            <tr ><td  class="model-{{ model.object_name|lower }}">Result Definitions</td></tr>
+            <tr ><td  class="model-{{ model.object_name|lower }}"><h1>Result Definitions</h1></td></tr>
                 <tr class="model-{{ model.object_name|lower }}">
                 <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
                 {% assign varnotfound False %}
@@ -421,7 +421,7 @@
         {% assign varnotfound True %}
         {% for model in app.models %}
             {% if model.admin_url and model.name == 'Measurement results' and varnotfound %}
-                <tr ><td  class="model-{{ model.object_name|lower }}">Result Values</td></tr>
+                <tr ><td  class="model-{{ model.object_name|lower }}"><h1>Result Values</h1></td></tr>
                 <tr class="model-{{ model.object_name|lower }}">
                 <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
                 {% assign varnotfound False %}
@@ -485,7 +485,7 @@
         {% assign varnotfound True %}
         {% for model in app.models %}
             {% if model.admin_url and model.name == 'Data logger program files' and varnotfound %}
-            <tr ><td  class="model-{{ model.object_name|lower }}">data logger files</td></tr>
+            <tr ><td  class="model-{{ model.object_name|lower }}"><h1>Data Logger Files</h1></td></tr>
                 <tr class="model-{{ model.object_name|lower }}">
                 <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
                 {% assign varnotfound False %}

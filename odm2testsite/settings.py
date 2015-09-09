@@ -116,6 +116,7 @@ AJAX_LOOKUP_CHANNELS = {
     'cv_variable_name': ('odm2testapp.lookups',  'CvVariableNameLookup'),
     'cv_variable_type': ('odm2testapp.lookups',  'CvVariableTypeLookup'),
     'cv_unit_type': ('odm2testapp.lookups',  'CvUnitTypeLookup'),
+    'cv_speciation': ('odm2testapp.lookups',  'CvVariableSpeciationLookup'),
     # define a custom lookup channel
 }
 

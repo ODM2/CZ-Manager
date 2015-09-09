@@ -53,6 +53,7 @@ from odm2testapp.models import Equipmentmodels
 from ajax_select import make_ajax_field
 from .models import Measurementresults
 from .models import Measurementresultvalues
+from .views import dataloggercolumnView
 from daterange_filter.filter import DateRangeFilter
 from chartit import DataPool, Chart
 
@@ -62,13 +63,15 @@ from chartit import DataPool, Chart
 
 #the following define what fields should be overridden so that dropdown lists can be populated with useful information
 
+
 class VariablesAdminForm(ModelForm):
     #variabletypecv= TermModelChoiceField(CvVariabletype.objects.all().order_by('term'))
    # variablenamecv= TermModelChoiceField(CvVariablename.objects.all().order_by('term'))
     #speciationcv= TermModelChoiceField(CvSpeciation.objects.all().order_by('term'))
     #make these fields ajax type ahead fields with links to odm2 controlled vocabulary
     variable_name = make_ajax_field(Variables,'variable_name','cv_variable_name')
-    variable_type = make_ajax_field(Variables,'variable_type','cv_variable_type')
+    #variable_type = make_ajax_field(Variables,'variable_type','cv_variable_type')
+    speciation = make_ajax_field(Variables,'speciation','cv_speciation')
     class Meta:
         model=Variables
         fields = '__all__'
@@ -107,15 +110,23 @@ class SamplingfeaturesAdmin(admin.ModelAdmin):
     search_fields = ['sampling_feature_type__name','sampling_feature_geo_type__name','samplingfeaturename','samplingfeaturecode']
 
 
+def duplicate_results_event(ModelAdmin, request, queryset):
+    for object in queryset:
+        object.resultid = None
+        object.save()
+duplicate_results_event.short_description = "Duplicate selected result"
+
 class ResultsAdminForm(ModelForm):
     class Meta:
         model= Results
         fields = '__all__'
 class ResultsAdmin(admin.ModelAdmin):
     form=ResultsAdminForm
-    list_display = ['feature_action','variable','processing_level']
-    search_fields= ['variable__variable_name__name','feature_action__sampling_feature__samplingfeaturename',
-                    'result_type__name','processing_level__definition__name']
+    list_display = ['resultid','feature_action','variable','processing_level']
+    search_fields= ['variable__variable_name__name','variable__variablecode','variable__variabledefinition',
+                    'feature_action__sampling_feature__samplingfeaturename',
+                    'result_type__name','processing_level__definition']
+    actions = [duplicate_results_event]
 
 class RelatedactionsAdminForm(ModelForm):
     #actionid= ActionsModelChoiceField(Actions.objects.all().order_by('begindatetime'))
@@ -197,6 +208,22 @@ class MethodsAdminForm(ModelForm):
 class MethodsAdmin(admin.ModelAdmin):
     form=MethodsAdminForm
 
+#
+def duplicate_Dataloggerfiles_event(ModelAdmin, request, queryset):
+     for dataloggerfile in queryset:
+         fileid = dataloggerfile.dataloggerfileid
+         filecolumns= Dataloggerfilecolumns.objects.filter(dataloggerfileid=fileid)
+         dataloggerfile.dataloggerfileid = None
+         dataloggerfile.save()
+         #save will assign new dataloggerfileid
+         fileid = dataloggerfile.dataloggerfileid
+         for columns in filecolumns:
+             columns.dataloggerfilecolumnid = None
+             columns.dataloggerfileid = dataloggerfile
+             columns.save()
+
+
+duplicate_Dataloggerfiles_event.short_description = "Duplicate selected datalogger file along with columns"
 
 class DataloggerfilesAdminForm(ModelForm):
     class Meta:
@@ -204,6 +231,18 @@ class DataloggerfilesAdminForm(ModelForm):
         fields = '__all__'
 class DataloggerfilesAdmin(admin.ModelAdmin):
     form=DataloggerfilesAdminForm
+    actions = [duplicate_Dataloggerfiles_event]
+    #save_as which does a copy could work but here it didn't copy the filecolumns
+    #save_as = True
+    #def add_view(self, request, form_url='', extra_context=None):
+        #return dataloggercolumnView.as_view()(request)
+
+
+def duplicate_Dataloggerfilecolumns_event(ModelAdmin, request, queryset):
+    for object in queryset:
+        object.dataloggerfilecolumnid = None
+        object.save()
+duplicate_Dataloggerfilecolumns_event.short_description = "Duplicate selected datalogger file columns"
 
 class DataloggerfilecolumnsAdminForm(ModelForm):
     class Meta:
@@ -211,8 +250,11 @@ class DataloggerfilecolumnsAdminForm(ModelForm):
         fields = '__all__'
 class DataloggerfilecolumnsAdmin(admin.ModelAdmin):
     form=DataloggerfilecolumnsAdminForm
-
-
+    list_display = ['columnlabel', 'resultid']
+    actions = [duplicate_Dataloggerfilecolumns_event]
+    search_fields= ['columnlabel',
+                    'resultid__variable__variable_name__name',]
+    save_as = True
 
 
 class MeasurementresultsAdminForm(ModelForm):
@@ -242,7 +284,8 @@ class MeasurementresultvaluesAdmin(admin.ModelAdmin):
     )
     list_display = ['datavalue','valuedatetime','resultid'] #'resultid','feature_action_link','resultid__feature_action__name', 'resultid__variable__name'
     list_display_links = ['resultid',] #'feature_action_link'
-    search_fields= ['resultid__resultid__feature_action__sampling_feature__samplingfeaturename','resultid__resultid__variable__variable_name__name',
+    search_fields= ['resultid__resultid__feature_action__sampling_feature__samplingfeaturename',
+                    'resultid__resultid__variable__variable_name__name',
                     'resultid__resultid__variable__variable_type__name']
     def feature_action_link(self,obj):
         return u'<a href="/admin/odm2testapp/featureactions/%s/">%s</a>' % (obj.resultid.resultid.feature_action.featureactionid,obj.resultid.resultid.feature_action)
