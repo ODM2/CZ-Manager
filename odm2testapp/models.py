@@ -107,7 +107,11 @@ def process_datalogger_file(f,fileid):
                             #raise ValidationError("result: " + str(colnum.resultid) + " datavalue "+
                                                   #str(row[colnum.columnnum])+ " dateTime " + datestr)
                             #thisresultid = colnum.resultid #result.values('resultid')
+
                             measurementresult = Measurementresults.objects.filter(resultid= colnum.resultid)
+                            if  measurementresult.count() == 0:
+                                raise ValidationError(_('No Measurement results for column ' + colnum.columnlabel + ' Add measurement results for'+
+                                                  'each column ' ))
                             #only one measurement result is allowed per result
                             for mresults in measurementresult:
                                 Measurementresultvalues(resultid=mresults

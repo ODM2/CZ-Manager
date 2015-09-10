@@ -250,9 +250,9 @@ class DataloggerfilecolumnsAdminForm(ModelForm):
         fields = '__all__'
 class DataloggerfilecolumnsAdmin(admin.ModelAdmin):
     form=DataloggerfilecolumnsAdminForm
-    list_display = ['columnlabel', 'resultid']
+    list_display = ['columnlabel', 'resultid','dataloggerfileid']
     actions = [duplicate_Dataloggerfilecolumns_event]
-    search_fields= ['columnlabel',
+    search_fields= ['columnlabel','dataloggerfileid__dataloggerfilename',
                     'resultid__variable__variable_name__name',]
     save_as = True
 
@@ -269,6 +269,9 @@ class MeasurementresultsAdmin(admin.ModelAdmin):
         return u'<a href="/admin/odm2testapp/featureactions/%s/">%s</a>' % (obj.resultid.feature_action.featureactionid, obj.resultid.feature_action)
     data_link.short_description = 'feature action'
     data_link.allow_tags = True
+    search_fields= ['resultid__feature_action__sampling_feature__samplingfeaturename',
+                    'resultid__variable__variable_name__name',
+                    'resultid__variable__variable_type__name']
 
 
 class MeasurementresultvaluesAdminForm(ModelForm):
