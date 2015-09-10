@@ -2,20 +2,26 @@
 
 {% block content %}
 <br>
+<br>
     
 	<form action="" method="post">
 	{% csrf_token %} 
 	<select class="form-control" id="s1" name="selection">
               <option><b>select a result to update chart</b></option>
               {% for Result in resultList %}
-                <option value="{{ Result.resultid }}">{{ Result }}</option>
+				{% if Result.resultid == SelectedResult %}
+					<option selected="selected" value="{{ Result.resultid }}">{{ Result }}</option>
+				{% else %}
+					<option value="{{ Result.resultid }}">{{ Result }}</option>
+				{% endif %}
               {% endfor %}
             </select>
 			<br>
-			<input id="startDate" maxlength="100" name="startDate" type="text">
+			<input id="startDate" maxlength="100" value= "{{ startDate }}" name="startDate" type="text">
 			Start Date (format YYYY-MM-DD HH:MM) </input>
-			<input id="endDate" maxlength="100" name="endDate" type="text"/>
+			<input id="endDate" maxlength="100" value= "{{ endDate }}" name="endDate" type="text"/>
 			End Date (format YYYY-MM-DD HH:MM) </input>
 			<br>
-	<input type="submit" name="update_chart" value="Update Chart" /></form>
+	<input type="submit" name="update_chart" value="Update Chart" />
+	<input type="submit" name="export_data" value="Export Data" /></form>
 {% endblock %}

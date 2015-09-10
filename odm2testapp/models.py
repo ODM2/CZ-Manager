@@ -1153,7 +1153,7 @@ class Measurementresultvalueannotations(models.Model):
         managed = False
         db_table = 'measurementresultvalueannotations'
 
-
+import re
 class Measurementresultvalues(models.Model):
     valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Measurementresults, verbose_name='result',db_column='resultid')
@@ -1164,6 +1164,14 @@ class Measurementresultvalues(models.Model):
         s=str(self.resultid)
         s += '- {0}'.format(str(self.datavalue))
         s += '- {0}'.format(self.valuedatetime)
+        return s
+    def csvoutput(self):
+        s = str(self.valueid)
+        s += ', {0}'.format(self.datavalue)
+        s += ', {0}'.format(self.valuedatetime)
+        #temp = str(self.resultid).translate(' ', ',')
+        temp = re.sub('[,]', '', str(self.resultid))
+        s += ', {0} \n'.format(temp)
         return s
     class Meta:
         managed = False

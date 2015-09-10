@@ -53,7 +53,7 @@ from odm2testapp.models import Equipmentmodels
 from ajax_select import make_ajax_field
 from .models import Measurementresults
 from .models import Measurementresultvalues
-from .views import dataloggercolumnView
+#from .views import dataloggercolumnView
 from daterange_filter.filter import DateRangeFilter
 from chartit import DataPool, Chart
 

@@ -16,6 +16,7 @@ from .models import Variables
 from .models import Units
 from .models import Results
 from datetime import datetime
+import csv
 import time
 from django.db.models import Q
 from django.views.generic import ListView
@@ -24,6 +25,7 @@ import io
 import binascii
 import unicodedata
 from io import TextIOWrapper
+import cStringIO as StringIO
 from odm2testsite.settings import MEDIA_ROOT
 from django.core.exceptions import ValidationError
 from daterange_filter.filter import DateRangeFilter
@@ -39,40 +41,19 @@ def AddSensor(request):
     #return HttpResponse("odm2testsite says hello world!")
 
     return TemplateResponse(request, 'AddSensor.html', {})
-#
-# def ImportData(request, pk):
-#     #YOUR_OBJECT.objects.filter(pk=pk).update(views=F('views')+1)
-#     raise ValidationError('encountered a problem  ')
-#     return HttpResponseRedirect(request.META["HTTP_REFERER"])
-#
-# def request_page(request):
-#     if(request.GET.get('mybtn')):
-#         print("something")
-#     #mypythoncode.mypythonfunction( int(request.GET.get('mytextbox')) )
-#         #raise ValidationError('encountered a problem  ')
-#     return render_to_response('/admin/odm2testapp/dataloggerfiles/change_list.html')
 
-# def ImportData(self,request):
-#     #request.GET.get('q', '')
-#     f = self.Dataloggerfiles
-#     #raise ValidationError('encountered a problem  ')
-#     try:
-#         with io.open(MEDIA_ROOT + '/dataloggerfiles/' + f.dataloggerfilename +'.csv', 'rt', encoding='ascii') as f:
-#             reader = csv.reader(f)
-#             for row in reader:
-#                 #raise ValidationError(row) #print the current row
-#                 print("hi")
-#                 #dateT = time.strptime(row[0],"%m/%d/%Y %H:%M")#'1/1/2013 0:10
-#                 #datestr = time.strftime("%Y-%m-%d %H:%M",dateT)
-#                 #Measurementresultvalues(resultid=id,datavalue=row[1],valuedatetime=datestr,valuedatetimeutcoffset=4).save()
-#     except IndexError:
-#         raise ValidationError('encountered a problem with row '+row)
-#
-#     return HttpResponseRedirect(request.META["HTTP_REFERER"])
-#     #return HttpResponse('<h1>'+ f.dataloggerfilename +' was found</h1>')
+def dataloggercolumnView(request):
+    DataloggerfilecolumnsList = Dataloggerfilecolumns.objects.all()
+#DataloggerfilecolumnsDisplay.html
+    return render(request, '.', {'DataloggerfilecolumnsList':DataloggerfilecolumnsList,}) #DataloggerfilecolumnsDisplay.html
+
+#register.inclusion_tag('DataloggerfilecolumnsDisplay.html')(dataloggercolumnView)
 
 def resultDDList(request):
     #resultList = Results.objects.all()
+    startDate = ''
+    endDate = ''
+    selected_resultid=5
     if request.method == "POST":
         resultList = Results.objects.all(request.POST)
 
@@ -81,24 +62,31 @@ def resultDDList(request):
             request.session["selection"] = request.POST['selection']
             request.session["startDate"] = request.POST['startDate']
             request.session["endDate"] = request.POST['endDate']
+            startDate = request.POST['startDate']
+            endDate = request.POST['endDate']
+            selected_resultid= int(request.POST['SelectedResult'])
+
             return HttpResponseRedirect('chart.html','selection', 'startDate','endDate',)
     else:
-        ResultsForm = Results.objects.all()
+        resultList = Results.objects.all()
 
-    return render(request, 'resultList.html', {'resultList': resultList,}) # 'ResultsForm':ResultsForm
+    return render(request, 'resultList.html', {'resultList': resultList,'startDate':startDate,
+                                               'endDate':endDate, 'SelectedResult':selected_resultid}) # 'ResultsForm':ResultsForm
      #return TemplateResponse(request,'resultList.html',{ 'resultList': resultList,},)
 
 
-
-def Measurementresultvalues_for_Results(Results):
-    resultValues = Measurementresultvalues.objects.filter(Measurementresultvalues__resultid=Results.resultid)
-    return {'resultValues': resultValues}
-
-register.inclusion_tag('resultList.html')(Measurementresultvalues_for_Results)
-register.inclusion_tag('chart.html')(Measurementresultvalues_for_Results)
+#
+# def Measurementresultvalues_for_Results(Results):
+#     resultValues = Measurementresultvalues.objects.filter(Measurementresultvalues__resultid=Results.resultid)
+#     return {'resultValues': resultValues}
+#
+# register.inclusion_tag('resultList.html')(Measurementresultvalues_for_Results)
+# register.inclusion_tag('chart.html')(Measurementresultvalues_for_Results)
 
 def temp_pivot_chart_view(request):
-
+    entered_start_date = ''
+    entered_end_date = ''
+    selected_resultid = 5
     if 'selection' in request.POST:
         selected_resultid = request.POST['selection']
     else:
@@ -111,14 +99,13 @@ def temp_pivot_chart_view(request):
         entered_end_date = request.POST['endDate']
     else:
         entered_end_date = "2015-08-21"
-
     if entered_end_date =='':
         entered_end_date = "2015-08-21"
     if entered_start_date=='':
         entered_start_date = "2015-06-21"
-    #Step 1: Create a PivotDataPool with the data we want to retrieve.
-    # host_data = HostData.objects.filter( managers__in=managers )
-    #get the name of the sampling feature for the graph title
+    #
+
+
     selected_result = Results.objects.filter(resultid=selected_resultid)
     title_feature_action = Featureactions.objects.filter(featureactionid=selected_result.values('feature_action'))
     title_sampling_feature = Samplingfeatures.objects.filter(samplingfeatureid=title_feature_action.values('sampling_feature'))
@@ -133,15 +120,15 @@ def temp_pivot_chart_view(request):
     title_units = Units.objects.filter(unitsid=selected_result.values('unitsid'))
     s = str(title_units.values_list('unitsname',flat=True))
     name_of_units= s.split('\'')[1]
-
+    myresults = Measurementresultvalues.objects.all().filter(~Q(datavalue=-6999))\
+        .filter(valuedatetime__gt= entered_start_date)\
+        .filter(valuedatetime__lt = entered_end_date)\
+                    .filter(resultid=selected_resultid).order_by('-valuedatetime')[:8000]
     resultList = Results.objects.all()
     tempdata = DataPool(
        series=
         [{'options': {
-            'source': Measurementresultvalues.objects.all().filter(~Q(datavalue=-6999))
-                        .filter(valuedatetime__gt= entered_start_date)
-                        .filter(valuedatetime__lt = entered_end_date)
-                        .filter(resultid=selected_resultid).order_by('-valuedatetime')[:8000]},
+            'source':myresults },
           'terms': [
               ('valuedatetime',  lambda d: time.mktime(d.timetuple())),
             'datavalue']}
@@ -168,38 +155,21 @@ def temp_pivot_chart_view(request):
                    'text': '' + name_of_units}}},
             x_sortf_mapf_mts=(None, lambda i: datetime.fromtimestamp(i).strftime("%m-%d-%Y-%H:%M"), False))
 
-    return TemplateResponse(request,'chart.html',{'temppivchart': temppivcht, 'resultList': resultList,},)
-    #
-    # temppivotdata = \
-    #     PivotDataPool(
-    #        series =
-    #         [{'options': {
-    #            'source': Measurementresultvalues.objects.all(),
-    #            'categories': ['resultid']},
-    #           'terms': [
-    #             'valuedatetime',
-    #             'datavalue'
-    #
-    #             ]}
-    #          ])
-    #
-    # #Step 2: Create the PivotChart object
-    # temppivcht = \
-    #     PivotChart(
-    #         datasource = temppivotdata,
-    #         series_options =
-    #           [{'options':{
-    #               'type': 'line',
-    #               'stacking': False},
-    #             'terms':{
-    #           'valuedatetime': [
-    #             'datavalue']
-    #           }}],
-    #         chart_options =
-    #           {'title': {
-    #                'text': 'Temperature'},
-    #            'xAxis': {
-    #                 'title': {
-    #                    'text': 'date time'}}})
+    int_selectedresultid = int(selected_resultid)
+    csvexport = False
+    #if the user hit the export csv button export the measurement results to csv
+    if request.REQUEST.get('export_data'):
+        csvexport=True
+
+        myfile = StringIO.StringIO()
+        for mresults in myresults:
+            myfile.write(mresults.csvoutput())
+        response = HttpResponse(myfile.getvalue(),content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="'+ name_of_sampling_feature+'-'+ name_of_variable +'.csv"'
+    if csvexport:
+        return response
+    else:
+        return TemplateResponse(request,'chart.html',{'temppivchart': temppivcht, 'resultList': resultList,
+            'startDate':entered_start_date,'endDate':entered_end_date, 'SelectedResult':int_selectedresultid,},)
 
 
