@@ -10,6 +10,8 @@ from django.forms import TypedChoiceField
 from django.forms import ModelForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from import_export import resources
+from import_export.admin import ImportExportActionModelAdmin
 
 from django.shortcuts import render_to_response
 #from odm2testapp.lookups import CvVariableNameLookup
@@ -50,13 +52,14 @@ from odm2testapp.models import MeasurementresultvalueFile
 from odm2testapp.models import CvUnitstype
 from odm2testapp.models import Instrumentoutputvariables
 from odm2testapp.models import Equipmentmodels
+import cStringIO as StringIO
 from ajax_select import make_ajax_field
 from .models import Measurementresults
 from .models import Measurementresultvalues
 #from .views import dataloggercolumnView
 from daterange_filter.filter import DateRangeFilter
 from chartit import DataPool, Chart
-
+#from .admin import MeasurementresultvaluesResource
 # AffiliationsChoiceField(People.objects.all().order_by('personlastname'),Organizations.objects.all().order_by('organizationname'))
 
 #a complicated use of search_fields described in ResultsAdminForm
@@ -176,7 +179,7 @@ class AffiliationsAdmin(admin.ModelAdmin):
     form=AffiliationsAdminForm
 
 class ActionsAdminForm(ModelForm):
-
+    actiondescription = CharField(max_length=500, label= "Action description", widget=forms.Textarea)
     class Meta:
         model= Actions
         fields = '__all__'
@@ -200,6 +203,7 @@ class ActionByAdmin(admin.ModelAdmin):
 
 
 class MethodsAdminForm(ModelForm):
+    methoddescription = CharField(max_length=500, label= "Method description", widget=forms.Textarea)
     #methodtypecv= TermModelChoiceField(CvMethodtype.objects.all().order_by('term'))
     #organizationid= OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
     class Meta:
@@ -274,12 +278,26 @@ class MeasurementresultsAdmin(admin.ModelAdmin):
                     'resultid__variable__variable_type__name']
 
 
+
+class MeasurementresultvaluesResource(resources.ModelResource):
+
+    class Meta:
+        model = Measurementresultvalues
+        import_id_fields = ('valueid',)
+        fields = ('valueid', 'resultid__resultid__variable__variable_name',
+                  'resultid__resultid__feature_action__sampling_feature__samplingfeaturename','valuedatetime','datavalue',)
+        export_order = ('valueid', 'valuedatetime','datavalue',
+        'resultid__resultid__variable__variable_name','resultid__resultid__feature_action__sampling_feature__samplingfeaturename',)
+
 class MeasurementresultvaluesAdminForm(ModelForm):
     class Meta:
         model= Measurementresultvalues
         fields = '__all__'
-class MeasurementresultvaluesAdmin(admin.ModelAdmin):
+class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin):
     form=MeasurementresultvaluesAdminForm
+    resource_class = MeasurementresultvaluesResource
+    #resource_class uses django-import-export
+    #resource_class = MeasurementresultvaluesResource
     list_filter = (
          ('valuedatetime', DateRangeFilter),
         'resultid',
@@ -296,6 +314,20 @@ class MeasurementresultvaluesAdmin(admin.ModelAdmin):
     feature_action_link.allow_tags = True
     feature_action_link.admin_order_field = 'resultid__resultid__feature_action__sampling_feature'
     #get_feature_action = 'resultid__resultid__feature_action'
+    # def change_view(self, request, object_id, form_url='', extra_context=None):
+    #
+    #     if request.REQUEST.get('export_data'):
+    #         csvexport=True
+    #         myMeasurementResults = Measurementresultvalues.objects.all().filter()
+    #         myfile = StringIO.StringIO()
+    #         for mresults in myMeasurementResults:
+    #             myfile.write(mresults.csvoutput())
+    #         response = HttpResponse(myfile.getvalue(),content_type='text/csv')
+    #         response['Content-Disposition'] = 'attachment; filename="'+ name_of_sampling_feature+'-'+ name_of_variable +'.csv"'
+    #         extra_context = response
+    #     return super(MeasurementresultvaluesAdmin, self).change_view(request, object_id,
+    #         form_url, extra_context=extra_context)
+
 
 class MeasurementresultvalueFileForm(ModelForm):
     class Meta:

@@ -54,6 +54,7 @@ INSTALLED_APPS = (
     'chartit',
     'highcharts',
     'jquery',
+    'import_export',
     'admin_shortcuts',
     'daterange_filter',
     'django.contrib.admin',
@@ -84,7 +85,7 @@ ADMIN_SHORTCUTS = [
                 'class':'home',
             },
             {
-                'url_name': 'admin:odm2testapp_results_changelist',
+                'url_name': 'admin:odm2testapp_measurementresultvalues_changelist',
                 'app_name': 'odm2testapp',
                 'title': 'Results',
                 'class':'archive',
@@ -94,6 +95,12 @@ ADMIN_SHORTCUTS = [
                 'app_name': 'odm2testapp',
                 'title': 'Add Sensor Data',
                 'class':'tool',
+            },
+            {
+                'url': '/admin/RecordAction.html',
+                'app_name': 'odm2testapp',
+                'title': 'Record an Action',
+                'class':'notepad',
             },
             {
                 'url': '/admin/chart.html',

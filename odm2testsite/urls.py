@@ -14,15 +14,17 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^admin/', include(admin.site.urls)),
-    #http://127.0.0.1:8000/admin/odm2testsite/templates/odm2testapp/my_index.html
     (r'^admin/lookups/', include(ajax_select_urls)),
     url(r'^admin/AddSensor.html', views.AddSensor, name="AddSensor"),
+    url(r'^admin/RecordAction.html', views.RecordAction, name="RecordAction"),
     #for uploaded files like dataloggerfiles
     url(r'^odm2testapp/upfiles/(?P<path>.*)$', 'django.views.static.serve', {
             'document_root': MEDIA_ROOT,
         }),
     url(r'^admin/chart.html', views.temp_pivot_chart_view, name="temp_pivot_chart_view"),
-    #url(r"^admin/dataloggerprogramfiles/$", views.ImportData)
-     #url(r'^create',  view='views.create',name='create'),
-   # url(r'^ajax_lookup/(?P<channel>[-\w]+)$', 'ajax_select.views.ajax_lookup', name = 'ajax_lookup'),
+    #url(r'^admin/DataloggerfilecolumnsDisplay.html', views.dataloggercolumnView, name="dataloggercolumnView"),
+    #url(r'^admin/odm2testapp/dataloggerfiles/\d+/', views.dataloggercolumnView, name="dataloggercolumnView"),
+    #url(r'^contas_pagar/pagamento/(?P<id_parcela>\d+)/$',
+                             #'contas_pagar.views.retorna_pagamentos_parcela'),
+
 )
