@@ -2202,7 +2202,7 @@ class Variables(models.Model):
     def __str__(self):
         s = str(self.variablecode)
         if self.variabledefinition:
-            s += ', {0}'.format(self.variabledefinition)[:20]
+            s += '- {0}'.format(self.variabledefinition)[:20]
         return s
     class Meta:
         managed = False

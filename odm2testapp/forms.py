@@ -73,6 +73,7 @@ class VariablesAdminForm(ModelForm):
     #speciationcv= TermModelChoiceField(CvSpeciation.objects.all().order_by('term'))
     #make these fields ajax type ahead fields with links to odm2 controlled vocabulary
     variable_name = make_ajax_field(Variables,'variable_name','cv_variable_name')
+    variabledefinition = forms.CharField(max_length=500, widget=forms.Textarea )
     #variable_type = make_ajax_field(Variables,'variable_type','cv_variable_type')
     speciation = make_ajax_field(Variables,'speciation','cv_speciation')
     class Meta:
@@ -103,6 +104,7 @@ class SamplingfeaturesAdminForm(ModelForm):
                                     " where long and lat are in decimal degrees. If you don't want to add a location"+
                                       " leave default value of POINT(0 0).",
                                     max_length=500, widget=forms.Textarea(),) #attrs={'readonly':'readonly'}
+    samplingfeaturedescription = CharField(max_length=500, label= "feature description", widget=forms.Textarea, required=False)
     featuregeometry.initial = "POINT(0 0)"
     featuregeometry.required=False
     class Meta:
@@ -179,12 +181,12 @@ class AffiliationsAdmin(admin.ModelAdmin):
     form=AffiliationsAdminForm
 
 class ActionsAdminForm(ModelForm):
-    actiondescription = CharField(max_length=500, label= "Action description", widget=forms.Textarea)
+    actiondescription = CharField(max_length=500, label= "Action description", widget=forms.Textarea, required=False)
     class Meta:
         model= Actions
         fields = '__all__'
 class ActionsAdmin(admin.ModelAdmin):
-    list_display=('action_type','method')
+    list_display=('action_type','method','begindatetime')
     list_display_links =('action_type','method')
     search_fields=['action_type__name','method__methodname']#,
     form=ActionsAdminForm
@@ -203,14 +205,21 @@ class ActionByAdmin(admin.ModelAdmin):
 
 
 class MethodsAdminForm(ModelForm):
-    methoddescription = CharField(max_length=500, label= "Method description", widget=forms.Textarea)
+    methoddescription = CharField(max_length=500, label= "Method description", widget=forms.Textarea, required=False)
+
     #methodtypecv= TermModelChoiceField(CvMethodtype.objects.all().order_by('term'))
     #organizationid= OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
     class Meta:
         model= Methods
         fields = '__all__'
 class MethodsAdmin(admin.ModelAdmin):
+    list_display=('methodname','methodtypecv','method_link')
+    list_display_links = ['methodname','method_link']
     form=MethodsAdminForm
+    def method_link(self,obj):
+        return u'<a href="%s/">%s</a>'% (obj.methodlink, obj.methodlink)
+    method_link.short_description = 'link to method documentation'
+    method_link.allow_tags = True
 
 #
 def duplicate_Dataloggerfiles_event(ModelAdmin, request, queryset):
@@ -236,6 +245,7 @@ class DataloggerfilesAdminForm(ModelForm):
 class DataloggerfilesAdmin(admin.ModelAdmin):
     form=DataloggerfilesAdminForm
     actions = [duplicate_Dataloggerfiles_event]
+    #prepopulated_fields = {'dataloggerfilename': ('dataloggerfiledescription',)}
     #save_as which does a copy could work but here it didn't copy the filecolumns
     #save_as = True
     #def add_view(self, request, form_url='', extra_context=None):
