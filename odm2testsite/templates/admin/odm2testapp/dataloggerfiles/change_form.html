@@ -1,0 +1,28 @@
+{% extends "admin/change_form.html" %}
+{% load admin_extras %}
+{% load i18n  admin_shortcuts_tags %}
+
+{% block content %}
+ 
+   {{ block.super }}   {% csrf_token %}
+  
+<div class="app-odm2testapp module">
+        <table>
+                {% assign prefixpath '/admin/odm2testapp/' %}
+				<tr ><td class="section"><h1>Data Logger Columns associated with this file </td>
+				<th scope="col" class="section">Instrument Output Variable</th>
+				<th scope="col"  class="section">File column label</th></h1></tr>
+				{% for Dataloggerfilecolumns in DataloggerfilecolumnsList %}
+				<tr><h1>
+				<th scope="row"><a href="{{prefixpath }}dataloggerfilecolumns/{{ Dataloggerfilecolumns.dataloggerfilecolumnid }}">
+                    {{ Dataloggerfilecolumns  }}</a></th></h1>
+					<td>{{Dataloggerfilecolumns.instrumentoutputvariableid}}</td>
+					<td>{{Dataloggerfilecolumns.columnlabel}}</td>
+					</tr>
+                {% endfor %}
+			 </table>	
+
+ 
+   
+
+   {% endblock %}

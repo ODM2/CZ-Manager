@@ -12,6 +12,7 @@ from __future__ import unicode_literals
 from uuidfield import UUIDField
 from django.db import models
 from odm2testsite.settings import MEDIA_ROOT
+from django.db import transaction
 #from django.contrib.gis.db import models
 import csv
 import io
@@ -60,6 +61,8 @@ def handle_uploaded_file(f,id):
     except IndexError:
         raise ValidationError('encountered a problem with row '+row)
 
+#using atomic transaction should improve the speed of loading the data.
+@transaction.atomic
 def process_datalogger_file(f,fileid):
     try:
         with io.open(MEDIA_ROOT +  f.name , 'rt', encoding='ascii') as f:
@@ -120,11 +123,8 @@ def process_datalogger_file(f,fileid):
 
                             #row[0] is this column object
                 i+=1
+        Measurementresults.objects.raw("SELECT odm2.\"MeasurementResultValsToResultsCountvalue\"()")
 
-                #read columns Add measurement result values for each column
-                #dateT = time.strptime(row[0],"%m/%d/%Y %H:%M")#'1/1/2013 0:10
-                #datestr = time.strftime("%Y-%m-%d %H:%M",dateT)
-                #Measurementresultvalues(resultid=programid,datavalue=row[1],valuedatetime=datestr,valuedatetimeutcoffset=4).save()
     except IndexError:
         raise ValidationError('encountered a problem with row '+row)
 

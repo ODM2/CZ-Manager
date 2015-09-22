@@ -12,6 +12,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from import_export import resources
 from import_export.admin import ImportExportActionModelAdmin
+from django.contrib.admin import SimpleListFilter, RelatedFieldListFilter
 
 from django.shortcuts import render_to_response
 #from odm2testapp.lookups import CvVariableNameLookup
@@ -59,6 +60,8 @@ from .models import Measurementresultvalues
 #from .views import dataloggercolumnView
 from daterange_filter.filter import DateRangeFilter
 from chartit import DataPool, Chart
+from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 #from .admin import MeasurementresultvaluesResource
 # AffiliationsChoiceField(People.objects.all().order_by('personlastname'),Organizations.objects.all().order_by('organizationname'))
 
@@ -244,12 +247,19 @@ class DataloggerfilesAdminForm(ModelForm):
         fields = '__all__'
 class DataloggerfilesAdmin(admin.ModelAdmin):
     form=DataloggerfilesAdminForm
+    change_form_template = './admin/odm2testapp/dataloggerfiles/change_form.html'
     actions = [duplicate_Dataloggerfiles_event]
-    #prepopulated_fields = {'dataloggerfilename': ('dataloggerfiledescription',)}
-    #save_as which does a copy could work but here it didn't copy the filecolumns
-    #save_as = True
-    #def add_view(self, request, form_url='', extra_context=None):
-        #return dataloggercolumnView.as_view()(request)
+    #get the data columns related to this data loggerfile and return them to the change view.
+    def get_dataloggerfilecolumns(self,object_id):
+        DataloggerfilecolumnsList = Dataloggerfilecolumns.objects.filter(dataloggerfileid=object_id)
+        return DataloggerfilecolumnsList
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['DataloggerfilecolumnsList'] = self.get_dataloggerfilecolumns(object_id)
+        #extra_context['dataloggerfileschange_view'] = DataloggerfilecolumnsAdmin.get_changelist(DataloggerfilecolumnsAdmin)
+        extra_context['adminformdlfc'] = DataloggerfilesAdminForm(request.POST)
+        return super(DataloggerfilesAdmin, self).change_view(request, object_id,form_url, extra_context=extra_context)
+
 
 
 def duplicate_Dataloggerfilecolumns_event(ModelAdmin, request, queryset):
@@ -270,6 +280,48 @@ class DataloggerfilecolumnsAdmin(admin.ModelAdmin):
                     'resultid__variable__variable_name__name',]
     save_as = True
 
+class MeasurementResultFilter(SimpleListFilter):
+    title = _('data values loaded')
+    parameter_name = 'resultValuesPresent'
+
+    def lookups(self, request, model_admin):
+        mrs = Measurementresults.objects.values('resultid', 'resultid__feature_action__sampling_feature__samplingfeaturename',
+                                                'resultid__variable__variable_name__name')
+        #need to make a custom list with feature name and variable name.
+        resultidlist =  [ ( p['resultid'], '{0} {1}'.format(
+            p['resultid__feature_action__sampling_feature__samplingfeaturename'],
+            p['resultid__variable__variable_name__name'] ),) for p in mrs ]
+
+        return resultidlist
+
+    def queryset(self, request, queryset):
+        if not self.value():
+            return queryset
+        valuesPresent = Measurementresults.objects.filter(resultid=self.value())
+        #values = Measurementresultvalues.objects.filter(resultid=self.value()).distinct()
+        resultsWCount = Results.objects.raw("SELECT results.*, count(measurementresultvalues.resultid) as valuecount2 " +
+                                       "from odm2.results "+
+                                       "left join odm2.measurementresultvalues " +
+                                       "on (results.resultid = measurementresultvalues.resultid) " +
+                                       "group by "+
+                                       "results.resultid")
+        ids = []
+        for mresults in valuesPresent:
+            resultid = str(mresults.resultid) #mresults.value_list('resultid')
+            resultid= resultid.split(':')[1]
+            resultid=  resultid.strip()
+            resultid = long(resultid)
+            #raise ValidationError(resultid)
+            for resultwCount in resultsWCount:
+                valuecount2= resultwCount.valuecount2
+                #raise ValidationError(resultwCount.resultid)
+                if resultid == resultwCount.resultid and valuecount2 > 0:
+                     ids += [resultwCount.resultid]
+                     #raise ValidationError(ids)
+
+        #valuesPresent = [p.resultid for p in resultsWCount]
+        return queryset.filter(resultid__in=ids)
+
 
 class MeasurementresultsAdminForm(ModelForm):
     class Meta:
@@ -277,8 +329,10 @@ class MeasurementresultsAdminForm(ModelForm):
         fields = '__all__'
 class MeasurementresultsAdmin(admin.ModelAdmin):
     form=MeasurementresultsAdminForm
+    list_filter = [MeasurementResultFilter, ]
     list_display = ['resultid','censorcodecv','data_link']
     list_display_links = ['resultid','censorcodecv','data_link']
+    save_as = True
     def data_link(self,obj):
         return u'<a href="/admin/odm2testapp/featureactions/%s/">%s</a>' % (obj.resultid.feature_action.featureactionid, obj.resultid.feature_action)
     data_link.short_description = 'feature action'
@@ -286,6 +340,7 @@ class MeasurementresultsAdmin(admin.ModelAdmin):
     search_fields= ['resultid__feature_action__sampling_feature__samplingfeaturename',
                     'resultid__variable__variable_name__name',
                     'resultid__variable__variable_type__name']
+    #resultValues = Measurementresultvalues.objects.filter(resultid=)
 
 
 
@@ -305,12 +360,15 @@ class MeasurementresultvaluesAdminForm(ModelForm):
         fields = '__all__'
 class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin):
     form=MeasurementresultvaluesAdminForm
-    resource_class = MeasurementresultvaluesResource
+
+    #MeasurementresultvaluesResource is for exporting values to different file types.
     #resource_class uses django-import-export
-    #resource_class = MeasurementresultvaluesResource
+    resource_class = MeasurementresultvaluesResource
+
+    #date time filter and list of results you can filter on
     list_filter = (
          ('valuedatetime', DateRangeFilter),
-        'resultid',
+        MeasurementResultFilter,
 
     )
     list_display = ['datavalue','valuedatetime','resultid'] #'resultid','feature_action_link','resultid__feature_action__name', 'resultid__variable__name'
