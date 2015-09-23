@@ -63,13 +63,14 @@ def handle_uploaded_file(f,id):
 
 #using atomic transaction should improve the speed of loading the data.
 @transaction.atomic
-def process_datalogger_file(f,fileid):
+def process_datalogger_file(f,fileid, databeginson,columnheaderson):
     try:
         with io.open(MEDIA_ROOT +  f.name , 'rt', encoding='ascii') as f:
             #reader = csv.reader(f)
             reader, reader2 = itertools.tee(csv.reader(f))
             columnsinCSV = len(next(reader2))
             rowColumnMap = list()
+            dateTimeColumnNum = -1
             DataloggerfilecolumnSet = Dataloggerfilecolumns.objects.filter(dataloggerfileid=fileid.dataloggerfileid)
             i=0
             numCols=DataloggerfilecolumnSet.count()
@@ -80,7 +81,7 @@ def process_datalogger_file(f,fileid):
                                        ' dataloggerfilecolumns '+ str(numCols) + ' associated with the dataloggerfile in the database. '), code='ColumnMisMatch')
             for row in reader:
                 #map the column objects to the column in the file assumes first row in file contains columnlabel.
-                if i==0:
+                if i==columnheaderson:
 
                     for dloggerfileColumns in DataloggerfilecolumnSet:
                         foundColumn=False
@@ -95,7 +96,7 @@ def process_datalogger_file(f,fileid):
                                                      str(dloggerfileColumns.columnlabel) ), code='ColumnMisMatch')
                         #if you didn't find a matching name for this column amoung the dloggerfileColumns raise error
 
-                else:
+                elif i >= databeginson:
 
                     #assume date is first column for the moment
                     dateT = time.strptime(row[0],"%m/%d/%Y %H:%M")#'1/1/2013 0:10
@@ -114,7 +115,7 @@ def process_datalogger_file(f,fileid):
                             measurementresult = Measurementresults.objects.filter(resultid= colnum.resultid)
                             if  measurementresult.count() == 0:
                                 raise ValidationError(_('No Measurement results for column ' + colnum.columnlabel + ' Add measurement results for'+
-                                                  'each column ' ))
+                                                  'each column. Both results and measurement results are needed.' ))
                             #only one measurement result is allowed per result
                             for mresults in measurementresult:
                                 Measurementresultvalues(resultid=mresults
@@ -872,10 +873,12 @@ class ProcessDataloggerfile(models.Model):
     processdataloggerfileid = models.AutoField(primary_key=True)
     dataloggerfileid = models.ForeignKey('dataloggerfiles',help_text="CAUTION dataloggerfilecolumns must be setup" +
                                          ", the date and time stamp is expected to be the first column, "+
-                                         " column names are expected to be in first row only and must match "+
-                                         "the column name in associated dataloggerfilecolumns. Data begins on row 2.",
+                                         " column names must match "+
+                                         "the column name in associated dataloggerfilecolumns.",
                                          verbose_name='data logger file', db_column='dataloggerfileid')
     processingCode = models.CharField(max_length=255, verbose_name='processing code', default="0")
+    databeginson = models.IntegerField(verbose_name="Data begins on this row number", default=2)
+    columnheaderson = models.IntegerField(verbose_name="Column headers matching column labels on data logger columns on row")
     date_processed = models.DateTimeField(auto_now=True)
     def __str__(self):
         s=str(self.dataloggerfileid)
@@ -886,7 +889,7 @@ class ProcessDataloggerfile(models.Model):
         db_table = 'processdataloggerfile'
         verbose_name= 'process data logger file'
     def save(self, *args, **kwargs):
-        process_datalogger_file(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid)
+        process_datalogger_file(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid, self.databeginson, self.columnheaderson)
         super(ProcessDataloggerfile, self).save(*args, **kwargs)
     # def get_actions(self, request):
     #     #Disable delete

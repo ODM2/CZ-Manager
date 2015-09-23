@@ -257,7 +257,6 @@ class DataloggerfilesAdmin(admin.ModelAdmin):
         extra_context = extra_context or {}
         extra_context['DataloggerfilecolumnsList'] = self.get_dataloggerfilecolumns(object_id)
         #extra_context['dataloggerfileschange_view'] = DataloggerfilecolumnsAdmin.get_changelist(DataloggerfilecolumnsAdmin)
-        extra_context['adminformdlfc'] = DataloggerfilesAdminForm(request.POST)
         return super(DataloggerfilesAdmin, self).change_view(request, object_id,form_url, extra_context=extra_context)
 
 
