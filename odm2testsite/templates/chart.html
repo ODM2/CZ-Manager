@@ -42,7 +42,14 @@ $(document).ready(function() {
         title: title2,
         xAxis: xAxis,
         yAxis: yAxis,
-        series: series
+        series: series,
+		tooltip: {
+    formatter: function() {
+        return ''+
+                "" +
+                'Date: '+ Highcharts.dateFormat(' %e-%b-%Y %I:%M %p', this.x);
+    }
+},
     });
 });
 </script>

@@ -10,6 +10,4 @@ dependency on djangocms_admin_style https://github.com/divio/djangocms-admin-sty
 dependency on django-apptemplates https://pypi.python.org/pypi/django-apptemplates/
 dependency on django-daterange-filter https://pypi.python.org/pypi/django-daterange-filter/1.1.1
 dependency on django-import-export https://django-import-export.readthedocs.org/en/latest/installation.html
-
-dependency on django_chartit https://github.com/pgollakota/django-chartit
-django_chartit needs  django-jquery and Highcharts http://django-highcharts.readthedocs.org/en/latest/
+dependency on django-jquery 
