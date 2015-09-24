@@ -1178,7 +1178,7 @@ class Measurementresultvalues(models.Model):
         s += ', {0}'.format(self.valuedatetime)
         #temp = str(self.resultid).translate(' ', ',')
         temp = re.sub('[,]', '', str(self.resultid))
-        s += ', {0} \n'.format(temp)
+        s += ', {0}'.format(temp)
         return s
     class Meta:
         managed = False

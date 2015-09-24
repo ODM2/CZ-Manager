@@ -22,18 +22,35 @@
 {{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
 
 
-{% block extrahead %}{{ block.super }}
- 
- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
-    <script src="http://code.highcharts.com/highcharts.js" type="text/javascript"></script>
-    <script src="/highcharts.js" type="text/javascript"></script>
-    {% load chartit %}
-	
+{% block extrahead %}{{ block.super }}<title>
+    {% block title %}{% endblock %}
+  </title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    
+	 <script src="http://code.highcharts.com/highcharts.js"></script>
+	 <script>
+    var chart_id = 'chartid'
+    var chart = {{ chart|safe }}
+    var title2 = {{ title2|safe }}
+    var xAxis = {{ xAxis|safe }}
+    var yAxis = {{ yAxis|safe }}
+    var series = {{ series|safe }}
+
+$(document).ready(function() {
+    $('#chartid').highcharts({
+		chart: chart,
+        title: title2,
+        xAxis: xAxis,
+        yAxis: yAxis,
+        series: series
+    });
+});
+</script>
 {% admin_shortcuts_js %}{% endblock %}
 
 {# end changes #}
 
-{% block coltype %}colMs{% endblock %}
+{% block coltype %}colM{% endblock %}
 
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
 
@@ -44,9 +61,21 @@
 
 
 
-    <div id='content-main'> {% csrf_token %}{{ temppivchart|load_charts:"content-main" }}
+    <div id='content-main'> {% csrf_token %}
+	 
+	<div id='chartid' class="chart" style="height:50%; width:100%"></div>
 	</div>
 <br>
 {% include 'resultList.html' %}
+
+
+{% endblock %}
+
+
+{% block overwrite %}
+<!-- Overwrite the base.html jQuery load and put in head for Highcharts to work -->
+{% endblock %}
+{% block extrajs %}
+<!-- Maps the Python template context variables from views.py to the Highchart js variables -->
 
 {% endblock %}

@@ -1,21 +1,58 @@
 
+{% load admin_extras %}
 
-{% block content %}
+
 <br>
 <br>
     
 	<form action="" method="post">
 	{% csrf_token %} 
-	<select class="form-control" id="s1" name="selection">
-              <option><b>select a result to update chart</b></option>
-              {% for Result in resultList %}
-				{% if Result.resultid == SelectedResult %}
-					<option selected="selected" value="{{ Result.resultid }}">{{ Result }}</option>
+	
+	<select class="form-control" id="s1" name="SelectedFeatureAction">
+              <option value="All"><b>All</b></option>
+              {% for featureaction in featureactionList %}
+				{% if featureaction.featureactionid == SelectedFeatureAction %}
+					<option selected="selected" value="{{ featureaction.featureactionid }}">{{ featureaction }}</option>
 				{% else %}
-					<option value="{{ Result.resultid }}">{{ Result }}</option>
+					<option  value="{{ featureaction.featureactionid }}">{{ featureaction }}</option>
 				{% endif %}
               {% endfor %}
             </select>
+	<input type="submit" name="update_result_list" value="Update Result List" />
+	
+	<table >
+                {% assign prefixpath '/admin/odm2testapp/' %}
+				<tr ><th scope="col" class="section">Result Series</td>
+				<th scope="col"  class="sortable column-resultid">Variable</th>
+				<th scope="col"  class="sortable column-resultid">Units</th>
+				<th scope="col"  class="sortable column-resultid">Processing Level</th></tr>
+				{% for Result in resultList %}
+					{% assign foundSelectedResult False %}
+					{% for SelectedResult in SelectedResults %}
+						
+						{% if Result.resultid == SelectedResult %}
+							{% assign foundSelectedResult True %}
+							<tr class="row1">
+							<td ><input type="checkbox" class="action-checkbox-column" id="s1" checked  name="selection{{ forloop.counter0 }}" value="{{ Result.resultid }}">{{ Result.feature_action }} </input><br></td>
+
+								<td >{{Result.variable}}</td>
+								<td >{{Result.unitsid}}</td>
+								<td > {{Result.processing_level}}</td>
+								</tr>
+								{% endif %}
+						{% endfor %}
+					{% if foundSelectedResult == False %}
+						<tr class="row1">
+						<td ><input type="checkbox" class="action-checkbox-column" id="s1" name="selection{{ forloop.counter0 }}" value="{{ Result.resultid }}">{{ Result.feature_action }} </input><br></td>
+
+							<td >{{Result.variable}}</td>
+							<td >{{Result.unitsid}}</td>
+							<td > {{Result.processing_level}}</td>
+							</tr>
+					{% endif %}
+                {% endfor %}
+			 </table>	
+			
 			<br>
 			<input id="startDate" maxlength="100" value= "{{ startDate }}" name="startDate" type="text">
 			Start Date (format YYYY-MM-DD HH:MM) </input>
@@ -24,4 +61,3 @@
 			<br>
 	<input type="submit" name="update_chart" value="Update Chart" />
 	<input type="submit" name="export_data" value="Export Data" /></form>
-{% endblock %}

@@ -1,7 +1,5 @@
 from django.http import HttpResponse
 from django.template.response import TemplateResponse
-from chartit import DataPool, Chart
-from .models import Measurementresultvalues
 from django.db.models import Sum, Avg
 from django.shortcuts import render_to_response
 #from odm2testapp.forms import VariablesForm
@@ -18,6 +16,8 @@ from .models import Results
 from datetime import datetime
 import csv
 import time
+import datetime
+from datetime import timedelta
 from django.db.models import Q
 from django.views.generic import ListView
 import csv
@@ -27,12 +27,18 @@ import unicodedata
 from io import TextIOWrapper
 import cStringIO as StringIO
 from odm2testsite.settings import MEDIA_ROOT
+import itertools
 from django.core.exceptions import ValidationError
 from daterange_filter.filter import DateRangeFilter
 from django import template
-
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+from django.views.generic import View
+from django.template import RequestContext
+from forms import DataloggerfilesAdmin
+from forms import DataloggerfilesAdminForm
 register = template.Library()
-
+import admin
 def PeopleAndOrgs(request):
     #return HttpResponse("odm2testsite says hello world!")
     return TemplateResponse(request, 'PeopleAndOrgs.html', {})
@@ -43,49 +49,54 @@ def AddSensor(request):
     return TemplateResponse(request, 'AddSensor.html', {})
 
 
-#def measurementresultvalues_change_list(request):
-    #return HttpResponse("odm2testsite says hello world!")
-
-    #return TemplateResponse(request, 'AddSensor.html', {})
-
-
 def RecordAction(request):
     #return HttpResponse("odm2testsite says hello world!")
 
     return TemplateResponse(request, 'RecordAction.html', {})
+# #
+# def dataloggerfilesView(request, id):
+#      #model = Dataloggerfiles
+#      #template_name = 'admin/odm2testapp/dataloggerfiles/change_form.html'#'DataloggerfilecolumnsDisplay.html'
+#      DataloggerfilecolumnsList = Dataloggerfilecolumns.objects.filter(dataloggerfileid=id)
+#      DataloggerfilecolumnsListvalues =  str(DataloggerfilecolumnsList.values())
+#      #raise ValidationError(DataloggerfilecolumnsListvalues)
+#      DataloggerfilecolumnsListvalues= DataloggerfilecolumnsList#DataloggerfilecolumnsListvalues.split('\'')
+#      #request.session["DataloggerfilecolumnsList"] =DataloggerfilecolumnsListvalues
+#      #fieldsets = Dataloggerfiles.objects.filter(dataloggerfileid=id)
+#      adm = DataloggerfilesAdmin(Dataloggerfiles,admin) #.change_form_template
+#      admform = DataloggerfilesAdminForm(request.POST)
+#      #data =request.POST
+#      data = {
+#           'opts': Dataloggerfiles._meta,
+#           'adminform': admform.formset,
+#           'change': True,
+#           'is_popup': False,
+#           'to_field' : True,
+#           'save_as': False,
+#           #'prepopulated_fields' : adm.get_prepopulated_fields(request),
+#           'has_delete_permission': True,
+#           'has_add_permission': True,
+#           'has_change_permission': True,
+#           'DataloggerfilecolumnsList' : DataloggerfilecolumnsListvalues,}
+# #
+# # #DataloggerfilecolumnsDisplay.html
+#      return render_to_response('admin/odm2testapp/dataloggerfiles/change_form.html', data, context_instance=RequestContext(request)) # DataloggerfilecolumnsDisplay.html
 
-def dataloggercolumnView(request):
-    DataloggerfilecolumnsList = Dataloggerfilecolumns.objects.all()
-#DataloggerfilecolumnsDisplay.html
-    return render(request, '.', {'DataloggerfilecolumnsList':DataloggerfilecolumnsList,}) #DataloggerfilecolumnsDisplay.html
-
+    # def get_context_data(self, **kwargs):
+    #     context = super(dataloggercolumnView, self).get_context_data(**kwargs)
+    #
+    #     data = {'test': 'test',
+    #     'opts': Dataloggerfiles._meta,
+    #     'change': True,
+    #     'is_popup': False,
+    #     'save_as': False,
+    #     'has_delete_permission': False,
+    #     'has_add_permission': False,
+    #     'has_change_permission': False}
+    #     context['data'] = data
+    #     context['DataloggerfilecolumnsList'] = Dataloggerfilecolumns.objects.all()
+    #     return context
 #register.inclusion_tag('DataloggerfilecolumnsDisplay.html')(dataloggercolumnView)
-
-def resultDDList(request):
-    #resultList = Results.objects.all()
-    startDate = ''
-    endDate = ''
-    selected_resultid=5
-    if request.method == "POST":
-        resultList = Results.objects.all(request.POST)
-
-        if resultList.is_valid():
-            selection = resultList.cleaned_data['selection']
-            request.session["selection"] = request.POST['selection']
-            request.session["startDate"] = request.POST['startDate']
-            request.session["endDate"] = request.POST['endDate']
-            startDate = request.POST['startDate']
-            endDate = request.POST['endDate']
-            selected_resultid= int(request.POST['SelectedResult'])
-
-
-            return HttpResponseRedirect('chart.html','selection', 'startDate','endDate',)
-    else:
-        resultList = Results.objects.all()
-
-    return render(request, 'resultList.html', {'resultList': resultList,'startDate':startDate,
-                                               'endDate':endDate, 'SelectedResult':selected_resultid,})
-     #return TemplateResponse(request,'resultList.html',{ 'resultList': resultList,},)
 
 def get_name_of_sampling_feature(selected_result):
 
@@ -107,84 +118,170 @@ def get_name_of_units(selected_result):
      name_of_units= s.split('\'')[1]
      return name_of_units
 
+def dumptoMillis(obj):
+    """Default JSON serializer."""
+    import calendar, datetime
+
+    if isinstance(obj, datetime.datetime):
+        if obj.utcoffset() is not None:
+            obj = obj - obj.utcoffset()
+    millis = int(
+        calendar.timegm(obj.timetuple())*1000
+    )
+    return millis
+
+def ValuesQuerySetToDict(vqs):
+    return [item for item in vqs]
+
+
 def temp_pivot_chart_view(request):
     entered_start_date = ''
     entered_end_date = ''
-    selected_resultid = 5
-    if 'selection' in request.POST:
-        selected_resultid = request.POST['selection']
+    selected_resultid = 15
+    selected_featureactionid = 5
+
+
+    if 'SelectedFeatureAction' in request.POST:
+        if not request.POST['SelectedFeatureAction'] == 'All':
+            selected_featureactionid= int(request.POST['SelectedFeatureAction'])
+            resultList = Results.objects.filter(feature_action=selected_featureactionid)
+            if 'update_result_list' in request.POST:
+                selected_resultid= resultList[0].resultid
+        else:
+            selected_featureactionid= request.POST['SelectedFeatureAction']
+            resultList = Results.objects.all()
     else:
-        selected_resultid = 5
+        resultList = Results.objects.filter(feature_action=selected_featureactionid)
+
+    #find the measurement results series that where selected.
+    numresults = resultList.count()
+    selectedMResultSeries = []
+    selectionStr = ''
+    for i in range(0,numresults):
+        selectionStr = str('selection' + str(i))
+        if selectionStr in request.POST:
+            #raise ValidationError(request.POST[selectionStr])
+            for result in resultList:
+                if int(request.POST[selectionStr]) == result.resultid:
+                    selectedMResultSeries.append(int(request.POST[selectionStr]))
+    #if 'selection0' in request.POST:
+        #raise ValidationError(request.POST['selection0'] + ' '+ request.POST['selection1'])
+        #selected_resultid = request.POST['selection0']
+    #else:
+        #selected_resultid = 15
+    #if no series were selected (like on first load) set the series to some value.
+    if len(resultList) > 0 and len(selectedMResultSeries)==0:
+        selectedMResultSeries.append(int(resultList[0].resultid))
+    elif len(resultList) == 0 and len(selectedMResultSeries)==0:
+        selectedMResultSeries.append(15)
+
+
     if 'startDate' in request.POST:
         entered_start_date = request.POST['startDate']
     else:
-        entered_start_date = "2015-06-21"
+        entered_start_date = "2015-07-20"
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
     else:
-        entered_end_date = "2015-08-21"
+        entered_end_date = "2015-07-21"
     if entered_end_date =='':
-        entered_end_date = "2015-08-21"
+        entered_end_date = "2015-07-21"
     if entered_start_date=='':
-        entered_start_date = "2015-06-21"
+        entered_start_date = "2015-07-20"
 
-    selected_result = Results.objects.filter(resultid=selected_resultid)
-    name_of_sampling_feature = get_name_of_sampling_feature(selected_result)
-    name_of_variable = get_name_of_variable(selected_result)
-    name_of_units = get_name_of_units(selected_result)
-
-
-    myresults = Measurementresultvalues.objects.all().filter(~Q(datavalue=-6999))\
+    selected_results = []
+    name_of_sampling_features = []
+    name_of_variables = []
+    name_of_units = []
+    myresultSeries = []
+    i = 0
+    data = {}
+    for selectedMResult in selectedMResultSeries:
+        i +=1
+        selected_result = Results.objects.filter(resultid=selectedMResult)
+        selected_results.append(selected_result)
+        name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
+        name_of_variables.append(get_name_of_variable(selected_result))
+        name_of_units.append(get_name_of_units(selected_result))
+        myresultSeries.append(Measurementresultvalues.objects.all().filter(~Q(datavalue=-6999))\
         .filter(valuedatetime__gt= entered_start_date)\
         .filter(valuedatetime__lt = entered_end_date)\
-                    .filter(resultid=selected_resultid).order_by('-valuedatetime')[:8000]
-    resultList = Results.objects.all()
-    tempdata = DataPool(
-       series=
-        [{'options': {
-            'source':myresults },
-          'terms': [
-              ('valuedatetime',  lambda d: time.mktime(d.timetuple())),
-            'datavalue']}
-         ])
+                    .filter(resultid=selectedMResult).order_by('-valuedatetime')[:8000])
+        data.update({'datavalue' + str(i): []})
 
-    temppivcht = Chart(
-        datasource = tempdata,
-        series_options =
-          [{'options':{
-              'type': 'line',
-              'stacking': False},
-            'terms':{
-              'valuedatetime': [
-                'datavalue']
-              }}],
-        chart_options =
-          {'title': {
-               'text': ''+name_of_sampling_feature  + ', ' +name_of_variable+''},
-           'xAxis': {
-                'title': {
-                   'text': 'Date'}},
-            'yAxis': {
-                'title': {
-                   'text': '' + name_of_units}}},
-            x_sortf_mapf_mts=(None, lambda i: datetime.fromtimestamp(i).strftime("%m-%d-%Y-%H:%M"), False))
+    # [Date.UTC(1971, 5, 10), 0]
+    #{'data': [[1437435900, 71.47], [1437435000, 71.47],
+     # [{
+     #        data: [
+     #            [Date.UTC(1970, 9, 21), 0],
+     #            [Date.UTC(1970, 10, 4), 0.28],
+    i = 0
 
-    int_selectedresultid = int(selected_resultid)
+    for myresults in myresultSeries:
+        i+=1
+        for result in myresults:
+            start = datetime.datetime(1970,1,1)
+            delta = result.valuedatetime-start
+            mills = delta.total_seconds()*1000
+            data['datavalue' + str(i)].append([mills, result.datavalue]) #dumptoMillis(result.valuedatetime)
+            #data['datavalue'].extend(tmplist )
+            #data['valuedatetime'].append(dumptoMillis(result.valuedatetime))
+
+
+
+    i = 0
+    seriesStr = ''
+    series = []
+    titleStr = ''
+    for name_of_unit in name_of_units:
+        i+=1
+        if i==1:
+            seriesStr +=name_of_unit
+        else:
+            seriesStr+=' - '+name_of_unit
+        series.append({"name": name_of_unit, "data": data['datavalue'+str(i)]})
+    i=0
+    for name_of_sampling_feature,name_of_variable in zip(name_of_sampling_features,name_of_variables) :
+        i+=1
+        if i ==1:
+            titleStr += name_of_sampling_feature  + ', ' +name_of_variable
+        else:
+            titleStr += ' -- '+name_of_sampling_feature  + ', ' +name_of_variable
+
+    chartID = 'chart_id'
+    chart = {"renderTo": chartID, "type": 'line', "height": 500,}
+    title2 = {"text": titleStr}
+    xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
+    yAxis = {"title": {"text": seriesStr}}
+    # series = [
+    #     {"name": seriesStr, "data": data['datavalue']},
+    #     {"name": name_of_units2, "data": data['datavalue2']},
+    #     ]
+
+    featureactionList = Featureactions.objects.all()
+
+    int_selectedresultid_ids = []
+    for int_selectedresultid in selectedMResultSeries:
+        int_selectedresultid_ids.append(int(int_selectedresultid))
     csvexport = False
     #if the user hit the export csv button export the measurement results to csv
     if request.REQUEST.get('export_data'):
         csvexport=True
 
         myfile = StringIO.StringIO()
-        for mresults in myresults:
-            myfile.write(mresults.csvoutput())
+        for myresults in myresultSeries:
+            for result in myresults:
+                myfile.write(result.csvoutput())
+            myfile.write('\n')
         response = HttpResponse(myfile.getvalue(),content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="'+ name_of_sampling_feature+'-'+ name_of_variable +'.csv"'
+        response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
     if csvexport:
         return response
     else:
-        return TemplateResponse(request,'chart.html',{'temppivchart': temppivcht, 'resultList': resultList,
-            'startDate':entered_start_date,'endDate':entered_end_date, 'SelectedResult':int_selectedresultid,},)
+        return TemplateResponse(request,'chart.html',{ 'featureactionList': featureactionList, 'resultList': resultList,
+            'startDate':entered_start_date,'endDate':entered_end_date, 'SelectedResults':int_selectedresultid_ids,
+             'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'xAxis': xAxis, 'yAxis': yAxis,
+            'SelectedFeatureAction':selected_featureactionid,},)
 
 #
 # def Measurementresultvalues_for_Results(Results):

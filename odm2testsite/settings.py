@@ -49,11 +49,10 @@ STATIC_ROOT = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin/static'
 #                       "Dataloggerprogramfiles")},
 # )
 INSTALLED_APPS = (
-    'djangocms_admin_style',
-    'odm2testapp',
-    'chartit',
     'highcharts',
     'jquery',
+    'djangocms_admin_style',
+    'odm2testapp',
     'import_export',
     'admin_shortcuts',
     'daterange_filter',
