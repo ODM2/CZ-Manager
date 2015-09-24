@@ -27,29 +27,20 @@
 				<th scope="col"  class="sortable column-resultid">Units</th>
 				<th scope="col"  class="sortable column-resultid">Processing Level</th></tr>
 				{% for Result in resultList %}
-					{% assign foundSelectedResult False %}
-					{% for SelectedResult in SelectedResults %}
-						
-						{% if Result.resultid == SelectedResult %}
-							{% assign foundSelectedResult True %}
-							<tr class="row1">
-							<td ><input type="checkbox" class="action-checkbox-column" id="s1" checked  name="selection{{ forloop.counter0 }}" value="{{ Result.resultid }}">{{ Result.feature_action }} </input><br></td>
+					<tr class="row1">
+							<td ><input type="checkbox" class="action-checkbox-column" id="s1" 
+							{% for SelectedResult in SelectedResults %}
+								{% if Result.resultid == SelectedResult %}
+									checked  
+								{% endif %}
+							{% endfor %}
+							name="selection{{ forloop.counter0 }}" value="{{ Result.resultid }}">{{ Result.feature_action }} </input><br></td>
 
 								<td >{{Result.variable}}</td>
 								<td >{{Result.unitsid}}</td>
 								<td > {{Result.processing_level}}</td>
 								</tr>
-								{% endif %}
-						{% endfor %}
-					{% if foundSelectedResult == False %}
-						<tr class="row1">
-						<td ><input type="checkbox" class="action-checkbox-column" id="s1" name="selection{{ forloop.counter0 }}" value="{{ Result.resultid }}">{{ Result.feature_action }} </input><br></td>
-
-							<td >{{Result.variable}}</td>
-							<td >{{Result.unitsid}}</td>
-							<td > {{Result.processing_level}}</td>
-							</tr>
-					{% endif %}
+				
                 {% endfor %}
 			 </table>	
 			
