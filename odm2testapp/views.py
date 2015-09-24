@@ -233,13 +233,13 @@ def temp_pivot_chart_view(request):
     seriesStr = ''
     series = []
     titleStr = ''
-    for name_of_unit in name_of_units:
+    for name_of_unit,name_of_sampling_feature in zip(name_of_units,name_of_sampling_features) :
         i+=1
         if i==1:
             seriesStr +=name_of_unit
         else:
-            seriesStr+=' - '+name_of_unit
-        series.append({"name": name_of_unit, "data": data['datavalue'+str(i)]})
+            seriesStr+=' - '+name_of_unit 
+        series.append({"name": name_of_unit+' - '+ name_of_sampling_feature, "data": data['datavalue'+str(i)]})
     i=0
     for name_of_sampling_feature,name_of_variable in zip(name_of_sampling_features,name_of_variables) :
         i+=1
@@ -251,12 +251,13 @@ def temp_pivot_chart_view(request):
     chartID = 'chart_id'
     chart = {"renderTo": chartID, "type": 'line', "height": 500,}
     title2 = {"text": titleStr}
-    xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
+    xAxis = {"type": 'datetime', "title": {"text": 'Date'},}
     yAxis = {"title": {"text": seriesStr}}
     # series = [
     #     {"name": seriesStr, "data": data['datavalue']},
     #     {"name": name_of_units2, "data": data['datavalue2']},
     #     ]
+
 
     featureactionList = Featureactions.objects.all()
 
