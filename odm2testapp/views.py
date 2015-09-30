@@ -41,18 +41,24 @@ register = template.Library()
 import admin
 def PeopleAndOrgs(request):
     #return HttpResponse("odm2testsite says hello world!")
-    return TemplateResponse(request, 'PeopleAndOrgs.html', {})
+    if request.user.is_authenticated():
+        return TemplateResponse(request, 'PeopleAndOrgs.html', {})
+    else:
+        return HttpResponseRedirect('/admin/login/?next=/admin/')
 
 def AddSensor(request):
     #return HttpResponse("odm2testsite says hello world!")
-
-    return TemplateResponse(request, 'AddSensor.html', {})
-
+    if request.user.is_authenticated():
+        return TemplateResponse(request, 'AddSensor.html', {})
+    else:
+        return HttpResponseRedirect('/admin/login/?next=/admin/')
 
 def RecordAction(request):
     #return HttpResponse("odm2testsite says hello world!")
-
-    return TemplateResponse(request, 'RecordAction.html', {})
+    if request.user.is_authenticated():
+        return TemplateResponse(request, 'RecordAction.html', {})
+    else:
+        return HttpResponseRedirect('/admin/login/?next=/admin/')
 # #
 # def dataloggerfilesView(request, id):
 #      #model = Dataloggerfiles
@@ -135,6 +141,8 @@ def ValuesQuerySetToDict(vqs):
 
 
 def temp_pivot_chart_view(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/admin/login/?next=/admin/')
     entered_start_date = ''
     entered_end_date = ''
     selected_resultid = 15
@@ -238,7 +246,7 @@ def temp_pivot_chart_view(request):
         if i==1:
             seriesStr +=name_of_unit
         else:
-            seriesStr+=' - '+name_of_unit 
+            seriesStr+=' - '+name_of_unit
         series.append({"name": name_of_unit+' - '+ name_of_sampling_feature, "data": data['datavalue'+str(i)]})
     i=0
     for name_of_sampling_feature,name_of_variable in zip(name_of_sampling_features,name_of_variables) :

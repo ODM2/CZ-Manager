@@ -22,8 +22,9 @@
 {{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
 
 
-{% block extrahead %}{{ block.super }}<title>
-    {% block title %}{% endblock %}
+{% block extrahead %}
+{{ block.super }}<title>
+	{% block title %}{% endblock %}
   </title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     
@@ -46,8 +47,9 @@ $(document).ready(function() {
 		tooltip: {
     formatter: function() {
         return ''+
-                "" +
-                'Date: '+ Highcharts.dateFormat(' %e-%b-%Y %I:%M %p', this.x);
+        return ''+
+                 ' Value: ' + this.y + 
+                '-- Date: '+ Highcharts.dateFormat(' %e-%b-%Y %I:%M %p', this.x);
     }
 },
     });
@@ -69,9 +71,9 @@ $(document).ready(function() {
 
 
     <div id='content-main'> {% csrf_token %}
-	 
+	 </div>
 	<div id='chartid' class="chart" style="height:50%; width:100%"></div>
-	</div>
+	
 <br>
 {% include 'resultList.html' %}
 
