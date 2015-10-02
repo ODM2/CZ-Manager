@@ -22,7 +22,8 @@
 {{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
 
 
-{% block extrahead %}{{ block.super }}{% admin_shortcuts_js %}{% endblock %}
+{% block extrahead %}
+{{ block.super }}{% admin_shortcuts_js %}{% endblock %}
 
 {# end changes #}
 
@@ -39,7 +40,7 @@
 
 <div class="app-odm2testapp module">
         <table>
-                {% assign prefixpath '/admin/odm2testapp/' %}
+               
 				<tr ><td class="section"><h1>Record an Action</h1></td></tr>
 				<tr>
 				<th scope="row"><a href="{{prefixpath }}actions/">

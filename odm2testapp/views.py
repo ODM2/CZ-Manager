@@ -38,29 +38,30 @@ from django.views.generic import View
 from django.template import RequestContext
 from forms import DataloggerfilesAdmin
 from forms import DataloggerfilesAdminForm
+from odm2testsite.settings import CUSTOM_TEMPLATE_PATH
 register = template.Library()
 import admin
 
 
 def AddSensor(request):
-    #return HttpResponse("odm2testsite says hello world!")
     if request.user.is_authenticated():
-        return TemplateResponse(request, 'AddSensor.html', {})
+        context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
+        return TemplateResponse(request, 'AddSensor.html', context)
     else:
         return HttpResponseRedirect('../')
 
 
 def AddProfile(request):
-    #return HttpResponse("odm2testsite says hello world!")
     if request.user.is_authenticated():
-        return TemplateResponse(request, 'AddProfile.html', {})
+        context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
+        return TemplateResponse(request, 'AddProfile.html', context)
     else:
         return HttpResponseRedirect('../')
 
 def RecordAction(request):
-    #return HttpResponse("odm2testsite says hello world!")
     if request.user.is_authenticated():
-        return TemplateResponse(request, 'RecordAction.html', {})
+        context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
+        return TemplateResponse(request, 'RecordAction.html', context)
     else:
         return HttpResponseRedirect('../')
 # #

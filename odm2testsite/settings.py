@@ -35,6 +35,7 @@ ALLOWED_HOSTS = []
 MEDIA_ROOT = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin/odm2testapp/upfiles/'
 MEDIA_URL = '/odm2testapp/upfiles/'
 # Application definition
+CUSTOM_TEMPLATE_PATH = '/admin/odm2testapp/'
 STATIC_ROOT = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin/static'
 
 #https://github.com/mishbahr/django-modeladmin-reorder
