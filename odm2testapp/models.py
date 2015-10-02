@@ -147,8 +147,6 @@ class Actionby(models.Model):
     affiliationid = models.ForeignKey('Affiliations',verbose_name="person by affiliation", db_column='affiliationid')
     isactionlead = models.BooleanField(verbose_name="is lead person on action")
     roledescription = models.CharField(max_length=500,verbose_name="person's role on this action", blank=True)
-    #def affiliationsForActionBy(self):
-        #return self.affiliationid.objects.all().order_by('personlink')
     def __str__(self):
         s = str(self.actionid)
         if self.affiliationid:
@@ -1407,21 +1405,28 @@ class Processinglevels(models.Model):
 
 
 class Profileresults(models.Model):
-    resultid = models.ForeignKey('Results', db_column='resultid', primary_key=True)
-    xlocation = models.FloatField(blank=True, null=True)
-    xlocationunitsid = models.ForeignKey('Units', related_name='+', db_column='xlocationunitsid', blank=True, null=True)
-    ylocation = models.FloatField(blank=True, null=True)
-    ylocationunitsid = models.ForeignKey('Units', related_name='+', db_column='ylocationunitsid', blank=True, null=True)
-    spatialreferenceid = models.ForeignKey('Spatialreferences', db_column='spatialreferenceid', blank=True, null=True)
-    intendedzspacing = models.FloatField(blank=True, null=True)
-    intendedzspacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedzspacingunitsid', blank=True, null=True)
-    intendedtimespacing = models.FloatField(blank=True, null=True)
-    intendedtimespacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedtimespacingunitsid', blank=True, null=True)
-    aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, db_column='aggregationstatisticcv')
+    resultid = models.ForeignKey('Results', verbose_name='result', db_column='resultid', primary_key=True)
+    xlocation = models.FloatField(blank=True, verbose_name='x location', null=True)
+    xlocationunitsid = models.ForeignKey('Units', verbose_name='x location units',related_name='+',
+                                         db_column='xlocationunitsid', blank=True, null=True)
+    ylocation = models.FloatField(blank=True, verbose_name='y location', null=True)
+    ylocationunitsid = models.ForeignKey('Units', related_name='+', verbose_name='y location units',
+                                         db_column='ylocationunitsid', blank=True, null=True)
+    spatialreferenceid = models.ForeignKey('Spatialreferences', verbose_name='spatial reference',
+                                         db_column='spatialreferenceid', blank=True, null=True)
+    intendedzspacing = models.FloatField(blank=True, verbose_name='intended depth', null=True)
+    intendedzspacingunitsid = models.ForeignKey('Units', verbose_name='intended depth units', related_name='+',
+                                         db_column='intendedzspacingunitsid', blank=True, null=True)
+    intendedtimespacing = models.FloatField(blank=True, null=True, verbose_name='intended time spacing')
+    intendedtimespacingunitsid = models.ForeignKey('Units', verbose_name='intended time spacing unit', related_name='+',
+                                         db_column='intendedtimespacingunitsid', blank=True, null=True)
+    aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, verbose_name= 'aggregation statistic',
+                                         db_column='aggregationstatisticcv')
 
     class Meta:
         managed = False
         db_table = 'profileresults'
+        verbose_name='profile result'
 
 
 class Profileresultvalueannotations(models.Model):
@@ -1437,20 +1442,23 @@ class Profileresultvalueannotations(models.Model):
 class Profileresultvalues(models.Model):
     valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Profileresults, db_column='resultid')
-    datavalue = models.FloatField()
-    valuedatetime = models.DateTimeField()
-    valuedatetimeutcoffset = models.IntegerField()
-    zlocation = models.FloatField()
-    zaggregationinterval = models.FloatField()
-    zlocationunitsid = models.ForeignKey('Units', related_name='+', db_column='zlocationunitsid')
-    censorcodecv = models.ForeignKey(CvCensorcode, db_column='censorcodecv')
-    qualitycodecv = models.ForeignKey(CvQualitycode, db_column='qualitycodecv')
-    timeaggregationinterval = models.FloatField()
-    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+', db_column='timeaggregationintervalunitsid')
+    datavalue = models.FloatField(verbose_name='data value')
+    valuedatetime = models.DateTimeField(verbose_name='value date and time')
+    valuedatetimeutcoffset = models.IntegerField(verbose_name='value date and time UTC offset')
+    zlocation = models.FloatField(verbose_name='z location')
+    zaggregationinterval = models.FloatField(verbose_name='z aggregation interval')
+    zlocationunitsid = models.ForeignKey('Units',verbose_name='z location unit', related_name='+',
+                                            db_column='zlocationunitsid')
+    censorcodecv = models.ForeignKey(CvCensorcode, verbose_name='censor code',db_column='censorcodecv')
+    qualitycodecv = models.ForeignKey(CvQualitycode, verbose_name='quality code', db_column='qualitycodecv')
+    timeaggregationinterval = models.FloatField(verbose_name='time aggregation interval')
+    timeaggregationintervalunitsid = models.ForeignKey('Units', verbose_name='time aggregation interval unit',
+                                            related_name='+', db_column='timeaggregationintervalunitsid')
 
     class Meta:
         managed = False
         db_table = 'profileresultvalues'
+        verbose_name='profile result value'
 
 
 class Referencematerialexternalidentifiers(models.Model):
@@ -1665,6 +1673,7 @@ class Results(models.Model):
     valuecount = models.IntegerField(verbose_name='number of recorded values')
     #def __unicode__(self):
     #    return u'%s - %s' % (self.resultid, self.feature_action)
+
     def __str__(self):
         #s = str(self.resultid)
         s = '{0}'.format(self.variable)

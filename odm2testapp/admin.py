@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db import models
 
+
 from .models import Samplingfeatures
 from .forms import SamplingfeaturesAdmin
 from .models import Affiliations
@@ -48,7 +49,14 @@ from .models import Equipmentmodels
 from .forms import EquipmentmodelsAdmin
 from .models import Relatedfeatures
 from .models import ProcessDataloggerfile
+from .models import Profileresults
+from .models import Profileresultvalues
+from .forms import ProfileresultsAdmin
+from .forms import ProfileresultsvaluesAdmin
 
+
+admin.site.register(Profileresults, ProfileresultsAdmin)
+admin.site.register(Profileresultvalues, ProfileresultsvaluesAdmin)
 admin.site.register(Equipmentmodels,EquipmentmodelsAdmin)
 admin.site.register(Instrumentoutputvariables, InstrumentoutputvariablesAdmin)
 admin.site.register(Dataloggerfilecolumns, DataloggerfilecolumnsAdmin)

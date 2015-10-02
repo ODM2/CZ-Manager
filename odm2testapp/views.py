@@ -13,6 +13,7 @@ from .models import Samplingfeatures
 from .models import Variables
 from .models import Units
 from .models import Results
+from .models import Actions
 from datetime import datetime
 import csv
 import time
@@ -39,17 +40,20 @@ from forms import DataloggerfilesAdmin
 from forms import DataloggerfilesAdminForm
 register = template.Library()
 import admin
-def PeopleAndOrgs(request):
-    #return HttpResponse("odm2testsite says hello world!")
-    if request.user.is_authenticated():
-        return TemplateResponse(request, 'PeopleAndOrgs.html', {})
-    else:
-        return HttpResponseRedirect('../')
+
 
 def AddSensor(request):
     #return HttpResponse("odm2testsite says hello world!")
     if request.user.is_authenticated():
         return TemplateResponse(request, 'AddSensor.html', {})
+    else:
+        return HttpResponseRedirect('../')
+
+
+def AddProfile(request):
+    #return HttpResponse("odm2testsite says hello world!")
+    if request.user.is_authenticated():
+        return TemplateResponse(request, 'AddProfile.html', {})
     else:
         return HttpResponseRedirect('../')
 
@@ -149,6 +153,7 @@ def temp_pivot_chart_view(request):
     selected_featureactionid = 5
 
 
+
     if 'SelectedFeatureAction' in request.POST:
         if not request.POST['SelectedFeatureAction'] == 'All':
             selected_featureactionid= int(request.POST['SelectedFeatureAction'])
@@ -157,7 +162,7 @@ def temp_pivot_chart_view(request):
                 selected_resultid= resultList[0].resultid
         else:
             selected_featureactionid= request.POST['SelectedFeatureAction']
-            resultList = Results.objects.all()
+            resultList = Results.objects.filter(result_type="Temporal observation")
     else:
         resultList = Results.objects.filter(feature_action=selected_featureactionid)
 
@@ -266,8 +271,9 @@ def temp_pivot_chart_view(request):
     #     {"name": name_of_units2, "data": data['datavalue2']},
     #     ]
 
-
-    featureactionList = Featureactions.objects.all()
+    actionList = Actions.objects.filter(~Q(action_type="Estimation")) #where the action is not of type estimation
+    #assuming an estimate is a single value.
+    featureactionList = Featureactions.objects.filter(action__in=actionList)
 
     int_selectedresultid_ids = []
     for int_selectedresultid in selectedMResultSeries:

@@ -1,0 +1,32 @@
+{% extends "admin/change_form.html" %}
+{% load admin_extras %}
+{% load i18n  admin_shortcuts_tags %}
+
+{% block content %}
+ 
+   {{ block.super }}   {% csrf_token %}
+  <style>
+
+.nowrap {
+    white-space: normal;
+}
+</style>
+<div class="app-odm2testapp module">
+        <table>
+                {% assign prefixpath '/admin/odm2testapp/' %}
+				<tr ><td scope="col" class="section"><h1>Associated Result </td>
+				<th scope="col" class="section">Measurement Result Values</th>
+				{% for result in ResultsList %}
+				<tr class="row1"> 
+				<td class="nowrap" ><a href="{{prefixpath }}results/{{ result.resultid }}">
+                    {{ result  }}</a></td>
+				<td class="nowrap" ><a href="{{prefixpath }}measurementresultvalues/?resultValuesPresent={{ result.resultid }}">
+                    Values</a></td>
+					</tr>
+                {% endfor %}
+			 </table>	
+
+ 
+   
+
+   {% endblock %}

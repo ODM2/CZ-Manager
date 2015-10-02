@@ -7,7 +7,7 @@
     
 	<form action="" method="post">
 	{% csrf_token %} 
-	
+	<p> Omits results with an action type of "Estimation" </p>
 	<select class="form-control" id="s1" name="SelectedFeatureAction">
               <option value="All"><b>All</b></option>
               {% for featureaction in featureactionList %}

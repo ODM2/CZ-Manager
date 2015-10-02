@@ -16,47 +16,51 @@ from django.contrib.admin import SimpleListFilter, RelatedFieldListFilter
 
 from django.shortcuts import render_to_response
 #from odm2testapp.lookups import CvVariableNameLookup
-from odm2testapp.models import Variables
-from odm2testapp.models import CvVariabletype
-from odm2testapp.models import CvVariablename
-from odm2testapp.models import CvSpeciation
-from odm2testapp.models import Taxonomicclassifiers
-from odm2testapp.models import CvTaxonomicclassifiertype
-from odm2testapp.models import CvMethodtype
-from odm2testapp.models import Samplingfeatures
-from odm2testapp.models import CvSamplingfeaturetype
-from odm2testapp.models import CvSamplingfeaturegeotype
-from odm2testapp.models import CvElevationdatum
-from odm2testapp.models import Results
-from odm2testapp.models import CvResulttype
-from odm2testapp.models import Variables
-from odm2testapp.models import Relatedactions
-from odm2testapp.models import CvActiontype
-from odm2testapp.models import Actions
-from odm2testapp.models import Datasets
-from odm2testapp.models import Featureactions
-from odm2testapp.models import Samplingfeatures
-from odm2testapp.models import Organizations
-from odm2testapp.models import CvOrganizationtype
-from odm2testapp.models import CvRelationshiptype
-from odm2testapp.models import CvDatasettypecv
-from odm2testapp.models import Affiliations
-from odm2testapp.models import People
-from odm2testapp.models import Actionby
-from odm2testapp.models import Actions
-from odm2testapp.models import Dataloggerprogramfiles
-from odm2testapp.models import Dataloggerfiles
-from odm2testapp.models import Dataloggerfilecolumns
-from odm2testapp.models import Methods
-from odm2testapp.models import Units
-from odm2testapp.models import MeasurementresultvalueFile
-from odm2testapp.models import CvUnitstype
-from odm2testapp.models import Instrumentoutputvariables
-from odm2testapp.models import Equipmentmodels
+from .models import Variables
+from .models import CvVariabletype
+from .models import CvVariablename
+from .models import CvSpeciation
+from .models import Taxonomicclassifiers
+from .models import CvTaxonomicclassifiertype
+from .models import CvMethodtype
+from .models import Samplingfeatures
+from .models import CvSamplingfeaturetype
+from .models import CvSamplingfeaturegeotype
+from .models import CvElevationdatum
+from .models import Results
+from .models import CvResulttype
+from .models import Variables
+from .models import Relatedactions
+from .models import CvActiontype
+from .models import Actions
+from .models import Datasets
+from .models import Featureactions
+from .models import Samplingfeatures
+from .models import Organizations
+from .models import CvOrganizationtype
+from .models import CvRelationshiptype
+from .models import CvDatasettypecv
+from .models import Affiliations
+from .models import People
+from .models import Actionby
+from .models import Actions
+from .models import Dataloggerprogramfiles
+from .models import Dataloggerfiles
+from .models import Dataloggerfilecolumns
+from .models import Methods
+from .models import Units
+from .models import MeasurementresultvalueFile
+from .models import CvUnitstype
+from .models import Instrumentoutputvariables
+from .models import Equipmentmodels
+from .models import Datasetsresults
+from odm2testsite.settings import STATIC_URL
+from .models import Profileresults
 import cStringIO as StringIO
 from ajax_select import make_ajax_field
 from .models import Measurementresults
 from .models import Measurementresultvalues
+from .models import Profileresultvalues
 #from .views import dataloggercolumnView
 from daterange_filter.filter import DateRangeFilter
 from chartit import DataPool, Chart
@@ -173,6 +177,24 @@ class DatasetsAdminForm(ModelForm):
         fields = '__all__'
 class DatasetsAdmin(admin.ModelAdmin):
     form=DatasetsAdminForm
+    def get_datasetsresults(self,object_id):
+        datasetResults = Datasetsresults.objects.filter(datasetid=object_id)
+        #raise ValidationError(datasetResults)
+        return datasetResults
+    def get_results(self,object_id):
+        ids = []
+        datasetResults = Datasetsresults.objects.filter(datasetid=object_id)
+        for result in datasetResults:
+                ids += [result.resultid.resultid]
+        resultsList = Results.objects.filter(resultid__in=ids)
+        #raise ValidationError(datasetResults)
+        #return queryset.filter(resultid__in=ids)
+        return resultsList
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['DatasetResultsList'] = self.get_datasetsresults(object_id)
+        extra_context['ResultsList'] = self.get_results(object_id)
+        return super(DatasetsAdmin, self).change_view(request, object_id,form_url, extra_context=extra_context)
 
 class AffiliationsAdminForm(ModelForm):
 
@@ -196,7 +218,6 @@ class ActionsAdmin(admin.ModelAdmin):
 
 
 class ActionByAdminForm(ModelForm):
-
     class Meta:
         model= Actionby
         fields = '__all__'
@@ -321,6 +342,28 @@ class MeasurementResultFilter(SimpleListFilter):
         #valuesPresent = [p.resultid for p in resultsWCount]
         return queryset.filter(resultid__in=ids)
 
+#for soil sampling profiles with depths
+class ProfileresultsAdminForm(ModelForm):
+    class Meta:
+        model =Profileresults
+        fields='__all__'
+class ProfileresultsAdmin(admin.ModelAdmin):
+    form = ProfileresultsAdminForm
+    list_display = ['resultid','intendedzspacing','intendedzspacingunitsid']
+    list_display_links = ['resultid','intendedzspacing','intendedzspacingunitsid']
+    save_as = True
+
+class ProfileresultsvaluesAdminForm(ModelForm):
+    class Meta:
+        model= Profileresultvalues
+        fields = '__all__'
+class ProfileresultsvaluesAdmin(ImportExportActionModelAdmin):
+    form=ProfileresultsvaluesAdminForm
+    list_display = ['datavalue','valuedatetime','resultid','zlocation','zlocationunitsid'] #'resultid','feature_action_link','resultid__feature_action__name', 'resultid__variable__name'
+    list_display_links = ['resultid',] #'feature_action_link'
+    search_fields= ['resultid__resultid__feature_action__sampling_feature__samplingfeaturename',
+                    'resultid__resultid__variable__variable_name__name',
+                    'resultid__resultid__variable__variable_type__name']
 
 class MeasurementresultsAdminForm(ModelForm):
     class Meta:
@@ -328,17 +371,18 @@ class MeasurementresultsAdminForm(ModelForm):
         fields = '__all__'
 class MeasurementresultsAdmin(admin.ModelAdmin):
     form=MeasurementresultsAdminForm
+    list_display = ('resultid','censorcodecv','data_link')
+    list_display_links = ('resultid','data_link')
     list_filter = [MeasurementResultFilter, ]
-    list_display = ['resultid','censorcodecv','data_link']
-    list_display_links = ['resultid','censorcodecv','data_link']
     save_as = True
-    def data_link(self,obj):
-        return u'<a href="/admin/odm2testapp/featureactions/%s/">%s</a>' % (obj.resultid.feature_action.featureactionid, obj.resultid.feature_action)
-    data_link.short_description = 'feature action'
-    data_link.allow_tags = True
     search_fields= ['resultid__feature_action__sampling_feature__samplingfeaturename',
                     'resultid__variable__variable_name__name',
                     'resultid__variable__variable_type__name']
+    def data_link(self,obj):
+        return u'<a href="/admin/odm2testapp/featureactions/%s/">%s</a>' % (obj.resultid.feature_action.featureactionid, obj.resultid.feature_action)
+    data_link.short_description = 'sampling feature action'
+    data_link.allow_tags = True
+
     #resultValues = Measurementresultvalues.objects.filter(resultid=)
 
 
@@ -359,11 +403,9 @@ class MeasurementresultvaluesAdminForm(ModelForm):
         fields = '__all__'
 class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin):
     form=MeasurementresultvaluesAdminForm
-
     #MeasurementresultvaluesResource is for exporting values to different file types.
     #resource_class uses django-import-export
     resource_class = MeasurementresultvaluesResource
-
     #date time filter and list of results you can filter on
     list_filter = (
          ('valuedatetime', DateRangeFilter),

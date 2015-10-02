@@ -23,7 +23,7 @@ TEMPLATE_DIRS = [TEMPLATE_PATH,] #TEMPLATE_PATH2,
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '0c6x-v91u8z$kiq-)s6t1=a%lx!u946aa9wp2*_46#d1y4c-%m'
+SECRET_KEY = ''
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -49,7 +49,6 @@ STATIC_ROOT = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin/static'
 #                       "Dataloggerprogramfiles")},
 # )
 INSTALLED_APPS = (
-    'highcharts',
     'jquery',
     'djangocms_admin_style',
     'odm2testapp',
@@ -94,6 +93,12 @@ ADMIN_SHORTCUTS = [
                 'app_name': 'odm2testapp',
                 'title': 'Add Sensor Data',
                 'class':'tool',
+            },
+            {
+                'url': '/admin/AddProfile.html',
+                'app_name': 'odm2testapp',
+                'title': 'Add Soil Profile Data',
+                'class':'flag',
             },
             {
                 'url': '/admin/RecordAction.html',
