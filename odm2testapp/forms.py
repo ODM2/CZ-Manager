@@ -55,6 +55,7 @@ from .models import Instrumentoutputvariables
 from .models import Equipmentmodels
 from .models import Datasetsresults
 from odm2testsite.settings import STATIC_URL
+from odm2testsite.settings import CUSTOM_TEMPLATE_PATH
 from .models import Profileresults
 import cStringIO as StringIO
 from ajax_select import make_ajax_field
@@ -194,6 +195,7 @@ class DatasetsAdmin(admin.ModelAdmin):
         extra_context = extra_context or {}
         extra_context['DatasetResultsList'] = self.get_datasetsresults(object_id)
         extra_context['ResultsList'] = self.get_results(object_id)
+        extra_context['prefixpath'] = CUSTOM_TEMPLATE_PATH
         return super(DatasetsAdmin, self).change_view(request, object_id,form_url, extra_context=extra_context)
 
 class AffiliationsAdminForm(ModelForm):
@@ -277,6 +279,7 @@ class DataloggerfilesAdmin(admin.ModelAdmin):
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
         extra_context['DataloggerfilecolumnsList'] = self.get_dataloggerfilecolumns(object_id)
+        extra_context['prefixpath'] = CUSTOM_TEMPLATE_PATH
         #extra_context['dataloggerfileschange_view'] = DataloggerfilecolumnsAdmin.get_changelist(DataloggerfilecolumnsAdmin)
         return super(DataloggerfilesAdmin, self).change_view(request, object_id,form_url, extra_context=extra_context)
 
