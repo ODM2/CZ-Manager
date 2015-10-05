@@ -1084,7 +1084,8 @@ class Featureactions(models.Model):
     sampling_feature = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     action = models.ForeignKey(Actions, db_column='actionid')
     def __str__(self):
-        s=str(self.sampling_feature)
+        s = '{0}'.format(self.featureactionid)
+        s+='- {0}'.format(self.sampling_feature)
         s += '- {0}'.format(self.action)
         return s
     class Meta:
@@ -1422,7 +1423,28 @@ class Profileresults(models.Model):
                                          db_column='intendedtimespacingunitsid', blank=True, null=True)
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, verbose_name= 'aggregation statistic',
                                          db_column='aggregationstatisticcv')
-
+    def __str__(self):
+        s=''
+        if self.xlocation:
+            s += 'x location- {0}'.format(self.xlocation)
+        if self.xlocationunitsid:
+            s += ' {0}'.format(self.xlocationunitsid)
+        if self.ylocation:
+            s += 'y location- {0}'.format(self.ylocation)
+        if self.ylocationunitsid:
+            s += ' {0}'.format(self.ylocationunitsid)
+        if self.intendedzspacing:
+            s += 'Depth- {0}'.format(self.intendedzspacing)
+        if self.intendedzspacingunitsid:
+            s += ', {0}'.format(self.intendedzspacingunitsid)
+        if self.intendedtimespacing:
+            s += 'y location- {0}'.format(self.intendedtimespacing)
+        if self.intendedtimespacingunitsid:
+            s += ' {0}'.format(self.intendedtimespacingunitsid)
+        if self.aggregationstatisticcv:
+            s += ' {0}'.format(self.aggregationstatisticcv)
+        s += str(self.resultid)
+        return s
     class Meta:
         managed = False
         db_table = 'profileresults'
@@ -1443,17 +1465,17 @@ class Profileresultvalues(models.Model):
     valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Profileresults, db_column='resultid')
     datavalue = models.FloatField(verbose_name='data value')
-    valuedatetime = models.DateTimeField(verbose_name='value date and time')
-    valuedatetimeutcoffset = models.IntegerField(verbose_name='value date and time UTC offset')
-    zlocation = models.FloatField(verbose_name='z location')
-    zaggregationinterval = models.FloatField(verbose_name='z aggregation interval')
+    valuedatetime = models.DateTimeField(verbose_name='value date and time', blank=True, null=True)
+    valuedatetimeutcoffset = models.IntegerField(verbose_name='value date and time UTC offset', blank=True, null=True)
+    zlocation = models.FloatField(verbose_name='z location', blank=True, null=True)
+    zaggregationinterval = models.FloatField(verbose_name='z aggregation interval', blank=True, null=True)
     zlocationunitsid = models.ForeignKey('Units',verbose_name='z location unit', related_name='+',
-                                            db_column='zlocationunitsid')
+                                            db_column='zlocationunitsid', blank=True, null=True)
     censorcodecv = models.ForeignKey(CvCensorcode, verbose_name='censor code',db_column='censorcodecv')
     qualitycodecv = models.ForeignKey(CvQualitycode, verbose_name='quality code', db_column='qualitycodecv')
-    timeaggregationinterval = models.FloatField(verbose_name='time aggregation interval')
+    timeaggregationinterval = models.FloatField(verbose_name='time aggregation interval', blank=True, null=True)
     timeaggregationintervalunitsid = models.ForeignKey('Units', verbose_name='time aggregation interval unit',
-                                            related_name='+', db_column='timeaggregationintervalunitsid')
+                        related_name='+', db_column='timeaggregationintervalunitsid', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -1752,7 +1774,8 @@ class Samplingfeatures(models.Model):
     elevation_m = models.FloatField(verbose_name='elevation',blank=True, null=True)
     elevation_datum = models.ForeignKey(CvElevationdatum, db_column='elevationdatumcv', blank=True, null=True)
     def __str__(self):
-        s = str(self.samplingfeaturecode)
+        s = '{0}'.format(self.samplingfeatureid)
+        s += '- {0}'.format(self.samplingfeaturecode)
         s += '- {0} '.format(self.sampling_feature_type)
         if self.samplingfeaturename:
             s += '- {0},'.format(self.samplingfeaturename)
@@ -2170,6 +2193,7 @@ class Units(models.Model):
         return s
     class Meta:
         managed = False
+        ordering = ('unitsabbreviation','unitsname',)
         db_table = 'units'
         verbose_name='unit'
 
@@ -2218,6 +2242,7 @@ class Variables(models.Model):
         return s
     class Meta:
         managed = False
+        ordering = ('variablecode','variable_name',)
         db_table = 'variables'
         verbose_name='variable'
     

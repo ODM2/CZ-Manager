@@ -272,7 +272,7 @@ def temp_pivot_chart_view(request):
     #     {"name": name_of_units2, "data": data['datavalue2']},
     #     ]
 
-    actionList = Actions.objects.filter(~Q(action_type="Estimation")) #where the action is not of type estimation
+    actionList = Actions.objects.filter(action_type="Observation") #where the action is not of type estimation
     #assuming an estimate is a single value.
     featureactionList = Featureactions.objects.filter(action__in=actionList)
 

@@ -121,7 +121,7 @@ class SamplingfeaturesAdminForm(ModelForm):
 class SamplingfeaturesAdmin(admin.ModelAdmin):
     form=SamplingfeaturesAdminForm
     search_fields = ['sampling_feature_type__name','sampling_feature_geo_type__name','samplingfeaturename','samplingfeaturecode']
-
+    save_as = True
 
 def duplicate_results_event(ModelAdmin, request, queryset):
     for object in queryset:
@@ -140,7 +140,7 @@ class ResultsAdmin(admin.ModelAdmin):
                     'feature_action__sampling_feature__samplingfeaturename',
                     'result_type__name','processing_level__definition']
     actions = [duplicate_results_event]
-
+    save_as = True
 class RelatedactionsAdminForm(ModelForm):
     #actionid= ActionsModelChoiceField(Actions.objects.all().order_by('begindatetime'))
     #relationshiptypecv= TermModelChoiceField(CvRelationshiptype.objects.all().order_by('term'))
@@ -169,7 +169,7 @@ class FeatureactionsAdminForm(ModelForm):
 class FeatureactionsAdmin(admin.ModelAdmin):
     list_display = ['sampling_feature','action',]
     form=FeatureactionsAdminForm
-
+    save_as = True
 
 class DatasetsAdminForm(ModelForm):
     datasetabstract = forms.CharField(max_length=500, widget=forms.Textarea )
@@ -352,8 +352,8 @@ class ProfileresultsAdminForm(ModelForm):
         fields='__all__'
 class ProfileresultsAdmin(admin.ModelAdmin):
     form = ProfileresultsAdminForm
-    list_display = ['resultid','intendedzspacing','intendedzspacingunitsid']
-    list_display_links = ['resultid','intendedzspacing','intendedzspacingunitsid']
+    list_display = ['intendedzspacing','intendedzspacingunitsid','aggregationstatisticcv','resultid',]
+    list_display_links = ['intendedzspacing','intendedzspacingunitsid','aggregationstatisticcv','resultid',]
     save_as = True
 
 class ProfileresultsvaluesAdminForm(ModelForm):
@@ -362,7 +362,7 @@ class ProfileresultsvaluesAdminForm(ModelForm):
         fields = '__all__'
 class ProfileresultsvaluesAdmin(ImportExportActionModelAdmin):
     form=ProfileresultsvaluesAdminForm
-    list_display = ['datavalue','valuedatetime','resultid','zlocation','zlocationunitsid'] #'resultid','feature_action_link','resultid__feature_action__name', 'resultid__variable__name'
+    list_display = ['datavalue','zlocation','zlocationunitsid','valuedatetime','resultid',] #'resultid','feature_action_link','resultid__feature_action__name', 'resultid__variable__name'
     list_display_links = ['resultid',] #'feature_action_link'
     search_fields= ['resultid__resultid__feature_action__sampling_feature__samplingfeaturename',
                     'resultid__resultid__variable__variable_name__name',
