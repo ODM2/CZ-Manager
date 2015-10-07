@@ -14,29 +14,16 @@ from django.db import models
 from odm2testsite.settings import MEDIA_ROOT
 from django.db import transaction
 #from django.contrib.gis.db import models
-import csv
-import io
-import binascii
-import unicodedata
-from io import TextIOWrapper
-from django.conf import settings
-from django import forms
-from django.contrib import admin
-from django.utils.html import format_html
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-from django.shortcuts import render_to_response
 import time
 #from django.forms import ModelFormWithFileField
 #from .forms import DataloggerprogramfilesAdminForm
 #from odm2testapp.forms import VariablesForm
-from odm2testsite.settings import MEDIA_ROOT
 #from django.contrib.gis.db import models
 import csv
 import io
-import binascii
-import unicodedata
-from io import TextIOWrapper
+
+import re
+
 from django.core.exceptions import ValidationError
 import itertools
 from django.utils.translation import ugettext as _
@@ -249,13 +236,15 @@ class Annotations(models.Model):
 
 class Authorlists(models.Model):
     bridgeid = models.AutoField(primary_key=True)
-    citationid = models.ForeignKey('Citations', db_column='citationid')
-    personid = models.ForeignKey('People', db_column='personid')
-    authororder = models.IntegerField()
+    citationid = models.ForeignKey('Citations', verbose_name='citation', db_column='citationid')
+    personid = models.ForeignKey('People', verbose_name='person', db_column='personid')
+    authororder = models.IntegerField(verbose_name='author order')
 
     class Meta:
         managed = False
         db_table = 'authorlists'
+        verbose_name='author list'
+        verbose_name_plural= 'author list'
 
 
 class Calibrationactions(models.Model):
@@ -354,13 +343,16 @@ class Citations(models.Model):
     citationid = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
     publisher = models.CharField(max_length=255)
-    publicationyear = models.IntegerField()
-    citationlink = models.CharField(max_length=255, blank=True)
-
+    publicationyear = models.IntegerField(verbose_name='publication year')
+    citationlink = models.CharField(max_length=255, blank=True,verbose_name='DOI',)
+    def __str__(self):
+        s = str(self.title)
+        return s
     class Meta:
         managed = False
         db_table = 'citations'
         ordering = ['title']
+        verbose_name = 'citation'
 
 
 class CvActiontype(models.Model):
@@ -933,13 +925,14 @@ class Dataquality(models.Model):
 
 class Datasetcitations(models.Model):
     bridgeid = models.AutoField(primary_key=True)
-    datasetid = models.ForeignKey('Datasets', db_column='datasetid')
-    relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
-    citationid = models.ForeignKey(Citations, db_column='citationid')
+    datasetid = models.ForeignKey('Datasets', verbose_name='dataset', db_column='datasetid')
+    relationshiptypecv = models.ForeignKey(CvRelationshiptype, verbose_name='relationship type', db_column='relationshiptypecv')
+    citationid = models.ForeignKey(Citations, db_column='citationid', verbose_name='citation')
 
     class Meta:
         managed = False
         db_table = 'datasetcitations'
+        verbose_name='dataset citation'
 
 
 class Datasets(models.Model):
@@ -1159,7 +1152,7 @@ class Measurementresultvalueannotations(models.Model):
         managed = False
         db_table = 'measurementresultvalueannotations'
 
-import re
+
 class Measurementresultvalues(models.Model):
     valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Measurementresults, verbose_name='result',db_column='resultid')
@@ -1214,13 +1207,17 @@ class Methodannotations(models.Model):
 
 class Methodcitations(models.Model):
     bridgeid = models.AutoField(primary_key=True)
-    methodid = models.ForeignKey('Methods', db_column='methodid')
-    relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
-    citationid = models.ForeignKey(Citations, db_column='citationid')
-
+    methodid = models.ForeignKey('Methods', db_column='methodid', verbose_name='method')
+    relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv', verbose_name='relationship type')
+    citationid = models.ForeignKey(Citations, db_column='citationid',verbose_name='citation')
+    def __str__(self):
+        s = str(self.methodid)
+        s += "- {0}".format(self.citationid)
+        return s
     class Meta:
         managed = False
         db_table = 'methodcitations'
+        verbose_name='method citation'
 
 
 class Methodextensionpropertyvalues(models.Model):
@@ -1268,6 +1265,7 @@ class Methods(models.Model):
         managed = False
         db_table = 'methods'
         verbose_name='method'
+        ordering = ["methodname"]
 
 
 class Modelaffiliations(models.Model):
@@ -1442,8 +1440,8 @@ class Profileresults(models.Model):
         if self.intendedtimespacingunitsid:
             s += ' {0}'.format(self.intendedtimespacingunitsid)
         if self.aggregationstatisticcv:
-            s += ' {0}'.format(self.aggregationstatisticcv)
-        s += str(self.resultid)
+            s += ' {0}- '.format(self.aggregationstatisticcv)
+        s += ' {0} '.format(self.resultid)
         return s
     class Meta:
         managed = False

@@ -107,6 +107,12 @@ ADMIN_SHORTCUTS = [
                 'title': 'Record an Action',
                 'class':'notepad',
             },
+             {
+                'url': '/admin/ManageCitations.html',
+                'app_name': 'odm2testapp',
+                'title': 'Manage Citations',
+                'class':'pencil',
+            },
             {
                 'url': '/admin/chart.html',
                 'app_name': 'odm2testapp',

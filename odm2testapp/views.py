@@ -64,6 +64,14 @@ def RecordAction(request):
         return TemplateResponse(request, 'RecordAction.html', context)
     else:
         return HttpResponseRedirect('../')
+
+
+def ManageCitations(request):
+    if request.user.is_authenticated():
+        context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
+        return TemplateResponse(request, 'ManageCitations.html', context)
+    else:
+        return HttpResponseRedirect('../')
 # #
 # def dataloggerfilesView(request, id):
 #      #model = Dataloggerfiles

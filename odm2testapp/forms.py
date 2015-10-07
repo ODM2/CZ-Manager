@@ -49,6 +49,10 @@ from .models import Dataloggerfiles
 from .models import Dataloggerfilecolumns
 from .models import Methods
 from .models import Units
+from .models import Datasetcitations
+from .models import Citations
+from .models import Authorlists
+from .models import Methodcitations
 from .models import MeasurementresultvalueFile
 from .models import CvUnitstype
 from .models import Instrumentoutputvariables
@@ -64,7 +68,6 @@ from .models import Measurementresultvalues
 from .models import Profileresultvalues
 #from .views import dataloggercolumnView
 from daterange_filter.filter import DateRangeFilter
-from chartit import DataPool, Chart
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 #from .admin import MeasurementresultvaluesResource
@@ -73,6 +76,40 @@ from django.core.exceptions import ValidationError
 #a complicated use of search_fields described in ResultsAdminForm
 
 #the following define what fields should be overridden so that dropdown lists can be populated with useful information
+
+
+class MethodcitationsAdminForm(ModelForm):
+    class Meta:
+        model= Methodcitations
+        fields = '__all__'
+class MethodcitationsAdmin(admin.ModelAdmin):
+    list_display=('methodid','relationshiptypecv','citationid')
+    form=MethodcitationsAdminForm
+
+class AuthorlistsAdminForm(ModelForm):
+    class Meta:
+        model= Authorlists
+        fields = '__all__'
+class AuthorlistsAdmin(admin.ModelAdmin):
+    list_display=('personid','citationid')
+    form=AuthorlistsAdminForm
+
+class DatasetcitationsAdminForm(ModelForm):
+    class Meta:
+        model= Datasetcitations
+        fields = '__all__'
+class DatasetcitationsAdmin(admin.ModelAdmin):
+    list_display=('datasetid','relationshiptypecv','citationid')
+    form=DatasetcitationsAdminForm
+
+
+class CitationsAdminForm(ModelForm):
+    class Meta:
+        model= Citations
+        fields = '__all__'
+class CitationsAdmin(admin.ModelAdmin):
+    list_display=('title','publisher','publicationyear', 'citationlink')
+    form=CitationsAdminForm
 
 
 class VariablesAdminForm(ModelForm):
@@ -91,8 +128,8 @@ class VariablesAdminForm(ModelForm):
        
 class VariablesAdmin(admin.ModelAdmin):
     form=VariablesAdminForm
-    list_display =('variable_type','variable_name','speciation')
-    search_fields = ['variable_type__name','variable_name__name','speciation__name']
+    list_display =('variable_type','variable_name','variablecode','speciation')
+    search_fields = ['variable_type__name','variable_name__name','variablecode','speciation__name']
 
 
 class TaxonomicclassifiersAdminForm(ModelForm):
@@ -160,6 +197,7 @@ class OrganizationsAdminForm(ModelForm):
 class OrganizationsAdmin(admin.ModelAdmin):
     list_display=('organizationname','organizationdescription')
     form=OrganizationsAdminForm
+
 
 
 class FeatureactionsAdminForm(ModelForm):
@@ -356,15 +394,28 @@ class ProfileresultsAdmin(admin.ModelAdmin):
     list_display_links = ['intendedzspacing','intendedzspacingunitsid','aggregationstatisticcv','resultid',]
     save_as = True
 
+
+
+class ProfileresultvaluesResource(resources.ModelResource):
+    class Meta:
+        model = Profileresultvalues
+        import_id_fields = ('valueid',)
+        fields = ('valueid', 'zlocation','zlocationunitsid','zaggregationinterval','resultid__resultid__variable__variable_name',
+                  'resultid__resultid__feature_action__sampling_feature__samplingfeaturename','valuedatetime','datavalue','resultid')
+        export_order = ('valueid', 'datavalue','zlocation','zlocationunitsid','zaggregationinterval',
+        'resultid__resultid__variable__variable_name','resultid__resultid__feature_action__sampling_feature__samplingfeaturename','valuedatetime','resultid')
+
+
 class ProfileresultsvaluesAdminForm(ModelForm):
     class Meta:
         model= Profileresultvalues
         fields = '__all__'
 class ProfileresultsvaluesAdmin(ImportExportActionModelAdmin):
     form=ProfileresultsvaluesAdminForm
-    list_display = ['datavalue','zlocation','zlocationunitsid','valuedatetime','resultid',] #'resultid','feature_action_link','resultid__feature_action__name', 'resultid__variable__name'
+    resource_class = ProfileresultvaluesResource
+    list_display = ['datavalue','zlocation','zlocationunitsid','zaggregationinterval','valuedatetime','resultid',] #'resultid','feature_action_link','resultid__feature_action__name', 'resultid__variable__name'
     list_display_links = ['resultid',] #'feature_action_link'
-    search_fields= ['resultid__resultid__feature_action__sampling_feature__samplingfeaturename',
+    search_fields= ['resultid__resultid__feature_action__sampling_feature__samplingfeaturename','zaggregationinterval',
                     'resultid__resultid__variable__variable_name__name',
                     'resultid__resultid__variable__variable_type__name']
 

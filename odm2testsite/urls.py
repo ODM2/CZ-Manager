@@ -17,6 +17,7 @@ urlpatterns = patterns('',
     url(r'^admin/AddSensor.html', views.AddSensor, name="AddSensor"),
     url(r'^admin/AddProfile.html', views.AddProfile, name="AddProfile"),
     url(r'^admin/RecordAction.html', views.RecordAction, name="RecordAction"),
+   url(r'^admin/ManageCitations.html', views.ManageCitations, name="ManageCitations"),
 
     #for uploaded files like dataloggerfiles
     url(r'^odm2testapp/upfiles/(?P<path>.*)$', 'django.views.static.serve', {

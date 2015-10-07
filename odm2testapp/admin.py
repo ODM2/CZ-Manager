@@ -53,7 +53,20 @@ from .models import Profileresults
 from .models import Profileresultvalues
 from .forms import ProfileresultsAdmin
 from .forms import ProfileresultsvaluesAdmin
+from .models import Datasetcitations
+from .models import Citations
+from .models import Authorlists
+from .models import Methodcitations
+from .forms import DatasetcitationsAdmin
+from .forms import CitationsAdmin
+from .forms import AuthorlistsAdmin
+from .forms import MethodcitationsAdmin
 
+
+admin.site.register(Datasetcitations, DatasetcitationsAdmin)
+admin.site.register(Citations, CitationsAdmin)
+admin.site.register(Authorlists, AuthorlistsAdmin)
+admin.site.register(Methodcitations, MethodcitationsAdmin)
 
 admin.site.register(Profileresults, ProfileresultsAdmin)
 admin.site.register(Profileresultvalues, ProfileresultsvaluesAdmin)
