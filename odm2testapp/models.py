@@ -861,14 +861,14 @@ class Dataloggerfiles(models.Model):
 
 class ProcessDataloggerfile(models.Model):
     processdataloggerfileid = models.AutoField(primary_key=True)
-    dataloggerfileid = models.ForeignKey('dataloggerfiles',help_text="CAUTION dataloggerfilecolumns must be setup" +
+    dataloggerfileid = models.ForeignKey('dataloggerfiles', related_name='+', help_text="CAUTION dataloggerfilecolumns must be setup" +
                                          ", the date and time stamp is expected to be the first column, "+
                                          " column names must match "+
                                          "the column name in associated dataloggerfilecolumns.",
                                          verbose_name='data logger file', db_column='dataloggerfileid')
     processingCode = models.CharField(max_length=255, verbose_name='processing code', default="0")
     databeginson = models.IntegerField(verbose_name="Data begins on this row number", default=2)
-    columnheaderson = models.IntegerField(verbose_name="Column headers matching column labels on data logger columns on row")
+    columnheaderson = models.IntegerField(verbose_name="Column headers matching column labels from data logger columns on row")
     date_processed = models.DateTimeField(auto_now=True)
     def __str__(self):
         s=str(self.dataloggerfileid)
@@ -1182,7 +1182,8 @@ class Measurementresultvalues(models.Model):
 
 class MeasurementresultvalueFile(models.Model):
     valueFileid = models.AutoField(primary_key=True)
-    resultid = models.ForeignKey(Measurementresults, verbose_name='result',db_column='resultid')
+    resultid = models.ForeignKey(Measurementresults, help_text="CAUTION saving a measurement result value file will attempt to "+
+                            "load values into the database.",verbose_name='result',db_column='resultid')
     valueFile = models.FileField(upload_to='resultvalues', verbose_name="value file ")
     def __str__(self):
         s=str(self.resultid)
@@ -1682,8 +1683,8 @@ class Results(models.Model):
     unitsid = models.ForeignKey('Units', verbose_name='units', related_name='+', db_column='unitsid')
     taxonomicclassifierid = models.ForeignKey('Taxonomicclassifiers', verbose_name='taxonomic classifier', db_column='taxonomicclassifierid',blank=True, null=True)
     processing_level = models.ForeignKey(Processinglevels, db_column='processinglevelid')
-    resultdatetime = models.DateTimeField(verbose_name='result date time',blank=True, null=True)
-    resultdatetimeutcoffset = models.BigIntegerField(verbose_name='result date time UTC offset', default=4, null=True)
+    resultdatetime = models.DateTimeField(verbose_name='Start result date time',blank=True, null=True)
+    resultdatetimeutcoffset = models.BigIntegerField(verbose_name='Start result date time UTC offset', default=4, null=True)
     #validdatetime>> Date and time for which the result is valid (e.g., for a forecast result).
     # Should probably be expressed as a duration
     validdatetime = models.DateTimeField(verbose_name= 'valid date time- Date and time for which the result is valid', blank=True, null=True)

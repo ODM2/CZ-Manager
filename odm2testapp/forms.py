@@ -83,8 +83,19 @@ class MethodcitationsAdminForm(ModelForm):
         model= Methodcitations
         fields = '__all__'
 class MethodcitationsAdmin(admin.ModelAdmin):
-    list_display=('methodid','relationshiptypecv','citationid')
+    list_display=('method_id','method_link','relationshiptypecv','citation_link')
     form=MethodcitationsAdminForm
+    def method_link(self,obj):
+        return u'<a href="%smethods/%s/">See Method</a>'% (CUSTOM_TEMPLATE_PATH, obj.methodid.methodid)
+    def citation_link(self,obj):
+        return u'<a href="%scitations/%s/">%s</a>'% (CUSTOM_TEMPLATE_PATH, obj.citationid.citationid,obj.citationid)
+    def method_id(self,obj):
+        return obj.methodid
+    method_id.short_description = "Method and Citation Link"
+    method_link.short_description = 'link to method'
+    method_link.allow_tags = True
+    citation_link.short_description = 'link to citation'
+    citation_link.allow_tags = True
 
 class AuthorlistsAdminForm(ModelForm):
     class Meta:
@@ -419,6 +430,8 @@ class ProfileresultsvaluesAdmin(ImportExportActionModelAdmin):
                     'resultid__resultid__variable__variable_name__name',
                     'resultid__resultid__variable__variable_type__name']
 
+
+
 class MeasurementresultsAdminForm(ModelForm):
     class Meta:
         model= Measurementresults
@@ -427,13 +440,19 @@ class MeasurementresultsAdmin(admin.ModelAdmin):
     form=MeasurementresultsAdminForm
     list_display = ('resultid','censorcodecv','data_link')
     list_display_links = ('resultid','data_link')
-    list_filter = [MeasurementResultFilter, ]
+    #def resultvalues_valuedatetime(self,obj):
+    #    mrv = Measurementresultvalues.objects.filter(resultid= obj.resultid)
+    #    return mrv.values('valuedatetime')
+    #gl = OrderDetail.objects.filter(order__order_date__range=('2015-02-02','2015-03-10'))
+    list_filter = [MeasurementResultFilter, ] #('resultid__valuedatetime', DateRangeFilter),
     save_as = True
     search_fields= ['resultid__feature_action__sampling_feature__samplingfeaturename',
                     'resultid__variable__variable_name__name',
                     'resultid__variable__variable_type__name']
     def data_link(self,obj):
-        return u'<a href="/admin/odm2testapp/featureactions/%s/">%s</a>' % (obj.resultid.feature_action.featureactionid, obj.resultid.feature_action)
+        return u'<a href="%sfeatureactions/%s/">%s</a>' % (CUSTOM_TEMPLATE_PATH, obj.resultid.feature_action.featureactionid, obj.resultid.feature_action)
+
+
     data_link.short_description = 'sampling feature action'
     data_link.allow_tags = True
 

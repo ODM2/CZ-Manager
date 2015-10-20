@@ -14,6 +14,7 @@ from .models import Variables
 from .models import Units
 from .models import Results
 from .models import Actions
+from .models import Relatedfeatures
 from datetime import datetime
 import csv
 import time
@@ -127,7 +128,7 @@ def get_name_of_sampling_feature(selected_result):
 
 def get_name_of_variable(selected_result):
      title_variables = Variables.objects.filter(variableid=selected_result.values('variable'))
-     s = str(title_variables.values_list('variable_name',flat=True))
+     s = str(title_variables.values_list('variablecode',flat=True))
      name_of_variable= s.split('\'')[1]
      return name_of_variable
 
@@ -160,10 +161,37 @@ def temp_pivot_chart_view(request):
     entered_end_date = ''
     selected_resultid = 15
     selected_featureactionid = 5
+    selected_relatedfeatid = 18
 
+    #relatedfeatureList
+    #update_result_on_related_feature
+    done=False
+    if 'SelectedRelatedFeature' in request.POST:
+        if not request.POST['SelectedRelatedFeature'] == 'All':
+            done=True
+            #raise ValidationError(done)
+            selected_relatedfeatid= request.POST['SelectedRelatedFeature']
+            selected_relatedfeatid= selected_relatedfeatid.split('-')[0]
+            feature = Samplingfeatures.objects.filter(samplingfeatureid=int(selected_relatedfeatid))
+            selected_relatedfeatid = str(feature.values_list('samplingfeatureid',flat=True)).split('[')[1]
+            selected_relatedfeatid = selected_relatedfeatid.split(']')[0]
+            #raise ValidationError(selected_relatedfeatid)
+            relatedFeatureList = Relatedfeatures.objects.filter(relatedfeatureid=int(selected_relatedfeatid)).distinct('relatedfeatureid')
+            relatedFeatureListLong = Relatedfeatures.objects.filter(relatedfeatureid=int(selected_relatedfeatid))
+            samplingfeatids= relatedFeatureListLong.values_list('samplingfeatureid', flat=True)
+            resultList = Results.objects.filter(feature_action__in=Featureactions.objects.filter(sampling_feature__in=samplingfeatids))
+            if 'update_result_on_related_feature' in request.POST:
+                #raise ValidationError(relatedFeatureList)
+                selected_relatedfeatid= relatedFeatureList[0].relatedfeatureid
+                selected_resultid= resultList[0].resultid
+        else:
+            selected_relatedfeatid= request.POST['SelectedRelatedFeature']
+            resultList = Results.objects.filter(result_type="Temporal observation")
+    else:
+        resultList = Results.objects.all()
 
-
-    if 'SelectedFeatureAction' in request.POST:
+    if 'SelectedFeatureAction' in request.POST and not done:
+        #raise ValidationError(done)
         if not request.POST['SelectedFeatureAction'] == 'All':
             selected_featureactionid= int(request.POST['SelectedFeatureAction'])
             resultList = Results.objects.filter(feature_action=selected_featureactionid)
@@ -172,8 +200,10 @@ def temp_pivot_chart_view(request):
         else:
             selected_featureactionid= request.POST['SelectedFeatureAction']
             resultList = Results.objects.filter(result_type="Temporal observation")
-    else:
+    elif not done:
         resultList = Results.objects.filter(feature_action=selected_featureactionid)
+
+
 
     #find the measurement results series that where selected.
     numresults = resultList.count()
@@ -226,9 +256,9 @@ def temp_pivot_chart_view(request):
         name_of_variables.append(get_name_of_variable(selected_result))
         name_of_units.append(get_name_of_units(selected_result))
         myresultSeries.append(Measurementresultvalues.objects.all().filter(~Q(datavalue=-6999))\
-        .filter(valuedatetime__gt= entered_start_date)\
+        .filter(~Q(datavalue=-888.88)).filter(valuedatetime__gt= entered_start_date)\
         .filter(valuedatetime__lt = entered_end_date)\
-                    .filter(resultid=selectedMResult).order_by('-valuedatetime')[:8000])
+                    .filter(resultid=selectedMResult).order_by('-valuedatetime'))
         data.update({'datavalue' + str(i): []})
 
     # [Date.UTC(1971, 5, 10), 0]
@@ -255,13 +285,13 @@ def temp_pivot_chart_view(request):
     seriesStr = ''
     series = []
     titleStr = ''
-    for name_of_unit,name_of_sampling_feature in zip(name_of_units,name_of_sampling_features) :
+    for name_of_unit,name_of_sampling_feature,name_of_variable in zip(name_of_units,name_of_sampling_features,name_of_variables) :
         i+=1
         if i==1:
             seriesStr +=name_of_unit
         else:
             seriesStr+=' - '+name_of_unit
-        series.append({"name": name_of_unit+' - '+ name_of_sampling_feature, "data": data['datavalue'+str(i)]})
+        series.append({"name": name_of_unit+' - '+ name_of_sampling_feature +' - '+ name_of_variable, "data": data['datavalue'+str(i)]})
     i=0
     for name_of_sampling_feature,name_of_variable in zip(name_of_sampling_features,name_of_variables) :
         i+=1
@@ -283,7 +313,7 @@ def temp_pivot_chart_view(request):
     actionList = Actions.objects.filter(action_type="Observation") #where the action is not of type estimation
     #assuming an estimate is a single value.
     featureactionList = Featureactions.objects.filter(action__in=actionList)
-
+    relatedFeatureList = Relatedfeatures.objects.order_by('relatedfeatureid').distinct('relatedfeatureid')
     int_selectedresultid_ids = []
     for int_selectedresultid in selectedMResultSeries:
         int_selectedresultid_ids.append(int(int_selectedresultid))
@@ -302,249 +332,10 @@ def temp_pivot_chart_view(request):
     if csvexport:
         return response
     else:
+        #raise ValidationError(relatedFeatureList)
         return TemplateResponse(request,'chart.html',{ 'featureactionList': featureactionList, 'resultList': resultList,
             'startDate':entered_start_date,'endDate':entered_end_date, 'SelectedResults':int_selectedresultid_ids,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'xAxis': xAxis, 'yAxis': yAxis,
-            'SelectedFeatureAction':selected_featureactionid,},)
-
-#
-# def Measurementresultvalues_for_Results(Results):
-#     resultValues = Measurementresultvalues.objects.filter(Measurementresultvalues__resultid=Results.resultid)
-#     return {'resultValues': resultValues}
-#
-# register.inclusion_tag('resultList.html')(Measurementresultvalues_for_Results)
-# register.inclusion_tag('chart.html')(Measurementresultvalues_for_Results)
-#
-# def createChart(tempdata,name_of_sampling_feature,name_of_variable,name_of_units
-#     ,name_of_sampling_feature2=None,name_of_variable2=None,name_of_units2=None):
-#
-#      if name_of_sampling_feature2 is None:
-#          titletext = ''+name_of_sampling_feature  + ', ' +name_of_variable
-#      else:
-#         titletext = ''+name_of_sampling_feature  + ', ' +name_of_variable+\
-#                      ' -- '+name_of_sampling_feature2  + ', ' +name_of_variable2+''
-#      if name_of_units2 is None:
-#          yLabel = '' + name_of_units
-#      else:
-#          yLabel = '' + name_of_units + ' and ' + name_of_units2
-#      if name_of_sampling_feature2 is None:
-#           myChart = Chart(
-#             datasource = tempdata,
-#             series_options =
-#               [{'options':{
-#                   'type': 'line',
-#                   'stacking': False},
-#                 'terms':{
-#                   'valuedatetime': [
-#                     'datavalue'],
-#
-#                   }}],
-#             chart_options =
-#               {'title': {
-#                    'text': titletext},
-#                'xAxis': {
-#                     'title': {
-#                        'text': 'Date'}},
-#                 'yAxis': {
-#                     'title': {
-#                        'text': yLabel}}},
-#                 x_sortf_mapf_mts=(None, lambda i: datetime.fromtimestamp(i).strftime("%m-%d-%Y-%H:%M"), False))
-#      else:
-#          myChart = Chart(
-#             datasource = tempdata,
-#             series_options =
-#               [{'options':{
-#                   'type': 'line',
-#                   'stacking': False},
-#                 'terms':{
-#                   'valuedatetime': [
-#                     'datavalue'],
-#                 'valuedatetime': [
-#                     'datavalue2'],
-#                   }}],
-#             chart_options =
-#               {'title': {
-#                    'text': titletext},
-#                'xAxis': {
-#                     'title': {
-#                        'text': 'Date'}},
-#                 'yAxis': {
-#                     'title': {
-#                        'text': yLabel}}},
-#                 x_sortf_mapf_mts=(None, lambda i: datetime.fromtimestamp(i).strftime("%m-%d-%Y-%H:%M"), False))
-#      return myChart
-#
-# def createDataPool(myresults, myresults2=None):
-#     if myresults2 is None:
-#         tempdata = DataPool(
-#            series=
-#             [{'options': {
-#                 'source':myresults},
-#               'terms': [
-#                   ('valuedatetime',  lambda d: time.mktime(d.timetuple())),
-#                 'datavalue']}
-#              ])
-#
-#     else:
-#         tempdata = DataPool(
-#            series=
-#             [{'options': {
-#                 'source':myresults},
-#               'terms': [
-#                   ('valuedatetime',  lambda d: time.mktime(d.timetuple())),
-#                 'datavalue']},
-#              {'options': {
-#                 'source':myresults2},
-#               'terms': [
-#                   ('valuedatetime',  lambda d: time.mktime(d.timetuple())),
-#                   {'datavalue2': 'datavalue'}]},
-#              ])
-#     return tempdata
-# #{'valuedatetime' : ('valuedatetime',  lambda d: time.mktime(d.timetuple()))},
-#                  # {'datavalue':'datavalue'}
-# def get_name_of_sampling_feature(selected_result):
-#
-#     title_feature_action = Featureactions.objects.filter(featureactionid=selected_result.values('feature_action'))
-#     title_sampling_feature = Samplingfeatures.objects.filter(samplingfeatureid=title_feature_action.values('sampling_feature'))
-#     s = str(title_sampling_feature.values_list('samplingfeaturename',flat=True))
-#     name_of_sampling_feature= s.split('\'')[1]
-#     return name_of_sampling_feature
-#
-# def get_name_of_variable(selected_result):
-#     title_variables = Variables.objects.filter(variableid=selected_result.values('variable'))
-#     s = str(title_variables.values_list('variable_name',flat=True))
-#     name_of_variable= s.split('\'')[1]
-#     return name_of_variable
-#
-# def get_name_of_units(selected_result):
-#     title_units = Units.objects.filter(unitsid=selected_result.values('unitsid'))
-#     s = str(title_units.values_list('unitsname',flat=True))
-#     name_of_units= s.split('\'')[1]
-#     return name_of_units
-#
-# def temp_pivot_chart_view(request):
-#     entered_start_date = ''
-#     entered_end_date = ''
-#     selected_resultid = '5'
-#     selected_resultid2 = '0'
-#     selected_resultid3 = '0'
-#     selected_resultid4 = '0'
-#     if 'selection' in request.POST:
-#         selected_resultid = request.POST['selection']
-#     else:
-#         selected_resultid = '5'
-#     if 'selection2' in request.POST:
-#         selected_resultid2 = request.POST['selection2']
-#     else:
-#         selected_resultid2 = '0'
-#     if 'selection3' in request.POST:
-#         selected_resultid3 = request.POST['selection3']
-#     else:
-#         selected_resultid3 = '0'
-#     if 'selection4' in request.POST:
-#         selected_resultid4 = request.POST['selection4']
-#     else:
-#         selected_resultid4 = '0'
-#     if 'startDate' in request.POST:
-#         entered_start_date = request.POST['startDate']
-#     else:
-#         entered_start_date = "2015-06-21"
-#     if 'endDate' in request.POST:
-#         entered_end_date = request.POST['endDate']
-#     else:
-#         entered_end_date = "2015-08-21"
-#     if entered_end_date =='':
-#         entered_end_date = "2015-08-21"
-#     if entered_start_date=='':
-#         entered_start_date = "2015-06-21"
-#     resultList = Results.objects.all()
-#
-#
-#     selected_result = Results.objects.filter(resultid=selected_resultid)
-#
-#     name_of_sampling_feature = get_name_of_sampling_feature(selected_result)
-#     name_of_variable = get_name_of_variable(selected_result)
-#     name_of_units = get_name_of_units(selected_result)
-#     plt2 = False
-#     plt3 = False
-#     plt4= False
-#     myMeasurementResults2= None
-#     myMeasurementResults3=None
-#     myMeasurementResults4=None
-#     if not selected_resultid2 =='0':
-#         plt2 = True
-#         selected_result2 = Results.objects.filter(resultid=selected_resultid2)
-#
-#         name_of_sampling_feature2 = get_name_of_sampling_feature(selected_result2)
-#         name_of_variable2 = get_name_of_variable(selected_result2)
-#         name_of_units2 = get_name_of_units(selected_result2)
-#
-#         myMeasurementResults2 = Measurementresultvalues.objects.all().filter(~Q(datavalue=-6999))\
-#         .filter(valuedatetime__gt= entered_start_date)\
-#         .filter(valuedatetime__lt = entered_end_date)\
-#                     .filter(resultid=selected_resultid2).order_by('-valuedatetime')[:8000]
-#     if not selected_resultid3 =='0':
-#         plt3 = True
-#         selected_result3 = Results.objects.filter(resultid=selected_resultid3)
-#
-#         name_of_sampling_feature3 = get_name_of_sampling_feature(selected_result3)
-#         name_of_variable3 = get_name_of_variable(selected_result3)
-#         name_of_units3 = get_name_of_units(selected_result3)
-#
-#         myMeasurementResults3 = Measurementresultvalues.objects.all().filter(~Q(datavalue=-6999))\
-#         .filter(valuedatetime__gt= entered_start_date)\
-#         .filter(valuedatetime__lt = entered_end_date)\
-#                     .filter(resultid=selected_resultid3).order_by('-valuedatetime')[:8000]
-#     if not selected_resultid4 =='0':
-#         plt4=True
-#         selected_result4 = Results.objects.filter(resultid=selected_resultid4)
-#
-#         name_of_sampling_feature4 = get_name_of_sampling_feature(selected_result4)
-#         name_of_variable4 = get_name_of_variable(selected_result4)
-#         name_of_units4 = get_name_of_units(selected_result4)
-#
-#
-#         myMeasurementResults4 = Measurementresultvalues.objects.all().filter(~Q(datavalue=-6999))\
-#         .filter(valuedatetime__gt= entered_start_date)\
-#         .filter(valuedatetime__lt = entered_end_date)\
-#                     .filter(resultid=selected_resultid4).order_by('-valuedatetime')[:8000]
-#     #unitsid
-#
-#     myMeasurementResults = Measurementresultvalues.objects.all().filter(~Q(datavalue=-6999))\
-#         .filter(valuedatetime__gt= entered_start_date)\
-#         .filter(valuedatetime__lt = entered_end_date)\
-#                     .filter(resultid=selected_resultid).order_by('-valuedatetime')[:8000]
-#
-#     if not plt2 and not plt3 and not plt4:
-#         tempdata = createDataPool(myMeasurementResults)
-#         temppivcht = createChart(tempdata,name_of_sampling_feature,name_of_variable,name_of_units)
-#     if plt2 and not plt3 and not plt4:
-#         tempdata = createDataPool(myMeasurementResults,myMeasurementResults2)
-#         temppivcht = createChart(tempdata,name_of_sampling_feature,name_of_variable,name_of_units,
-#                                  name_of_sampling_feature2,name_of_variable2,name_of_units2)
-#
-#     csvexport = False
-#     #if the user hit the export csv button export the measurement results to csv
-#     if request.REQUEST.get('export_data'):
-#         csvexport=True
-#
-#         myfile = StringIO.StringIO()
-#         for mresults in myMeasurementResults:
-#             myfile.write(mresults.csvoutput())
-#         response = HttpResponse(myfile.getvalue(),content_type='text/csv')
-#         response['Content-Disposition'] = 'attachment; filename="'+ name_of_sampling_feature+'-'+ name_of_variable +'.csv"'
-#
-#     #need to make sure selected result id is an int so it can be handled correctly in the template.
-#     int_selectedresultid = int(selected_resultid)
-#     int_selectedresultid2 = int(selected_resultid2)
-#     int_selectedresultid3 = int(selected_resultid3)
-#     int_selectedresultid4 = int(selected_resultid4)
-#     if csvexport:
-#         return response
-#     else:
-#         return TemplateResponse(request,'chart.html',{'temppivchart': temppivcht, 'resultList': resultList,
-#             'startDate':entered_start_date,'endDate':entered_end_date, 'SelectedResult':int_selectedresultid,
-#             'SelectedResult2':int_selectedresultid2,'SelectedResult3':int_selectedresultid3,
-#             'SelectedResult4':int_selectedresultid4},)
+            'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,},)
 
 

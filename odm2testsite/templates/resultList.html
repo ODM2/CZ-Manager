@@ -20,6 +20,17 @@
             </select>
 	<input type="submit" name="update_result_list" value="Update Result List" />
 	
+	<select class="form-control" id="s2" name="SelectedRelatedFeature">
+              <option value="All"><b>All</b></option>
+              {% for relatedFeature in relatedFeatureList %}
+				{% if relatedFeature.relatedfeatureid == SelectedRelatedFeature %}
+					<option selected="selected" value="{{ relatedFeature.relatedfeatureid }}">{{ relatedFeature.relatedfeatureid }}</option>
+				{% else %}
+					<option  value="{{ relatedFeature.relatedfeatureid }}">{{ relatedFeature.relatedfeatureid }}</option>
+				{% endif %}
+              {% endfor %}
+            </select>
+	<input type="submit" name="update_result_on_related_feature" value="Select Results based on Slope Position or Transect" />
 	<table >
                 {% assign prefixpath '/admin/odm2testapp/' %}
 				<tr ><th scope="col" class="section">Result Series</td>
