@@ -86,8 +86,13 @@ def process_datalogger_file(f,fileid, databeginson,columnheaderson):
                 elif i >= databeginson:
 
                     #assume date is first column for the moment
-                    dateT = time.strptime(row[0],"%m/%d/%Y %H:%M")#'1/1/2013 0:10
-                    datestr = time.strftime("%Y-%m-%d %H:%M",dateT)
+                    try:
+                        dateT = time.strptime(row[0],"%m/%d/%Y %H:%M")#'1/1/2013 0:10
+                        datestr = time.strftime("%Y-%m-%d %H:%M",dateT)
+                    except ValueError:
+                        dateT = time.strptime(row[0],"%m/%d/%Y %H:%M:%S")#'1/1/2013 0:10
+                        datestr = time.strftime("%Y-%m-%d %H:%M:%S",dateT)
+
                     #for each column in the data table
                     #raise ValidationError("".join(str(rowColumnMap)))
                     for colnum in rowColumnMap:

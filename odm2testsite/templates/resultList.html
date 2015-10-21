@@ -1,13 +1,26 @@
 
 {% load admin_extras %}
+<style>
+select {
+    width:85%; 
+    overflow:hidden; 
+    white-space:pre; 
+    text-overflow:ellipsis;
+    
+    
 
-
+}
+option {
+          border: solid 1px #DDDDDD; 
+}
+</style>
 <br>
 <br>
     
 	<form action="" method="post">
 	{% csrf_token %} 
 	<p> Omits results with an action type other then "Observation" </p>
+	<table ><tr><td>
 	<select class="form-control" id="s1" name="SelectedFeatureAction">
               <option value="All"><b>All</b></option>
               {% for featureaction in featureactionList %}
@@ -17,9 +30,9 @@
 					<option  value="{{ featureaction.featureactionid }}">{{ featureaction }}</option>
 				{% endif %}
               {% endfor %}
-            </select>
-	<input type="submit" name="update_result_list" value="Update Result List" />
-	
+            </select></td>
+	<td><input type="submit" name="update_result_list" value="Update Result List" /></td></tr>
+	<tr><td>
 	<select class="form-control" id="s2" name="SelectedRelatedFeature">
               <option value="All"><b>All</b></option>
               {% for relatedFeature in relatedFeatureList %}
@@ -29,8 +42,9 @@
 					<option  value="{{ relatedFeature.relatedfeatureid }}">{{ relatedFeature.relatedfeatureid }}</option>
 				{% endif %}
               {% endfor %}
-            </select>
-	<input type="submit" name="update_result_on_related_feature" value="Select Results based on Slope Position or Transect" />
+            </select></td>
+	<td><input type="submit" name="update_result_on_related_feature" value="Select Results with Slope/Transect Position" />
+	</td></tr></table>
 	<table >
                 {% assign prefixpath '/admin/odm2testapp/' %}
 				<tr ><th scope="col" class="section">Result Series</td>

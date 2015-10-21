@@ -153,6 +153,33 @@ def dumptoMillis(obj):
 def ValuesQuerySetToDict(vqs):
     return [item for item in vqs]
 
+def relatedFeaturesFilter(request,done,selected_relatedfeatid):
+    if 'SelectedRelatedFeature' in request.POST:
+
+        if not request.POST['SelectedRelatedFeature'] == 'All':
+            done=True
+            #raise ValidationError(done)
+            selected_relatedfeatid= request.POST['SelectedRelatedFeature']
+            selected_relatedfeatid= selected_relatedfeatid.split('-')[0]
+            feature = Samplingfeatures.objects.filter(samplingfeatureid=int(selected_relatedfeatid))
+            selected_relatedfeatid = str(feature.values_list('samplingfeatureid',flat=True)).split('[')[1]
+            selected_relatedfeatid = selected_relatedfeatid.split(']')[0]
+            #raise ValidationError(selected_relatedfeatid)
+            relatedFeatureList = Relatedfeatures.objects.filter(relatedfeatureid=int(selected_relatedfeatid)).distinct('relatedfeatureid')
+            relatedFeatureListLong = Relatedfeatures.objects.filter(relatedfeatureid=int(selected_relatedfeatid))
+            samplingfeatids= relatedFeatureListLong.values_list('samplingfeatureid', flat=True)
+            #raise ValidationError(samplingfeatids)
+            resultList = Results.objects.filter(feature_action__in=Featureactions.objects.filter(sampling_feature__in=samplingfeatids))
+            if 'update_result_on_related_feature' in request.POST:
+                #raise ValidationError(relatedFeatureList)
+                selected_relatedfeatid= relatedFeatureList[0].relatedfeatureid
+                selected_resultid= resultList[0].resultid
+        else:
+            selected_relatedfeatid= request.POST['SelectedRelatedFeature']
+            resultList = Results.objects.filter(result_type="Temporal observation")
+    else:
+        resultList = Results.objects.filter(result_type="Temporal observation")
+    return selected_relatedfeatid, done, resultList
 
 def temp_pivot_chart_view(request):
     if not request.user.is_authenticated():
@@ -166,29 +193,7 @@ def temp_pivot_chart_view(request):
     #relatedfeatureList
     #update_result_on_related_feature
     done=False
-    if 'SelectedRelatedFeature' in request.POST:
-        if not request.POST['SelectedRelatedFeature'] == 'All':
-            done=True
-            #raise ValidationError(done)
-            selected_relatedfeatid= request.POST['SelectedRelatedFeature']
-            selected_relatedfeatid= selected_relatedfeatid.split('-')[0]
-            feature = Samplingfeatures.objects.filter(samplingfeatureid=int(selected_relatedfeatid))
-            selected_relatedfeatid = str(feature.values_list('samplingfeatureid',flat=True)).split('[')[1]
-            selected_relatedfeatid = selected_relatedfeatid.split(']')[0]
-            #raise ValidationError(selected_relatedfeatid)
-            relatedFeatureList = Relatedfeatures.objects.filter(relatedfeatureid=int(selected_relatedfeatid)).distinct('relatedfeatureid')
-            relatedFeatureListLong = Relatedfeatures.objects.filter(relatedfeatureid=int(selected_relatedfeatid))
-            samplingfeatids= relatedFeatureListLong.values_list('samplingfeatureid', flat=True)
-            resultList = Results.objects.filter(feature_action__in=Featureactions.objects.filter(sampling_feature__in=samplingfeatids))
-            if 'update_result_on_related_feature' in request.POST:
-                #raise ValidationError(relatedFeatureList)
-                selected_relatedfeatid= relatedFeatureList[0].relatedfeatureid
-                selected_resultid= resultList[0].resultid
-        else:
-            selected_relatedfeatid= request.POST['SelectedRelatedFeature']
-            resultList = Results.objects.filter(result_type="Temporal observation")
-    else:
-        resultList = Results.objects.all()
+    selected_relatedfeatid, done, resultList = relatedFeaturesFilter(request, done,selected_relatedfeatid)
 
     if 'SelectedFeatureAction' in request.POST and not done:
         #raise ValidationError(done)
