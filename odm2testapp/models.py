@@ -1173,15 +1173,19 @@ class Measurementresultvalues(models.Model):
         s = str(self.valueid)
         s += ', {0}'.format(self.datavalue)
         s += ', {0}'.format(self.valuedatetime)
+        s += ', {0}'.format(self.resultid.resultid.variable.variable_name)
+        s += ', {0}'.format(self.resultid.resultid.unitsid.unitsname)
+        s += ', {0}'.format(self.resultid.resultid.feature_action.sampling_feature.samplingfeaturename)
+        s += ', {0}'.format(self.resultid.timeaggregationinterval)
+        s += ', {0}'.format(self.resultid.timeaggregationintervalunitsid)
         #temp = str(self.resultid).translate(' ', ',')
-        temp = re.sub('[,]', '', str(self.resultid))
-        s += ', {0}'.format(temp)
+        #temp = re.sub('[,]', '', str(self.resultid))
+       # s += ', {0}'.format(temp)
         return s
     class Meta:
         managed = False
         db_table = 'measurementresultvalues'
         verbose_name='measurement result value'
-
 
 
 
