@@ -412,9 +412,10 @@ class ProfileresultvaluesResource(resources.ModelResource):
         model = Profileresultvalues
         import_id_fields = ('valueid',)
         fields = ('valueid', 'zlocation','zlocationunitsid','zaggregationinterval','resultid__resultid__variable__variable_name',
-                  'resultid__resultid__feature_action__sampling_feature__samplingfeaturename','valuedatetime','datavalue','resultid')
+                  'resultid__resultid__feature_action__sampling_feature__samplingfeaturename','valuedatetime',
+                  'resultid__resultid__unitsid__unitsname','datavalue')
         export_order = ('valueid', 'datavalue','zlocation','zlocationunitsid','zaggregationinterval',
-        'resultid__resultid__variable__variable_name','resultid__resultid__feature_action__sampling_feature__samplingfeaturename','valuedatetime','resultid')
+        'resultid__resultid__variable__variable_name','resultid__resultid__unitsid__unitsname','resultid__resultid__feature_action__sampling_feature__samplingfeaturename','valuedatetime')
 
 
 class ProfileresultsvaluesAdminForm(ModelForm):
@@ -428,7 +429,7 @@ class ProfileresultsvaluesAdmin(ImportExportActionModelAdmin):
     list_display_links = ['resultid',] #'feature_action_link'
     search_fields= ['resultid__resultid__feature_action__sampling_feature__samplingfeaturename','zaggregationinterval',
                     'resultid__resultid__variable__variable_name__name',
-                    'resultid__resultid__variable__variable_type__name']
+                    'resultid__resultid__variable__variable_type__name', 'resultid__']
 
 
 
@@ -465,10 +466,13 @@ class MeasurementresultvaluesResource(resources.ModelResource):
     class Meta:
         model = Measurementresultvalues
         import_id_fields = ('valueid',)
-        fields = ('valueid', 'resultid__resultid__variable__variable_name',
-                  'resultid__resultid__feature_action__sampling_feature__samplingfeaturename','valuedatetime','datavalue',)
-        export_order = ('valueid', 'valuedatetime','datavalue',
-        'resultid__resultid__variable__variable_name','resultid__resultid__feature_action__sampling_feature__samplingfeaturename',)
+        fields = ('valueid', 'resultid__resultid__variable__variable_name','resultid__resultid__unitsid__unitsname',
+                  'resultid__resultid__feature_action__sampling_feature__samplingfeaturename','valuedatetime',
+                  'datavalue','resultid__timeaggregationinterval','resultid__timeaggregationintervalunitsid')
+        export_order = ('valueid', 'valuedatetime','datavalue','resultid__timeaggregationinterval',
+        'resultid__timeaggregationintervalunitsid', 'resultid__resultid__variable__variable_name',
+        'resultid__resultid__unitsid__unitsname',
+        'resultid__resultid__feature_action__sampling_feature__samplingfeaturename',)
 
 class MeasurementresultvaluesAdminForm(ModelForm):
     class Meta:

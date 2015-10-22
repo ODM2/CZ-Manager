@@ -251,9 +251,48 @@ def temp_pivot_chart_view(request):
         i +=1
         selected_result = Results.objects.filter(resultid=selectedMResult)
         selected_results.append(selected_result)
-        name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
-        name_of_variables.append(get_name_of_variable(selected_result))
-        name_of_units.append(get_name_of_units(selected_result))
+        #name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
+
+        tmpname = get_name_of_sampling_feature(selected_result)
+        if name_of_sampling_features.__len__() >0:
+            namefound=False
+            for name in name_of_sampling_features:
+                if name == tmpname:
+                    namefound=True
+            if not namefound:
+                name_of_sampling_features.append(tmpname)
+            else:
+                name_of_sampling_features.append('')
+        else:
+             name_of_sampling_features.append(tmpname)
+
+
+        tmpname = get_name_of_variable(selected_result)
+        if name_of_variables.__len__() >0:
+            namefound=False
+            for name in name_of_variables:
+                if name == tmpname:
+                    namefound=True
+            if not namefound:
+                 name_of_variables.append(tmpname)
+            else:
+                 name_of_variables.append('')
+        else:
+              name_of_variables.append(tmpname)
+
+        tmpname = get_name_of_units(selected_result)
+        if name_of_units.__len__() >0:
+            namefound=False
+            for name in name_of_units:
+                if name == tmpname:
+                    namefound=True
+            if not namefound:
+                name_of_units.append(tmpname)
+            else:
+                name_of_units.append('')
+        else:
+             name_of_units.append(tmpname)
+
         myresultSeries.append(Measurementresultvalues.objects.all().filter(~Q(datavalue=-6999))\
         .filter(~Q(datavalue=-888.88)).filter(valuedatetime__gt= entered_start_date)\
         .filter(valuedatetime__lt = entered_end_date)\
@@ -284,20 +323,30 @@ def temp_pivot_chart_view(request):
     seriesStr = ''
     series = []
     titleStr = ''
+    tmpUnit = ''
+    tmpVariableName = ''
+    tmpLocName= ''
     for name_of_unit,name_of_sampling_feature,name_of_variable in zip(name_of_units,name_of_sampling_features,name_of_variables) :
         i+=1
-        if i==1:
+        if i==1 and not name_of_unit == '':
             seriesStr +=name_of_unit
-        else:
-            seriesStr+=' - '+name_of_unit
-        series.append({"name": name_of_unit+' - '+ name_of_sampling_feature +' - '+ name_of_variable, "data": data['datavalue'+str(i)]})
+        elif not name_of_unit == '':
+                tmpUnit = name_of_unit
+                seriesStr+=' - '+name_of_unit
+        if not name_of_variable=='':
+            tmpVariableName = name_of_variable
+        if not name_of_unit == '':
+            tmpUnit = name_of_unit
+        if not name_of_sampling_feature =='':
+            tmpLocName = name_of_sampling_feature
+        series.append({"name": tmpUnit +' - '+ tmpVariableName +' - '+ name_of_sampling_feature, "data": data['datavalue'+str(i)]})
     i=0
     for name_of_sampling_feature,name_of_variable in zip(name_of_sampling_features,name_of_variables) :
         i+=1
         if i ==1:
-            titleStr += name_of_sampling_feature  + ', ' +name_of_variable
+            titleStr += name_of_sampling_feature  #+ ', ' +name_of_variable
         else:
-            titleStr += ' -- '+name_of_sampling_feature  + ', ' +name_of_variable
+            titleStr += ' -- '  +name_of_sampling_feature #+name_of_variable+ ', '
 
     chartID = 'chart_id'
     chart = {"renderTo": chartID, "type": 'line', "height": 500,}
