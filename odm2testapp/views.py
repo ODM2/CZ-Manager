@@ -339,7 +339,7 @@ def temp_pivot_chart_view(request):
             tmpUnit = name_of_unit
         if not name_of_sampling_feature =='':
             tmpLocName = name_of_sampling_feature
-        series.append({"name": tmpUnit +' - '+ tmpVariableName +' - '+ name_of_sampling_feature, "data": data['datavalue'+str(i)]})
+        series.append({"name": tmpUnit +' - '+ tmpVariableName +' - '+ tmpLocName,"yAxis": tmpUnit, "data": data['datavalue'+str(i)]})
     i=0
     for name_of_sampling_feature,name_of_variable in zip(name_of_sampling_features,name_of_variables) :
         i+=1
@@ -353,10 +353,8 @@ def temp_pivot_chart_view(request):
     title2 = {"text": titleStr}
     xAxis = {"type": 'datetime', "title": {"text": 'Date'},}
     yAxis = {"title": {"text": seriesStr}}
-    # series = [
-    #     {"name": seriesStr, "data": data['datavalue']},
-    #     {"name": name_of_units2, "data": data['datavalue2']},
-    #     ]
+    opposite = False
+    
 
     actionList = Actions.objects.filter(action_type="Observation") #where the action is not of type estimation
     #assuming an estimate is a single value.
@@ -383,7 +381,7 @@ def temp_pivot_chart_view(request):
         #raise ValidationError(relatedFeatureList)
         return TemplateResponse(request,'chart.html',{ 'featureactionList': featureactionList, 'resultList': resultList,
             'startDate':entered_start_date,'endDate':entered_end_date, 'SelectedResults':int_selectedresultid_ids,
-             'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'xAxis': xAxis, 'yAxis': yAxis,
+             'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'xAxis': xAxis, 'yAxis': yAxis,'name_of_units':name_of_units,
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,},)
 
 

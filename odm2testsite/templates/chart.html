@@ -36,13 +36,39 @@
     var xAxis = {{ xAxis|safe }}
     var yAxis = {{ yAxis|safe }}
     var series = {{ series|safe }}
+	var name_of_units = {{name_of_units|safe}}
 
 $(document).ready(function() {
-    $('#chartid').highcharts({
+	
+	var opposite2 = false;
+	yaxes = [];
+	for (var i=0; i<name_of_units.length; i++) {
+		name = name_of_units[i];
+		//alert(name);
+		 
+		axi = {id: name,
+		labels: {
+                format: '{value}',
+                style: {
+                    color: Highcharts.getOptions().colors[i]
+                }
+            },
+		title: {
+			text: name
+		},
+		lineWidth: 2,
+        lineColor: Highcharts.getOptions().colors[i],
+		opposite: opposite2
+		};
+		yaxes.push(axi);
+		opposite2 = !opposite2;
+	}
+	//yAxis[1] = yAxis2.replace('"','');
+	var chart =$('#chartid').highcharts({
 		chart: chart,
         title: title2,
         xAxis: xAxis,
-        yAxis: yAxis,
+        yAxis:yaxes,
         series: series,
 		tooltip: {
     formatter: function() {
@@ -52,7 +78,11 @@ $(document).ready(function() {
     }
 },
     });
-});
+	
+	//alert(name_of_units.length);
+	
+	
+	});
 </script>
 {% admin_shortcuts_js %}{% endblock %}
 
@@ -75,7 +105,7 @@ $(document).ready(function() {
 	
 <br>
 {% include 'resultList.html' %}
-
+{{ yAxis|safe }}
 
 {% endblock %}
 
