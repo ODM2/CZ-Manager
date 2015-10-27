@@ -916,16 +916,20 @@ class Dataloggerprogramfiles(models.Model):
 
 class Dataquality(models.Model):
     dataqualityid = models.AutoField(primary_key=True)
-    dataqualitytypecv = models.ForeignKey(CvDataqualitytype, db_column='dataqualitytypecv')
-    dataqualitycode = models.CharField(max_length=255)
-    dataqualityvalue = models.FloatField(blank=True, null=True)
-    dataqualityvalueunitsid = models.ForeignKey('Units', related_name='+', db_column='dataqualityvalueunitsid', blank=True, null=True)
-    dataqualitydescription = models.CharField(max_length=500, blank=True)
-    dataqualitylink = models.CharField(max_length=255, blank=True)
-
+    dataqualitytypecv = models.ForeignKey(CvDataqualitytype, db_column='dataqualitytypecv', verbose_name="data quality type")
+    dataqualitycode = models.CharField(max_length=255,verbose_name="data quality code")
+    dataqualityvalue = models.FloatField(blank=True, null=True,verbose_name="data quality value")
+    dataqualityvalueunitsid = models.ForeignKey('Units', related_name='+', db_column='dataqualityvalueunitsid',
+                                                verbose_name="data quality value units", blank=True, null=True)
+    dataqualitydescription = models.CharField(max_length=500, blank=True, verbose_name="data quality description")
+    dataqualitylink = models.CharField(max_length=255, blank=True, verbose_name="data quality link")
+    def __unicode__(self):
+        return u"%s - %s - %s" % (self.dataqualitycode, self.dataqualityvalue, self.dataqualityvalueunitsid)
     class Meta:
         managed = False
         db_table = 'dataquality'
+        verbose_name='data quality'
+        verbose_name_plural = 'data quality'
 
 
 class Datasetcitations(models.Model):
@@ -1081,16 +1085,13 @@ class Featureactions(models.Model):
     featureactionid = models.AutoField(primary_key=True)
     sampling_feature = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     action = models.ForeignKey(Actions, db_column='actionid')
-    def __str__(self):
-        s = '{0}'.format(self.featureactionid)
-        s+='- {0}'.format(self.sampling_feature)
-        s += '- {0}'.format(self.action)
-        return s
+    def __unicode__(self):
+        return u"%s - %s - %s" % (self.featureactionid, self.sampling_feature, self.action)
     class Meta:
         managed = False
         db_table = 'featureactions'
-        verbose_name='sampling feature action (link sampling features and actions)'
-        verbose_name_plural='sampling feature action (link sampling features and actions)'
+        verbose_name='action at sampling feature'
+        verbose_name_plural='action at sampling feature action'
 
 
 class Instrumentoutputvariables(models.Model):
@@ -1607,11 +1608,8 @@ class Relatedfeatures(models.Model):
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, verbose_name= "relationship type", db_column='relationshiptypecv')
     relatedfeatureid = models.ForeignKey('Samplingfeatures', verbose_name="second feature", related_name='RelatedFeatures', db_column='relatedfeatureid')
     spatialoffsetid = models.ForeignKey('Spatialoffsets',verbose_name="spatial offset", db_column='spatialoffsetid', blank=True, null=True)
-    def __str__(self):
-        s = str(self.samplingfeatureid)
-        s +=  ' - {0}'.format(self.relationshiptypecv)
-        s += ' - {0}'.format(self.relatedfeatureid)
-        return s
+    def __unicode__(self):
+        return u"%s - %s - %s" % (self.samplingfeatureid, self.relationshiptypecv, self.relatedfeatureid)
     class Meta:
         managed = False
         db_table = 'relatedfeatures'
@@ -1703,15 +1701,8 @@ class Results(models.Model):
     valuecount = models.IntegerField(verbose_name='number of recorded values')
     #def __unicode__(self):
     #    return u'%s - %s' % (self.resultid, self.feature_action)
-
-    def __str__(self):
-        #s = str(self.resultid)
-        s = '{0}'.format(self.variable)
-        s+='- {0}'.format(self.feature_action)
-        s += '- ID: {0}'.format(self.resultid)
-        #if self.result_type:
-            #s += ', {0}'.format(self.result_type)
-        return s
+    def __unicode__(self):
+        return u"%s - %s - ID: %s" % (self.variable, self.feature_action, self.resultid)
     class Meta:
         managed = False
         db_table = 'results'
@@ -1721,12 +1712,15 @@ class Results(models.Model):
 
 class Resultsdataquality(models.Model):
     bridgeid = models.AutoField(primary_key=True)
-    resultid = models.ForeignKey(Results, db_column='resultid')
-    dataqualityid = models.ForeignKey(Dataquality, db_column='dataqualityid')
-
+    resultid = models.ForeignKey(Results, db_column='resultid',verbose_name='result')
+    dataqualityid = models.ForeignKey(Dataquality, db_column='dataqualityid', verbose_name='data quality')
+    def __unicode__(self):
+        return u"%s - %s" % (self.resultid, self.dataqualityid)
     class Meta:
         managed = False
         db_table = 'resultsdataquality'
+        verbose_name='results data quality'
+        verbose_name_plural = 'results data quality'
 
 
 class Samplingfeatureannotations(models.Model):

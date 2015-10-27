@@ -738,6 +738,47 @@
         {% endfor %}
 
 
+        {% assign varnotfound True %}
+        {% for model in app.models %}
+            {% if model.admin_url and model.name == 'Data quality' and varnotfound %}
+            <tr ><td  class="model-{{ model.object_name|lower }}"><h1>Data Quality</h1></td></tr>
+                <tr class="model-{{ model.object_name|lower }}">
+                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+                {% assign varnotfound False %}
+            {% if model.add_url %}
+                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+            {% if model.admin_url %}
+                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+            </tr>
+        {% endif %}
+        {% endfor %}
+
+
+        {% assign varnotfound True %}
+        {% for model in app.models %}
+            {% if model.admin_url and model.name == 'Results data quality' and varnotfound %}
+                <tr class="model-{{ model.object_name|lower }}">
+                <th scope="row"><a href="{{ model.admin_url }}">Link results and data quality</a></th>
+                {% assign varnotfound False %}
+            {% if model.add_url %}
+                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+            {% if model.admin_url %}
+                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+            </tr>
+        {% endif %}
+        {% endfor %}
 
     {% endfor %}
     {% endif %}

@@ -58,6 +58,8 @@ from .models import CvUnitstype
 from .models import Instrumentoutputvariables
 from .models import Equipmentmodels
 from .models import Datasetsresults
+from .models import Dataquality
+from .models import Resultsdataquality
 from odm2testsite.settings import STATIC_URL
 from odm2testsite.settings import CUSTOM_TEMPLATE_PATH
 from .models import Profileresults
@@ -77,6 +79,22 @@ from django.core.exceptions import ValidationError
 
 #the following define what fields should be overridden so that dropdown lists can be populated with useful information
 
+
+class ResultsdataqualityAdminForm(ModelForm):
+    class Meta:
+        model= Resultsdataquality
+        fields = '__all__'
+class ResultsdataqualityAdmin(admin.ModelAdmin):
+    list_display=('resultid', 'dataqualityid')
+    form=ResultsdataqualityAdminForm
+
+class DataqualityAdminForm(ModelForm):
+    class Meta:
+        model= Dataquality
+        fields = '__all__'
+class DataqualityAdmin(admin.ModelAdmin):
+    list_display=('dataqualitytypecv', 'dataqualitycode', 'dataqualityvalue', 'dataqualityvalueunitsid')
+    form=DataqualityAdminForm
 
 class MethodcitationsAdminForm(ModelForm):
     class Meta:
@@ -403,6 +421,9 @@ class ProfileresultsAdmin(admin.ModelAdmin):
     form = ProfileresultsAdminForm
     list_display = ['intendedzspacing','intendedzspacingunitsid','aggregationstatisticcv','resultid',]
     list_display_links = ['intendedzspacing','intendedzspacingunitsid','aggregationstatisticcv','resultid',]
+    search_fields= ['resultid__feature_action__sampling_feature__samplingfeaturename',
+                    'resultid__variable__variable_name__name','resultid__unitsid__unitsname',
+                    'resultid__variable__variable_type__name']
     save_as = True
 
 
@@ -428,8 +449,8 @@ class ProfileresultsvaluesAdmin(ImportExportActionModelAdmin):
     list_display = ['datavalue','zlocation','zlocationunitsid','zaggregationinterval','valuedatetime','resultid',] #'resultid','feature_action_link','resultid__feature_action__name', 'resultid__variable__name'
     list_display_links = ['resultid',] #'feature_action_link'
     search_fields= ['resultid__resultid__feature_action__sampling_feature__samplingfeaturename','zaggregationinterval',
-                    'resultid__resultid__variable__variable_name__name',
-                    'resultid__resultid__variable__variable_type__name', 'resultid__']
+                    'resultid__resultid__variable__variable_name__name','resultid__resultid__unitsid__unitsname',
+                    'resultid__resultid__variable__variable_type__name', ]
 
 
 

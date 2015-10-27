@@ -61,7 +61,13 @@ from .forms import DatasetcitationsAdmin
 from .forms import CitationsAdmin
 from .forms import AuthorlistsAdmin
 from .forms import MethodcitationsAdmin
+from .models import Dataquality
+from .forms import DataqualityAdmin
+from .models import Resultsdataquality
+from .forms import ResultsdataqualityAdmin
 
+admin.site.register(Dataquality, DataqualityAdmin)
+admin.site.register(Resultsdataquality,ResultsdataqualityAdmin)
 
 admin.site.register(Datasetcitations, DatasetcitationsAdmin)
 admin.site.register(Citations, CitationsAdmin)
