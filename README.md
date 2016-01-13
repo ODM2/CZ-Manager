@@ -1,3 +1,5 @@
+#using django 1.6
+#python 2.7
 # odm2djangoadmin
 This is a Django admin app for Observation Data Model 2 (ODM2)
 Django models exist for all ODM2 tables. Forms for ODM2Core and some additional tables have been created. Graphing of measurement result values via highcharts are implemented. Data logger files can be imported as long 
