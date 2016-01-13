@@ -4,8 +4,10 @@ This is a Django admin app for Observation Data Model 2 (ODM2)
 Django models exist for all ODM2 tables. Forms for ODM2Core and some additional tables have been created. Graphing of measurement result values via highcharts are implemented. Data logger files can be imported as long 
 as data logger file columns and results are properly setup.   
 ODM2 can be found here: https://github.com/ODM2
+
 using django 1.6
 python 2.7
+
 dependency on django-uuidfield https://github.com/dcramer/django-uuidfield
 dependency on django-ajax-selects https://github.com/crucialfelix/django-ajax-selects
 dependency on django-admin-shortcuts https://github.com/alesdotio/django-admin-shortcuts/
