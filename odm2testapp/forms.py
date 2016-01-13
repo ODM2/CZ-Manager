@@ -201,9 +201,9 @@ class ResultsAdminForm(ModelForm):
         fields = '__all__'
 class ResultsAdmin(admin.ModelAdmin):
     form=ResultsAdminForm
-    list_display = ['resultid','feature_action','variable','processing_level']
+    list_display = ['resultid','featureactionid','variable','processing_level']
     search_fields= ['variable__variable_name__name','variable__variablecode','variable__variabledefinition',
-                    'feature_action__sampling_feature__samplingfeaturename',
+                    'featureactionid__samplingfeatureid__samplingfeaturename',
                     'result_type__name','processing_level__definition']
     actions = [duplicate_results_event]
     save_as = True
@@ -234,7 +234,7 @@ class FeatureactionsAdminForm(ModelForm):
         model= Featureactions
         fields = '__all__'
 class FeatureactionsAdmin(admin.ModelAdmin):
-    list_display = ['sampling_feature','action',]
+    list_display = ['samplingfeatureid','action',]
     form=FeatureactionsAdminForm
     save_as = True
 
@@ -375,11 +375,11 @@ class MeasurementResultFilter(SimpleListFilter):
     parameter_name = 'resultValuesPresent'
 
     def lookups(self, request, model_admin):
-        mrs = Measurementresults.objects.values('resultid', 'resultid__feature_action__sampling_feature__samplingfeaturename',
+        mrs = Measurementresults.objects.values('resultid', 'resultid__featureactionid__samplingfeatureid__samplingfeaturename',
                                                 'resultid__variable__variable_name__name')
         #need to make a custom list with feature name and variable name.
         resultidlist =  [ ( p['resultid'], '{0} {1}'.format(
-            p['resultid__feature_action__sampling_feature__samplingfeaturename'],
+            p['resultid__featureactionid__samplingfeatureid__samplingfeaturename'],
             p['resultid__variable__variable_name__name'] ),) for p in mrs ]
 
         return resultidlist
@@ -421,7 +421,7 @@ class ProfileresultsAdmin(admin.ModelAdmin):
     form = ProfileresultsAdminForm
     list_display = ['intendedzspacing','intendedzspacingunitsid','aggregationstatisticcv','resultid',]
     list_display_links = ['intendedzspacing','intendedzspacingunitsid','aggregationstatisticcv','resultid',]
-    search_fields= ['resultid__feature_action__sampling_feature__samplingfeaturename',
+    search_fields= ['resultid__featureactionid__samplingfeatureid__samplingfeaturename',
                     'resultid__variable__variable_name__name','resultid__unitsid__unitsname',
                     'resultid__variable__variable_type__name']
     save_as = True
@@ -433,10 +433,10 @@ class ProfileresultvaluesResource(resources.ModelResource):
         model = Profileresultvalues
         import_id_fields = ('valueid',)
         fields = ('valueid', 'zlocation','zlocationunitsid','zaggregationinterval','resultid__resultid__variable__variable_name',
-                  'resultid__resultid__feature_action__sampling_feature__samplingfeaturename','valuedatetime',
+                  'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename','valuedatetime',
                   'resultid__resultid__unitsid__unitsname','datavalue')
         export_order = ('valueid', 'datavalue','zlocation','zlocationunitsid','zaggregationinterval',
-        'resultid__resultid__variable__variable_name','resultid__resultid__unitsid__unitsname','resultid__resultid__feature_action__sampling_feature__samplingfeaturename','valuedatetime')
+        'resultid__resultid__variable__variable_name','resultid__resultid__unitsid__unitsname','resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename','valuedatetime')
 
 
 class ProfileresultsvaluesAdminForm(ModelForm):
@@ -446,9 +446,9 @@ class ProfileresultsvaluesAdminForm(ModelForm):
 class ProfileresultsvaluesAdmin(ImportExportActionModelAdmin):
     form=ProfileresultsvaluesAdminForm
     resource_class = ProfileresultvaluesResource
-    list_display = ['datavalue','zlocation','zlocationunitsid','zaggregationinterval','valuedatetime','resultid',] #'resultid','feature_action_link','resultid__feature_action__name', 'resultid__variable__name'
-    list_display_links = ['resultid',] #'feature_action_link'
-    search_fields= ['resultid__resultid__feature_action__sampling_feature__samplingfeaturename','zaggregationinterval',
+    list_display = ['datavalue','zlocation','zlocationunitsid','zaggregationinterval','valuedatetime','resultid',] #'resultid','featureactionid_link','resultid__featureactionid__name', 'resultid__variable__name'
+    list_display_links = ['resultid',] #'featureactionid_link'
+    search_fields= ['resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename','zaggregationinterval',
                     'resultid__resultid__variable__variable_name__name','resultid__resultid__unitsid__unitsname',
                     'resultid__resultid__variable__variable_type__name', ]
 
@@ -468,11 +468,11 @@ class MeasurementresultsAdmin(admin.ModelAdmin):
     #gl = OrderDetail.objects.filter(order__order_date__range=('2015-02-02','2015-03-10'))
     list_filter = [MeasurementResultFilter, ] #('resultid__valuedatetime', DateRangeFilter),
     save_as = True
-    search_fields= ['resultid__feature_action__sampling_feature__samplingfeaturename',
+    search_fields= ['resultid__featureactionid__samplingfeatureid__samplingfeaturename',
                     'resultid__variable__variable_name__name',
                     'resultid__variable__variable_type__name']
     def data_link(self,obj):
-        return u'<a href="%sfeatureactions/%s/">%s</a>' % (CUSTOM_TEMPLATE_PATH, obj.resultid.feature_action.featureactionid, obj.resultid.feature_action)
+        return u'<a href="%sfeatureactions/%s/">%s</a>' % (CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid, obj.resultid.featureactionid)
 
 
     data_link.short_description = 'sampling feature action'
@@ -488,12 +488,12 @@ class MeasurementresultvaluesResource(resources.ModelResource):
         model = Measurementresultvalues
         import_id_fields = ('valueid',)
         fields = ('valueid', 'resultid__resultid__variable__variable_name','resultid__resultid__unitsid__unitsname',
-                  'resultid__resultid__feature_action__sampling_feature__samplingfeaturename','valuedatetime',
+                  'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename','valuedatetime',
                   'datavalue','resultid__timeaggregationinterval','resultid__timeaggregationintervalunitsid')
         export_order = ('valueid', 'valuedatetime','datavalue','resultid__timeaggregationinterval',
         'resultid__timeaggregationintervalunitsid', 'resultid__resultid__variable__variable_name',
         'resultid__resultid__unitsid__unitsname',
-        'resultid__resultid__feature_action__sampling_feature__samplingfeaturename',)
+        'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',)
 
 class MeasurementresultvaluesAdminForm(ModelForm):
     class Meta:
@@ -510,16 +510,16 @@ class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin):
         MeasurementResultFilter,
 
     )
-    list_display = ['datavalue','valuedatetime','resultid'] #'resultid','feature_action_link','resultid__feature_action__name', 'resultid__variable__name'
-    list_display_links = ['resultid',] #'feature_action_link'
-    search_fields= ['resultid__resultid__feature_action__sampling_feature__samplingfeaturename',
+    list_display = ['datavalue','valuedatetime','resultid'] #'resultid','featureactionid_link','resultid__featureactionid__name', 'resultid__variable__name'
+    list_display_links = ['resultid',] #'featureactionid_link'
+    search_fields= ['resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',
                     'resultid__resultid__variable__variable_name__name',
                     'resultid__resultid__variable__variable_type__name']
     def feature_action_link(self,obj):
-        return u'<a href="/admin/odm2testapp/featureactions/%s/">%s</a>' % (obj.resultid.resultid.feature_action.featureactionid,obj.resultid.resultid.feature_action)
+        return u'<a href="/admin/odm2testapp/featureactions/%s/">%s</a>' % (obj.resultid.resultid.featureactionid.featureactionid,obj.resultid.resultid.featureactionid)
     feature_action_link.short_description = 'feature action'
     feature_action_link.allow_tags = True
-    feature_action_link.admin_order_field = 'resultid__resultid__feature_action__sampling_feature'
+    feature_action_link.admin_order_field = 'resultid__resultid__featureactionid__samplingfeatureid'
     #get_feature_action = 'resultid__resultid__feature_action'
     # def change_view(self, request, object_id, form_url='', extra_context=None):
     #

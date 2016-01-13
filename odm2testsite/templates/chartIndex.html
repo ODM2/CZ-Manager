@@ -1,0 +1,57 @@
+<!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/
+
+
+
+
+-->
+
+{% extends "admin/base_site.html" %}
+{% load admin_extras %}
+{% load static %}
+{% load i18n  admin_shortcuts_tags %}
+
+{# django-admin-shortcuts changes these blocks #}
+
+{% block breadcrumbs %}
+	<div class="admin_shortcuts">
+		{% admin_shortcuts %}
+	</div>
+{% endblock %}
+
+ {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
+{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+
+
+{% block extrahead %}
+{{ block.super }}{% admin_shortcuts_js %}{% endblock %}
+
+{# end changes #}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+
+
+
+{% block content %}
+<div id="content-main">
+
+
+<div class="app-odm2testapp module">
+        <table>
+               
+				<tr ><td class="section"><h1>Graphs</h1></td></tr>
+				<tr>
+				<th scope="row"><a href="{{prefixpath }}chart.html">
+                    {% trans 'Time Series' %}</a></th>
+                </tr>
+				<tr>
+				<th scope="row"><a href="{{prefixpath }}chartVariableAndFeature.html">
+                    {% trans 'Soils Data' %}</a></th>
+                </tr>
+				
+        </table>
+
+
+{% endblock %}

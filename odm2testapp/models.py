@@ -881,7 +881,7 @@ class ProcessDataloggerfile(models.Model):
         return s
     class Meta:
         managed = True
-        db_table = 'processdataloggerfile'
+        db_table = 'odm2extra\".\"processdataloggerfile'
         verbose_name= 'process data logger file'
     def save(self, *args, **kwargs):
         process_datalogger_file(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid, self.databeginson, self.columnheaderson)
@@ -1083,10 +1083,10 @@ class Externalidentifiersystems(models.Model):
 
 class Featureactions(models.Model):
     featureactionid = models.AutoField(primary_key=True)
-    sampling_feature = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
+    samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     action = models.ForeignKey(Actions, db_column='actionid')
     def __unicode__(self):
-        return u"%s - %s - %s" % (self.featureactionid, self.sampling_feature, self.action)
+        return u"%s - %s - %s" % (self.featureactionid, self.samplingfeatureid, self.action)
     class Meta:
         managed = False
         db_table = 'featureactions'
@@ -1176,7 +1176,7 @@ class Measurementresultvalues(models.Model):
         s += ', {0}'.format(self.valuedatetime)
         s += ', {0}'.format(self.resultid.resultid.variable.variable_name)
         s += ', {0}'.format(self.resultid.resultid.unitsid.unitsname)
-        s += ', {0}'.format(self.resultid.resultid.feature_action.sampling_feature.samplingfeaturename)
+        s += ', {0}'.format(self.resultid.resultid.featureactionid.sampling_feature.samplingfeaturename)
         s += ', {0}'.format(self.resultid.timeaggregationinterval)
         s += ', {0}'.format(self.resultid.timeaggregationintervalunitsid)
         #temp = str(self.resultid).translate(' ', ',')
@@ -1199,7 +1199,7 @@ class MeasurementresultvalueFile(models.Model):
         s=str(self.resultid)
         return s
     class Meta:
-        db_table = 'Measurementresultvaluefile'
+        db_table = 'odm2extra\".\"Measurementresultvaluefile'
         verbose_name='measurement result value file'
     def save(self, *args, **kwargs):
         handle_uploaded_file(self.valueFile.file,self.resultid)
@@ -1684,7 +1684,7 @@ class Resultnormalizationvalues(models.Model):
 class Results(models.Model):
     resultid = models.AutoField(primary_key=True)
     resultuuid = UUIDField(auto=True)
-    feature_action = models.ForeignKey( Featureactions,related_name="feature_actions",verbose_name="sampling feature action", db_column='featureactionid')
+    featureactionid = models.ForeignKey( Featureactions,related_name="feature_actions",verbose_name="sampling feature action", db_column='featureactionid')
     result_type = models.ForeignKey(CvResulttype,verbose_name='result type', db_column='resulttypecv')
     variable = models.ForeignKey('Variables', verbose_name='variable', db_column='variableid')
     unitsid = models.ForeignKey('Units', verbose_name='units', related_name='+', db_column='unitsid')
@@ -1702,7 +1702,7 @@ class Results(models.Model):
     #def __unicode__(self):
     #    return u'%s - %s' % (self.resultid, self.feature_action)
     def __unicode__(self):
-        return u"%s - %s - ID: %s" % (self.variable, self.feature_action, self.resultid)
+        return u"%s - %s - ID: %s" % (self.variable, self.featureactionid, self.resultid)
     class Meta:
         managed = False
         db_table = 'results'

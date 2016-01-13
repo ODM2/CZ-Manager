@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     (r'^admin/lookups/', include(ajax_select_urls)),
     url(r'^admin/AddSensor.html', views.AddSensor, name="AddSensor"),
+    url(r'^admin/chartIndex.html', views.chartIndex, name="chartIndex"),
     url(r'^admin/AddProfile.html', views.AddProfile, name="AddProfile"),
     url(r'^admin/RecordAction.html', views.RecordAction, name="RecordAction"),
    url(r'^admin/ManageCitations.html', views.ManageCitations, name="ManageCitations"),
@@ -23,7 +24,9 @@ urlpatterns = patterns('',
     url(r'^odm2testapp/upfiles/(?P<path>.*)$', 'django.views.static.serve', {
             'document_root': MEDIA_ROOT,
         }),
-    url(r'^admin/chart.html', views.temp_pivot_chart_view, name="temp_pivot_chart_view"),
+    url(r'^admin/odm2testapp/chart.html', views.temp_pivot_chart_view, name="temp_pivot_chart_view"),
+    url(r'^admin/odm2testapp/chartVariableAndFeature.html', views.graph_data, name="graph_data"),
+
     #url(r'^admin/DataloggerfilecolumnsDisplay.html', views.dataloggercolumnView, name="dataloggercolumnView"),
 
     #url(r'^contas_pagar/pagamento/(?P<id_parcela>\d+)/$',

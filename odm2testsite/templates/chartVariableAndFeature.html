@@ -33,11 +33,11 @@
     var chart_id = 'chartid'
     var chart = {{ chart|safe }}
     var title2 = {{ title2|safe }}
-    var xAxis = {{ xAxis|safe }}
     var yAxis = {{ yAxis|safe }}
+	//var xAxisCategories = {{ xAxisCategories|safe}}
     var series = {{ series|safe }}
-	var graphType =   '{{graphType|safe }}'
 	var name_of_units = {{name_of_units|safe}}
+	var graphType =   '{{graphType|safe }}'
 
 $(document).ready(function() {
 	
@@ -68,14 +68,35 @@ $(document).ready(function() {
 	var chart =$('#chartid').highcharts({
 		chart: {renderTo: chart_id, type: graphType,  zoomType: 'xy',},
         title: title2,
-        xAxis: xAxis,
+        xAxis: {
+		//categories: xAxisCategories
+		type: "category"
+		},
+		series: series,
         yAxis:yaxes,
-        series: series,
+		plotOptions: {
+            column: {
+        pointPadding: 0,
+        borderWidth: 3,
+        groupPadding: 0,
+        shadow: false
+		}},
+			//scatter: {
+              //  marker: {
+                //    radius: 5,
+                //    states: {
+                //        hover: {
+                //            enabled: true,
+                            //lineColor: 'rgb(100,100,100)'
+                //        }
+                 //   }
+                //}}},
+       
 		tooltip: {
     formatter: function() {
         return ''+
-                 ' Value: ' + this.y + 
-                '-- Date: '+ Highcharts.dateFormat(' %e-%b-%Y %I:%M %p', this.x);
+				this.series.name + 
+                ' Value: ' + this.y;
     }
 },
     });
@@ -104,8 +125,8 @@ $(document).ready(function() {
 	 </div>
 	<div id='chartid' class="chart" style="height:75%; width:100%"></div>
 	
-<br>
-{% include 'resultList.html' %}
+	
+{% include 'FeatureAndVariableList.html' %}
 
 {% endblock %}
 
