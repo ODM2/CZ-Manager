@@ -109,11 +109,14 @@ def process_datalogger_file(f,fileid, databeginson,columnheaderson):
                                 raise ValidationError(_('No Measurement results for column ' + colnum.columnlabel + ' Add measurement results for'+
                                                   'each column. Both results and measurement results are needed.' ))
                             #only one measurement result is allowed per result
-                            for mresults in measurementresult:
-                                Measurementresultvalues(resultid=mresults
-                                        ,datavalue=row[colnum.columnnum],
-                                        valuedatetime=datestr,valuedatetimeutcoffset=4).save()
-
+                            value = row[colnum.columnnum]
+                            try:
+                                for mresults in measurementresult:
+                                    Measurementresultvalues(resultid=mresults
+                                            ,datavalue=row[colnum.columnnum],
+                                            valuedatetime=datestr,valuedatetimeutcoffset=4).save()
+                            except ValueError:
+                                pass
                             #row[0] is this column object
                 i+=1
         Measurementresults.objects.raw("SELECT odm2.\"MeasurementResultValsToResultsCountvalue\"()")
