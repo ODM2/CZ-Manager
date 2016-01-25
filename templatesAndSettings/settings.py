@@ -3,14 +3,15 @@ Keep this file untracked
 """
 
 # SECURITY WARNING: keep the secret key used in production secret!
-secret_key = 'x'
+secret_key = 'random_secret_key_like_so_7472873649836'
 
 
-media_root = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin/odm2testapp/upfiles/'
+media_root = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin/ODM2CZOData/upfiles/'
 media_url = '/odm2testapp/upfiles/'
 # Application definition
-custom_template_path = '/admin/odm2testapp/'
-admin_shortcuts_path = '/admin/'
+custom_template_path = '/admin/ODM2CZOData/'
+#admin_shortcuts_path = '/admin/'
+url_path = 'admin/'
 static_root = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin/static'
 debug = True
 template_debug = True
@@ -27,11 +28,10 @@ ODM2_configs = {
      'OPTIONS': {
       'options': '-c search_path=odm2,odm2extra'
     }
-
 }
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 static_url = '/static/'
-from odm2testsite.base import *
+from templatesAndSettings.base import *

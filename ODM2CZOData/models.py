@@ -11,7 +11,7 @@
 from __future__ import unicode_literals
 from uuidfield import UUIDField
 from django.db import models
-from odm2testsite.settings import MEDIA_ROOT
+from templatesAndSettings.settings import MEDIA_ROOT
 from django.db import transaction
 #from django.contrib.gis.db import models
 import time

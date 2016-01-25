@@ -60,8 +60,8 @@ from .models import Equipmentmodels
 from .models import Datasetsresults
 from .models import Dataquality
 from .models import Resultsdataquality
-from odm2testsite.settings import STATIC_URL
-from odm2testsite.settings import CUSTOM_TEMPLATE_PATH
+from templatesAndSettings.settings import STATIC_URL
+from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
 from .models import Profileresults
 import cStringIO as StringIO
 from ajax_select import make_ajax_field
@@ -337,7 +337,7 @@ class DataloggerfilesAdminForm(ModelForm):
         fields = '__all__'
 class DataloggerfilesAdmin(admin.ModelAdmin):
     form=DataloggerfilesAdminForm
-    change_form_template = './admin/odm2testapp/dataloggerfiles/change_form.html'
+    change_form_template = './admin/ODM2CZOData/dataloggerfiles/change_form.html'
     actions = [duplicate_Dataloggerfiles_event]
     #get the data columns related to this data loggerfile and return them to the change view.
     def get_dataloggerfilecolumns(self,object_id):
@@ -516,7 +516,7 @@ class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin):
                     'resultid__resultid__variable__variable_name__name',
                     'resultid__resultid__variable__variable_type__name']
     def feature_action_link(self,obj):
-        return u'<a href="/admin/odm2testapp/featureactions/%s/">%s</a>' % (obj.resultid.resultid.featureactionid.featureactionid,obj.resultid.resultid.featureactionid)
+        return u'<a href="/admin/ODM2CZOData/featureactions/%s/">%s</a>' % (obj.resultid.resultid.featureactionid.featureactionid,obj.resultid.resultid.featureactionid)
     feature_action_link.short_description = 'feature action'
     feature_action_link.allow_tags = True
     feature_action_link.admin_order_field = 'resultid__resultid__featureactionid__samplingfeatureid'

@@ -10,7 +10,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-from odm2testsite.settings import *
+from templatesAndSettings.settings import *
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 TEMPLATE_DIR =os.path.dirname(__file__)
 TEMPLATE_DIR_APP = os.path.join(os.path.dirname(__file__), '..')
@@ -37,7 +37,8 @@ MEDIA_ROOT = media_root
 MEDIA_URL = media_url
 # Application definition
 CUSTOM_TEMPLATE_PATH = custom_template_path
-ADMIN_SHORTCUTS_PATH=admin_shortcuts_path
+#ADMIN_SHORTCUTS_PATH=admin_shortcuts_path
+URL_PATH = url_path
 STATIC_ROOT = static_root
 
 #https://github.com/mishbahr/django-modeladmin-reorder
@@ -54,7 +55,7 @@ STATIC_ROOT = static_root
 INSTALLED_APPS = (
     'jquery',
     'djangocms_admin_style',
-    'odm2testapp',
+    'ODM2CZOData',
     'import_export',
     'admin_shortcuts',
     'daterange_filter',
@@ -80,44 +81,44 @@ ADMIN_SHORTCUTS = [
 
         'shortcuts': [
             {
-                'url': ADMIN_SHORTCUTS_PATH,
-                'app_name': 'odm2testapp',
+                'url': '/'+URL_PATH,
+                'app_name': 'ODM2CZOData',
                 'title': 'Home',
                 'class':'home',
             },
             {
-                'url_name': 'admin:odm2testapp_measurementresultvalues_changelist',
-                'app_name': 'odm2testapp',
+                'url_name': 'admin:ODM2CZOData_measurementresultvalues_changelist',
+                'app_name': 'ODM2CZOData',
                 'title': 'Results',
                 'class':'archive',
             },
             {
-                'url': ADMIN_SHORTCUTS_PATH + 'AddSensor.html',
-                'app_name': 'odm2testapp',
+                'url': '/'+URL_PATH+ 'AddSensor.html',
+                'app_name': 'ODM2CZOData',
                 'title': 'Add Sensor Data',
                 'class':'tool',
             },
             {
-                'url': ADMIN_SHORTCUTS_PATH + 'AddProfile.html',
-                'app_name': 'odm2testapp',
+                'url': '/'+URL_PATH+'AddProfile.html',
+                'app_name': 'ODM2CZOData',
                 'title': 'Add Soil Profile Data',
                 'class':'flag',
             },
             {
-                'url': ADMIN_SHORTCUTS_PATH + 'RecordAction.html',
-                'app_name': 'odm2testapp',
+                'url': '/'+URL_PATH+ 'RecordAction.html',
+                'app_name': 'ODM2CZOData',
                 'title': 'Record an Action',
                 'class':'notepad',
             },
              {
-                'url': ADMIN_SHORTCUTS_PATH + 'ManageCitations.html',
-                'app_name': 'odm2testapp',
+                'url': '/'+URL_PATH+ 'ManageCitations.html',
+                'app_name': 'ODM2CZOData',
                 'title': 'Manage Citations',
                 'class':'pencil',
             },
             {
-                'url': ADMIN_SHORTCUTS_PATH + 'chartIndex.html',
-                'app_name': 'odm2testapp',
+                'url': '/'+URL_PATH+ 'chartIndex.html',
+                'app_name': 'ODM2CZOData',
                 'title': 'Graph My Data',
                 'class':'monitor',
             },
@@ -133,10 +134,10 @@ ADMIN_SHORTCUTS_SETTINGS = {
 #https://github.com/crucialfelix/django-ajax-selects
 AJAX_LOOKUP_CHANNELS = {
     #  simple: search Person.objects.filter(name__icontains=q)
-    'cv_variable_name': ('odm2testapp.lookups',  'CvVariableNameLookup'),
-    'cv_variable_type': ('odm2testapp.lookups',  'CvVariableTypeLookup'),
-    'cv_unit_type': ('odm2testapp.lookups',  'CvUnitTypeLookup'),
-    'cv_speciation': ('odm2testapp.lookups',  'CvVariableSpeciationLookup'),
+    'cv_variable_name': ('ODM2CZOData.lookups',  'CvVariableNameLookup'),
+    'cv_variable_type': ('ODM2CZOData.lookups',  'CvVariableTypeLookup'),
+    'cv_unit_type': ('ODM2CZOData.lookups',  'CvUnitTypeLookup'),
+    'cv_speciation': ('ODM2CZOData.lookups',  'CvVariableSpeciationLookup'),
     # define a custom lookup channel
 }
 
@@ -151,9 +152,9 @@ MIDDLEWARE_CLASSES = (
     #'admin_reorder.middleware.ModelAdminReorder',
 )
 
-ROOT_URLCONF = 'odm2testsite.urls'
+ROOT_URLCONF = 'templatesAndSettings.urls'
 
-WSGI_APPLICATION = 'odm2testsite.wsgi.application'
+WSGI_APPLICATION = 'templatesAndSettings.wsgi.application'
 
 
 # Database
