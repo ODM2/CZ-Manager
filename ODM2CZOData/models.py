@@ -13,6 +13,7 @@ from uuidfield import UUIDField
 from django.db import models
 from templatesAndSettings.settings import MEDIA_ROOT
 from django.db import transaction
+from django.db import IntegrityError
 #from django.contrib.gis.db import models
 import time
 #from django.forms import ModelFormWithFileField
@@ -98,7 +99,6 @@ def process_datalogger_file(f,fileid, databeginson,columnheaderson):
                     for colnum in rowColumnMap:
                         #x[0] for x in my_tuples
                         #colnum[0] = column number, colnum[1] = dataloggerfilecolumn object
-
                         if not colnum.columnnum ==0:
                             #raise ValidationError("result: " + str(colnum.resultid) + " datavalue "+
                                                   #str(row[colnum.columnnum])+ " dateTime " + datestr)
@@ -110,14 +110,17 @@ def process_datalogger_file(f,fileid, databeginson,columnheaderson):
                                                   'each column. Both results and measurement results are needed.' ))
                             #only one measurement result is allowed per result
                             value = row[colnum.columnnum]
-                            try:
-                                for mresults in measurementresult:
+                            for mresults in measurementresult:
+                                try:
+                                    if(value==''):
+                                        raise IntegrityError
                                     Measurementresultvalues(resultid=mresults
-                                            ,datavalue=row[colnum.columnnum],
-                                            valuedatetime=datestr,valuedatetimeutcoffset=4).save()
-                            except ValueError:
-                                pass
-                            #row[0] is this column object
+                                                ,datavalue=row[colnum.columnnum],
+                                                valuedatetime=datestr,valuedatetimeutcoffset=4).save()
+                                except IntegrityError:
+                                    pass
+                                    #Measurementresultvalues.delete()
+                                #row[0] is this column object
                 i+=1
         Measurementresults.objects.raw("SELECT odm2.\"MeasurementResultValsToResultsCountvalue\"()")
 
