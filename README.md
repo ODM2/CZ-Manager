@@ -5,7 +5,7 @@ Django models exist for all ODM2 tables. Forms for ODM2Core and some additional 
 as data logger file columns and results are properly setup.   
 ODM2 can be found here: https://github.com/ODM2
 
-using django 1.6
+using django 1.6.5
 python 2.7
 
 dependency on django-uuidfield https://github.com/dcramer/django-uuidfield

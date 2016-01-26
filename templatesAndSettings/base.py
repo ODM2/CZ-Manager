@@ -59,7 +59,6 @@ INSTALLED_APPS = (
     'import_export',
     'admin_shortcuts',
     'daterange_filter',
-    'debug_toolbar',
     'django.contrib.admin',
     #'django.contrib.gis',
     'django.contrib.auth',
@@ -146,7 +145,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    #'django.contrib.auth.middleware.SessionAuthenticationMiddleware', didn't work in production
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     #'admin_reorder.middleware.ModelAdminReorder',
