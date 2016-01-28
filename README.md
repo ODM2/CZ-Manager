@@ -8,7 +8,7 @@ in the folder templatesAndSeetings you will find settings.py which contains all 
 
 You might find issues with psycopg2 on windows 
 
-To install psycopg2 use, install git for windows first 
+To install psycopg2 for windows follow the instructions here:  
 https://github.com/nwcell/psycopg2-windows
 
 You may need to copy a folder from from C:\Users\<user name>\AppData\Local\Temp\2\pip_build_Administrator\psycopg\ into your python library for instance C:\Python27\Lib\site-packages\psycopg2\ 
