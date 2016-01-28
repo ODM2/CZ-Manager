@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.db import models
-
+from templatesAndSettings.settings import URL_PATH
 
 from .models import Samplingfeatures
 from .forms import SamplingfeaturesAdmin
@@ -103,4 +103,4 @@ admin.site.register(Relatedfeatures)
 admin.site.register(Measurementresults, MeasurementresultsAdmin)
 admin.site.register(Measurementresultvalues,MeasurementresultvaluesAdmin)
 admin.site.register(MeasurementresultvalueFile)
-admin.site.index_template = "admin/my_index.html"
+admin.site.index_template = URL_PATH + "/my_index.html"

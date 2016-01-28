@@ -1,0 +1,8 @@
+django-uuidfield
+django-ajax-selects
+django-admin-shortcuts
+djangocms_admin_style
+django-apptemplates
+django-daterange-filter
+django-import-export
+django-jquery 
