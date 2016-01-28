@@ -1,3 +1,4 @@
+django==1.6.5
 django-uuidfield
 django-ajax-selects
 django-admin-shortcuts
