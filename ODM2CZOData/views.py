@@ -43,7 +43,7 @@ from .forms import DataloggerfilesAdmin
 from .forms import DataloggerfilesAdminForm
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
 register = template.Library()
-import admin
+
 
 
 def AddSensor(request):
@@ -435,23 +435,12 @@ def graph_data(request):
     sampling_features = Relatedfeatures.objects.filter(relatedfeatureid=selected_relatedfeatid)
     #select the feature actions for all of the related features.
     feature_actions = Featureactions.objects.filter(samplingfeatureid__in = sampling_features)
+    featureresults = Results.objects.filter(featureactionid__in=feature_actions)
+    variableList = Variables.objects.filter(variableid__in =featureresults.values("variable"))
 
-    featureresults = None
-    for featureaction in feature_actions:
-        if featureresults:
-            featureresults = featureresults | Results.objects.filter(featureactionid=featureaction.featureactionid)
-        else:
-            featureresults = Results.objects.filter(featureactionid=featureaction.featureactionid)
-        for result in featureresults:
-            if variableList:
-                variableList = variableList | Variables.objects.filter(variableid=result.variable_id)
-            else:
-                variableList = Variables.objects.filter(variableid=result.variable_id)
-    #if 'update_result_on_related_feature' in request.POST:
-    #        raise ValidationError(featureresults)
-    #raise ValidationError(variableList)
     #find the profile results series for the selected variable
     numvariables = variableList.__len__()
+    #raise ValidationError(numvariables)
     selectedMVariableSeries = []
     selectionStr = ''
     for i in range(0,numvariables):
@@ -594,14 +583,6 @@ def graph_data(request):
     yAxis = {"title": {"text": seriesStr}}
     graphType = 'column'
     opposite = False
-
-
-    #actionList = Actions.objects.filter(action_type="Observation") #where the action is not of type estimation
-    #assuming an estimate is a single value.
-
-
-    actionList = Actions.objects.filter(action_type="Observation") #where the action is not of type estimation
-    #assuming an estimate is a single value.
 
     withProfileResults = Profileresults.objects.all()
     results = Results.objects.filter(resultid__in=withProfileResults)
