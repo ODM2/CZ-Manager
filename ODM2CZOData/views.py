@@ -586,8 +586,10 @@ def graph_data(request):
 
     withProfileResults = Profileresults.objects.all()
     results = Results.objects.filter(resultid__in=withProfileResults)
-    featureAction = Featureactions.objects.filter(featureactionid__in=results)
+    featureAction = Featureactions.objects.filter(featureactionid__in=results.values("featureactionid"))
     relatedFeatureList = Relatedfeatures.objects.filter(samplingfeatureid__in=featureAction).order_by('relatedfeatureid').distinct('relatedfeatureid')
+    #raise ValidationError(list(featureAction.values("samplingfeatureid")))
+    #raise ValidationError(list(results.values("resultid")))
     #
     # withProfileResults = Profileresults.objects.all()
     # resultswithProfile = Results.objects.filter(resultid__in=withProfileResults)
