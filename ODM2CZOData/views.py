@@ -405,8 +405,8 @@ def temp_pivot_chart_view(request):
 #     return selected_relatedfeatid, done, variableList
 
 def graph_data(request):
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect('../')
+    #if not request.user.is_authenticated():
+        #return HttpResponseRedirect('../')
 
     selected_resultid = 9365
     selected_relatedfeatid = 15
@@ -478,7 +478,7 @@ def graph_data(request):
     i = 0
     data = {}
     data2= []
-
+    resultValuesSeries = None
     #if 'update_result_on_related_feature' in request.POST:
             #raise ValidationError(selectedMResultsSeries)
     for selectedMResult in selectedMResultsSeries:
@@ -491,7 +491,7 @@ def graph_data(request):
 
         tmpname = get_name_of_sampling_feature(selected_result)
         tmpLocName = tmpname
-        name_of_sampling_features.append(tmpname)
+
 
 
         tmpname = get_name_of_variable(selected_result)
@@ -526,12 +526,18 @@ def graph_data(request):
 
         resultValues= Profileresultvalues.objects.all().filter(~Q(datavalue=-6999))\
         .filter(~Q(datavalue=-888.88)).filter(resultid=selectedMResult)
+        if not resultValuesSeries:
+            resultValuesSeries = resultValues
+        else:
+            resultValuesSeries = resultValuesSeries | resultValues
         #if 'update_result_on_related_feature' in request.POST:
             #raise ValidationError(resultValues)
         for resultValue in resultValues:
             seriesName = 'datavalue' + unitAndVariable
+            tmpLocName = tmpLocName + " Depth " + str(resultValue.zlocation) + " " + str(resultValue.zlocationunitsid.unitsabbreviation)
+            name_of_sampling_features.append(tmpLocName)
             if seriesName in data:
-                 data['datavalue' + unitAndVariable].append([ tmpLocName,resultValue.datavalue]) #tmpUnit +' - '+tmpVariableName +' - '+
+                data['datavalue' + unitAndVariable].append([ tmpLocName,resultValue.datavalue]) #tmpUnit +' - '+tmpVariableName +' - '+
             else:
                 data.update({'datavalue' + unitAndVariable: []})
                 data['datavalue' + unitAndVariable].append([tmpLocName,resultValue.datavalue]) #tmpUnit +' - '+tmpVariableName +' - '+
@@ -623,9 +629,10 @@ def graph_data(request):
         csvexport=True
 
         myfile = StringIO.StringIO()
-        for myresults in myresultSeries:
-            for result in myresults:
-                myfile.write(result.csvoutput())
+        #raise ValidationError(resultValues)
+        for myresults in resultValuesSeries:
+        #for myresults in profileresult:
+            myfile.write(myresults.csvoutput())
             myfile.write('\n')
         response = HttpResponse(myfile.getvalue(),content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
