@@ -1446,7 +1446,7 @@ class Profileresults(models.Model):
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, verbose_name= 'aggregation statistic',
                                          db_column='aggregationstatisticcv')
     def __unicode__(self):
-        s = u""
+        s = u"%s" % self.resultid
         if self.xlocation:
             s += u"- %s" % (self.xlocation)
         if self.xlocationunitsid:
@@ -1491,7 +1491,27 @@ class Profileresultvalues(models.Model):
     timeaggregationinterval = models.FloatField(verbose_name='time aggregation interval', blank=True, null=True)
     timeaggregationintervalunitsid = models.ForeignKey('Units', verbose_name='time aggregation interval unit',
                         related_name='+', db_column='timeaggregationintervalunitsid', blank=True, null=True)
-
+    def __unicode__(self):
+        s = u"%s " % (self.resultid)
+        s += u", %s" % (self.datavalue)
+        s += u", %s" % (self.zlocation)
+        #s += u", %s" % (self.zaggregationinterval)
+        s += u", %s" % (self.zlocationunitsid)
+        return s
+    def csvoutput(self):
+        s = str(self.valueid)
+        s += ', {0}'.format(self.datavalue)
+        s += ', {0}'.format(self.valuedatetime)
+        s += ', {0}'.format(self.zlocation)
+        #s += ', {0}'.format(self.zaggregationinterval)
+        s += ', {0}'.format(self.zlocationunitsid)
+        s += ', {0}'.format(self.resultid.resultid.variable.variable_name)
+        s += ', {0}'.format(self.resultid.resultid.unitsid.unitsname)
+        s += ', {0}'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)
+        #temp = str(self.resultid).translate(' ', ',')
+        #temp = re.sub('[,]', '', str(self.resultid))
+       # s += ', {0}'.format(temp)
+        return s
     class Meta:
         managed = False
         db_table = 'profileresultvalues'
