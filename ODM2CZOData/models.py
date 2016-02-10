@@ -355,8 +355,11 @@ class Citations(models.Model):
     publicationyear = models.IntegerField(verbose_name='publication year')
     citationlink = models.CharField(max_length=255, blank=True,verbose_name='DOI',)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
+        s = u"%s" % (self.title)
+        if self.publisher:
+            s += u"- %s," % (self.publisher)
+        if self.publicationyear:
+            s += u", %s," % (self.publicationyear)
         return s
     class Meta:
         managed = False

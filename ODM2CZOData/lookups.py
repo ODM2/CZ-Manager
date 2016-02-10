@@ -119,7 +119,17 @@ class FeatureactionsLookup(LookupChannel):
     model = Featureactions
 
     def get_query(self,q,request):
-        return Featureactions.objects.filter(Q(samplingfeatureid__samplingfeaturename__icontains=q) | Q(action__method__methodname__icontains=q)).order_by('samplingfeatureid__samplingfeaturename') #
+        qset = None
+        for part in q.split():
+            if not qset:
+                qset = Featureactions.objects.filter(Q(samplingfeatureid__samplingfeaturename__icontains=part)\
+                | Q(action__method__methoddescription__icontains=part)\
+                | Q(action__method__methodname__icontains=part)).order_by('samplingfeatureid__samplingfeaturename')
+            else:
+                qset = qset &   Featureactions.objects.filter(Q(samplingfeatureid__samplingfeaturename__icontains=part)\
+                | Q(action__method__methoddescription__icontains=part)\
+                | Q(action__method__methodname__icontains=part)).order_by('samplingfeatureid__samplingfeaturename')
+        return qset #
         #return Featureactions.objects.filter(name__icontains=q)#.order_by('name')
     def get_result(self,obj):
         #return obj.featureactionid
