@@ -1095,7 +1095,7 @@ class Externalidentifiersystems(models.Model):
 
 
 class Featureactions(models.Model):
-    featureactionid = models.AutoField(primary_key=True)
+    featureactionid = models.AutoField(primary_key=True, verbose_name="sampling feature action")
     samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     action = models.ForeignKey(Actions, db_column='actionid')
     def __unicode__(self):
