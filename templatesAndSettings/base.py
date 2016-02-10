@@ -40,7 +40,6 @@ CUSTOM_TEMPLATE_PATH = custom_template_path
 #ADMIN_SHORTCUTS_PATH=admin_shortcuts_path
 URL_PATH = url_path
 STATIC_ROOT = static_root
-
 #https://github.com/mishbahr/django-modeladmin-reorder
 #{'app': 'auth', 'models': ('auth.User', 'auth.Group')},
 # ADMIN_REORDER = ('odm2testsite',
@@ -59,6 +58,7 @@ INSTALLED_APPS = (
     'import_export',
     'admin_shortcuts',
     'daterange_filter',
+    'ajax_select',
     'django.contrib.admin',
     #'django.contrib.gis',
     'django.contrib.auth',
@@ -67,7 +67,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     #'admin_reorder',
-    'ajax_select',
+
 )
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
@@ -137,6 +137,10 @@ AJAX_LOOKUP_CHANNELS = {
     'cv_variable_type': ('ODM2CZOData.lookups',  'CvVariableTypeLookup'),
     'cv_unit_type': ('ODM2CZOData.lookups',  'CvUnitTypeLookup'),
     'cv_speciation': ('ODM2CZOData.lookups',  'CvVariableSpeciationLookup'),
+    'featureaction_lookup': ('ODM2CZOData.lookups',  'FeatureactionsLookup'),
+    'result_lookup': ('ODM2CZOData.lookups',  'ResultsLookup'),
+    'profileresult_lookup': ('ODM2CZOData.lookups', 'ProfileResultsLookup'),
+    'measurementresult_lookup': ('ODM2CZOData.lookups', 'MeasurementResultsLookup')
     # define a custom lookup channel
 }
 

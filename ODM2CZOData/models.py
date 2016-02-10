@@ -1099,12 +1099,41 @@ class Featureactions(models.Model):
     samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     action = models.ForeignKey(Actions, db_column='actionid')
     def __unicode__(self):
-        return u"%s - %s - %s" % (self.featureactionid, self.samplingfeatureid, self.action)
+        return u"%s- %s - %s" % (self.featureactionid, self.samplingfeatureid, self.action)
+    #     nameexists = FeatureactionsNames.objects.filter(featureactionid=self.featureactionid)
+    #     if nameexists.__len__() >0:
+    #         return u"%s" % nameexists[0]
+    #     else:
+    #         s = u"%s- %s - %s" % (self.featureactionid, self.samplingfeatureid, self.action)
+    #         fan = FeatureactionsNames.objects.create(featureactionid=self,name=s)
+    #         return "%s" % (fan)
+    # def save(self, *args, **kwargs):
+    #     nameexists = FeatureactionsNames.objects.filter(featureactionid=self.featureactionid)
+    #     if nameexists.__len__() >0:
+    #         s = u"%s- %s - %s" % (self.featureactionid, self.samplingfeatureid, self.action)
+    #         nameexists.update(name = s)
+    #     else:
+    #         s = u"%s- %s - %s" % (self.featureactionid, self.samplingfeatureid, self.action)
+    #         fan = FeatureactionsNames.objects.create(featureactionid=self, name=s)
+    #     super(Featureactions, self).save(*args, **kwargs)
     class Meta:
         managed = False
         db_table = 'featureactions'
         verbose_name='action at sampling feature'
         verbose_name_plural='action at sampling feature action'
+
+#this class just stores the unicode representation of a featureaction for faster lookup
+class FeatureactionsNames(models.Model):
+    featureactionNamesid = models.AutoField(primary_key=True)
+    featureactionid = models.ForeignKey('Featureactions',db_column='featureactionid')
+    name = models.CharField(max_length=500)
+
+    def __unicode__(self):
+        return u"%s" % self.name
+    class Meta:
+        managed= True
+        db_table = 'odm2extra\".\"featureactionsNames'
+        verbose_name= 'feature action names'
 
 
 class Instrumentoutputvariables(models.Model):
@@ -1174,7 +1203,7 @@ class Measurementresultvalueannotations(models.Model):
 
 class Measurementresultvalues(models.Model):
     valueid = models.AutoField(primary_key=True)
-    resultid = models.ForeignKey(Measurementresults, verbose_name='result',db_column='resultid')
+    resultid = models.ForeignKey(Measurementresults, verbose_name='Result Series',db_column='resultid')
     datavalue = models.FloatField(verbose_name='data value')
     valuedatetime = models.DateTimeField(verbose_name='value date time')
     valuedatetimeutcoffset = models.IntegerField(verbose_name='value date time UTC offset', default=4)
@@ -1707,11 +1736,11 @@ class Resultnormalizationvalues(models.Model):
         db_table = 'resultnormalizationvalues'
 
 class Results(models.Model):
-    resultid = models.AutoField(primary_key=True)
+    resultid = models.AutoField(primary_key=True, verbose_name="result")
     resultuuid = UUIDField(auto=True)
     featureactionid = models.ForeignKey( Featureactions,related_name="feature_actions",verbose_name="sampling feature action", db_column='featureactionid')
     result_type = models.ForeignKey(CvResulttype,verbose_name='result type', db_column='resulttypecv')
-    variable = models.ForeignKey('Variables', verbose_name='variable', db_column='variableid')
+    variableid = models.ForeignKey('Variables', verbose_name='variable', db_column='variableid')
     unitsid = models.ForeignKey('Units', verbose_name='units', related_name='+', db_column='unitsid')
     taxonomicclassifierid = models.ForeignKey('Taxonomicclassifiers', verbose_name='taxonomic classifier', db_column='taxonomicclassifierid',blank=True, null=True)
     processing_level = models.ForeignKey(Processinglevels, db_column='processinglevelid')
@@ -1726,13 +1755,14 @@ class Results(models.Model):
     valuecount = models.IntegerField(verbose_name='number of recorded values')
     #def __unicode__(self):
     #    return u'%s - %s' % (self.resultid, self.feature_action)
+
     def __unicode__(self):
-        return u"%s - %s - ID: %s" % (self.variable, self.featureactionid, self.resultid)
+        return u"%s - %s - ID: %s" % (self.variableid, self.featureactionid, self.resultid)
     class Meta:
         managed = False
         db_table = 'results'
         verbose_name='result'
-        ordering = ["variable"]
+        ordering = ["variableid"]
 
 
 class Resultsdataquality(models.Model):
@@ -2214,11 +2244,12 @@ class Units(models.Model):
     unitsname = models.CharField(verbose_name='unit name',max_length=255)
     unitslink = models.CharField(verbose_name='reference for the unit (web link)',max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.unit_type)
-        if self.unitsabbreviation:
-            s = u" - %s" % (self.unitsabbreviation)
+
+        s = u"%s" % (self.unitsabbreviation)
+        #if self.unit_type:
+        #    s = u"- %s" % (self.unit_type)
         if self.unitsname:
-            s+=u", %s" % (self.unitsname)
+            s+=u"- %s" % (self.unitsname)
         return s
     class Meta:
         managed = False

@@ -15,7 +15,6 @@ from import_export.admin import ImportExportActionModelAdmin
 from django.contrib.admin import SimpleListFilter, RelatedFieldListFilter
 
 from django.shortcuts import render_to_response
-#from odm2testapp.lookups import CvVariableNameLookup
 from .models import Variables
 from .models import CvVariabletype
 from .models import CvVariablename
@@ -62,6 +61,7 @@ from .models import Dataquality
 from .models import Resultsdataquality
 from templatesAndSettings.settings import STATIC_URL
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
+from templatesAndSettings.settings import MEDIA_URL
 from .models import Profileresults
 import cStringIO as StringIO
 from ajax_select import make_ajax_field
@@ -158,7 +158,7 @@ class VariablesAdminForm(ModelForm):
 class VariablesAdmin(admin.ModelAdmin):
     form=VariablesAdminForm
     list_display =('variable_type','variable_name','variablecode','speciation')
-    search_fields = ['variable_type__name','variable_name__name','variablecode','speciation__name']
+    search_fields = ['variableid_type__name','variableid_name__name','variablecode','speciation__name']
 
 
 class TaxonomicclassifiersAdminForm(ModelForm):
@@ -194,19 +194,55 @@ def duplicate_results_event(ModelAdmin, request, queryset):
         object.resultid = None
         object.save()
 duplicate_results_event.short_description = "Duplicate selected result"
+#
+# class FeatureactionsField(ajax_select.make_ajax_field):
+#     def to_python(self, value):
+#         featureactioniduni= self.data['featureactionid']
+#         for faiduni in featureactioniduni.split("-"):
+#              if faiduni.isdigit():
+#                  featureactionid = faiduni
+#                  continue
+#         featureaction = Featureactions.objects.filter(featureactionid=featureactionid)
+#         self.data['featureactionid'] = featureaction
+#         return featureaction
 
 class ResultsAdminForm(ModelForm):
+    featureactionid = make_ajax_field(Featureactions,'featureactionid','featureaction_lookup',max_length=500)
+
+    def clean_featureactionid(self):
+          featureactioniduni= self.data['featureactionid']
+          featureactionid = None
+          for faiduni in featureactioniduni.split("-"):
+              if faiduni.isdigit():
+                  featureactionid = faiduni
+                  continue
+          featureaction = Featureactions.objects.filter(featureactionid=featureactionid).get()
+          return featureaction
     class Meta:
         model= Results
         fields = '__all__'
+        #widgets = {
+        #     'featureactionid': autocomplete.ModelSelect2(url='featueactions-autocomplete')
+        # }
 class ResultsAdmin(admin.ModelAdmin):
     form=ResultsAdminForm
-    list_display = ['resultid','featureactionid','variable','processing_level']
-    search_fields= ['variable__variable_name__name','variable__variablecode','variable__variabledefinition',
+
+    list_display = ['resultid','featureactionid','variableid','processing_level']
+    search_fields= ['variableid__variable_name__name','variableid__variablecode','variableid__variabledefinition',
                     'featureactionid__samplingfeatureid__samplingfeaturename',
                     'result_type__name','processing_level__definition']
     actions = [duplicate_results_event]
     save_as = True
+    # def save_model(self, request, obj, form, change):
+    #     featureactionidstr = request.featureactionid
+    #     featureactionid = None
+    #     for featureactionidstr in str.split():
+    #         if featureactionidstr.isdigit():
+    #             featureactionid = featureactionidstr
+    #             continue
+    #     raise ValidationError(featureactionid)
+    #     obj.featureactionid = featureactionid
+    #     obj.save()
 class RelatedactionsAdminForm(ModelForm):
     #actionid= ActionsModelChoiceField(Actions.objects.all().order_by('begindatetime'))
     #relationshiptypecv= TermModelChoiceField(CvRelationshiptype.objects.all().order_by('term'))
@@ -367,7 +403,7 @@ class DataloggerfilecolumnsAdmin(admin.ModelAdmin):
     list_display = ['columnlabel', 'resultid','dataloggerfileid']
     actions = [duplicate_Dataloggerfilecolumns_event]
     search_fields= ['columnlabel','dataloggerfileid__dataloggerfilename',
-                    'resultid__variable__variable_name__name',]
+                    'resultid__variableid__variable_name__name',]
     save_as = True
 
 class MeasurementResultFilter(SimpleListFilter):
@@ -376,11 +412,11 @@ class MeasurementResultFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         mrs = Measurementresults.objects.values('resultid', 'resultid__featureactionid__samplingfeatureid__samplingfeaturename',
-                                                'resultid__variable__variable_name__name')
+                                                'resultid__variableid__variable_name__name')
         #need to make a custom list with feature name and variable name.
         resultidlist =  [ ( p['resultid'], '{0} {1}'.format(
             p['resultid__featureactionid__samplingfeatureid__samplingfeaturename'],
-            p['resultid__variable__variable_name__name'] ),) for p in mrs ]
+            p['resultid__variableid__variable_name__name'] ),) for p in mrs ]
 
         return resultidlist
 
@@ -414,16 +450,30 @@ class MeasurementResultFilter(SimpleListFilter):
 
 #for soil sampling profiles with depths
 class ProfileresultsAdminForm(ModelForm):
+    resultid = make_ajax_field(Results,'resultid','result_lookup')
+
+    #this processes the user input into the form.
+    def clean_resultid(self):
+      resultiduni= self.data['resultid']
+      resultid = None
+      for riduni in resultiduni.split("-"):
+          if riduni.isdigit():
+              resultid = riduni
+              continue
+      result = Results.objects.filter(resultid=resultid).get()
+      return result
+
     class Meta:
         model =Profileresults
         fields='__all__'
 class ProfileresultsAdmin(admin.ModelAdmin):
+
     form = ProfileresultsAdminForm
     list_display = ['intendedzspacing','intendedzspacingunitsid','aggregationstatisticcv','resultid',]
     list_display_links = ['intendedzspacing','intendedzspacingunitsid','aggregationstatisticcv','resultid',]
     search_fields= ['resultid__featureactionid__samplingfeatureid__samplingfeaturename',
-                    'resultid__variable__variable_name__name','resultid__unitsid__unitsname',
-                    'resultid__variable__variable_type__name']
+                    'resultid__variableid__variable_name__name','resultid__unitsid__unitsname',
+                    'resultid__variableid__variable_type__name']
     save_as = True
 
 
@@ -432,14 +482,24 @@ class ProfileresultvaluesResource(resources.ModelResource):
     class Meta:
         model = Profileresultvalues
         import_id_fields = ('valueid',)
-        fields = ('valueid', 'zlocation','zlocationunitsid','zaggregationinterval','resultid__resultid__variable__variable_name',
+        fields = ('valueid', 'zlocation','zlocationunitsid','zaggregationinterval','resultid__resultid__variableid__variable_name',
                   'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename','valuedatetime',
                   'resultid__resultid__unitsid__unitsname','datavalue')
         export_order = ('valueid', 'datavalue','zlocation','zlocationunitsid','zaggregationinterval',
-        'resultid__resultid__variable__variable_name','resultid__resultid__unitsid__unitsname','resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename','valuedatetime')
+        'resultid__resultid__variableid__variable_name','resultid__resultid__unitsid__unitsname','resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename','valuedatetime')
 
 
 class ProfileresultsvaluesAdminForm(ModelForm):
+    resultid = make_ajax_field(Profileresults,'resultid','profileresult_lookup')
+    def clean_resultid(self):
+      resultiduni= self.data['resultid']
+      resultid = None
+      for riduni in resultiduni.split("-"):
+          if riduni.isdigit():
+              resultid = riduni
+              continue
+      result = Profileresults.objects.filter(resultid=resultid).get()
+      return result
     class Meta:
         model= Profileresultvalues
         fields = '__all__'
@@ -449,12 +509,24 @@ class ProfileresultsvaluesAdmin(ImportExportActionModelAdmin):
     list_display = ['datavalue','zlocation','zlocationunitsid','zaggregationinterval','valuedatetime','resultid',] #'resultid','featureactionid_link','resultid__featureactionid__name', 'resultid__variable__name'
     list_display_links = ['resultid',] #'featureactionid_link'
     search_fields= ['resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename','zaggregationinterval',
-                    'resultid__resultid__variable__variable_name__name','resultid__resultid__unitsid__unitsname',
-                    'resultid__resultid__variable__variable_type__name', ]
+                    'resultid__resultid__variableid__variable_name__name','resultid__resultid__unitsid__unitsname',
+                    'resultid__resultid__variableid__variable_type__name', ]
 
 
 
 class MeasurementresultsAdminForm(ModelForm):
+    resultid = make_ajax_field(Results,'resultid','result_lookup')
+     #this processes the user input into the form.
+    def clean_resultid(self):
+      resultiduni= self.data['resultid']
+      resultid = None
+      for riduni in resultiduni.split("-"):
+          if riduni.isdigit():
+              resultid = riduni
+              continue
+      result = Results.objects.filter(resultid=resultid).get()
+      return result
+
     class Meta:
         model= Measurementresults
         fields = '__all__'
@@ -469,8 +541,8 @@ class MeasurementresultsAdmin(admin.ModelAdmin):
     list_filter = [MeasurementResultFilter, ] #('resultid__valuedatetime', DateRangeFilter),
     save_as = True
     search_fields= ['resultid__featureactionid__samplingfeatureid__samplingfeaturename',
-                    'resultid__variable__variable_name__name',
-                    'resultid__variable__variable_type__name']
+                    'resultid__variableid__variable_name__name',
+                    'resultid__variableid__variable_type__name']
     def data_link(self,obj):
         return u'<a href="%sfeatureactions/%s/">%s</a>' % (CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid, obj.resultid.featureactionid)
 
@@ -487,15 +559,27 @@ class MeasurementresultvaluesResource(resources.ModelResource):
     class Meta:
         model = Measurementresultvalues
         import_id_fields = ('valueid',)
-        fields = ('valueid', 'resultid__resultid__variable__variable_name','resultid__resultid__unitsid__unitsname',
+        fields = ('valueid', 'resultid__resultid__variableid__variable_name','resultid__resultid__unitsid__unitsname',
                   'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename','valuedatetime',
                   'datavalue','resultid__timeaggregationinterval','resultid__timeaggregationintervalunitsid')
         export_order = ('valueid', 'valuedatetime','datavalue','resultid__timeaggregationinterval',
-        'resultid__timeaggregationintervalunitsid', 'resultid__resultid__variable__variable_name',
+        'resultid__timeaggregationintervalunitsid', 'resultid__resultid__variableid__variable_name',
         'resultid__resultid__unitsid__unitsname',
         'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',)
 
 class MeasurementresultvaluesAdminForm(ModelForm):
+    resultid = make_ajax_field(Measurementresults,'resultid','measurementresult_lookup') #
+
+    def clean_resultid(self):
+      resultiduni= self.data['resultid']
+      resultid = None
+      for riduni in resultiduni.split("-"):
+          if riduni.isdigit():
+              resultid = riduni
+              continue
+      result = Measurementresults.objects.filter(resultid=resultid).get()
+      return result
+
     class Meta:
         model= Measurementresultvalues
         fields = '__all__'
@@ -513,8 +597,8 @@ class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin):
     list_display = ['datavalue','valuedatetime','resultid'] #'resultid','featureactionid_link','resultid__featureactionid__name', 'resultid__variable__name'
     list_display_links = ['resultid',] #'featureactionid_link'
     search_fields= ['resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',
-                    'resultid__resultid__variable__variable_name__name',
-                    'resultid__resultid__variable__variable_type__name']
+                    'resultid__resultid__variableid__variable_name__name',
+                    'resultid__resultid__variableid__variable_type__name']
     def feature_action_link(self,obj):
         return u'<a href="/admin/ODM2CZOData/featureactions/%s/">%s</a>' % (obj.resultid.resultid.featureactionid.featureactionid,obj.resultid.resultid.featureactionid)
     feature_action_link.short_description = 'feature action'
