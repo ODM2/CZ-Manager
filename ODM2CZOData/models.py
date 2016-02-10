@@ -340,8 +340,8 @@ class Citationexternalidentifiers(models.Model):
     bridgeid = models.AutoField(primary_key=True)
     citationid = models.ForeignKey('Citations', db_column='citationid')
     externalidentifiersystemid = models.ForeignKey('Externalidentifiersystems', db_column='externalidentifiersystemid')
-    citationexternalidentifer = models.CharField(max_length=255)
-    citationexternalidentiferuri = models.CharField(max_length=255, blank=True)
+    citationexternalidentifier = models.CharField(max_length=255)
+    citationexternalidentifieruri = models.CharField(max_length=255, blank=True)
 
     class Meta:
         managed = False
@@ -1370,9 +1370,9 @@ class Organizations(models.Model):
 
 class People(models.Model):
     personid = models.AutoField(primary_key=True)
-    personfirstname = models.CharField(max_length=255)
-    personmiddlename = models.CharField(max_length=255, blank=True)
-    personlastname = models.CharField(max_length=255)
+    personfirstname = models.CharField(max_length=255, verbose_name="first name")
+    personmiddlename = models.CharField(max_length=255, verbose_name="middle name",blank=True)
+    personlastname = models.CharField(max_length=255, verbose_name="last name")
     def __unicode__(self):
         s = u"%s " % (self.personlastname)
         if self.personfirstname:
