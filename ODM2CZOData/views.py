@@ -45,6 +45,22 @@ from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
 register = template.Library()
 
 
+#
+# class FeatureactionsAutocomplete(autocomplete.Select2QuerySetView):
+#     def get_queryset(self):
+#         # Don't forget to filter out results depending on the visitor !
+#         if not self.request.is_authenticated():
+#             return Featureactions.objects.none()
+#
+#         qs = Featureactions.objects.all()
+#
+#         if self.q:
+#             names = FeatureactionsNames.objects.filter(name__icontains=self.q)
+#             qs = Featureactions.objects.filter(featureactionid=names.values("featureactionid"))
+#             #qs = qs.filter(__istartswith=self.q)
+#
+#         return self.q
+
 
 def AddSensor(request):
     if request.user.is_authenticated():
@@ -136,7 +152,7 @@ def get_name_of_sampling_feature(selected_result):
      return name_of_sampling_feature
 
 def get_name_of_variable(selected_result):
-     title_variables = Variables.objects.filter(variableid=selected_result.values('variable'))
+     title_variables = Variables.objects.filter(variableid=selected_result.values('variableid'))
      s = str(title_variables.values_list('variablecode',flat=True))
      name_of_variable= s.split('\'')[1]
      return name_of_variable
@@ -436,7 +452,7 @@ def graph_data(request):
     #select the feature actions for all of the related features.
     feature_actions = Featureactions.objects.filter(samplingfeatureid__in = sampling_features)
     featureresults = Results.objects.filter(featureactionid__in=feature_actions)
-    variableList = Variables.objects.filter(variableid__in =featureresults.values("variable"))
+    variableList = Variables.objects.filter(variableid__in =featureresults.values("variableid"))
 
     #find the profile results series for the selected variable
     numvariables = variableList.__len__()
@@ -460,9 +476,9 @@ def graph_data(request):
     selectedMResultsSeries = None
     for variable in selectedMVariableSeries:
         if not selectedMResultsSeries:
-            selectedMResultsSeries = featureresults.filter(variable_id=variable)
+            selectedMResultsSeries = featureresults.filter(variableid=variable)
         else: #concatenante the sets of results for each variable
-            selectedMResultsSeries = selectedMResultsSeries | featureresults.filter(variable_id=variable)
+            selectedMResultsSeries = selectedMResultsSeries | featureresults.filter(variableid=variable)
             #if 'SelectedFeatureAction' in request.POST:
                 #raise ValidationError(selectedMResultsSeries)
     selected_results = []

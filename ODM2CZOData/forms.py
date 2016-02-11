@@ -65,6 +65,9 @@ from templatesAndSettings.settings import MEDIA_URL
 from .models import Profileresults
 import cStringIO as StringIO
 from ajax_select import make_ajax_field
+from ajax_select.fields import autoselect_fields_check_can_add
+from ajax_select.admin import AjaxSelectAdmin
+from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
 from .models import Measurementresults
 from .models import Measurementresultvalues
 from .models import Profileresultvalues
@@ -207,8 +210,8 @@ duplicate_results_event.short_description = "Duplicate selected result"
 #         return featureaction
 
 class ResultsAdminForm(ModelForm):
-    featureactionid = make_ajax_field(Featureactions,'featureactionid','featureaction_lookup',max_length=500)
-
+    #featureactionid = make_ajax_field(Featureactions,'featureactionid','featureaction_lookup',max_length=500)
+    featureactionid = AutoCompleteSelectField('featureaction_lookup', required=True, help_text='')
     def clean_featureactionid(self):
           featureactioniduni= self.data['featureactionid']
           featureactionid = None
@@ -221,18 +224,28 @@ class ResultsAdminForm(ModelForm):
     class Meta:
         model= Results
         fields = '__all__'
+    #make_ajax_field doesn't work with the add + green plus on the field
+
         #widgets = {
         #     'featureactionid': autocomplete.ModelSelect2(url='featueactions-autocomplete')
         # }
-class ResultsAdmin(admin.ModelAdmin):
+#The user can click, a popup window lets them create a new object, they click save, the popup closes and the AjaxSelect field is set.
+#Your Admin must inherit from AjaxSelectAdmin
+#http://django-ajax-selects.readthedocs.org/en/latest/Admin-add-popup.html
+class ResultsAdmin(AjaxSelectAdmin): # admin.ModelAdmin
     form=ResultsAdminForm
-
     list_display = ['resultid','featureactionid','variableid','processing_level']
     search_fields= ['variableid__variable_name__name','variableid__variablecode','variableid__variabledefinition',
                     'featureactionid__samplingfeatureid__samplingfeaturename',
                     'result_type__name','processing_level__definition']
     actions = [duplicate_results_event]
     save_as = True
+
+    #def get_form(self, request, obj=None, **kwargs):
+      #form = super(ResultsAdmin, self).get_form(request, obj, **kwargs)
+      #autoselect_fields_check_can_add(form, self.model, request.user)
+      #raise ValidationError(form)
+      #return form
     # def save_model(self, request, obj, form, change):
     #     featureactionidstr = request.featureactionid
     #     featureactionid = None
@@ -243,6 +256,7 @@ class ResultsAdmin(admin.ModelAdmin):
     #     raise ValidationError(featureactionid)
     #     obj.featureactionid = featureactionid
     #     obj.save()
+
 class RelatedactionsAdminForm(ModelForm):
     #actionid= ActionsModelChoiceField(Actions.objects.all().order_by('begindatetime'))
     #relationshiptypecv= TermModelChoiceField(CvRelationshiptype.objects.all().order_by('term'))

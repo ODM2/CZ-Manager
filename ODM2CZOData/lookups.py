@@ -145,7 +145,7 @@ class FeatureactionsLookup(LookupChannel):
 
     def get_objects(self, ids):
         obj = Featureactions.objects.filter(featureactionid__in=ids)
-        return
+        return obj
 
 class CvVariableNameLookup(LookupChannel):
     model = CvVariablename
