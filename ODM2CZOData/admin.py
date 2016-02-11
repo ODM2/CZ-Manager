@@ -65,6 +65,10 @@ from .models import Dataquality
 from .forms import DataqualityAdmin
 from .models import Resultsdataquality
 from .forms import ResultsdataqualityAdmin
+from .models import Extensionproperties
+from .forms import ExtensionpropertiesAdmin
+from .models import Citationextensionpropertyvalues
+from .forms import CitationextensionpropertyvaluesAdmin
 
 admin.site.register(Dataquality, DataqualityAdmin)
 admin.site.register(Resultsdataquality,ResultsdataqualityAdmin)
@@ -73,6 +77,8 @@ admin.site.register(Datasetcitations, DatasetcitationsAdmin)
 admin.site.register(Citations, CitationsAdmin)
 admin.site.register(Authorlists, AuthorlistsAdmin)
 admin.site.register(Methodcitations, MethodcitationsAdmin)
+admin.site.register(Extensionproperties, ExtensionpropertiesAdmin)
+admin.site.register(Citationextensionpropertyvalues, CitationextensionpropertyvaluesAdmin)
 
 admin.site.register(Profileresults, ProfileresultsAdmin)
 admin.site.register(Profileresultvalues, ProfileresultsvaluesAdmin)
