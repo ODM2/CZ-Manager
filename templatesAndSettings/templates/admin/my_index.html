@@ -610,6 +610,48 @@
         {% endif %}
         {% endfor %}
 
+        {% assign varnotfound True %}
+        {% for model in app.models %}
+            {% if model.admin_url and model.name == 'Citation extension properties' and varnotfound %}
+
+                <tr class="model-{{ model.object_name|lower }}">
+                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+                {% assign varnotfound False %}
+            {% if model.add_url %}
+                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+            {% if model.admin_url %}
+                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+            </tr>
+        {% endif %}
+        {% endfor %}
+
+
+        {% assign varnotfound True %}
+        {% for model in app.models %}
+            {% if model.admin_url and model.name == 'Extension properties' and varnotfound %}
+
+                <tr class="model-{{ model.object_name|lower }}">
+                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+                {% assign varnotfound False %}
+            {% if model.add_url %}
+                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+            {% if model.admin_url %}
+                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
+            {% else %}
+                <td>&nbsp;</td>
+            {% endif %}
+            </tr>
+        {% endif %}
+        {% endfor %}
 
         {% assign varnotfound True %}
         {% for model in app.models %}

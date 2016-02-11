@@ -50,6 +50,8 @@ from .models import Methods
 from .models import Units
 from .models import Datasetcitations
 from .models import Citations
+from .models import Citationextensionpropertyvalues
+from .models import Extensionproperties
 from .models import Authorlists
 from .models import Methodcitations
 from .models import MeasurementresultvalueFile
@@ -143,6 +145,26 @@ class CitationsAdmin(admin.ModelAdmin):
     list_display=('title','publisher','publicationyear', 'citationlink')
     form=CitationsAdminForm
 
+class CitationextensionpropertyvaluesAdminForm(ModelForm):
+    propertyvalue = forms.CharField(max_length=255, widget=forms.Textarea )
+    class Meta:
+        model=Citationextensionpropertyvalues
+        fields = '__all__'
+
+class CitationextensionpropertyvaluesAdmin(admin.ModelAdmin):
+    list_display=('citationid','propertyid','propertyvalue')
+    form=CitationextensionpropertyvaluesAdminForm
+
+
+class ExtensionpropertiesAdminForm(ModelForm):
+    propertydescription = forms.CharField(max_length=255, widget=forms.Textarea, label="Property description")
+    class Meta:
+        model= Extensionproperties
+        fields = '__all__'
+class ExtensionpropertiesAdmin(admin.ModelAdmin):
+    list_display=('propertyname','propertydescription','propertydatatypecv', 'propertyunitsid')
+    form=ExtensionpropertiesAdminForm
+
 
 class VariablesAdminForm(ModelForm):
     #variabletypecv= TermModelChoiceField(CvVariabletype.objects.all().order_by('term'))
@@ -211,7 +233,7 @@ duplicate_results_event.short_description = "Duplicate selected result"
 
 class ResultsAdminForm(ModelForm):
     #featureactionid = make_ajax_field(Featureactions,'featureactionid','featureaction_lookup',max_length=500)
-    featureactionid = AutoCompleteSelectField('featureaction_lookup', required=True, help_text='')
+    featureactionid = AutoCompleteSelectField('featureaction_lookup', required=True, help_text='',label='Sampling feature action')
     def clean_featureactionid(self):
           featureactioniduni= self.data['featureactionid']
           featureactionid = None
@@ -464,8 +486,8 @@ class MeasurementResultFilter(SimpleListFilter):
 
 #for soil sampling profiles with depths
 class ProfileresultsAdminForm(ModelForm):
-    resultid = make_ajax_field(Results,'resultid','result_lookup')
-
+    #resultid = make_ajax_field(Results,'resultid','result_lookup')
+    resultid =AutoCompleteSelectField('result_lookup', required=True, help_text='result to extend as a soil profile result',label='Result')
     #this processes the user input into the form.
     def clean_resultid(self):
       resultiduni= self.data['resultid']
@@ -480,7 +502,7 @@ class ProfileresultsAdminForm(ModelForm):
     class Meta:
         model =Profileresults
         fields='__all__'
-class ProfileresultsAdmin(admin.ModelAdmin):
+class ProfileresultsAdmin(AjaxSelectAdmin):
 
     form = ProfileresultsAdminForm
     list_display = ['intendedzspacing','intendedzspacingunitsid','aggregationstatisticcv','resultid',]
@@ -504,7 +526,8 @@ class ProfileresultvaluesResource(resources.ModelResource):
 
 
 class ProfileresultsvaluesAdminForm(ModelForm):
-    resultid = make_ajax_field(Profileresults,'resultid','profileresult_lookup')
+    #resultid = make_ajax_field(Profileresults,'resultid','profileresult_lookup')
+    resultid =AutoCompleteSelectField('profileresult_lookup', required=True, help_text='',label='Profile Result')
     def clean_resultid(self):
       resultiduni= self.data['resultid']
       resultid = None
@@ -517,7 +540,7 @@ class ProfileresultsvaluesAdminForm(ModelForm):
     class Meta:
         model= Profileresultvalues
         fields = '__all__'
-class ProfileresultsvaluesAdmin(ImportExportActionModelAdmin):
+class ProfileresultsvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin):
     form=ProfileresultsvaluesAdminForm
     resource_class = ProfileresultvaluesResource
     list_display = ['datavalue','zlocation','zlocationunitsid','zaggregationinterval','valuedatetime','resultid',] #'resultid','featureactionid_link','resultid__featureactionid__name', 'resultid__variable__name'
@@ -529,7 +552,8 @@ class ProfileresultsvaluesAdmin(ImportExportActionModelAdmin):
 
 
 class MeasurementresultsAdminForm(ModelForm):
-    resultid = make_ajax_field(Results,'resultid','result_lookup')
+    #resultid = make_ajax_field(Results,'resultid','result_lookup')
+    resultid =AutoCompleteSelectField('result_lookup', required=True, help_text='',label='Result')
      #this processes the user input into the form.
     def clean_resultid(self):
       resultiduni= self.data['resultid']
@@ -544,7 +568,7 @@ class MeasurementresultsAdminForm(ModelForm):
     class Meta:
         model= Measurementresults
         fields = '__all__'
-class MeasurementresultsAdmin(admin.ModelAdmin):
+class MeasurementresultsAdmin(AjaxSelectAdmin):
     form=MeasurementresultsAdminForm
     list_display = ('resultid','censorcodecv','data_link')
     list_display_links = ('resultid','data_link')
@@ -582,8 +606,8 @@ class MeasurementresultvaluesResource(resources.ModelResource):
         'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',)
 
 class MeasurementresultvaluesAdminForm(ModelForm):
-    resultid = make_ajax_field(Measurementresults,'resultid','measurementresult_lookup') #
-
+    #resultid = make_ajax_field(Measurementresults,'resultid','measurementresult_lookup') #
+    resultid =AutoCompleteSelectField('measurementresult_lookup', required=True, help_text='',label='Result')
     def clean_resultid(self):
       resultiduni= self.data['resultid']
       resultid = None
@@ -597,7 +621,7 @@ class MeasurementresultvaluesAdminForm(ModelForm):
     class Meta:
         model= Measurementresultvalues
         fields = '__all__'
-class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin):
+class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin):
     form=MeasurementresultvaluesAdminForm
     #MeasurementresultvaluesResource is for exporting values to different file types.
     #resource_class uses django-import-export

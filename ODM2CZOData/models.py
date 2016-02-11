@@ -330,10 +330,14 @@ class Citationextensionpropertyvalues(models.Model):
     citationid = models.ForeignKey('Citations', db_column='citationid')
     propertyid = models.ForeignKey('Extensionproperties', db_column='propertyid')
     propertyvalue = models.CharField(max_length=255)
-
+    def __unicode__(self):
+        s = u"%s - %s - %s" % (self.citationid, self.propertyid, self.propertyvalue)
+        return s
     class Meta:
         managed = False
         db_table = 'citationextensionpropertyvalues'
+        verbose_name='citation extension property'
+        verbose_name_plural='citation extension properties'
 
 
 class Citationexternalidentifiers(models.Model):
@@ -547,7 +551,10 @@ class CvPropertydatatype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __unicode__(self):
+        s = u"%s" % (self.term)
+        s += u"- %s," % (self.name)
+        return s
     class Meta:
         managed = False
         db_table = 'cv_propertydatatype'
@@ -1075,14 +1082,17 @@ class Equipmentused(models.Model):
 
 class Extensionproperties(models.Model):
     propertyid = models.AutoField(primary_key=True)
-    propertyname = models.CharField(max_length=255)
-    propertydescription = models.CharField(max_length=500, blank=True)
-    propertydatatypecv = models.ForeignKey(CvPropertydatatype, db_column='propertydatatypecv')
-    propertyunitsid = models.ForeignKey('Units', related_name='+',  db_column='propertyunitsid', blank=True, null=True)
-
+    propertyname = models.CharField(max_length=255, verbose_name="property name")
+    propertydescription = models.CharField(max_length=500, blank=True, verbose_name="property description")
+    propertydatatypecv = models.ForeignKey(CvPropertydatatype, db_column='propertydatatypecv', verbose_name="property data type")
+    propertyunitsid = models.ForeignKey('Units',  db_column='propertyunitsid', blank=True, null=True, verbose_name="units for property")
+    def __unicode__(self):
+        return u"%s - %s - %s - %s" % (self.propertyname,self.propertydescription, self.propertydatatypecv, self.propertyunitsid)
     class Meta:
         managed = False
         db_table = 'extensionproperties'
+        verbose_name='extension property'
+        verbose_name_plural='extension properties'
 
 
 class Externalidentifiersystems(models.Model):
@@ -1123,7 +1133,7 @@ class Featureactions(models.Model):
         managed = False
         db_table = 'featureactions'
         verbose_name='action at sampling feature'
-        verbose_name_plural='action at sampling feature action'
+        verbose_name_plural='action at sampling feature'
 
 #this class just stores the unicode representation of a featureaction for faster lookup
 class FeatureactionsNames(models.Model):
@@ -2286,7 +2296,6 @@ class Variableexternalidentifiers(models.Model):
 
 
 class Variables(models.Model):
-    #form = VariablesForm
     variableid = models.AutoField(primary_key=True)
     variable_type = models.ForeignKey(CvVariabletype,
         help_text="view variable types here http://vocabulary.odm2.org/variabletype/ ", db_column='variabletypecv')
