@@ -128,6 +128,31 @@ def process_datalogger_file(f,fileid, databeginson,columnheaderson):
         raise ValidationError('encountered a problem with row '+row)
 
 
+def buildCitation(s, self):
+    datasetresults = Datasetsresults.objects.filter(resultid=self.resultid.resultid)
+    dsCitations = Datasetcitations.objects.filter(datasetid__in= datasetresults.values("datasetid"))
+    citations = Citations.objects.filter(citationid__in=dsCitations.values("citationid"))
+
+    authcount=0
+    for citation in citations:
+        citedauthors = Authorlists.objects.filter(citationid=citation.citationid)
+        citedpersons = People.objects.filter(personid__in=citedauthors.values("personid"))
+        for author in citedpersons:
+            if authcount ==0:
+                s += ',\" {0}'.format(author.personlastname)
+            else:
+                s += ' {0}'.format(author.personlastname)
+
+            authcount +=1
+            if authcount == citedpersons.count():
+                s += ' {0}.'.format(author.personfirstname)
+            else:
+                s += ' {0},'.format(author.personfirstname)
+        s += ' {0}'.format(citation.title)
+        s += '. {0}'.format(citation.publisher)
+        s += ', {0}.\"'.format(citation.publicationyear)
+        #s += ' DOI {0}\"'.format(citation.citationlink) #doesn't work not sure why
+    return s
 
 class Actionannotations(models.Model):
     bridgeid = models.AutoField(primary_key=True)
@@ -1234,28 +1259,8 @@ class Measurementresultvalues(models.Model):
         s += ',\" {0}\"'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)
         s += ', {0}'.format(self.resultid.timeaggregationinterval)
         s += ', {0}'.format(self.resultid.timeaggregationintervalunitsid)
-        datasetresults = Datasetsresults.objects.filter(resultid=self.resultid.resultid)
-        dsCitations = Datasetcitations.objects.filter(datasetid__in= datasetresults.values("datasetid"))
-        citations = Citations.objects.filter(citationid__in=dsCitations.values("citationid"))
+        s = buildCitation(s,self)
 
-        authcount=0
-        for citation in citations:
-            citedauthors = Authorlists.objects.filter(citationid=citation.citationid)
-            citedpersons = People.objects.filter(personid__in=citedauthors.values("personid"))
-            for author in citedpersons:
-                if authcount ==0:
-                    s += ',\" {0}'.format(author.personfirstname)
-                else:
-                    s += ' {0}'.format(author.personfirstname)
-
-                authcount +=1
-                if authcount == citedpersons.count():
-                    s += ' {0}.'.format(author.personlastname)
-                else:
-                    s += ' {0},'.format(author.personlastname)
-            s += ' {0}'.format(citation.title)
-            s += '. {0}'.format(citation.publisher)
-            s += ', {0}.'.format(citation.publicationyear)
             #s += ' {0}\"'.format(citation.citationlink)
         return s
     class Meta:
@@ -1569,30 +1574,8 @@ class Profileresultvalues(models.Model):
         s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variable_name)
         s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
         s += ',\" {0}\"'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)
+        s = buildCitation(s,self)
 
-        datasetresults = Datasetsresults.objects.filter(resultid=self.resultid.resultid)
-        dsCitations = Datasetcitations.objects.filter(datasetid__in= datasetresults.values("datasetid"))
-        citations = Citations.objects.filter(citationid__in=dsCitations.values("citationid"))
-        authcount=0
-        for citation in citations:
-            citedauthors = Authorlists.objects.filter(citationid=citation.citationid)
-            citedpersons = People.objects.filter(personid__in=citedauthors.values("personid"))
-            for author in citedpersons:
-                if authcount ==0:
-                    s += ',\" {0}'.format(author.personfirstname)
-                else:
-                    s += ' {0}'.format(author.personfirstname)
-
-                authcount +=1
-                if authcount == citedpersons.count():
-                    s += ' {0}.'.format(author.personlastname)
-                else:
-                    s += ' {0},'.format(author.personlastname)
-            s += ' {0}'.format(citation.title)
-            s += '. {0}'.format(citation.publisher)
-            s += ', {0}.'.format(citation.publicationyear)
-            #s += ' DOI {0}\"'.format(citation.citationlink) #doesn't work not sure why
-            #raise ValidationError(s)
         return s
     class Meta:
         managed = False
