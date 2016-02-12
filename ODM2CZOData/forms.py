@@ -183,7 +183,7 @@ class VariablesAdminForm(ModelForm):
 class VariablesAdmin(admin.ModelAdmin):
     form=VariablesAdminForm
     list_display =('variable_type','variable_name','variablecode','speciation')
-    search_fields = ['variableid_type__name','variableid_name__name','variablecode','speciation__name']
+    search_fields = ['variable_type__name','variable_name__name','variablecode','speciation__name']
 
 
 class TaxonomicclassifiersAdminForm(ModelForm):
