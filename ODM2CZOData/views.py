@@ -124,24 +124,6 @@ def ManageCitations(request):
 #           'has_change_permission': True,
 #           'DataloggerfilecolumnsList' : DataloggerfilecolumnsListvalues,}
 # #
-# # #DataloggerfilecolumnsDisplay.html
-#      return render_to_response('admin/odm2testapp/dataloggerfiles/change_form.html', data, context_instance=RequestContext(request)) # DataloggerfilecolumnsDisplay.html
-
-    # def get_context_data(self, **kwargs):
-    #     context = super(dataloggercolumnView, self).get_context_data(**kwargs)
-    #
-    #     data = {'test': 'test',
-    #     'opts': Dataloggerfiles._meta,
-    #     'change': True,
-    #     'is_popup': False,
-    #     'save_as': False,
-    #     'has_delete_permission': False,
-    #     'has_add_permission': False,
-    #     'has_change_permission': False}
-    #     context['data'] = data
-    #     context['DataloggerfilecolumnsList'] = Dataloggerfilecolumns.objects.all()
-    #     return context
-#register.inclusion_tag('DataloggerfilecolumnsDisplay.html')(dataloggercolumnView)
 
 def get_name_of_sampling_feature(selected_result):
 
@@ -180,10 +162,10 @@ def relatedFeaturesFilter(request,done,selected_relatedfeatid,selected_resultid,
                 selected_resultid= resultList[0].resultid
         else:
             selected_relatedfeatid= request.POST['SelectedRelatedFeature']
-            resultList = Results.objects.filter(result_type=resultType)[:25] # remove slice just for testing
+            resultList = Results.objects.filter(result_type=resultType) # remove slice just for testing [:25]
     else:
         selected_relatedfeatid='All'
-        resultList = Results.objects.filter(result_type=resultType)[:25]# remove slice just for testing
+        resultList = Results.objects.filter(result_type=resultType)# remove slice just for testing
     return selected_relatedfeatid, done, resultList,selected_resultid
 
 
@@ -388,7 +370,7 @@ def temp_pivot_chart_view(request):
         for myresults in myresultSeries:
             for result in myresults:
                 myfile.write(result.csvoutput())
-            myfile.write('\n')
+                myfile.write('\n')
         response = HttpResponse(myfile.getvalue(),content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
     if csvexport:
@@ -400,25 +382,7 @@ def temp_pivot_chart_view(request):
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'graphType':graphType, 'xAxis': xAxis, 'yAxis': yAxis,'name_of_units':name_of_units,
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,},)
 #
-# #maybe don't need this
-# def relatedFeaturesFilterForVariables(request,done,selected_relatedfeatid,selected_variableid,resultType='Temporal observation'):
-#     #selected_relatedfeatid = 18
-#     if 'SelectedRelatedFeature' in request.POST:
-#         if not request.POST['SelectedRelatedFeature'] == 'All':
-#             done=True
-#             selected_relatedfeatid= int(request.POST['SelectedRelatedFeature'])
-#             relatedFeatureList = Relatedfeatures.objects.filter(relatedfeatureid=int(selected_relatedfeatid)).distinct('relatedfeatureid')
-#             relatedFeatureListLong = Relatedfeatures.objects.filter(relatedfeatureid=int(selected_relatedfeatid))#.select_related('samplingfeatureid','relationshiptypecv','relatedfeatureid')
-#             samplingfeatids= relatedFeatureListLong.values_list('samplingfeatureid', flat=True)
-#             variableList = Variables.objects.filter(featureactionid__in=Featureactions.objects.filter(sampling_feature__in=samplingfeatids))#.select_related('variable','feature_action')
-#             if 'update_result_on_related_feature' in request.POST:
-#                 #raise ValidationError(relatedFeatureList)
-#                 selected_relatedfeatid= relatedFeatureList[0].relatedfeatureid.samplingfeatureid
-#         else:
-#             selected_relatedfeatid= request.POST['SelectedRelatedFeature']
-#     else:
-#         selected_relatedfeatid='All'
-#     return selected_relatedfeatid, done, variableList
+
 
 def graph_data(request):
     #if not request.user.is_authenticated():
@@ -610,31 +574,6 @@ def graph_data(request):
     results = Results.objects.filter(resultid__in=withProfileResults)
     featureAction = Featureactions.objects.filter(featureactionid__in=results.values("featureactionid"))
     relatedFeatureList = Relatedfeatures.objects.filter(samplingfeatureid__in=featureAction).order_by('relatedfeatureid').distinct('relatedfeatureid')
-    #raise ValidationError(list(featureAction.values("samplingfeatureid")))
-    #raise ValidationError(list(results.values("resultid")))
-    #
-    # withProfileResults = Profileresults.objects.all()
-    # resultswithProfile = Results.objects.filter(resultid__in=withProfileResults)
-    # #featureaction has featureactionid, samplingfeatureid, actionid
-    # featureAction = Featureactions.objects.filter(featureactionid__in=resultswithProfile)
-    # relatedFeatureList = Relatedfeatures.objects.filter(samplingfeatureid__in=featureAction.values('samplingfeatureid')).order_by('relatedfeatureid').distinct('relatedfeatureid')
-    # relatedFeatureList = Relatedfeatures.objects.all()
-    # results = Results.objects.filter(samplingfeatureid__in=relatedFeatureList.values('samplingfeatureid'))
-    # withProfileResults = Profileresults.objects.filter(resultid__in=results)
-
-    #relatedFeatureList = Relatedfeatures.objects.filter().order_by('relatedfeatureid').distinct('relatedfeatureid')
-    #raise ValidationError(list(featureAction))
-    #relatedFeatureList = None
-    #for profileResult in withProfileResults:
-    #     result = Results.objects.filter(resultid=profileResult.resultid.resultid)
-    #     featureAction = Featureactions.objects.filter(featureactionid=result[0].featureactionid.featureactionid)
-    #     if relatedFeatureList:
-    #         relatedFeatureList = relatedFeatureList | Relatedfeatures.objects.get(samplingfeatureid=
-    #                         featureAction.values("samplingfeatureid"))
-
-    #     else:
-    #         relatedFeatureList = Relatedfeatures.objects.get(samplingfeatureid=
-    #                         featureAction.values("samplingfeatureid"))
 
     int_selectedvariable_ids = []
     for int_selectedvariableid in selectedMVariableSeries:
