@@ -86,6 +86,15 @@ import re
 
 #the following define what fields should be overridden so that dropdown lists can be populated with useful information
 
+def link_list_display_DOI(link):
+    match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])\S)+", link)
+    if not match:
+        match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])[[:graph:]])+", link)
+    if match:
+        return u'<a href="http://dx.doi.org/%s">%s</a>'% (link, link)
+    else:
+        return u'<a href="%s/">%s</a>'% (link, link)
+
 
 class ResultsdataqualityAdminForm(ModelForm):
     class Meta:
@@ -147,13 +156,7 @@ class CitationsAdmin(admin.ModelAdmin):
     list_display=('title','publisher','publicationyear', 'citation_link')
     form=CitationsAdminForm
     def citation_link(self,obj):
-        match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])\S)+", obj.citationlink)
-        if not match:
-            match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])[[:graph:]])+", obj.citationlink)
-        if match:
-            return u'<a href="http://dx.doi.org/%s">%s</a>'% (obj.citationlink, obj.citationlink)
-        else:
-            return u'<a href="%s/">%s</a>'% (obj.citationlink, obj.citationlink)
+       return link_list_display_DOI(obj.citationlink)
     citation_link.short_description = 'link to citation'
     citation_link.allow_tags = True
 
@@ -395,13 +398,7 @@ class MethodsAdmin(admin.ModelAdmin):
     form=MethodsAdminForm
     #DOI matching reg expresion came from http://stackoverflow.com/questions/27910/finding-a-doi-in-a-document-or-page
     def method_link(self,obj):
-        match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])\S)+", obj.methodlink)
-        if not match:
-            match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])[[:graph:]])+", obj.methodlink)
-        if match:
-            return u'<a href="http://dx.doi.org/%s">%s</a>'% (obj.methodlink, obj.methodlink)
-        else:
-            return u'<a href="%s/">%s</a>'% (obj.methodlink, obj.methodlink)
+        return link_list_display_DOI(obj.methodlink)
     method_link.short_description = 'link to method documentation'
     method_link.allow_tags = True
 
