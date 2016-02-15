@@ -61,6 +61,7 @@ from .models import Equipmentmodels
 from .models import Datasetsresults
 from .models import Dataquality
 from .models import Resultsdataquality
+
 from templatesAndSettings.settings import STATIC_URL
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
 from templatesAndSettings.settings import MEDIA_URL
@@ -77,6 +78,7 @@ from .models import Profileresultvalues
 from daterange_filter.filter import DateRangeFilter
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
+import re
 #from .admin import MeasurementresultvaluesResource
 # AffiliationsChoiceField(People.objects.all().order_by('personlastname'),Organizations.objects.all().order_by('organizationname'))
 
@@ -142,8 +144,18 @@ class CitationsAdminForm(ModelForm):
         model= Citations
         fields = '__all__'
 class CitationsAdmin(admin.ModelAdmin):
-    list_display=('title','publisher','publicationyear', 'citationlink')
+    list_display=('title','publisher','publicationyear', 'citation_link')
     form=CitationsAdminForm
+    def citation_link(self,obj):
+        match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])\S)+", obj.citationlink)
+        if not match:
+            match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])[[:graph:]])+", obj.citationlink)
+        if match:
+            return u'<a href="http://dx.doi.org/%s">%s</a>'% (obj.citationlink, obj.citationlink)
+        else:
+            return u'<a href="%s/">%s</a>'% (obj.citationlink, obj.citationlink)
+    citation_link.short_description = 'link to citation'
+    citation_link.allow_tags = True
 
 class CitationextensionpropertyvaluesAdminForm(ModelForm):
     propertyvalue = forms.CharField(max_length=255, widget=forms.Textarea )
@@ -381,12 +393,18 @@ class MethodsAdmin(admin.ModelAdmin):
     list_display=('methodname','methodtypecv','method_link')
     list_display_links = ['methodname','method_link']
     form=MethodsAdminForm
+    #DOI matching reg expresion came from http://stackoverflow.com/questions/27910/finding-a-doi-in-a-document-or-page
     def method_link(self,obj):
-        return u'<a href="%s/">%s</a>'% (obj.methodlink, obj.methodlink)
+        match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])\S)+", obj.methodlink)
+        if not match:
+            match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])[[:graph:]])+", obj.methodlink)
+        if match:
+            return u'<a href="http://dx.doi.org/%s">%s</a>'% (obj.methodlink, obj.methodlink)
+        else:
+            return u'<a href="%s/">%s</a>'% (obj.methodlink, obj.methodlink)
     method_link.short_description = 'link to method documentation'
     method_link.allow_tags = True
 
-#
 def duplicate_Dataloggerfiles_event(ModelAdmin, request, queryset):
      for dataloggerfile in queryset:
          fileid = dataloggerfile.dataloggerfileid
