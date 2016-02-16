@@ -506,6 +506,7 @@ def graph_data(request):
 
         resultValues= Profileresultvalues.objects.all().filter(~Q(datavalue=-6999))\
         .filter(~Q(datavalue=-888.88)).filter(resultid=selectedMResult)
+
         if not resultValuesSeries:
             resultValuesSeries = resultValues
         else:
@@ -523,7 +524,7 @@ def graph_data(request):
                 data['datavalue' + unitAndVariable].append([tmpLocName,resultValue.datavalue]) #tmpUnit +' - '+tmpVariableName +' - '+
             #data['datavalue' + unitAndVariable].append( resultValue.datavalue) #get_name_of_variable(selected_result) + " " + get_name_of_sampling_feature(selected_result) ,
             #data2.append(resultValue.datavalue)
-
+    #raise ValidationError(data)
     #build strings for graph labels
     i = 0
     seriesStr = ''
@@ -534,6 +535,7 @@ def graph_data(request):
     lastUnitAndVariable = ''
     tmpLocName= ''
     #xAxisCategories = []
+    numberofLocations =len(name_of_sampling_features)
     for name_of_unit,name_of_sampling_feature,name_of_variable in zip(name_of_units,name_of_sampling_features,name_of_variables) :
         i+=1
         if i==1 and not name_of_unit == '':
@@ -549,8 +551,9 @@ def graph_data(request):
             tmpLocName = name_of_sampling_feature
         lastUnitAndVariable = unitAndVariable
         unitAndVariable = tmpVariableName + " " + tmpUnit
+        #raise ValidationError(data['datavalue'+unitAndVariable])
         #xAxisCategories.append(tmpUnit + ' ' + tmpVariableName +' - '+ tmpLocName)
-        if lastUnitAndVariable != unitAndVariable:
+        if lastUnitAndVariable != unitAndVariable or i==numberofLocations:
             series.append({"name":tmpUnit +' - '+tmpVariableName,"yAxis": tmpUnit, "data": data['datavalue'+unitAndVariable]}) #removewd from name +' - '+ tmpLocName
         #series.append(data['datavalue'+str(i)])
 
