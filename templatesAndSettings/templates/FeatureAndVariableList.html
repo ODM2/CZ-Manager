@@ -35,10 +35,10 @@ option {
 	</td></tr></table>
 	<table >
                 {% assign prefixpath '/admin/odm2testapp/' %}
-				<tr ><th scope="col" class="section">Variables</td>
-				<th scope="col"  class="sortable column-resultid">Variable Type</th>
-				<th scope="col"  class="sortable column-resultid">Name</th>
-				<th scope="col"  class="sortable column-resultid">Code</th></tr>
+				<tr ><th scope="col" class="section">Variable Code</td>
+				<th scope="col"  class="section">Variable Name</th>
+				<th scope="col"  class="section">Variable Type</th></tr>
+				
 				{% for Variable in variableList %}
 					<tr class="row1">
 							<td ><input type="checkbox" class="action-checkbox-column" id="s1" 
@@ -47,11 +47,10 @@ option {
 									checked  
 								{% endif %}
 							{% endfor %}
-							name="selection{{ forloop.counter0 }}" value="{{ Variable.variableid }}">{{ Variable.variable_name }} </input><br></td>
-								
+							name="selection{{ forloop.counter0 }}" value="{{ Variable.variableid }}">{{ Variable.variablecode }} </input><br></td>
+								<td > {{Variable.variable_name}}</td>
 								<td >{{Variable.variable_type}}</td>
-								<td >{{Variable.variable_name}}</td>
-								<td > {{Variable.variablecode}}</td>
+								
 								</tr>
 				
                 {% endfor %}
