@@ -9,7 +9,7 @@
 # Also note: You'll have to insert the output of 'django-admin.py sqlcustom [app_label]'
 # into your database.
 from __future__ import unicode_literals
-from uuidfield import UUIDField
+
 from django.db import models
 from templatesAndSettings.settings import MEDIA_ROOT
 from django.db import transaction
@@ -22,7 +22,7 @@ import time
 #from django.contrib.gis.db import models
 import csv
 import io
-
+from uuidfield import UUIDField
 import re
 
 from django.core.exceptions import ValidationError
@@ -1250,6 +1250,17 @@ class Measurementresultvalues(models.Model):
         s += u"- %s" % (self.datavalue)
         s += u"- %s" % (self.valuedatetime)
         return s
+    def csvheader(self):
+        s='databaseid,'
+        s+='Value,'
+        s += 'Date and Time,'
+        s += 'Variable Name,'
+        s += 'Unit Name,'
+        s += 'sampling feature/location,'
+        s += 'time aggregation interval,'
+        s += 'time aggregation unit,'
+        s +='citation'
+        return s
     def csvoutput(self):
         s = str(self.valueid)
         s += ', {0}'.format(self.datavalue)
@@ -1563,6 +1574,17 @@ class Profileresultvalues(models.Model):
         s += u", %s" % (self.zlocation)
         #s += u", %s" % (self.zaggregationinterval)
         s += u", %s" % (self.zlocationunitsid)
+        return s
+    def csvheader(self):
+        s='databaseid,'
+        s+='Value,'
+        s += 'Date and Time,'
+        s += 'depth,'
+        s += 'depth units,'
+        s += 'Variable Name,'
+        s += 'Unit Name,'
+        s += 'sampling feature/location,'
+        s +='citation'
         return s
     def csvoutput(self):
         s = str(self.valueid)

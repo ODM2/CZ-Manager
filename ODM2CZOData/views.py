@@ -365,12 +365,16 @@ def temp_pivot_chart_view(request):
     #if the user hit the export csv button export the measurement results to csv
     if request.REQUEST.get('export_data'):
         csvexport=True
-
+        k=0
         myfile = StringIO.StringIO()
         for myresults in myresultSeries:
             for result in myresults:
+                if k==0:
+                    myfile.write(result.csvheader())
+                    myfile.write('\n')
                 myfile.write(result.csvoutput())
                 myfile.write('\n')
+                k+=1
         response = HttpResponse(myfile.getvalue(),content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
     if csvexport:
@@ -382,7 +386,7 @@ def temp_pivot_chart_view(request):
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'graphType':graphType, 'xAxis': xAxis, 'yAxis': yAxis,'name_of_units':name_of_units,
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,},)
 #
-
+import operator
 
 def graph_data(request):
     #if not request.user.is_authenticated():
@@ -562,7 +566,7 @@ def graph_data(request):
         i+=1
         if i ==1:
             titleStr += name_of_variable  #+ ', ' +name_of_sampling_feature
-        else:
+        elif name_of_variable!='':
             titleStr += ' - '  +name_of_variable #+name_of_sampling_feature+ ', '
     #series = series.append({})
     chartID = 'chart_id'
@@ -576,8 +580,8 @@ def graph_data(request):
     withProfileResults = Profileresults.objects.all()
     results = Results.objects.filter(resultid__in=withProfileResults)
     featureAction = Featureactions.objects.filter(featureactionid__in=results.values("featureactionid"))
-    relatedFeatureList = Relatedfeatures.objects.filter(samplingfeatureid__in=featureAction).order_by('relatedfeatureid').distinct('relatedfeatureid')
-
+    relatedFeatureList = Relatedfeatures.objects.filter(samplingfeatureid__in=featureAction).order_by('relatedfeatureid').distinct('relatedfeatureid') #
+    #relatedFeatureList = sorted(relatedFeatureList, key=operator.attrgetter('relatedfeatureid__samplingfeaturecode')) #relatedFeatureList.order_by('relatedfeatureid__samplingfeaturecode')
     int_selectedvariable_ids = []
     for int_selectedvariableid in selectedMVariableSeries:
         int_selectedvariable_ids.append(int(int_selectedvariableid))
@@ -588,10 +592,15 @@ def graph_data(request):
 
         myfile = StringIO.StringIO()
         #raise ValidationError(resultValues)
+        k=0
         for myresults in resultValuesSeries:
         #for myresults in profileresult:
+            if k==0:
+                myfile.write(myresults.csvheader())
+                myfile.write('\n')
             myfile.write(myresults.csvoutput())
             myfile.write('\n')
+            k+=1
         response = HttpResponse(myfile.getvalue(),content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
     if csvexport:
