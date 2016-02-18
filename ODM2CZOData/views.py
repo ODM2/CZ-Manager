@@ -42,6 +42,7 @@ from django.template import RequestContext
 from .forms import DataloggerfilesAdmin
 from .forms import DataloggerfilesAdminForm
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
+import re
 register = template.Library()
 
 
@@ -386,7 +387,15 @@ def temp_pivot_chart_view(request):
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'graphType':graphType, 'xAxis': xAxis, 'yAxis': yAxis,'name_of_units':name_of_units,
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,},)
 #
-import operator
+#From http://stackoverflow.com/questions/8200342/removing-duplicate-strings-from-a-list-in-python
+def removeDupsFromListOfStrings(listOfStrings):
+    seen = set()
+    result = []
+    for item in listOfStrings:
+        if item not in seen:
+            seen.add(item)
+            result.append(item)
+    return result
 
 def graph_data(request):
     #if not request.user.is_authenticated():
@@ -419,7 +428,7 @@ def graph_data(request):
     sampling_features = Relatedfeatures.objects.filter(relatedfeatureid=selected_relatedfeatid)
     #select the feature actions for all of the related features.
     feature_actions = Featureactions.objects.filter(samplingfeatureid__in = sampling_features)
-    featureresults = Results.objects.filter(featureactionid__in=feature_actions)
+    featureresults = Results.objects.filter(featureactionid__in=feature_actions).order_by("variableid","unitsid")#
     variableList = Variables.objects.filter(variableid__in =featureresults.values("variableid"))
 
     #find the profile results series for the selected variable
@@ -447,18 +456,11 @@ def graph_data(request):
             selectedMResultsSeries = featureresults.filter(variableid=variable)
         else: #concatenante the sets of results for each variable
             selectedMResultsSeries = selectedMResultsSeries | featureresults.filter(variableid=variable)
-            #if 'SelectedFeatureAction' in request.POST:
-                #raise ValidationError(selectedMResultsSeries)
     selected_results = []
     name_of_sampling_features = []
     name_of_variables = []
     name_of_units = []
     unitAndVariable = ''
-    myresultSeries = []
-    tmpUnit = ''
-    tmpVariableName = ''
-    lastUnitAndVariable = ''
-    tmpLocName= ''
     i = 0
     data = {}
     data2= []
@@ -476,35 +478,18 @@ def graph_data(request):
         tmpname = get_name_of_sampling_feature(selected_result)
         tmpLocName = tmpname
 
-
-
         tmpname = get_name_of_variable(selected_result)
         unitAndVariable = tmpname
-        tmpVariableName = tmpname
         if name_of_variables.__len__() >0:
-            namefound=False
-            for name in name_of_variables:
-                if name == tmpname:
-                    namefound=True
-            if not namefound:
-                 name_of_variables.append(tmpname)
-            else:
-                 name_of_variables.append('')
+            name_of_variables.append(tmpname)
         else:
               name_of_variables.append(tmpname)
-
         tmpname = get_name_of_units(selected_result)
-        tmpUnit = tmpname
+        #if(selectedMResult.resultid==2072):
+            #raise ValidationError(tmpname)
         unitAndVariable = unitAndVariable + " " + tmpname
         if name_of_units.__len__() >0:
-            namefound=False
-            for name in name_of_units:
-                if name == tmpname:
-                    namefound=True
-            if not namefound:
-                name_of_units.append(tmpname)
-            else:
-                name_of_units.append('')
+            name_of_units.append(tmpname)
         else:
              name_of_units.append(tmpname)
 
@@ -536,39 +521,47 @@ def graph_data(request):
     titleStr = ''
     tmpUnit = ''
     tmpVariableName = ''
-    lastUnitAndVariable = ''
-    tmpLocName= ''
-    #xAxisCategories = []
+    update = False
     numberofLocations =len(name_of_sampling_features)
-    for name_of_unit,name_of_sampling_feature,name_of_variable in zip(name_of_units,name_of_sampling_features,name_of_variables) :
+
+    for name_of_unit,name_of_variable in zip(name_of_units,name_of_variables) :
+        #raise ValidationError("length of unit names"+ str(len(name_of_units)) +
+        #"length of name of variables"+ str(len(name_of_variables))) #get fewer sampling feature names
         i+=1
+        lastUnit = tmpUnit
+        lastVariableName = tmpVariableName
+        tmpVariableName = name_of_variable
+        tmpUnit = name_of_unit
+
+        if not name_of_variable ==lastVariableName or not name_of_unit==lastUnit:
+            update = True
+        else:
+            update = False
+
         if i==1 and not name_of_unit == '':
             seriesStr +=name_of_unit
-        elif not name_of_unit == '':
-                tmpUnit = name_of_unit
-                seriesStr+=' - '+name_of_unit
-        if not name_of_variable=='':
-            tmpVariableName = name_of_variable
-        if not name_of_unit == '':
-            tmpUnit = name_of_unit
-        if not name_of_sampling_feature =='':
-            tmpLocName = name_of_sampling_feature
+        elif name_of_unit !=lastUnit and update:
+                #tmpUnit = name_of_unit
+            seriesStr+=' - '+name_of_unit
         lastUnitAndVariable = unitAndVariable
         unitAndVariable = tmpVariableName + " " + tmpUnit
         #raise ValidationError(data['datavalue'+unitAndVariable])
-        #xAxisCategories.append(tmpUnit + ' ' + tmpVariableName +' - '+ tmpLocName)
-        if lastUnitAndVariable != unitAndVariable or (i==numberofLocations and len(series)==0):
+        #raise ValidationError(name_of_unit)
+        if lastUnitAndVariable != unitAndVariable and update:
             series.append({"name":tmpUnit +' - '+tmpVariableName,"yAxis": tmpUnit, "data": data['datavalue'+unitAndVariable]}) #removewd from name +' - '+ tmpLocName
+            if titleStr =='':
+                titleStr = tmpVariableName
+            else:
+                titleStr += ' - '+ tmpVariableName
+        elif i==numberofLocations and len(series)==0:
+             #raise ValidationError(name_of_unit)
+             series.append({"name":tmpUnit +' - '+tmpVariableName,"yAxis": tmpUnit, "data": data['datavalue'+unitAndVariable]})
+             if titleStr =='':
+                titleStr = tmpVariableName
+             #titleStr += tmpVariableName
         #series.append(data['datavalue'+str(i)])
 
     i=0
-    for name_of_sampling_feature,name_of_variable in zip(name_of_sampling_features,name_of_variables) :
-        i+=1
-        if i ==1:
-            titleStr += name_of_variable  #+ ', ' +name_of_sampling_feature
-        elif name_of_variable!='':
-            titleStr += ' - '  +name_of_variable #+name_of_sampling_feature+ ', '
-    #series = series.append({})
     chartID = 'chart_id'
     chart = {"renderTo": chartID, "type": 'column',  "zoomType": 'xy',}
     title2 = {"text": titleStr}
@@ -606,17 +599,10 @@ def graph_data(request):
     if csvexport:
         return response
     else:
+        #this removes duplicates from a list of strings
+        name_of_units = removeDupsFromListOfStrings(name_of_units)
         #raise ValidationError(relatedFeatureList)
         return TemplateResponse(request,'chartVariableAndFeature.html',{'prefixpath': CUSTOM_TEMPLATE_PATH,  'variableList': variableList,
              'SelectedVariables':int_selectedvariable_ids,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'graphType':graphType, 'yAxis': yAxis,'name_of_units':name_of_units,
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid,},)
-
-
-#
-# def ManageCitations(request):
-#     if request.user.is_authenticated():
-#         context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
-#         return TemplateResponse(request, 'ManageCitations.html', context)
-#     else:
-#         return HttpResponseRedirect('../')
