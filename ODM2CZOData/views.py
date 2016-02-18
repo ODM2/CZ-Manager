@@ -467,6 +467,14 @@ def graph_data(request):
     resultValuesSeries = None
     #if 'update_result_on_related_feature' in request.POST:
             #raise ValidationError(selectedMResultsSeries)
+    #selectedMResultsSeries.order_by("resultid__")
+
+    profileresults = Profileresults.objects.filter(resultid__in=selectedMResultsSeries).order_by("resultid__variableid",
+            "resultid__unitsid","intendedzspacing","resultid__featureactionid__samplingfeatureid__samplingfeaturecode")
+    sortedResults = list()
+    for result in profileresults:
+        sortedResults.append(selectedMResultsSeries.get(resultid=result.resultid.resultid))
+    selectedMResultsSeries = sortedResults
     for selectedMResult in selectedMResultsSeries:
         i +=1
         selected_result = Results.objects.filter(resultid=selectedMResult.resultid)
@@ -494,7 +502,7 @@ def graph_data(request):
              name_of_units.append(tmpname)
 
         resultValues= Profileresultvalues.objects.all().filter(~Q(datavalue=-6999))\
-        .filter(~Q(datavalue=-888.88)).filter(resultid=selectedMResult)
+        .filter(~Q(datavalue=-888.88)).filter(resultid=selectedMResult)#.order_by("-zlocation")
 
         if not resultValuesSeries:
             resultValuesSeries = resultValues
@@ -503,6 +511,7 @@ def graph_data(request):
         #if 'update_result_on_related_feature' in request.POST:
             #raise ValidationError(resultValues)
         for resultValue in resultValues:
+            #raise ValidationError(resultValues)
             seriesName = 'datavalue' + unitAndVariable
             tmpLocName = tmpLocName + " Depth " + str(resultValue.zlocation) + " " + str(resultValue.zlocationunitsid.unitsabbreviation)
             name_of_sampling_features.append(tmpLocName)
