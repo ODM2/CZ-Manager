@@ -557,7 +557,7 @@ def graph_data(request):
         unitAndVariable = tmpVariableName + " " + tmpUnit
         #raise ValidationError(data['datavalue'+unitAndVariable])
         #xAxisCategories.append(tmpUnit + ' ' + tmpVariableName +' - '+ tmpLocName)
-        if lastUnitAndVariable != unitAndVariable or i==numberofLocations:
+        if lastUnitAndVariable != unitAndVariable or (i==numberofLocations and len(series)==0):
             series.append({"name":tmpUnit +' - '+tmpVariableName,"yAxis": tmpUnit, "data": data['datavalue'+unitAndVariable]}) #removewd from name +' - '+ tmpLocName
         #series.append(data['datavalue'+str(i)])
 
