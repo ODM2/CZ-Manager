@@ -134,6 +134,9 @@ def buildCitation(s, self):
     citations = Citations.objects.filter(citationid__in=dsCitations.values("citationid"))
 
     authcount=0
+    if citations.count()==0:
+        s +=','
+        return  s
     for citation in citations:
         citedauthors = Authorlists.objects.filter(citationid=citation.citationid)
         citedpersons = People.objects.filter(personid__in=citedauthors.values("personid"))
@@ -1259,17 +1262,18 @@ class Measurementresultvalues(models.Model):
         s += 'sampling feature/location,'
         s += 'time aggregation interval,'
         s += 'time aggregation unit,'
-        s +='citation'
+        s +='citation,'
+
         return s
     def csvoutput(self):
         s = str(self.valueid)
         s += ', {0}'.format(self.datavalue)
         s += ', {0}'.format(self.valuedatetime)
-        s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variable_name)
+        s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
         s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
         s += ',\" {0}\"'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)
         s += ', {0}'.format(self.resultid.timeaggregationinterval)
-        s += ', {0}'.format(self.resultid.timeaggregationintervalunitsid)
+        s += ', {0},'.format(self.resultid.timeaggregationintervalunitsid)
         s = buildCitation(s,self)
 
             #s += ' {0}\"'.format(citation.citationlink)
@@ -1577,27 +1581,44 @@ class Profileresultvalues(models.Model):
         return s
     def csvheader(self):
         s='databaseid,'
-        s+='Value,'
-        s += 'Date and Time,'
+        #s+='Value,'
+        #s += 'Date and Time,'
         s += 'depth,'
-        s += 'depth units,'
-        s += 'Variable Name,'
-        s += 'Unit Name,'
+        #s += '\" {0}{1}\",'.format(self.resultid.resultid.variableid.variablecode,self.resultid.resultid.unitsid.unitsname)
         s += 'sampling feature/location,'
-        s +='citation'
+        s += 'method,'
+        s +='citation,'
+        #s = buildCitation(s,self)
+        return s
+
+    def cite(self):
+        s = buildCitation('',self)
+        return s
+    def csvheaderShort(self):
+        #s='databaseid,'
+        s = '\" {0} -unit-{1}\",'.format(self.resultid.resultid.variableid.variablecode,self.resultid.resultid.unitsid.unitsname)
+        #s += 'Date and Time,'
+        #s += 'Variable Name,'
+        #s += 'Unit Name,'
         return s
     def csvoutput(self):
-        s = str(self.valueid)
-        s += ', {0}'.format(self.datavalue)
-        s += ', {0}'.format(self.valuedatetime)
-        s += ', {0}'.format(self.zlocation)
+        s = '{0}'.format(self.resultid.resultid.resultid) #.samplingfeatureid.samplingfeatureid
+        #s += ', {0}'.format(self.datavalue)
+        s += ', {0}-{1} {2} '.format((self.zlocation -self.zaggregationinterval),self.zlocation,self.zlocationunitsid)
         #s += ', {0}'.format(self.zaggregationinterval)
-        s += ', {0}'.format(self.zlocationunitsid)
-        s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variable_name)
-        s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
+        #s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
+        #s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
         s += ',\" {0}\"'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)
+        s += ',\" {0}\"'.format(self.resultid.resultid.featureactionid.action.method.methoddescription)
         s = buildCitation(s,self)
-
+        s += ','
+        return s
+    def csvoutputShort(self):
+        #s = '{0}'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeatureid)
+        s = '{0}'.format(self.datavalue)
+        #s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
+        #s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
+        s += ','
         return s
     class Meta:
         managed = False

@@ -469,6 +469,8 @@ def graph_data(request):
             #raise ValidationError(selectedMResultsSeries)
     #selectedMResultsSeries.order_by("resultid__")
 
+    #these 5 lines sort the results by there z-spacing low to high, then by alphabelitcally by there sampling
+    #feature code, luckily Ridge, Slope, Valley are in alphabetical order.
     profileresults = Profileresults.objects.filter(resultid__in=selectedMResultsSeries).order_by("resultid__variableid",
             "resultid__unitsid","intendedzspacing","resultid__featureactionid__samplingfeatureid__samplingfeaturecode")
     sortedResults = list()
@@ -595,13 +597,48 @@ def graph_data(request):
         myfile = StringIO.StringIO()
         #raise ValidationError(resultValues)
         k=0
+        lastVariable=''
+        variable = ''
+        lastUnit = ''
+        unit = ''
+        firstheader = True
         for myresults in resultValuesSeries:
-        #for myresults in profileresult:
-            if k==0:
-                myfile.write(myresults.csvheader())
+            lastVariable = variable
+            variable=myresults.resultid.resultid.variableid.variable_name
+            lastUnit = unit
+            unit = myresults.resultid.resultid.unitsid
+            #lastResult = myresults
+            if not lastVariable == variable or not lastUnit==unit:
+                if firstheader:
+                    myfile.write(myresults.csvheader())
+                    firstheader = False
+                # else:
+                myfile.write(myresults.csvheaderShort())
+
+        #myfile.write(lastResult.csvheaderShort())
+        myfile.write('\n')
+        lastSamplingFeatureCode=''
+        samplingFeatureCode = ''
+        lastDepth=0
+        depth = 0
+        nextRow = False
+        #resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode
+        resultValuesSeries = resultValuesSeries.order_by("resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
+                "resultid__intendedzspacing","resultid__resultid__variableid","resultid__resultid__unitsid")
+        for myresults in resultValuesSeries:
+            lastSamplingFeatureCode = samplingFeatureCode
+            samplingFeatureCode=myresults.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturecode
+            lastDepth = depth
+            depth = myresults.resultid.intendedzspacing
+
+            if not k==0 and (not lastSamplingFeatureCode == samplingFeatureCode or not depth==lastDepth):
                 myfile.write('\n')
-            myfile.write(myresults.csvoutput())
-            myfile.write('\n')
+                myfile.write(myresults.csvoutput())
+            elif k==0:
+                myfile.write(myresults.csvoutput())
+            #else:
+            myfile.write(myresults.csvoutputShort())
+
             k+=1
         response = HttpResponse(myfile.getvalue(),content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
