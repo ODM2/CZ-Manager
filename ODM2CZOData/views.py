@@ -515,7 +515,7 @@ def graph_data(request):
         for resultValue in resultValues:
             #raise ValidationError(resultValues)
             seriesName = 'datavalue' + unitAndVariable
-            tmpLocName = tmpLocName + " Depth " + str(resultValue.zlocation) + " " + str(resultValue.zlocationunitsid.unitsabbreviation)
+            tmpLocName = tmpLocName + " Depth " + str(resultValue.zlocation -resultValue.zaggregationinterval) + str(resultValue.zlocation) + " " + str(resultValue.zlocationunitsid.unitsabbreviation)
             name_of_sampling_features.append(tmpLocName)
             if seriesName in data:
                 data['datavalue' + unitAndVariable].append([ tmpLocName,resultValue.datavalue]) #tmpUnit +' - '+tmpVariableName +' - '+
@@ -602,17 +602,24 @@ def graph_data(request):
         lastUnit = ''
         unit = ''
         firstheader = True
+        firstVar = None
+        firstUnit = None
+        resultValuesSeries = resultValuesSeries.order_by("resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
+                "resultid__intendedzspacing","resultid__resultid__variableid","resultid__resultid__unitsid")
         for myresults in resultValuesSeries:
             lastVariable = variable
             variable=myresults.resultid.resultid.variableid.variable_name
             lastUnit = unit
             unit = myresults.resultid.resultid.unitsid
-            #lastResult = myresults
+            if not firstheader and firstVar==variable and firstUnit==unit:
+                #only add the first instance of each variable once one repeats your done.
+                break
             if not lastVariable == variable or not lastUnit==unit:
                 if firstheader:
                     myfile.write(myresults.csvheader())
+                    firstVar=variable
+                    firstUnit=unit
                     firstheader = False
-                # else:
                 myfile.write(myresults.csvheaderShort())
 
         #myfile.write(lastResult.csvheaderShort())
@@ -623,8 +630,6 @@ def graph_data(request):
         depth = 0
         nextRow = False
         #resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode
-        resultValuesSeries = resultValuesSeries.order_by("resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
-                "resultid__intendedzspacing","resultid__resultid__variableid","resultid__resultid__unitsid")
         for myresults in resultValuesSeries:
             lastSamplingFeatureCode = samplingFeatureCode
             samplingFeatureCode=myresults.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturecode
