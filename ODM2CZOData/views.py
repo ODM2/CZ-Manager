@@ -515,7 +515,7 @@ def graph_data(request):
         for resultValue in resultValues:
             #raise ValidationError(resultValues)
             seriesName = 'datavalue' + unitAndVariable
-            tmpLocName = tmpLocName + " Depth " + str(resultValue.zlocation -resultValue.zaggregationinterval) + str(resultValue.zlocation) + " " + str(resultValue.zlocationunitsid.unitsabbreviation)
+            tmpLocName = tmpLocName + " Depth " + str(resultValue.zlocation -resultValue.zaggregationinterval) +"-" + str(resultValue.zlocation) + " " + str(resultValue.zlocationunitsid.unitsabbreviation)
             name_of_sampling_features.append(tmpLocName)
             if seriesName in data:
                 data['datavalue' + unitAndVariable].append([ tmpLocName,resultValue.datavalue]) #tmpUnit +' - '+tmpVariableName +' - '+
