@@ -1,0 +1,185 @@
+<!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/
+
+
+
+
+-->
+
+{% extends "admin/base_site.html" %}
+{% load admin_extras %}
+{% load static %}
+{% load i18n admin_static admin_shortcuts_tags %}
+
+{# django-admin-shortcuts changes these blocks #}
+
+{% block breadcrumbs %}
+	<div class="admin_shortcuts">
+		{% admin_shortcuts %}
+	</div>
+{% endblock %}
+
+ {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
+{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+
+
+{% block extrahead %}
+{{ block.super }}<title>
+	{% block title %}{% endblock %}
+  </title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    
+	 <script src="https://code.highcharts.com/4.1.10/highcharts.js"></script>
+	 
+	 <script>
+    var chart_id = 'chartid'
+    var chart = {{ chart|safe }}
+    var title2 = {{ title2|safe }}
+    var yAxis = {{ yAxis|safe }}
+	var xAxis = {{ xAxis|safe }}
+	var xdata = {{ xdata|safe }}
+	var ydata = {{ ydata|safe }}
+	var xdepth = {{ xdepth|safe }}
+	var ydepth = {{ ydepth|safe }}
+	//var desired = stringToReplace.replace(/[^\w\s]/gi, '')
+    var xlocation = {{ xlocation|safe }}
+	var ylocation = {{ ylocation|safe }}
+    var series = {{ series|safe }}
+	//window.alert(typeof series)
+	//series = series.replace(/'/g, '');
+	//chart.series[0] = new Array();
+	//chart.series = new Object()
+	xyArray = new String();
+	len = xdata.length;
+	xprefix = '[';
+	yprefix=',';
+	end=']';
+	var i=0;
+	
+	for(i; i<len;i++){
+		xyArray=xyArray+'{name:\''+xlocation[i]+'\',x:'+xdata[i]+ ',y:'+ydata[i]+'}';
+	}
+	
+
+var series = generateData(xdata, xlocation, ydata)
+
+function generateData(cats, names, points) { //x, names, y
+    var ret = {},
+        ps = [],
+        series = [],
+        len = cats.length;
+
+    //concat to get points
+    for (var i = 0; i < len; i++) {
+		if(xdepth[i]==10){
+		color="green";
+		}else{
+		color="blue";
+		}
+        ps[i] = {
+            x: parseFloat(cats[i]),
+            y: parseFloat(points[i]),
+			//z: parseFloat(xdepth[i]),
+            name: names[i],
+			marker:{ fillColor: color}
+        };
+    }
+    names = [];
+	// marker:{ fillColor: 'red'}
+    //generate series and split points
+    for (i = 0; i < len; i++) {
+        var p = ps[i],
+            sIndex = $.inArray(p.n, names);
+
+        if (sIndex < 0) {
+            sIndex = names.push(p.n) - 1; //should be name instead of n but this is not working as intended at the moment. 
+            series.push({
+                name: p.n,
+                data: [],
+            });
+        }
+        series[sIndex].data.push(p);
+    }
+    return series;
+}
+	
+	var graphType =   '{{graphType|safe }}'
+
+$(document).ready(function() {
+	
+	var chart =$('#chartid').highcharts({
+		chart: {renderTo: chart_id, type: graphType,  zoomType: 'xy',},
+        title: title2,
+		series: series,
+        yAxis:yAxis,
+		xAxis:xAxis,
+		//series: [{
+        //    data: xyArray,
+		//	name: title2,
+        // }],
+		scatter: {
+              marker: {
+                   radius: 5,
+                   states: {
+                       hover: {
+                           enabled: true,
+                           lineColor: 'rgb(100,100,100)'
+                       }
+                   }
+               }},
+       
+		tooltip: {
+    formatter: function() {
+        return ''+ this.point.name +' <br> x: ' + this.x + ', y: ' + this.y; //' max depth: '+ this.z +
+    }
+},
+    });
+	
+	//var i=0;
+//for (i; i<len;i++) {
+		//if(i==1){
+		//alert(xdata[i],ydata[i]);
+		//}
+		//chart.series[0].addPoint([xdata[i],ydata[i]],true); //.data = new Array(xdata, ydata);
+	//}
+	
+	//alert(chart.series[0].data);
+	});
+	
+	//var chart = $('#chartid').highcharts();
+	//alert(name_of_units.length);
+	
+	//alert(len);
+	
+</script>
+{% admin_shortcuts_js %}{% endblock %}
+
+{# end changes #}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+
+
+
+{% block content %}
+
+
+
+    <div id='content-main'> {% csrf_token %}
+	 </div>
+	<div id='chartid' class="chart" style="height:75%; width:100%"></div>
+	
+	
+{% include 'xyVariableList.html' %}
+
+{% endblock %}
+
+
+{% block overwrite %}
+<!-- Overwrite the base.html jQuery load and put in head for Highcharts to work -->
+{% endblock %}
+{% block extrajs %}
+<!-- Maps the Python template context variables from views.py to the Highchart js variables -->
+
+{% endblock %}

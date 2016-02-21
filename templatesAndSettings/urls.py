@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
     url(r'^' + URL_PATH +'', include(admin.site.urls)),
     (r'^' + URL_PATH +'lookups/', include(ajax_select_urls)),
+    #(r'^ajax_select/', include('ajax_select.urls')),
      url(r'^' + URL_PATH +'AddSensor.html', views.AddSensor, name="AddSensor"),
     url(r'^' + URL_PATH +'chartIndex.html', views.chartIndex, name="chartIndex"),
     url(r'^' + URL_PATH +'AddProfile.html', views.AddProfile, name="AddProfile"),
@@ -23,6 +24,7 @@ urlpatterns = patterns('',
    url(r'^' + URL_PATH +'ManageCitations.html', views.ManageCitations, name="ManageCitations"),
     url(r'^' + URL_PATH +'chart.html', views.temp_pivot_chart_view, name="temp_pivot_chart_view"),
     url(r'^' + URL_PATH +'chartVariableAndFeature.html', views.graph_data, name="graph_data"),
+     url(r'^' + URL_PATH +'soilsscatterplot.html', views.scatter_plot, name="scatter_plot"),
 
     #for uploaded files like dataloggerfiles
     #url(r'^' + MEDIA_URL +'(?P<path>.*)$', 'django.views.static.serve', {
