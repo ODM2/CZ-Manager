@@ -38,6 +38,7 @@
 	var xAxis = {{ xAxis|safe }}
 	var xdata = {{ xdata|safe }}
 	var ydata = {{ ydata|safe }}
+	var data = {{ data|safe }}
 	var xdepth = {{ xdepth|safe }}
 	var ydepth = {{ ydepth|safe }}
 	//var desired = stringToReplace.replace(/[^\w\s]/gi, '')
@@ -60,8 +61,8 @@
 	}
 	
 
-var series = generateData(xdata, xlocation, ydata)
-
+//var series = generateData(xdata, xlocation, ydata)
+var series =generateData(xdata, xlocation, ydata)
 function generateData(cats, names, points) { //x, names, y
     var ret = {},
         ps = [],

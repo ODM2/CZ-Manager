@@ -409,6 +409,8 @@ def scatter_plot(request):
         yVariableSelection = request.POST['yVariableSelection']
         xVar = Variables.objects.filter(variableid=xVariableSelection).get()
         yVar = Variables.objects.filter(variableid=yVariableSelection).get()
+        xVariableSelection= Variables.objects.filter(variableid=xVariableSelection).get()
+        yVariableSelection = Variables.objects.filter(variableid=yVariableSelection).get()
         title = str(xVar.variablecode) + " " +str(yVar.variablecode)
     prv = Profileresults.objects.all()
     pr = Results.objects.filter(resultid__in=prv)
@@ -420,10 +422,10 @@ def scatter_plot(request):
     rvy=None
     prvx=None
     prvy=None
-    xdata= None
-    ydata=None
-    xdepth=None
-    ydepth=None
+    xdata= []
+    ydata=[]
+    xdepth=[]
+    ydepth=[]
     if xVar and yVar:
         rvx=pr.filter(variableid=xVar)
         prvx=Profileresultvalues.objects.filter(~Q(datavalue=-6999))\
@@ -434,32 +436,29 @@ def scatter_plot(request):
 
         xr =  Results.objects.filter(resultid__in=prvx.values("resultid"))
         xfa = Featureactions.objects.filter(featureactionid__in=xr.values("featureactionid"))
-        xloc=Samplingfeatures.objects.filter(samplingfeatureid__in=xfa.values("samplingfeatureid"))
-        xloc = xloc.values_list("samplingfeaturename",flat=True)
+        xlocs=Samplingfeatures.objects.filter(samplingfeatureid__in=xfa.values("samplingfeatureid"))
+        xloc = xlocs.values_list("samplingfeaturename",flat=True)
         #xlocation = re.sub('[^A-Za-z0-9]+', '', xlocation)
         yr =  Results.objects.filter(resultid__in=prvy.values("resultid"))
         yfa = Featureactions.objects.filter(featureactionid__in=yr.values("featureactionid"))
-        yloc=Samplingfeatures.objects.filter(samplingfeatureid__in=yfa.values("samplingfeatureid"))
-        yloc = yloc.values_list("samplingfeaturename",flat=True)
-        for loc in yloc:
-            ylocation.append(str(loc))
-        for loc in xloc:
-            xlocation.append(str(loc))
-       # ylocation = re.sub('[^A-Za-z0-9]+', '', ylocation)
-            #data[str(xlocation)] =['x:', valuex.datavalue,'y:',valuey.datavalue]
-        #ylocation=json.dumps(ylocation)
-        #xlocation=json.dumps(xlocation)
-    #raise ValidationError(rvx)
+        ylocs=Samplingfeatures.objects.filter(samplingfeatureid__in=yfa.values("samplingfeatureid"))
+        yloc = ylocs.values_list("samplingfeaturename",flat=True)
     if prvx and prvy:
-        xdata=prvx.values_list("datavalue",flat=True)
-        ydata=prvy.values_list("datavalue",flat=True)
-        xdepth=prvx.values_list("zlocation",flat=True)
-        ydepth=prvy.values_list("zlocation",flat=True)
-        names =xlocation
-        for x,y,loc in zip(xdata,ydata,names):
-            data[loc] =[x,y]
-            ##data[loc] =['name:',loc,'x:',x,'y:',y]
-        #raise ValidationError(list(xlocation))
+        for loc in xlocs:
+            fax= xfa.filter(samplingfeatureid=loc)
+            rx=xr.filter(featureactionid=fax)
+            fax= yfa.filter(samplingfeatureid=loc)
+            yx=yr.filter(featureactionid=fax)
+            xs=prvx.filter(resultid=rx)
+            ys=prvy.filter(resultid=yx)
+            #raise ValidationError(xs,ys)
+            for x,y in zip(xs,ys):
+
+                xdata.append(x.datavalue)
+                ydata.append(y.datavalue)
+                xdepth.append(x.zlocation)
+                ydepth.append(y.zlocation)
+                xlocation.append(str(loc.samplingfeaturename))
     data =json.dumps(data)
     series = []
     series.append({"name":title, "data": data})
@@ -478,7 +477,7 @@ def scatter_plot(request):
         'xVariables':variables, 'yVariables':variables,'xdepth':xdepth,'ydepth':ydepth,
         'xVariableSelection':xVariableSelection,'yVariableSelection':yVariableSelection,'Series':series,
         'chartID': chartID, 'chart': chart, 'series': series,'title2': title2, 'graphType':graphType,
-        'yAxis': yAxis, 'xAxis': xAxis,'xdata':xdata,'ydata':ydata,'ylocation':ylocation,'xlocation':xlocation,},)
+        'yAxis': yAxis, 'xAxis': xAxis,'xdata':xdata,'ydata':ydata,'data':data,'ylocation':ylocation,'xlocation':xlocation,},)
 def exportspreadsheet(request,resultValuesSeries):
     #if the user hit the export csv button export the measurement results to csv
     csvexport=True
@@ -733,62 +732,9 @@ def graph_data(request):
     csvexport = False
     #if the user hit the export csv button export the measurement results to csv
     if request.REQUEST.get('export_data'):
-        csvexport=True
-
-        myfile = StringIO.StringIO()
-        #raise ValidationError(resultValues)
-        k=0
-        lastVariable=''
-        variable = ''
-        lastUnit = ''
-        unit = ''
-        firstheader = True
-        firstVar = None
-        firstUnit = None
         resultValuesSeries = resultValuesSeries.order_by("resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
                 "resultid__intendedzspacing","resultid__resultid__variableid","resultid__resultid__unitsid")
-        for myresults in resultValuesSeries:
-            lastVariable = variable
-            variable=myresults.resultid.resultid.variableid.variable_name
-            lastUnit = unit
-            unit = myresults.resultid.resultid.unitsid
-            if not firstheader and firstVar==variable and firstUnit==unit:
-                #only add the first instance of each variable once one repeats your done.
-                break
-            if not lastVariable == variable or not lastUnit==unit:
-                if firstheader:
-                    myfile.write(myresults.csvheader())
-                    firstVar=variable
-                    firstUnit=unit
-                    firstheader = False
-                myfile.write(myresults.csvheaderShort())
-
-        #myfile.write(lastResult.csvheaderShort())
-        myfile.write('\n')
-        lastSamplingFeatureCode=''
-        samplingFeatureCode = ''
-        lastDepth=0
-        depth = 0
-        nextRow = False
-        #resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode
-        for myresults in resultValuesSeries:
-            lastSamplingFeatureCode = samplingFeatureCode
-            samplingFeatureCode=myresults.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturecode
-            lastDepth = depth
-            depth = myresults.resultid.intendedzspacing
-
-            if not k==0 and (not lastSamplingFeatureCode == samplingFeatureCode or not depth==lastDepth):
-                myfile.write('\n')
-                myfile.write(myresults.csvoutput())
-            elif k==0:
-                myfile.write(myresults.csvoutput())
-            #else:
-            myfile.write(myresults.csvoutputShort())
-
-            k+=1
-        response = HttpResponse(myfile.getvalue(),content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
-    if csvexport:
+        response=exportspreadsheet(request,resultValuesSeries)
         return response
     else:
         #this removes duplicates from a list of strings

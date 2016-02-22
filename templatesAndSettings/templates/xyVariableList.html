@@ -15,8 +15,7 @@ option {
 }
 </style>
 <br>
-{{ xVariableSelection }}
-<br>
+
      <p>green=0-10cm and blue is all deeper depths</p>
 	<form action="" method="post">
 	{% csrf_token %} 
@@ -24,7 +23,7 @@ option {
 	<tr><td>
 	<select class="form-control" id="s2" name="xVariableSelection">
               {% for variable in xVariables %}
-				{% if variable.variableid == xVariableSelection %}
+				{% if variable.variableid == xVariableSelection.variableid %}
 					<option selected="selected" value="{{ variable.variableid }}">{{ variable }}</option>
 				{% else %}
 					<option  value="{{ variable.variableid }}">{{ variable }}</option>
@@ -34,7 +33,7 @@ option {
 			<td>
 	<select class="form-control" id="s2" name="yVariableSelection">
               {% for variable in yVariables %}
-				{% if variable.variableid == yVariableSelection %}
+				{% if variable.variableid == yVariableSelection.variableid %}
 					<option selected="selected" value="{{ variable.variableid }}">{{ variable }}</option>
 				{% else %}
 					<option  value="{{ variable.variableid }}">{{ variable }}</option>
