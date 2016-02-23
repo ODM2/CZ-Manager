@@ -643,8 +643,7 @@ def graph_data(request):
         else:
              name_of_units.append(tmpname)
 
-        resultValues= Profileresultvalues.objects.all().filter(~Q(datavalue=-6999))\
-        .filter(~Q(datavalue=-888.88)).filter(resultid=selectedMResult)#.order_by("-zlocation")
+        resultValues= Profileresultvalues.objects.all().filter(resultid=selectedMResult)#.order_by("-zlocation")
 
         if not resultValuesSeries:
             resultValuesSeries = resultValues
@@ -658,10 +657,16 @@ def graph_data(request):
             tmpLocName = tmpLocName + " Depth " + str(resultValue.zlocation -resultValue.zaggregationinterval) +"-" + str(resultValue.zlocation) + " " + str(resultValue.zlocationunitsid.unitsabbreviation)
             name_of_sampling_features.append(tmpLocName)
             if seriesName in data:
-                data['datavalue' + unitAndVariable].append([ tmpLocName,resultValue.datavalue]) #tmpUnit +' - '+tmpVariableName +' - '+
+                if resultValue.datavalue!=-6999 and resultValue.datavalue!=-888.88:
+                    data['datavalue' + unitAndVariable].append([ tmpLocName,resultValue.datavalue]) #tmpUnit +' - '+tmpVariableName +' - '+
+                else:
+                    data['datavalue' + unitAndVariable].append([ tmpLocName,None])
             else:
                 data.update({'datavalue' + unitAndVariable: []})
-                data['datavalue' + unitAndVariable].append([tmpLocName,resultValue.datavalue]) #tmpUnit +' - '+tmpVariableName +' - '+
+                if resultValue.datavalue!=-6999 and resultValue.datavalue!=-888.88:
+                    data['datavalue' + unitAndVariable].append([ tmpLocName,resultValue.datavalue]) #tmpUnit +' - '+tmpVariableName +' - '+
+                else:
+                    data['datavalue' + unitAndVariable].append([ tmpLocName,None])
             #data['datavalue' + unitAndVariable].append( resultValue.datavalue) #get_name_of_variable(selected_result) + " " + get_name_of_sampling_feature(selected_result) ,
             #data2.append(resultValue.datavalue)
     #raise ValidationError(data)
