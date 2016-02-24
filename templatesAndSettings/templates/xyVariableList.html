@@ -40,6 +40,29 @@ option {
 				{% endif %}
               {% endfor %}
             </select></td>
+			<td>
+	<select class="form-control" id="s3" name="fieldarea1">
+		<option value="All"><b>All</b></option>
+              {% for fieldarea in fieldareas %}
+				{% if fieldarea.samplingfeatureid == fieldarea1.samplingfeatureid %}
+					<option selected="selected" value="{{ fieldarea.samplingfeatureid }}">{{ fieldarea.samplingfeaturecode }}</option>
+				{% else %}
+					<option  value="{{ fieldarea.samplingfeatureid }}">{{ fieldarea.samplingfeaturecode }}</option>
+				{% endif %}
+              {% endfor %}
+            </select></td>
+			<td>
+	<select class="form-control" id="s3" name="fieldarea2">
+		<option value="All"><b>All</b></option>
+              {% for fieldarea in fieldareas %}
+				{% if fieldarea.samplingfeatureid == fieldarea2.samplingfeatureid %}
+					<option selected="selected" value="{{ fieldarea.samplingfeatureid }}">{{ fieldarea.samplingfeaturecode }}</option>
+				{% else %}
+					<option  value="{{ fieldarea.samplingfeatureid }}">{{ fieldarea.samplingfeaturecode }}</option>
+				{% endif %}
+              {% endfor %}
+            </select></td>
+			
 	<td><input type="submit" name="update_chart" value="Update Chart" />
 	<input type="submit" name="export_data" value="Export Data" />
 	</td></tr></table>

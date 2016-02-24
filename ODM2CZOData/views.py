@@ -399,11 +399,29 @@ def removeDupsFromListOfStrings(listOfStrings):
     return result
 
 def scatter_plot(request):
-    xVariableSelection=None
-    yVariableSelection=None
+    xVariableSelection=yVariableSelection=fieldarea1=fieldarea2=filteredFeatures=fieldareaRF=None
     xVar=None
     yVar=None
     title = None
+    if 'fieldarea1' in request.POST and not 'fieldarea2' in request.POST:
+        if not request.POST['fieldarea1'] == 'All':
+            fieldarea1 = request.POST['fieldarea1']
+            fieldarea1RF=Relatedfeatures.objects.filter(relatedfeatureid=fieldarea1)
+            filteredFeatures = Samplingfeatures.objects.filter(samplingfeatureid__in=fieldarea1RF.values("samplingfeatureid"))
+            fieldarea1= Samplingfeatures.objects.filter(samplingfeatureid=fieldarea1).get()
+    if 'fieldarea1' in request.POST and 'fieldarea2' in request.POST:
+        if not request.POST['fieldarea1'] == 'All' and not request.POST['fieldarea2'] == 'All':
+            fieldarea1 = request.POST['fieldarea1']
+            fieldarea2 = request.POST['fieldarea2']
+            fieldareaRF1=Relatedfeatures.objects.filter(relatedfeatureid=fieldarea1)
+            fieldareaRF2=Relatedfeatures.objects.filter(relatedfeatureid=fieldarea2)
+            #fieldareaRF = fieldarea1RF & fieldarea2RF #only sampling features in 1 and 2
+
+            filteredFeatures = Samplingfeatures.objects.filter(samplingfeatureid__in=fieldareaRF1.values("samplingfeatureid"))\
+                .filter(samplingfeatureid__in=fieldareaRF2.values("samplingfeatureid"))
+            fieldarea1= Samplingfeatures.objects.filter(samplingfeatureid=fieldarea1).get()
+            fieldarea2= Samplingfeatures.objects.filter(samplingfeatureid=fieldarea2).get()
+            title =str(fieldarea1.samplingfeaturecode) + " - " +str(fieldarea2.samplingfeaturecode) + " : "
     if 'xVariableSelection' and 'yVariableSelection' in request.POST:
         xVariableSelection= request.POST['xVariableSelection']
         yVariableSelection = request.POST['yVariableSelection']
@@ -411,21 +429,24 @@ def scatter_plot(request):
         yVar = Variables.objects.filter(variableid=yVariableSelection).get()
         xVariableSelection= Variables.objects.filter(variableid=xVariableSelection).get()
         yVariableSelection = Variables.objects.filter(variableid=yVariableSelection).get()
-        title = str(xVar.variablecode) + " " +str(yVar.variablecode)
+        if title:
+            title =title+ str(xVar.variablecode) + " - " +str(yVar.variablecode)
+        else:
+            title =str(xVar.variablecode) + " - " +str(yVar.variablecode)
     prv = Profileresults.objects.all()
-    pr = Results.objects.filter(resultid__in=prv)
+    #second filter = exclude summary results attached to field areas
+    pr = Results.objects.filter(resultid__in=prv).filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Field area"))
+    #variables is the list to pass to the html template
     variables = Variables.objects.filter(variableid__in=pr.values("variableid"))
+    fieldareas = Samplingfeatures.objects.filter(sampling_feature_type="Field area")
     data = {}
     xlocation=[]
     ylocation=[]
-    rvx=None
-    rvy=None
-    prvx=None
-    prvy=None
-    xdata= []
+    xdata=[]
     ydata=[]
     xdepth=[]
     ydepth=[]
+    rvx=rvy=prvx=prvy=None
     if xVar and yVar:
         rvx=pr.filter(variableid=xVar)
         prvx=Profileresultvalues.objects.filter(~Q(datavalue=-6999))\
@@ -436,12 +457,18 @@ def scatter_plot(request):
 
         xr =  Results.objects.filter(resultid__in=prvx.values("resultid"))
         xfa = Featureactions.objects.filter(featureactionid__in=xr.values("featureactionid"))
-        xlocs=Samplingfeatures.objects.filter(samplingfeatureid__in=xfa.values("samplingfeatureid"))
+        if filteredFeatures:
+            xlocs=Samplingfeatures.objects.filter(samplingfeatureid__in=xfa.values("samplingfeatureid")).filter(samplingfeatureid__in=filteredFeatures)
+        else:
+            xlocs=Samplingfeatures.objects.filter(samplingfeatureid__in=xfa.values("samplingfeatureid"))
         xloc = xlocs.values_list("samplingfeaturename",flat=True)
         #xlocation = re.sub('[^A-Za-z0-9]+', '', xlocation)
         yr =  Results.objects.filter(resultid__in=prvy.values("resultid"))
         yfa = Featureactions.objects.filter(featureactionid__in=yr.values("featureactionid"))
-        ylocs=Samplingfeatures.objects.filter(samplingfeatureid__in=yfa.values("samplingfeatureid"))
+        if filteredFeatures:
+            ylocs=Samplingfeatures.objects.filter(samplingfeatureid__in=yfa.values("samplingfeatureid")).filter(samplingfeatureid__in=filteredFeatures)
+        else:
+            ylocs=Samplingfeatures.objects.filter(samplingfeatureid__in=yfa.values("samplingfeatureid"))
         yloc = ylocs.values_list("samplingfeaturename",flat=True)
     if prvx and prvy:
         for loc in xlocs:
@@ -452,13 +479,15 @@ def scatter_plot(request):
             xs=prvx.filter(resultid=rx)
             ys=prvy.filter(resultid=yx)
             #raise ValidationError(xs,ys)
+            #name includes depth information
             for x,y in zip(xs,ys):
-
                 xdata.append(x.datavalue)
                 ydata.append(y.datavalue)
                 xdepth.append(x.zlocation)
                 ydepth.append(y.zlocation)
-                xlocation.append(str(loc.samplingfeaturename))
+                tmpLoc = str(loc.samplingfeaturename) + " " + str(x.zlocation -x.zaggregationinterval) + \
+                         "-" + str(x.zlocation) + " " + str(x.zlocationunitsid.unitsabbreviation)
+                xlocation.append(tmpLoc)
     data =json.dumps(data)
     series = []
     series.append({"name":title, "data": data})
@@ -475,9 +504,11 @@ def scatter_plot(request):
         return response
     return TemplateResponse(request,'soilsscatterplot.html',{'prefixpath': CUSTOM_TEMPLATE_PATH,
         'xVariables':variables, 'yVariables':variables,'xdepth':xdepth,'ydepth':ydepth,
-        'xVariableSelection':xVariableSelection,'yVariableSelection':yVariableSelection,'Series':series,
+        'xVariableSelection':xVariableSelection,'yVariableSelection':yVariableSelection,
+        'fieldarea1':fieldarea1, 'fieldarea2':fieldarea2, 'fieldareas':fieldareas,
         'chartID': chartID, 'chart': chart, 'series': series,'title2': title2, 'graphType':graphType,
         'yAxis': yAxis, 'xAxis': xAxis,'xdata':xdata,'ydata':ydata,'data':data,'ylocation':ylocation,'xlocation':xlocation,},)
+
 def exportspreadsheet(request,resultValuesSeries):
     #if the user hit the export csv button export the measurement results to csv
     csvexport=True
