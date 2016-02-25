@@ -435,10 +435,10 @@ def scatter_plot(request):
             title =str(xVar.variablecode) + " - " +str(yVar.variablecode)
     prv = Profileresults.objects.all()
     #second filter = exclude summary results attached to field areas
-    pr = Results.objects.filter(resultid__in=prv).filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Field area"))
+    pr = Results.objects.filter(resultid__in=prv).filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification"))
     #variables is the list to pass to the html template
     variables = Variables.objects.filter(variableid__in=pr.values("variableid"))
-    fieldareas = Samplingfeatures.objects.filter(sampling_feature_type="Field area")
+    fieldareas = Samplingfeatures.objects.filter(sampling_feature_type="Landscape classification") #Field area
     data = {}
     xlocation=[]
     ylocation=[]
