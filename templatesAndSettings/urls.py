@@ -25,7 +25,7 @@ urlpatterns = patterns('',
     url(r'^' + URL_PATH +'chart.html', views.temp_pivot_chart_view, name="temp_pivot_chart_view"),
     url(r'^' + URL_PATH +'chartVariableAndFeature.html', views.graph_data, name="graph_data"),
      url(r'^' + URL_PATH +'soilsscatterplot.html', views.scatter_plot, name="scatter_plot"),
-
+    url(r'^' + URL_PATH +'publications.html', views.publications, name="publications"),
     #for uploaded files like dataloggerfiles
     #url(r'^' + MEDIA_URL +'(?P<path>.*)$', 'django.views.static.serve', {
     #        'document_root': MEDIA_ROOT,
