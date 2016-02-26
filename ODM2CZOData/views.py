@@ -78,6 +78,8 @@ def publications(request):
                     citationList =Citations.objects.filter(publisher__icontains=selectedTag)
             else:
                 selectedTag = 'All'
+        else:
+            citationList =Citations.objects.filter(citationid__in=authList.values("citationid"))
         filterTags=['CZO Authors','All','AGU', 'LCZO Meeting']
         return TemplateResponse(request,'publications.html',{ 'citationList': citationList,'authList':authList,
                 'filterTags':filterTags,'selectedTag':selectedTag,'prefixpath': CUSTOM_TEMPLATE_PATH,},)
