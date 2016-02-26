@@ -45,8 +45,8 @@ import json
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
 import re
 register = template.Library()
-
-
+from .models import Citations
+from .models import Authorlists
 #
 # class FeatureactionsAutocomplete(autocomplete.Select2QuerySetView):
 #     def get_queryset(self):
@@ -63,6 +63,26 @@ register = template.Library()
 #
 #         return self.q
 
+def publications(request):
+    if request.user.is_authenticated():
+        context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
+        citationList = Citations.objects.all()
+        authList = Authorlists.objects.all()
+        selectedTag = 'CZO Authors'
+        if 'filterTags' in request.POST:
+            if not request.POST['filterTags'] == 'All':
+                selectedTag = request.POST['filterTags']
+                if request.POST['filterTags'] == 'CZO Authors':
+                    citationList =Citations.objects.filter(citationid__in=authList.values("citationid"))
+                else:
+                    citationList =Citations.objects.filter(publisher__icontains=selectedTag)
+            else:
+                selectedTag = 'All'
+        filterTags=['CZO Authors','All','AGU', 'LCZO Meeting']
+        return TemplateResponse(request,'publications.html',{ 'citationList': citationList,'authList':authList,
+                'filterTags':filterTags,'selectedTag':selectedTag,'prefixpath': CUSTOM_TEMPLATE_PATH,},)
+    else:
+        return HttpResponseRedirect('../')
 
 def AddSensor(request):
     if request.user.is_authenticated():

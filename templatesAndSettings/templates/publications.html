@@ -1,0 +1,74 @@
+
+{% extends "admin/base_site.html" %}
+{% load admin_extras %}
+{% load static %}
+{% load i18n  admin_shortcuts_tags %}
+
+{# django-admin-shortcuts changes these blocks #}
+
+{% block breadcrumbs %}
+	<div class="admin_shortcuts">
+		{% admin_shortcuts %}
+	</div>
+{% endblock %}
+
+ {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
+{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+
+
+{% block extrahead %}
+{{ block.super }}{% admin_shortcuts_js %}{% endblock %}
+
+{# end changes #}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+
+
+
+{% block content %}
+<form action="" method="post">
+{% csrf_token %} 
+<table><td>
+<select class="form-control" id="s3" name="filterTags">
+              {% for filterTag in filterTags %}
+				{% if filterTag == selectedTag %}
+					<option selected="selected" value="{{ filterTag }}">{{ filterTag }}</option>
+				{% else %}
+					<option  value="{{ filterTag }}">{{ filterTag }}</option>
+				{% endif %}
+              {% endfor %}
+            </select></td>
+			<td><input type="submit" name="update_list" value="Update list" /></td>
+			</table>
+<table >
+                {% assign prefixpath '/admin/odm2testapp/' %}
+				<tr ><th scope="col" class="section">title, CZO Author</td>
+				<th scope="col"  class="section">publisher</th>
+				<th scope="col"  class="section">year</th>
+				<th scope="col"  class="section">DOI</th></tr>
+					<tr>
+							
+				{% for citation in citationList %}
+					<td > <b>{{citation.title}}</b></td>
+					<td >{{citation.publisher}}</td>
+					<td >{{citation.publicationyear}}</td>
+					<td ><a href="http://dx.doi.org/{{citation.citationlink}}">{{citation.citationlink}}</a></td>
+					</tr>
+					
+					{% for author in authList %}
+						{% if author.citationid == citation %}
+						<tr>
+						<td > &nbsp&nbsp&nbsp{{author.personid}}</td>
+						<td></td><td></td><td></td></tr>
+						{% endif %}
+					{% endfor %}
+					
+                {% endfor %}
+			 </table>	
+
+
+{% endblock %}
+</form>

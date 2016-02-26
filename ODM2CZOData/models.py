@@ -1115,7 +1115,7 @@ class Extensionproperties(models.Model):
     propertydatatypecv = models.ForeignKey(CvPropertydatatype, db_column='propertydatatypecv', verbose_name="property data type")
     propertyunitsid = models.ForeignKey('Units',  db_column='propertyunitsid', blank=True, null=True, verbose_name="units for property")
     def __unicode__(self):
-        return u"%s - %s - %s - %s" % (self.propertyname,self.propertydescription, self.propertydatatypecv, self.propertyunitsid)
+        return u"%s - %s" % (self.propertyname,self.propertydescription)
     class Meta:
         managed = False
         db_table = 'extensionproperties'
