@@ -466,16 +466,14 @@ def scatter_plot(request):
     ylocation=[]
     xdata=[]
     ydata=[]
-    xdepth=[]
-    ydepth=[]
-    rvx=rvy=prvx=prvy=None
+    rvx=rvy=prvx=prvy=xlocs=ylocs=None
     if xVar and yVar:
         rvx=pr.filter(variableid=xVar)
         prvx=Profileresultvalues.objects.filter(~Q(datavalue=-6999))\
-        .filter(~Q(datavalue=-888.88)).filter(resultid__in=rvx)
+        .filter(~Q(datavalue=-888.88)).filter(resultid__in=rvx).order_by("resultid__resultid__unitsid","resultid__resultid__featureactionid__samplingfeatureid","zlocation")
         rvy=pr.filter(variableid=yVar)
         prvy=Profileresultvalues.objects.filter(~Q(datavalue=-6999))\
-        .filter(~Q(datavalue=-888.88)).filter(resultid=rvy)
+        .filter(~Q(datavalue=-888.88)).filter(resultid__in=rvy).order_by("resultid__resultid__unitsid","resultid__resultid__featureactionid__samplingfeatureid","zlocation")
 
         xr =  Results.objects.filter(resultid__in=prvx.values("resultid"))
         xfa = Featureactions.objects.filter(featureactionid__in=xr.values("featureactionid"))
@@ -492,27 +490,34 @@ def scatter_plot(request):
         else:
             ylocs=Samplingfeatures.objects.filter(samplingfeatureid__in=yfa.values("samplingfeatureid"))
         yloc = ylocs.values_list("samplingfeaturename",flat=True)
-    if prvx and prvy:
-        for loc in xlocs:
-            fax= xfa.filter(samplingfeatureid=loc)
-            rx=xr.filter(featureactionid=fax)
-            fax= yfa.filter(samplingfeatureid=loc)
-            yx=yr.filter(featureactionid=fax)
-            xs=prvx.filter(resultid=rx)
-            ys=prvy.filter(resultid=yx)
-            #raise ValidationError(xs,ys)
-            #name includes depth information
-            for x,y in zip(xs,ys):
-                xdata.append(x.datavalue)
-                ydata.append(y.datavalue)
-                xdepth.append(x.zlocation)
-                ydepth.append(y.zlocation)
-                tmpLoc = str(loc.samplingfeaturename) + " " + str(x.zlocation -x.zaggregationinterval) + \
-                         "-" + str(x.zlocation) + " " + str(x.zlocationunitsid.unitsabbreviation)
+    if prvx and prvx:
+        prvx = prvx.filter(resultid__resultid__featureactionid__samplingfeatureid__in=xlocs)
+        prvy = prvy.filter(resultid__resultid__featureactionid__samplingfeatureid__in=ylocs)
+        for x in prvx:
+            xdata.append(str(x.datavalue) + ";"+str(x.resultid.resultid.unitsid.unitsabbreviation)+
+                         ";"+str(x.zlocation)+";"+str(x.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename))
+
+            tmpLoc = str(x.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)  + " " + str(x.zlocation -x.zaggregationinterval) + \
+                     "-" + str(x.zlocation) + " " + str(x.zlocationunitsid.unitsabbreviation) +\
+                     ";" +str(x.resultid.resultid.unitsid.unitsabbreviation) + ";"+str(x.zlocation) \
+                     + ";" + str(x.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)+";" +str(x.resultid.resultid.unitsid.unitsabbreviation)
+            xlocation.append(tmpLoc)
+
+        for y in prvy:
+            ydata.append(str(y.datavalue)+";"+str(y.resultid.resultid.unitsid.unitsabbreviation)+";"+str(y.zlocation)+
+                         ";"+str(y.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename))
+            foundloc=False
+            for x in prvx:
+                if x.zlocation == y.zlocation or x.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename==y.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename:
+                    foundloc=True
+                    tmpLoc = str(y.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)  + " " + str(y.zlocation -y.zaggregationinterval) + \
+                         "-" + str(y.zlocation) + " " + str(y.zlocationunitsid.unitsabbreviation) +\
+                         ";" +str(y.resultid.resultid.unitsid.unitsabbreviation) + ";"+str(y.zlocation) \
+                         + ";" + str(y.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)+";" +str(y.resultid.resultid.unitsid.unitsabbreviation)
+            if not foundloc:
                 xlocation.append(tmpLoc)
+            #xlocation.append(tmpLoc)
     data =json.dumps(data)
-    series = []
-    series.append({"name":title, "data": data})
     chartID = 'chart_id'
     chart = {"renderTo": chartID, "type": 'scatter',  "zoomType": 'xy',}
     title2 = {"text": title }
@@ -525,10 +530,10 @@ def scatter_plot(request):
         response=exportspreadsheet(request,resultValuesSeries)
         return response
     return TemplateResponse(request,'soilsscatterplot.html',{'prefixpath': CUSTOM_TEMPLATE_PATH,
-        'xVariables':variables, 'yVariables':variables,'xdepth':xdepth,'ydepth':ydepth,
+        'xVariables':variables, 'yVariables':variables,
         'xVariableSelection':xVariableSelection,'yVariableSelection':yVariableSelection,
         'fieldarea1':fieldarea1, 'fieldarea2':fieldarea2, 'fieldareas':fieldareas,
-        'chartID': chartID, 'chart': chart, 'series': series,'title2': title2, 'graphType':graphType,
+        'chartID': chartID, 'chart': chart,'title2': title2, 'graphType':graphType,
         'yAxis': yAxis, 'xAxis': xAxis,'xdata':xdata,'ydata':ydata,'data':data,'ylocation':ylocation,'xlocation':xlocation,},)
 
 def exportspreadsheet(request,resultValuesSeries):

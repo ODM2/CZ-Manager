@@ -39,16 +39,10 @@
 	var xdata = {{ xdata|safe }}
 	var ydata = {{ ydata|safe }}
 	var data = {{ data|safe }}
-	var xdepth = {{ xdepth|safe }}
-	var ydepth = {{ ydepth|safe }}
 	//var desired = stringToReplace.replace(/[^\w\s]/gi, '')
     var xlocation = {{ xlocation|safe }}
 	var ylocation = {{ ylocation|safe }}
-    var series = {{ series|safe }}
-	//window.alert(typeof series)
-	//series = series.replace(/'/g, '');
-	//chart.series[0] = new Array();
-	//chart.series = new Object()
+	var None = null
 	xyArray = new String();
 	len = xdata.length;
 	xprefix = '[';
@@ -61,40 +55,144 @@
 	}
 	
 
-//var series = generateData(xdata, xlocation, ydata)
-var series =generateData(xdata, xlocation, ydata)
-function generateData(cats, names, points) { //x, names, y
+//var series = generateData(xdata, xlocation, ydata)sdfas
+xydata = sortData(xdata, xlocation, ydata);
+xdata=xydata[0];
+ydata=xydata[1];
+xlocation = xydata[2];
+function sortData(x, names, y) {
+	var xlen = x.length;
+	var ylen = y.length;
+	var nameslen= names.length;
+	var xsorted = [];
+	var ysorted = [];
+	var namesorted=[];
+	var xysorted=[];
+	var xfound;
+	var yfound;
+	var xnamefound;
+	var ynamefound;
+	for (var i = 0; i < nameslen; i++) {
+		var namevals=names[i].split(";"); 
+		yfoundmatch= false;
+		xfoundmatch= false;
+		xnamecount=0;
+		ynamecount=0;
+		for(var k=0;k<xlen;k++){
+			var xname = x[k].split(";"); //value;units;zlocation;samplingfeaturename
+			if ( xname[2] == namevals[2] & xname[3] == namevals[3]){ //yname[1] == xname[1] &
+					xsorted.push(x[k]);
+					xfound=x[k];
+					xfoundmatch = true;
+					xnamecount+=1;
+					xnamefound=String(namevals[0]+";"+xname[1]+";"+xname[2]+";"+xname[3]+";"+xname[3])
+					namesorted.push(xnamefound);
+					
+				}
+			}
+		//if(!xfoundmatch){
+		//xsorted.push("null;"+namevals[1]+";"+namevals[2]+";"+namevals[3]); //+xname[1]+";"+xname[2]+";"+xname[3]
+		//namesorted.push("");
+		//namesorted.push(str(namevals[0]+";"+xname[1]+";"xname[2]+";"+xname[3]));
+		//}
+		
+		for (var j = 0; j < ylen; j++) {
+			var yname = y[j].split(";");
+			if ( yname[2] == namevals[2] & yname[3] == namevals[3]){ //yname[1] == xname[1] &
+				ysorted.push(y[j]);
+				yfound=y[j];
+				yfoundmatch = true;
+				ynamecount+=1;
+				ynamefound=String(namevals[0]+";"+yname[1]+";"+yname[2]+";"+yname[3]+";"+yname[3]);
+				xnamecheck=xnamefound.split(";"); 
+				if (namevals[2] != xnamecheck[2]){ //see if this is a different depth
+					//resort=namesorted.pop()
+					namesorted.push(ynamefound);
+					//namesorted.push(resort);
+				}
+			}
+		}
+		//if(!yfoundmatch){
+		//ysorted.push("null;"+namevals[1]+";"+namevals[2]+";"+namevals[3]); //+yname[1]+";"+yname[2]+";"+yname[3]
+		//namesorted.push("");
+		//}
+		if(ynamecount>xnamecount){
+			for(var l=0;l<ynamecount-xnamecount;l++){
+				//if (typeof xfound !== 'undefined') {
+				//xsorted.push("null;"+namevals[1]+";"+namevals[2]+";"+namevals[3]);//xfound
+				xsorted.push(xfound);
+				namesorted.push(namevals[0]+";"+namevals[1]+";"+namevals[2]+";"+namevals[3]);//xnamefound
+				//}else{
+				//	ysorted.pop()
+				//	namesorted.pop()
+				//}
+				}
+			}
+		if(xnamecount>ynamecount){
+			for(var l=0;l<xnamecount-ynamecount;l++){
+				//if (typeof yfound !== 'undefined') {
+				ysorted.push(yfound);
+				//ysorted.push("null;"+namevals[1]+";"+namevals[2]+";"+namevals[3]);
+				//namesorted.push(namevals[0]+";"+namevals[1]+";"+namevals[2]+";"+namevals[3]);
+				//}else{
+				//	xsorted.pop()
+				//	namesorted.pop()
+				//}
+			}
+		}
+		//for(var g=0;g<namecount;g++){
+		//namesorted.push(names[i]);
+		//}
+	}
+	xysorted[0] = xsorted;
+	xysorted[1] = ysorted;
+	xysorted[2] = namesorted;
+	return xysorted;
+	}
+
+var series =generateData(xdata, xlocation, ydata);
+function generateData(x, names, y) { //x, names, y
     var ret = {},
         ps = [],
         series = [],
-        len = cats.length;
+        len = x.length;
 
     //concat to get points
     for (var i = 0; i < len; i++) {
-		if(xdepth[i]==10){
-		color="green";
-		}else{
-		color="blue";
-		}
+		//var seriesnames=[];
+		//if(xdepth[i]==10){
+		//color="green";
+		//}else{
+		//color="blue";
+		//}
+		var xname=x[i].split(";");
+		var yname=y[i].split(";");
+		xtmp= parseFloat(xname[0]);
+		if(xname[0]=="null")  xtmp=null;
+		ytmp= parseFloat(yname[0]);
+		if(yname[0]=="null")  ytmp=null;
+
         ps[i] = {
-            x: parseFloat(cats[i]),
-            y: parseFloat(points[i]),
+            x: xtmp,
+            y: ytmp,
 			//z: parseFloat(xdepth[i]),
-            name: names[i],
-			marker:{ fillColor: color}
+            name: names[i],//xname[1] + " " + yname[1], //concat unit names 
+			//marker:{ fillColor: color}
         };
     }
-    names = [];
+    var names = [];
 	// marker:{ fillColor: 'red'}
     //generate series and split points
     for (i = 0; i < len; i++) {
-        var p = ps[i],
-            sIndex = $.inArray(p.n, names);
-
+		var xname=x[i].split(";")[1];
+		var yname=y[i].split(";")[1];
+		var name = xname+" - "+yname;
+        sIndex = $.inArray(name, names);
+		var p = ps[i];
         if (sIndex < 0) {
-            sIndex = names.push(p.n) - 1; //should be name instead of n but this is not working as intended at the moment. 
+            sIndex = names.push(name) - 1; //should be name instead of n but this is not working as intended at the moment. 
             series.push({
-                name: p.n,
+                name: name,
                 data: [],
             });
         }
@@ -130,20 +228,20 @@ $(document).ready(function() {
        
 		tooltip: {
     formatter: function() {
-        return ''+ this.point.name +' <br> x: ' + this.x + ', y: ' + this.y; //' max depth: '+ this.z +
+		var name=String(this.point.name).split(";"); //string name, xunits,x.zlocation, samplingfeaturename 
+		var seriesname = String(this.series.name).split("-");
+		//var len = ydata.length;
+		//var yunit ="";
+		//for (var i = 0; i < len; i++) {
+		//	var yname=ydata[i] //value;units;zlocation;samplingfeaturename
+		//	if (name[1] == yname[1] & name[2] == yname[2] & name[3] == yname[3]){
+		//		yunit=yname[1]
+		//	}
+		//}
+        return ''+ name[0]+' <br> x: '  +this.x + ' x unit: '+seriesname[0] +', y: ' + this.y+ ' y unit: '+seriesname[1] ; //' max depth: '+ this.z + ' x unit:'+ name[1]+ +' y unit:'+ name[4]
     }
 },
     });
-	
-	//var i=0;
-//for (i; i<len;i++) {
-		//if(i==1){
-		//alert(xdata[i],ydata[i]);
-		//}
-		//chart.series[0].addPoint([xdata[i],ydata[i]],true); //.data = new Array(xdata, ydata);
-	//}
-	
-	//alert(chart.series[0].data);
 	});
 	
 	//var chart = $('#chartid').highcharts();

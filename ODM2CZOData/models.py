@@ -1433,6 +1433,7 @@ class People(models.Model):
         db_table = 'people'
         verbose_name='people'
         verbose_name_plural='people'
+        ordering = ["personlastname"]
 
 
 class Personexternalidentifiers(models.Model):
