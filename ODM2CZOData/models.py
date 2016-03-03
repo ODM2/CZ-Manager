@@ -282,6 +282,18 @@ class Authorlists(models.Model):
         db_table = 'authorlists'
         verbose_name='author list'
         verbose_name_plural= 'author list'
+    def csvheader(self):
+        s = 'Author '+  str(self.authororder) +','
+        return s
+    def csvoutput(self):
+        s = '"'+ str(self.personid.personlastname)+', '+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'",'
+        return s
+    def endnoteexport(self):
+        if self.authororder ==1:
+            s = 'FAU - "'+ str(self.personid.personlastname)+","+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'"\n'
+        else:
+            s = 'AU - "'+ str(self.personid.personlastname)+","+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'"\n'
+        return s
 
 
 class Calibrationactions(models.Model):
@@ -366,7 +378,18 @@ class Citationextensionpropertyvalues(models.Model):
         db_table = 'citationextensionpropertyvalues'
         verbose_name='citation extension property'
         verbose_name_plural='citation extension properties'
-
+    def csvheader(self):
+        s ='"'+ str(self.propertyid)+'",'
+        return s
+    def csvoutput(self):
+        s = '"'+str(self.propertyvalue) +'",'
+        return s
+    #def endnoteheader(self):
+        #s ='"'+ str(self.propertyid)+'"\t'
+        #return s
+    def endnoteexport(self):
+        s = 'MH - "'+ str(self.propertyid) + '": "'+str(self.propertyvalue) +'"\n'
+        return s
 
 class Citationexternalidentifiers(models.Model):
     bridgeid = models.AutoField(primary_key=True)
@@ -398,7 +421,25 @@ class Citations(models.Model):
         db_table = 'citations'
         ordering = ['title']
         verbose_name = 'citation'
-
+    def csvheader(self):
+        s = 'citationid,title,publisher,year,citationlink,'
+        return s
+    def csvoutput(self):
+        s = str(self.citationid)
+        s += ',"{0}"'.format(self.title)
+        s += ',"{0}"'.format(self.publisher)
+        s += ', {0}'.format(self.publicationyear)
+        s += ', {0},'.format(self.citationlink)
+        return s
+    def endnoteexportheader(self):
+        s = 'TI\tPB\tPY\tcitationlink\t'
+        return s
+    def endnoteexport(self):
+        s = 'TI - "{0}"\n'.format(self.title)
+        s += 'PB - "{0}"\n'.format(self.publisher)
+        s += 'PY - {0}\n'.format(self.publicationyear)
+        s += 'AID {0} [doi]\n'.format(self.citationlink)
+        return s
 
 class CvActiontype(models.Model):
     term = models.CharField(max_length=255)
