@@ -17,6 +17,7 @@ from .models import Results
 from .models import Actions
 from .models import Relatedfeatures
 from .models import Profileresults
+from .models import Citationextensionpropertyvalues
 from datetime import datetime
 import csv
 import time
@@ -47,6 +48,8 @@ import re
 register = template.Library()
 from .models import Citations
 from .models import Authorlists
+from .models import Extensionproperties
+from .forms import CitationsAdminForm
 #
 # class FeatureactionsAutocomplete(autocomplete.Select2QuerySetView):
 #     def get_queryset(self):
@@ -62,10 +65,15 @@ from .models import Authorlists
 #             #qs = qs.filter(__istartswith=self.q)
 #
 #         return self.q
+from django.views.generic.edit import CreateView
+
+#class CreatePubView(CreateView):
+    #template_name = "publications2.html"
+    #model = Citations
+
 
 def publications(request):
     if request.user.is_authenticated():
-        context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
         citationList = Citations.objects.all()
         authList = Authorlists.objects.all()
         selectedTag = 'CZO Authors'
@@ -81,8 +89,26 @@ def publications(request):
         else:
             citationList =Citations.objects.filter(citationid__in=authList.values("citationid"))
         filterTags=['CZO Authors','All','AGU', 'LCZO Meeting']
-        return TemplateResponse(request,'publications.html',{ 'citationList': citationList,'authList':authList,
-                'filterTags':filterTags,'selectedTag':selectedTag,'prefixpath': CUSTOM_TEMPLATE_PATH,},)
+
+        citationCategories = Citationextensionpropertyvalues.objects.filter(propertyid=5).distinct("propertyvalue") #citation category Extensionproperties
+        selectedCategory = None
+        if 'citationCategories' in request.POST:
+            if not request.POST['citationCategories'] == 'All':
+                selectedCategory = request.POST['citationCategories']
+                citationPropValueFilter = Citationextensionpropertyvalues.objects.filter(propertyvalue__icontains=selectedCategory)
+                citationList = citationList.filter(citationid__in=citationPropValueFilter.values("citationid"))
+            else:
+                selectedCategory = 'All'
+        #context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
+        if request.REQUEST.get('export_data'):
+            response=exportcitations(request,citationList, True)
+            return response
+        if request.REQUEST.get('export_endnote'):
+            response=exportcitations(request,citationList, False)
+            return response
+        return TemplateResponse(request,'publications.html',{'citationList': citationList,'authList':authList,
+                'filterTags':filterTags,'citationCategories':citationCategories,'selectedCategory':selectedCategory,
+                'selectedTag':selectedTag,'prefixpath': CUSTOM_TEMPLATE_PATH,})
     else:
         return HttpResponseRedirect('../')
 
@@ -535,6 +561,68 @@ def scatter_plot(request):
         'fieldarea1':fieldarea1, 'fieldarea2':fieldarea2, 'fieldareas':fieldareas,
         'chartID': chartID, 'chart': chart,'title2': title2, 'graphType':graphType,
         'yAxis': yAxis, 'xAxis': xAxis,'xdata':xdata,'ydata':ydata,'data':data,'ylocation':ylocation,'xlocation':xlocation,},)
+
+def exportcitations(request,citations,csv):
+    myfile = StringIO.StringIO()
+    first= True
+    citationpropvalues = Citationextensionpropertyvalues.objects.filter(citationid__in=citations).order_by("propertyid")
+    authorheader = Authorlists.objects.filter(citationid__in=citations).order_by("authororder").distinct("authororder")
+    authheadercount=authorheader.__len__()
+    citationpropheaders = citationpropvalues.distinct("propertyid").order_by("propertyid")
+    for citation in citations:
+
+        if first and csv:
+            myfile.write(citation.csvheader())
+            for auth in authorheader:
+                 myfile.write(auth.csvheader())
+
+            for citationprop in citationpropheaders:
+                 myfile.write(citationprop.csvheader())
+
+            myfile.write('\n')
+        if csv:
+            myfile.write(citation.csvoutput())
+        else: #endnote instead
+            myfile.write(citation.endnoteexport())
+        #export authors
+        authors = Authorlists.objects.filter(citationid=citation).order_by("authororder")
+        authcount=authors.__len__()
+        for auth in authors:
+            if csv:
+                myfile.write(auth.csvoutput())
+            else:
+                myfile.write(auth.endnoteexport())
+        if csv:
+            for i in range(0, authheadercount-authcount, 1):
+                 myfile.write('"",')
+        thiscitationpropvalues = citationpropvalues.filter(citationid=citation).order_by("propertyid")
+        for matchheader in citationpropheaders:
+            headermatched = False
+            for citationprop in thiscitationpropvalues:
+                headermatched=False
+                if matchheader.propertyid == citationprop.propertyid:
+                    headermatched = True
+                if csv and headermatched:
+                    myfile.write(citationprop.csvoutput())
+                elif headermatched:
+                    myfile.write(citationprop.endnoteexport())
+                if headermatched:
+                    break
+            if not headermatched and csv:
+                myfile.write('"",')
+
+        myfile.write('\n')
+        first=False
+
+    if csv:
+        response = HttpResponse(myfile.getvalue(),content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="mycitations.csv"'
+    else:
+        response = HttpResponse(myfile.getvalue(),content_type='text/txt')
+        response['Content-Disposition'] = 'attachment; filename="myCitationsEndNoteImport.txt"'
+
+    return response
+
 
 def exportspreadsheet(request,resultValuesSeries):
     #if the user hit the export csv button export the measurement results to csv
