@@ -640,7 +640,7 @@ def exportspreadsheet(request,resultValuesSeries):
     firstVar = None
     firstUnit = None
     resultValuesSeries = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
-        filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Field area")).\
+        filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area")).\
         order_by("resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
             "resultid__intendedzspacing","resultid__resultid__variableid","resultid__resultid__unitsid")
     for myresults in resultValuesSeries:
@@ -719,7 +719,7 @@ def graph_data(request):
     feature_actions = Featureactions.objects.filter(samplingfeatureid__in = sampling_features)
     featureresults = Results.objects.filter(featureactionid__in=feature_actions).order_by("variableid","unitsid")\
         .filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
-        filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Field area"))
+        filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area"))
     variableList = Variables.objects.filter(variableid__in =featureresults.values("variableid"))
 
     #find the profile results series for the selected variable
