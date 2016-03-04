@@ -718,8 +718,8 @@ def graph_data(request):
     #select the feature actions for all of the related features.
     feature_actions = Featureactions.objects.filter(samplingfeatureid__in = sampling_features)
     featureresults = Results.objects.filter(featureactionid__in=feature_actions).order_by("variableid","unitsid")\
-        .filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
-        filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area"))
+        .filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
+        filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Field area"))
     variableList = Variables.objects.filter(variableid__in =featureresults.values("variableid"))
 
     #find the profile results series for the selected variable
