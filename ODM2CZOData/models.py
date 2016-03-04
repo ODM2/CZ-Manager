@@ -388,7 +388,7 @@ class Citationextensionpropertyvalues(models.Model):
         #s ='"'+ str(self.propertyid)+'"\t'
         #return s
     def endnoteexport(self):
-        s = 'MH - "'+ str(self.propertyid) + '": "'+str(self.propertyvalue) +'"\n'
+        s = 'MH '+ str(self.propertyid) + ': '+str(self.propertyvalue) +'\n'
         return s
 
 class Citationexternalidentifiers(models.Model):
@@ -435,10 +435,10 @@ class Citations(models.Model):
         s = 'TI\tPB\tPY\tcitationlink\t'
         return s
     def endnoteexport(self):
-        s = 'TI - "{0}"\n'.format(self.title)
-        s += 'PB - "{0}"\n'.format(self.publisher)
-        s += 'PY - {0}\n'.format(self.publicationyear)
-        s += 'AID {0} [doi]\n'.format(self.citationlink)
+        s = 'TI {0}\n'.format(self.title)
+        s += 'PB {0}\n'.format(self.publisher)
+        s += 'PY {0}\n'.format(self.publicationyear)
+        s += 'DI {0} \n'.format(self.citationlink)
         return s
 
 class CvActiontype(models.Model):

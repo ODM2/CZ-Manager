@@ -610,7 +610,7 @@ def exportcitations(request,citations,csv):
                     break
             if not headermatched and csv:
                 myfile.write('"",')
-
+        myfile.write('ER \n')
         myfile.write('\n')
         first=False
 
