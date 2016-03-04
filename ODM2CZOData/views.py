@@ -483,7 +483,8 @@ def scatter_plot(request):
             title =str(xVar.variablecode) + " - " +str(yVar.variablecode)
     prv = Profileresults.objects.all()
     #second filter = exclude summary results attached to field areas
-    pr = Results.objects.filter(resultid__in=prv).filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification"))
+    pr = Results.objects.filter(resultid__in=prv).filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification"))\
+        .filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Field area"))
     #variables is the list to pass to the html template
     variables = Variables.objects.filter(variableid__in=pr.values("variableid"))
     fieldareas = Samplingfeatures.objects.filter(sampling_feature_type="Landscape classification") #Field area
@@ -638,7 +639,9 @@ def exportspreadsheet(request,resultValuesSeries):
     firstheader = True
     firstVar = None
     firstUnit = None
-    resultValuesSeries = resultValuesSeries.order_by("resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
+    resultValuesSeries = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
+        filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Field area")).\
+        order_by("resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
             "resultid__intendedzspacing","resultid__resultid__variableid","resultid__resultid__unitsid")
     for myresults in resultValuesSeries:
         lastVariable = variable
@@ -714,7 +717,9 @@ def graph_data(request):
     sampling_features = Relatedfeatures.objects.filter(relatedfeatureid=selected_relatedfeatid)
     #select the feature actions for all of the related features.
     feature_actions = Featureactions.objects.filter(samplingfeatureid__in = sampling_features)
-    featureresults = Results.objects.filter(featureactionid__in=feature_actions).order_by("variableid","unitsid")#
+    featureresults = Results.objects.filter(featureactionid__in=feature_actions).order_by("variableid","unitsid")\
+        .filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
+        filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Field area"))
     variableList = Variables.objects.filter(variableid__in =featureresults.values("variableid"))
 
     #find the profile results series for the selected variable

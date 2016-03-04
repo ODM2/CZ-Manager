@@ -388,7 +388,10 @@ class Citationextensionpropertyvalues(models.Model):
         #s ='"'+ str(self.propertyid)+'"\t'
         #return s
     def endnoteexport(self):
-        s = 'MH '+ str(self.propertyid) + ': '+str(self.propertyvalue) +'\n'
+        if (str(self.propertyvalue).__len__()>0):
+            s = 'MH '+ str(self.propertyid) + ': '+str(self.propertyvalue) +'\n'
+        else:
+            s=''
         return s
 
 class Citationexternalidentifiers(models.Model):

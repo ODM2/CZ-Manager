@@ -43,17 +43,11 @@
     var xlocation = {{ xlocation|safe }}
 	var ylocation = {{ ylocation|safe }}
 	var None = null
-	xyArray = new String();
 	len = xdata.length;
 	xprefix = '[';
 	yprefix=',';
 	end=']';
-	var i=0;
-	
-	for(i; i<len;i++){
-		xyArray=xyArray+'{name:\''+xlocation[i]+'\',x:'+xdata[i]+ ',y:'+ydata[i]+'}';
-	}
-	
+		
 
 //var series = generateData(xdata, xlocation, ydata)sdfas
 xydata = sortData(xdata, xlocation, ydata);
@@ -118,26 +112,26 @@ function sortData(x, names, y) {
 		//}
 		if(ynamecount>xnamecount){
 			for(var l=0;l<ynamecount-xnamecount;l++){
-				//if (typeof xfound !== 'undefined') {
+				if (typeof xfound !== 'undefined') {
 				//xsorted.push("null;"+namevals[1]+";"+namevals[2]+";"+namevals[3]);//xfound
 				xsorted.push(xfound);
 				namesorted.push(namevals[0]+";"+namevals[1]+";"+namevals[2]+";"+namevals[3]);//xnamefound
-				//}else{
-				//	ysorted.pop()
-				//	namesorted.pop()
-				//}
+				}else{
+					ysorted.pop()
+					namesorted.pop()
+				}
 				}
 			}
 		if(xnamecount>ynamecount){
 			for(var l=0;l<xnamecount-ynamecount;l++){
-				//if (typeof yfound !== 'undefined') {
-				ysorted.push(yfound);
+				if (typeof yfound !== 'undefined') {
+					ysorted.push(yfound);
 				//ysorted.push("null;"+namevals[1]+";"+namevals[2]+";"+namevals[3]);
 				//namesorted.push(namevals[0]+";"+namevals[1]+";"+namevals[2]+";"+namevals[3]);
-				//}else{
-				//	xsorted.pop()
-				//	namesorted.pop()
-				//}
+				}else{
+					xsorted.pop()
+					namesorted.pop()
+				}
 			}
 		}
 		//for(var g=0;g<namecount;g++){
