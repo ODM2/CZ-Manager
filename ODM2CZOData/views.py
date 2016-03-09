@@ -632,42 +632,52 @@ def exportspreadsheet(request,resultValuesSeries):
     myfile = StringIO.StringIO()
     #raise ValidationError(resultValues)
     k=0
-    lastVariable=''
+    variablesAndUnits=[]
     variable = ''
-    lastUnit = ''
     unit = ''
     firstheader = True
     firstVar = None
     firstUnit = None
-    resultValuesSeries = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
+    resultValuesHeaders = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
         filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area")).\
-        order_by("resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
-            "resultid__intendedzspacing","resultid__resultid__variableid","resultid__resultid__unitsid")
-    for myresults in resultValuesSeries:
+        order_by("resultid__resultid__variableid","resultid__resultid__unitsid")#.distinct("resultid__resultid__variableid","resultid__resultid__unitsid")
+    for myresults in resultValuesHeaders:
         lastVariable = variable
         variable=myresults.resultid.resultid.variableid.variable_name
         lastUnit = unit
         unit = myresults.resultid.resultid.unitsid
-        if not firstheader and firstVar==variable and firstUnit==unit:
-            #only add the first instance of each variable once one repeats your done.
-            break
+        #if not firstheader and firstVar==variable and firstUnit==unit:
+            #only add the first instance of each variable, once one repeats your done.
+            #break
         if not lastVariable == variable or not lastUnit==unit:
+            variablesAndUnits.append(unicode(variable) + unicode(unit))
             if firstheader:
                 myfile.write(myresults.csvheader())
                 firstVar=variable
                 firstUnit=unit
                 firstheader = False
             myfile.write(myresults.csvheaderShort())
+        #elif not lastUnit==unit:
+             #myfile.write(myresults.csvheaderShortUnitOnly())
 
+    resultValuesSeries = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
+        filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area")).\
+        order_by("resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
+            "resultid__intendedzspacing","resultid__resultid__variableid","resultid__resultid__unitsid")
     #myfile.write(lastResult.csvheaderShort())
     myfile.write('\n')
     lastSamplingFeatureCode=''
     samplingFeatureCode = ''
     lastDepth=0
     depth = 0
+    position=0
     nextRow = False
     #resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode
     for myresults in resultValuesSeries:
+        lastVariable = variable
+        variable=myresults.resultid.resultid.variableid.variable_name
+        lastUnit = unit
+        unit = myresults.resultid.resultid.unitsid
         lastSamplingFeatureCode = samplingFeatureCode
         samplingFeatureCode=myresults.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturecode
         lastDepth = depth
@@ -676,11 +686,16 @@ def exportspreadsheet(request,resultValuesSeries):
         if not k==0 and (not lastSamplingFeatureCode == samplingFeatureCode or not depth==lastDepth):
             myfile.write('\n')
             myfile.write(myresults.csvoutput())
+            position=0
         elif k==0:
             myfile.write(myresults.csvoutput())
         #else:
+        #if variablesAndUnits.index(unicode(variable)+unicode(unit)) ==position:
+        for i in range(position,variablesAndUnits.index(unicode(variable)+unicode(unit))):
+            myfile.write(",")
+            position+=1
         myfile.write(myresults.csvoutputShort())
-
+        position+=1
         k+=1
     response = HttpResponse(myfile.getvalue(),content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="mydata.csv"'

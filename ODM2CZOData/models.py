@@ -1632,7 +1632,7 @@ class Profileresultvalues(models.Model):
         #s += '\" {0}{1}\",'.format(self.resultid.resultid.variableid.variablecode,self.resultid.resultid.unitsid.unitsname)
         s += 'sampling feature/location,'
         s += 'method,'
-        s +='citation,'
+        s +='citation'
         #s = buildCitation(s,self)
         return s
 
@@ -1641,7 +1641,7 @@ class Profileresultvalues(models.Model):
         return s
     def csvheaderShort(self):
         #s='databaseid,'
-        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(self.resultid.resultid.variableid.variablecode,self.resultid.resultid.unitsid.unitsname,self.resultid.resultid.processing_level)
+        s = ',\" {0} -unit-{1}-processing level-{2}\"'.format(self.resultid.resultid.variableid.variablecode,self.resultid.resultid.unitsid.unitsname,self.resultid.resultid.processing_level)
         #s += 'Date and Time,'
         #s += 'Variable Name,'
         #s += 'Unit Name,'
