@@ -72,6 +72,8 @@ function sortData(x, names, y) {
 		xfoundmatch= false;
 		xnamecount=0;
 		ynamecount=0;
+		yfound=null;
+		xfound=null;
 		for(var k=0;k<xlen;k++){
 			var xname = x[k].split(";"); //value;units;zlocation;samplingfeaturename
 			if ( xname[2] == namevals[2] & xname[3] == namevals[3]){ //yname[1] == xname[1] &
@@ -89,10 +91,13 @@ function sortData(x, names, y) {
 		//namesorted.push("");
 		//namesorted.push(str(namevals[0]+";"+xname[1]+";"xname[2]+";"+xname[3]));
 		//}
-		
 		for (var j = 0; j < ylen; j++) {
 			var yname = y[j].split(";");
+			
 			if ( yname[2] == namevals[2] & yname[3] == namevals[3]){ //yname[1] == xname[1] &
+				if(yname[0]=="1.887"){
+				nothing=false;
+			}
 				ysorted.push(y[j]);
 				yfound=y[j];
 				yfoundmatch = true;
@@ -112,25 +117,28 @@ function sortData(x, names, y) {
 		//}
 		if(ynamecount>xnamecount){
 			for(var l=0;l<ynamecount-xnamecount;l++){
-				if (typeof xfound !== 'undefined') {
+				if (xfound != null) {
 				//xsorted.push("null;"+namevals[1]+";"+namevals[2]+";"+namevals[3]);//xfound
-				xsorted.push(xfound);
-				namesorted.push(namevals[0]+";"+namevals[1]+";"+namevals[2]+";"+namevals[3]);//xnamefound
+					xsorted.push(xfound);
+					namesorted.push(namevals[0]+";"+namevals[1]+";"+namevals[2]+";"+namevals[3]);//xnamefound
 				}else{
-					ysorted.pop()
-					namesorted.pop()
-				}
+					xsorted.push("null;"+namevals[1]+";"+namevals[2]+";"+namevals[3]);//xfound
+					namesorted.push(namevals[0]+";"+namevals[1]+";"+namevals[2]+";"+namevals[3]);
+					//ysorted.pop()
+					//namesorted.pop()
 				}
 			}
+		}
 		if(xnamecount>ynamecount){
 			for(var l=0;l<xnamecount-ynamecount;l++){
-				if (typeof yfound !== 'undefined') {
+				if (yfound != null) {
 					ysorted.push(yfound);
-				//ysorted.push("null;"+namevals[1]+";"+namevals[2]+";"+namevals[3]);
+					//ysorted.push("null;"+namevals[1]+";"+namevals[2]+";"+namevals[3]);
 				//namesorted.push(namevals[0]+";"+namevals[1]+";"+namevals[2]+";"+namevals[3]);
 				}else{
-					xsorted.pop()
-					namesorted.pop()
+					ysorted.push("null;"+namevals[1]+";"+namevals[2]+";"+namevals[3]);
+					//xsorted.pop()
+					//namesorted.pop()
 				}
 			}
 		}
@@ -169,7 +177,6 @@ function generateData(x, names, y) { //x, names, y
         ps[i] = {
             x: xtmp,
             y: ytmp,
-			//z: parseFloat(xdepth[i]),
             name: names[i],//xname[1] + " " + yname[1], //concat unit names 
 			//marker:{ fillColor: color}
         };
@@ -180,17 +187,21 @@ function generateData(x, names, y) { //x, names, y
     for (i = 0; i < len; i++) {
 		var xname=x[i].split(";")[1];
 		var yname=y[i].split(";")[1];
+		var xval=x[i].split(";")[0];
+		var yval=y[i].split(";")[0];
 		var name = xname+" - "+yname;
         sIndex = $.inArray(name, names);
 		var p = ps[i];
-        if (sIndex < 0) {
-            sIndex = names.push(name) - 1; //should be name instead of n but this is not working as intended at the moment. 
-            series.push({
-                name: name,
-                data: [],
-            });
-        }
-        series[sIndex].data.push(p);
+		if (!(xval=="null" | yval=="null")){
+			if (sIndex < 0 ) {
+				sIndex = names.push(name) - 1; //should be name instead of n but this is not working as intended at the moment. 
+				series.push({
+					name: name,
+					data: [],
+				});
+			}
+			series[sIndex].data.push(p);
+		}
     }
     return series;
 }
