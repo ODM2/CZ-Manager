@@ -265,7 +265,9 @@ class Annotations(models.Model):
     annotationlink = models.CharField(max_length=255, blank=True)
     annotatorid = models.ForeignKey('People', db_column='annotatorid', blank=True, null=True)
     citationid = models.ForeignKey('Citations', db_column='citationid', blank=True, null=True)
-
+    def __unicode__(self):
+        s = u" %s" % (self.annotationtext)
+        return s
     class Meta:
         managed = False
         db_table = 'annotations'
@@ -1304,8 +1306,10 @@ class Measurementresultvalues(models.Model):
         s += 'Variable Name,'
         s += 'Unit Name,'
         s += 'sampling feature/location,'
+        s += 'processing level,'
         s += 'time aggregation interval,'
         s += 'time aggregation unit,'
+        s +='annotation,'
         s +='citation,'
 
         return s
@@ -1315,9 +1319,22 @@ class Measurementresultvalues(models.Model):
         s += ', {0}'.format(self.valuedatetime)
         s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
         s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
+        s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
         s += ',\" {0}\"'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)
         s += ', {0}'.format(self.resultid.timeaggregationinterval)
         s += ', {0},'.format(self.resultid.timeaggregationintervalunitsid)
+        mrvannotation = Measurementresultvalueannotations.objects.filter(valueid=self.valueid)
+        if mrvannotation.__len__()>0:
+            mrvannotat =mrvannotation[:1]
+            annotation = Annotations.objects.filter(annotationid=mrvannotat[0].annotationid.annotationid)
+            if annotation.__len__()>0:
+                annote = annotation[:1]
+                s += ',\" {0}\"'.format(annote[0])
+            else:
+                 s += ','
+        else:
+            s += ','
+
         s = buildCitation(s,self)
 
             #s += ' {0}\"'.format(citation.citationlink)

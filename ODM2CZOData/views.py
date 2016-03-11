@@ -290,6 +290,7 @@ def temp_pivot_chart_view(request):
     name_of_variables = []
     name_of_units = []
     myresultSeries = []
+    myresultSeriesExport = []
     i = 0
     data = {}
 
@@ -341,6 +342,10 @@ def temp_pivot_chart_view(request):
              name_of_units.append(tmpname)
 
         myresultSeries.append(Measurementresultvalues.objects.all().filter(~Q(datavalue__lte=-6999))\
+        .filter(valuedatetime__gt= entered_start_date)\
+        .filter(valuedatetime__lt = entered_end_date)\
+                    .filter(resultid=selectedMResult).order_by('-valuedatetime'))
+        myresultSeriesExport.append(Measurementresultvalues.objects.all()\
         .filter(valuedatetime__gt= entered_start_date)\
         .filter(valuedatetime__lt = entered_end_date)\
                     .filter(resultid=selectedMResult).order_by('-valuedatetime'))
@@ -413,11 +418,12 @@ def temp_pivot_chart_view(request):
         int_selectedresultid_ids.append(int(int_selectedresultid))
     csvexport = False
     #if the user hit the export csv button export the measurement results to csv
+
     if request.REQUEST.get('export_data'):
         csvexport=True
         k=0
         myfile = StringIO.StringIO()
-        for myresults in myresultSeries:
+        for myresults in myresultSeriesExport:
             for result in myresults:
                 if k==0:
                     myfile.write(result.csvheader())
