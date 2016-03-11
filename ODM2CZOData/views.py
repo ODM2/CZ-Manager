@@ -340,8 +340,8 @@ def temp_pivot_chart_view(request):
         else:
              name_of_units.append(tmpname)
 
-        myresultSeries.append(Measurementresultvalues.objects.all().filter(~Q(datavalue=-6999))\
-        .filter(~Q(datavalue=-888.88)).filter(valuedatetime__gt= entered_start_date)\
+        myresultSeries.append(Measurementresultvalues.objects.all().filter(~Q(datavalue__lte=-6999))\
+        .filter(valuedatetime__gt= entered_start_date)\
         .filter(valuedatetime__lt = entered_end_date)\
                     .filter(resultid=selectedMResult).order_by('-valuedatetime'))
         data.update({'datavalue' + str(i): []})
@@ -488,7 +488,6 @@ def scatter_plot(request):
     #variables is the list to pass to the html template
     variables = Variables.objects.filter(variableid__in=pr.values("variableid"))
     fieldareas = Samplingfeatures.objects.filter(sampling_feature_type="Landscape classification") #Field area
-    data = {}
     xlocation=[]
     ylocation=[]
     xdata=[]
@@ -544,7 +543,6 @@ def scatter_plot(request):
             if not foundloc:
                 xlocation.append(tmpLoc)
             #xlocation.append(tmpLoc)
-    data =json.dumps(data)
     chartID = 'chart_id'
     chart = {"renderTo": chartID, "type": 'scatter',  "zoomType": 'xy',}
     title2 = {"text": title }
@@ -561,7 +559,7 @@ def scatter_plot(request):
         'xVariableSelection':xVariableSelection,'yVariableSelection':yVariableSelection,
         'fieldarea1':fieldarea1, 'fieldarea2':fieldarea2, 'fieldareas':fieldareas,
         'chartID': chartID, 'chart': chart,'title2': title2, 'graphType':graphType,
-        'yAxis': yAxis, 'xAxis': xAxis,'xdata':xdata,'ydata':ydata,'data':data,'ylocation':ylocation,'xlocation':xlocation,},)
+        'yAxis': yAxis, 'xAxis': xAxis,'xdata':xdata,'ydata':ydata,'ylocation':ylocation,'xlocation':xlocation,},)
 
 def exportcitations(request,citations,csv):
     myfile = StringIO.StringIO()

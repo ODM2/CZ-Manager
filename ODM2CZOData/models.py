@@ -289,10 +289,10 @@ class Authorlists(models.Model):
         s = '"'+ str(self.personid.personlastname)+', '+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'",'
         return s
     def endnoteexport(self):
-        if self.authororder ==1:
-            s = 'FAU - "'+ str(self.personid.personlastname)+","+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'"\n'
-        else:
-            s = 'AU - "'+ str(self.personid.personlastname)+","+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'"\n'
+        #if self.authororder ==1:
+            #s = 'FAU - '+ str(self.personid.personlastname)+","+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'\n'
+        #else:
+        s = 'AU - '+ str(self.personid.personlastname)+","+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'\n'
         return s
 
 
@@ -389,7 +389,7 @@ class Citationextensionpropertyvalues(models.Model):
         #return s
     def endnoteexport(self):
         if (str(self.propertyvalue).__len__()>0):
-            s = 'MH '+ str(self.propertyid) + ': '+str(self.propertyvalue) +'\n'
+            s = 'KW '+ str(self.propertyid) + ': '+str(self.propertyvalue) +'\n'
         else:
             s=''
         return s
@@ -397,9 +397,9 @@ class Citationextensionpropertyvalues(models.Model):
 class Citationexternalidentifiers(models.Model):
     bridgeid = models.AutoField(primary_key=True)
     citationid = models.ForeignKey('Citations', db_column='citationid')
-    externalidentifiersystemid = models.ForeignKey('Externalidentifiersystems', db_column='externalidentifiersystemid')
-    citationexternalidentifier = models.CharField(max_length=255)
-    citationexternalidentifieruri = models.CharField(max_length=255, blank=True)
+    externalidentifiersystemid = models.ForeignKey('Externalidentifiersystems', db_column='externalidentifiersystemid') #externalidentifiersystemid
+    citationexternalidentifier = models.CharField(max_length=255, db_column="citationexternalidentifier")
+    citationexternalidentiferuri = models.CharField(max_length=255, blank=True, db_column="citationexternalidentiferuri")
 
     class Meta:
         managed = False
