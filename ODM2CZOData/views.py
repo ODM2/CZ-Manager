@@ -196,7 +196,7 @@ def get_name_of_units(selected_result):
      return name_of_units
 
 
-def relatedFeaturesFilter(request,done,selected_relatedfeatid,selected_resultid,resultType='Temporal observation'):
+def relatedFeaturesFilter(request,done,selected_relatedfeatid,selected_resultid,resultType='Time series coverage'):
     #selected_relatedfeatid = 18
     if 'SelectedRelatedFeature' in request.POST and not 'update_result_list' in request.POST:
         if not request.POST['SelectedRelatedFeature'] == 'All':
@@ -243,7 +243,7 @@ def temp_pivot_chart_view(request):
                 selected_resultid= resultList[0].resultid
         else:
             selected_featureactionid= request.POST['SelectedFeatureAction']
-            resultList = Results.objects.filter(result_type="Temporal observation")
+            resultList = Results.objects.filter(result_type="Time series coverage")
     elif not done:
         resultList = Results.objects.filter(featureactionid=selected_featureactionid)
 
