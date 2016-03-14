@@ -50,6 +50,7 @@ option {
 				<tr ><th scope="col" class="section">Result Series</td>
 				<th scope="col"  class="sortable column-resultid">Variable</th>
 				<th scope="col"  class="sortable column-resultid">Units</th>
+				<th scope="col"  class="sortable column-resultid">Location</th>
 				<th scope="col"  class="sortable column-resultid">Processing Level</th></tr>
 				{% for Result in resultList %}
 					<tr class="row1">
@@ -61,8 +62,9 @@ option {
 							{% endfor %}
 							name="selection{{ forloop.counter0 }}" value="{{ Result.resultid }}">{{ Result.feature_action }} </input><br></td>
 
-								<td >{{Result.variable}}</td>
+								<td >{{Result.variableid.variablecode}}</td>
 								<td >{{Result.unitsid}}</td>
+								<td >{{Result.featureactionid.samplingfeatureid}}</td>
 								<td > {{Result.processing_level}}</td>
 								</tr>
 				
