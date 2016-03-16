@@ -1,4 +1,5 @@
 {% extends "admin:admin/app_index.html" %}
+
 {% load admin_extras %}
 {% load static %}
 {% load i18n admin_static admin_shortcuts_tags %}
@@ -24,801 +25,258 @@
 
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
 
-
-
-
-{
 {% block content %}
 <div id="content-main">
+
+<div class="app-ODM2CZOData module">
 
 {% if app_list %}
     {% for app in app_list|slice:":1"%}
         <div class="app-{{ app.app_label }} module">
-        <table>
-        <caption>
+    <table>
+              <caption>
             <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">{{ app.name }}</a>
-        </caption>
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'People' and varnotfound %}
-                <tr ><td  class="model-{{ model.object_name|lower }}"><h1>People and Organizations</h1></td></tr>
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Organizations' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Affiliation (relate people and organizations)' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Variables' and varnotfound %}
-             <tr ><td  class="model-{{ model.object_name|lower }}"><h1>Variables and Units</h1></td></tr>
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Units' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Taxonomic classifiers' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">Taxonomic classifiers- to describe Results and Specimens</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Methods' and varnotfound %}
-                <tr ><td  class="model-{{ model.object_name|lower }}"><h1>Methods and Actions</h1></td></tr>
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Actions' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Related action (associates one action with another)' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Action by' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Sampling features' and varnotfound %}
-            <tr ><td  class="model-{{ model.object_name|lower }}"><h1>Locations and Actions at Locations</h1></td></tr>
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Relate two features' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Sampling feature action (link sampling features and actions)' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Datatsets' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Results' and varnotfound %}
-            <tr ><td  class="model-{{ model.object_name|lower }}"><h1>Result Definitions</h1></td></tr>
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Datasets' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">Datasets- a description (title, abstract) of
-                some set of results </a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Dataset results' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">associate datasets and results-
-                    results can be described with many datasets, and datasets can be made of many results.</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Processing levels' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Measurement results' and varnotfound %}
-                <tr ><td  class="model-{{ model.object_name|lower }}"><h1>Result Values</h1></td></tr>
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Measurement result values' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Measurement result value files' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Profile results' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Profile result values' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Citations' and varnotfound %}
-            <tr ><td  class="model-{{ model.object_name|lower }}"><h1>Citations</h1></td></tr>
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Author list' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Dataset citations' and varnotfound %}
-
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Method citations' and varnotfound %}
-
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Citation extension properties' and varnotfound %}
-
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Extension properties' and varnotfound %}
-
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Data logger program files' and varnotfound %}
-            <tr ><td  class="model-{{ model.object_name|lower }}"><h1>Data Logger Files</h1></td></tr>
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Data logger files' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Data logger file columns' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Process data logger files' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-		
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Instrument output variables' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Equipment models' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Data quality' and varnotfound %}
-            <tr ><td  class="model-{{ model.object_name|lower }}"><h1>Data Quality</h1></td></tr>
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-
-        {% assign varnotfound True %}
-        {% for model in app.models %}
-            {% if model.admin_url and model.name == 'Results data quality' and varnotfound %}
-                <tr class="model-{{ model.object_name|lower }}">
-                <th scope="row"><a href="{{ model.admin_url }}">Link results and data quality</a></th>
-                {% assign varnotfound False %}
-            {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            {% if model.admin_url %}
-                <td><a href="{{ model.admin_url }}" class="changelink">{% trans 'Change' %}</a></td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-            </tr>
-        {% endif %}
-        {% endfor %}
-
-    {% endfor %}
-    {% endif %}
-
-
-</div>
-{% endblock %}
+            </caption>
+				<tr ><td class="section"><h1>People and Organizations</h1></td></tr>
+				<tr>
+				<th scope="row"><a href="{{prefixpath }}people/">
+                    {% trans 'People' %}</a></th>
+                <td><a href="{{prefixpath }}people/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}people/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+                <tr>
+				<th scope="row"><a href="{{prefixpath }}organizations/">
+                    {% trans 'Organizations' %}</a></th>
+                <td><a href="{{prefixpath }}organizations/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}organizations/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+                <tr>
+                <th scope="row"><a href="{{prefixpath }}affiliations/">
+                    {% trans 'Affiliation (relate people and organizations)' %}</a></th>
+                <td><a href="{{prefixpath }}affiliations/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}affiliations/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+				<tr ><td class="section"><h1>Variables and Units</h1></td></tr>
+				<tr>
+				<th scope="row"><a href="{{prefixpath }}variables/">
+                    {% trans 'Variables' %}</a></th>
+                <td><a href="{{prefixpath }}variables/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}variables/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+                <tr>
+				<th scope="row"><a href="{{prefixpath }}units/">
+                    {% trans 'Units' %}</a></th>
+                <td><a href="{{prefixpath }}units/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}units/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+                <tr>
+				<th scope="row"><a href="{{prefixpath }}taxonomicclassifiers/">
+                    {% trans 'Taxonomic classifiers- to describe Results and Specimens' %}</a></th>
+                <td><a href="{{prefixpath }}taxonomicclassifiers/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}taxonomicclassifiers/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+                <tr ><td class="section"><h1>Methods and Actions</h1></td></tr>
+				<tr>
+				<th scope="row"><a href="{{prefixpath }}methods/">
+                    {% trans 'Methods' %}</a></th>
+                <td><a href="{{prefixpath }}methods/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}methods/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+                <tr>
+				<th scope="row"><a href="{{prefixpath }}actions/">
+                    {% trans 'Actions' %}</a></th>
+                <td><a href="{{prefixpath }}actions/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}actions/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+                <tr>
+				<th scope="row"><a href="{{prefixpath }}relatedactions/">
+                    {% trans 'Related action (associates one action with another)' %}</a></th>
+                <td><a href="{{prefixpath }}relatedactions/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}relatedactions/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+                    <tr>
+				<th scope="row"><a href="{{prefixpath }}actionby/">
+                    {% trans 'Action by' %}</a></th>
+                <td><a href="{{prefixpath }}actionby/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}actionby/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+         <tr ><td class="section"><h1>Locations and Actions at Locations</h1></td></tr>
+				<tr>
+				<th scope="row"><a href="{{prefixpath }}samplingfeatures/">
+                    {% trans 'Sampling features' %}</a></th>
+                <td><a href="{{prefixpath }}samplingfeatures/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}samplingfeatures/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+        <tr>
+				<th scope="row"><a href="{{prefixpath }}relatedfeatures/">
+                    {% trans 'Relate two features' %}</a></th>
+                <td><a href="{{prefixpath }}relatedfeatures/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}relatedfeatures/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+
+        <tr>
+				<th scope="row"><a href="{{prefixpath }}featureactions/">
+                    {% trans 'Sampling feature action (link sampling features and actions)' %}</a></th>
+                <td><a href="{{prefixpath }}featureactions/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}featureactions/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+                 <tr ><td class="section"><h1>Result Definitions</h1></td></tr>
+              <tr>
+				<th scope="row"><a href="{{prefixpath }}results/">
+                    {% trans 'Results' %}</a></th>
+                <td><a href="{{prefixpath }}results/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}results/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+        <tr>
+				<th scope="row"><a href="{{prefixpath }}datatsets/">
+                    {% trans 'Datasets- a description (title, abstract) of some set of results ' %}</a></th>
+                <td><a href="{{prefixpath }}datatsets/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}datatsets/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+        <tr>
+				<th scope="row"><a href="{{prefixpath }}datasetsresults/">
+                    {% trans 'Dataset results- link results to datasets' %}</a></th>
+                <td><a href="{{prefixpath }}datasetsresults/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}datasetsresults/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+         <tr>
+				<th scope="row"><a href="{{prefixpath }}datasetsresults/">
+                    {% trans 'Dataset results- link results to datasets' %}</a></th>
+                <td><a href="{{prefixpath }}datasetsresults/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}datasetsresults/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+         <tr>
+				<th scope="row"><a href="{{prefixpath }}processinglevels/">
+                    {% trans 'Processing Levels' %}</a></th>
+                <td><a href="{{prefixpath }}processinglevels/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}processinglevels/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+        <tr ><td class="section"><h1>Result Values</h1></td></tr>
+        <tr>
+				<th scope="row"><a href="{{prefixpath }}measurementresults/">
+                    {% trans 'Measurement Results - Define Time Series' %}</a></th>
+                <td><a href="{{prefixpath }}measurementresults/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}measurementresults/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+
+          <tr>
+				<th scope="row"><a href="{{prefixpath }}measurementresultvalues/">
+                    {% trans 'Measurement Result Values - Time Series Values' %}</a></th>
+                <td><a href="{{prefixpath }}measurementresultvalues/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}measurementresultvalues/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+         <tr>
+				<th scope="row"><a href="{{prefixpath }}measurementresultvaluefile/">
+                    {% trans 'Measurement result value files' %}</a></th>
+                <td><a href="{{prefixpath }}measurementresultvaluefile/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}measurementresultvaluefile/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+        <tr>
+				<th scope="row"><a href="{{prefixpath }}profileresults/">
+                    {% trans 'Profile results- define soils data' %}</a></th>
+                <td><a href="{{prefixpath }}profileresults/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}profileresults/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+         <tr>
+				<th scope="row"><a href="{{prefixpath }}profileresults/">
+                    {% trans 'Profile result values- soils data values' %}</a></th>
+                <td><a href="{{prefixpath }}profileresults/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}profileresults/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+            <tr ><td class="section"><h1>Citations</h1></td></tr>
+         <tr>
+				<th scope="row"><a href="{{prefixpath }}citations/">
+                    {% trans 'Citations' %}</a></th>
+                <td><a href="{{prefixpath }}citations/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}citations/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+         <tr>
+				<th scope="row"><a href="{{prefixpath }}authorlists/">
+                    {% trans 'Author list' %}</a></th>
+                <td><a href="{{prefixpath }}authorlists/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}authorlists/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+         <tr>
+				<th scope="row"><a href="{{prefixpath }}authorlists/">
+                    {% trans 'Author list' %}</a></th>
+                <td><a href="{{prefixpath }}authorlists/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}authorlists/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+         <tr>
+				<th scope="row"><a href="{{prefixpath }}datasetcitations/">
+                    {% trans 'Dataset citations-link a dataset to a citation' %}</a></th>
+                <td><a href="{{prefixpath }}datasetcitations/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}datasetcitations/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+         <tr>
+				<th scope="row"><a href="{{prefixpath }}methodcitations/">
+                    {% trans 'Method citations-link a method to a citation' %}</a></th>
+                <td><a href="{{prefixpath }}methodcitations/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}methodcitations/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+         <tr>
+				<th scope="row"><a href="{{prefixpath }}extensionproperties/">
+                    {% trans 'Extension properties - define extra metrics about citations, can be applied to other objects' %}</a></th>
+                <td><a href="{{prefixpath }}extensionproperties/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}extensionproperties/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+        <tr>
+				<th scope="row"><a href="{{prefixpath }}citationextensionpropertyvalues/">
+                    {% trans 'Citation extension properties values - track extra metrics about citations' %}</a></th>
+                <td><a href="{{prefixpath }}citationextensionpropertyvalues/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}citationextensionpropertyvalues/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+        <tr ><td class="section"><h1>Data Logger Files</h1></td></tr>
+          <tr>
+				<th scope="row"><a href="{{prefixpath }}dataloggerprogramfiles/">
+                    {% trans 'Data logger program files' %}</a></th>
+                <td><a href="{{prefixpath }}dataloggerprogramfiles/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}dataloggerprogramfiles/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+          <tr>
+				<th scope="row"><a href="{{prefixpath }}dataloggerfiles/">
+                    {% trans 'Data logger files' %}</a></th>
+                <td><a href="{{prefixpath }}dataloggerfiles/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}dataloggerfiles/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+         <tr>
+				<th scope="row"><a href="{{prefixpath }}dataloggerfilecolumns/">
+                    {% trans 'Data logger file columns' %}</a></th>
+                <td><a href="{{prefixpath }}dataloggerfilecolumns/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}dataloggerfilecolumns/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+          <tr>
+				<th scope="row"><a href="{{prefixpath }}processdataloggerfile/">
+                    {% trans 'Process data logger files' %}</a></th>
+                <td><a href="{{prefixpath }}processdataloggerfile/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}processdataloggerfile/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+            <tr>
+				<th scope="row"><a href="{{prefixpath }}instrumentoutputvariables/">
+                    {% trans 'Instrument output variables' %}</a></th>
+                <td><a href="{{prefixpath }}instrumentoutputvariables/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}instrumentoutputvariables/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+           <tr>
+				<th scope="row"><a href="{{prefixpath }}equipmentmodels/">
+                    {% trans 'Equipment models' %}</a></th>
+                <td><a href="{{prefixpath }}equipmentmodels/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}equipmentmodels/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+                <tr ><td class="section"><h1>Data Quality</h1></td></tr>
+        <tr>
+				<th scope="row"><a href="{{prefixpath }}dataquality/">
+                    {% trans 'Data quality' %}</a></th>
+                <td><a href="{{prefixpath }}dataquality/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}dataquality/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+         <tr>
+				<th scope="row"><a href="{{prefixpath }}resultsdataquality/">
+                    {% trans 'Sepcify Data quality for results' %}</a></th>
+                <td><a href="{{prefixpath }}resultsdataquality/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}resultsdataquality/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+        {% endfor %}{% endif %}
+    </table></div>
+
+{% endblock %}{% block sidebar %}{% endblock %}
