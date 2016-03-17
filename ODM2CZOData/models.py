@@ -1303,9 +1303,9 @@ class Measurementresultvalues(models.Model):
         s='databaseid,'
         #s+='Value,'
         s += 'Date and Time,'
-        s += 'Variable Name,'
-        s += 'Unit Name,'
-        s += 'processing level,'
+        #s += 'Variable Name,'
+        #s += 'Unit Name,'
+        #s += 'processing level,'
         s += 'sampling feature/location,'
         s += 'time aggregation interval,'
         s += 'time aggregation unit,'
@@ -1317,9 +1317,9 @@ class Measurementresultvalues(models.Model):
         s = str(self.valueid)
         #s += ', {0}'.format(self.datavalue)
         s += ', {0}'.format(self.valuedatetime)
-        s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
-        s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
-        s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
+        #s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
+        #s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
+        #s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
         s += ',\" {0}\"'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)
         s += ', {0}'.format(self.resultid.timeaggregationinterval)
         s += ', {0},'.format(self.resultid.timeaggregationintervalunitsid)
