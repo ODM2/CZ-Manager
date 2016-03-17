@@ -290,7 +290,7 @@ def temp_pivot_chart_view(request):
     name_of_variables = []
     name_of_units = []
     myresultSeries = []
-    myresultSeriesExport = []
+    myresultSeriesExport = None
     i = 0
     data = {}
 
@@ -302,16 +302,6 @@ def temp_pivot_chart_view(request):
         #name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
 
         tmpname = get_name_of_sampling_feature(selected_result)
-        # if name_of_sampling_features.__len__() >0:
-        #     namefound=False
-        #     for name in name_of_sampling_features:
-        #         if name == tmpname:
-        #             namefound=True
-        #     if not namefound:
-        #         name_of_sampling_features.append(tmpname)
-        #     else:
-        #         name_of_sampling_features.append('')
-        # else:
         name_of_sampling_features.append(tmpname)
 
 
@@ -345,18 +335,18 @@ def temp_pivot_chart_view(request):
         .filter(valuedatetime__gt= entered_start_date)\
         .filter(valuedatetime__lt = entered_end_date)\
                     .filter(resultid=selectedMResult).order_by('-valuedatetime'))
-        myresultSeriesExport.append(Measurementresultvalues.objects.all()\
-        .filter(valuedatetime__gt= entered_start_date)\
-        .filter(valuedatetime__lt = entered_end_date)\
-                    .filter(resultid=selectedMResult).order_by('-valuedatetime'))
+        if myresultSeriesExport:
+            myresultSeriesExport = myresultSeriesExport | Measurementresultvalues.objects.all()\
+                .filter(valuedatetime__gt= entered_start_date)\
+                .filter(valuedatetime__lt = entered_end_date)\
+                    .filter(resultid=selectedMResult).order_by('-valuedatetime')
+        else:
+            myresultSeriesExport = Measurementresultvalues.objects.all()\
+                .filter(valuedatetime__gt= entered_start_date)\
+                .filter(valuedatetime__lt = entered_end_date)\
+                    .filter(resultid=selectedMResult).order_by('-valuedatetime')
         data.update({'datavalue' + str(i): []})
 
-    # [Date.UTC(1971, 5, 10), 0]
-    #{'data': [[1437435900, 71.47], [1437435000, 71.47],
-     # [{
-     #        data: [
-     #            [Date.UTC(1970, 9, 21), 0],
-     #            [Date.UTC(1970, 10, 4), 0.28],
     i = 0
 
     for myresults in myresultSeries:
@@ -420,19 +410,20 @@ def temp_pivot_chart_view(request):
     #if the user hit the export csv button export the measurement results to csv
 
     if request.REQUEST.get('export_data'):
+        response = exportspreadsheet(request,myresultSeriesExport,False)
         csvexport=True
-        k=0
-        myfile = StringIO.StringIO()
-        for myresults in myresultSeriesExport:
-            for result in myresults:
-                if k==0:
-                    myfile.write(result.csvheader())
-                    myfile.write('\n')
-                myfile.write(result.csvoutput())
-                myfile.write('\n')
-                k+=1
-        response = HttpResponse(myfile.getvalue(),content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
+        # k=0
+        # myfile = StringIO.StringIO()
+        # for myresults in myresultSeriesExport:
+        #     for result in myresults:
+        #         if k==0:
+        #             myfile.write(result.csvheader())
+        #             myfile.write('\n')
+        #         myfile.write(result.csvoutput())
+        #         myfile.write('\n')
+        #         k+=1
+        #response = HttpResponse(myfile.getvalue(),content_type='text/csv')
+        #response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
     if csvexport:
         return response
     else:
@@ -629,7 +620,7 @@ def exportcitations(request,citations,csv):
     return response
 
 
-def exportspreadsheet(request,resultValuesSeries):
+def exportspreadsheet(request,resultValuesSeries,profileResult=True):
     #if the user hit the export csv button export the measurement results to csv
     csvexport=True
 
@@ -663,11 +654,16 @@ def exportspreadsheet(request,resultValuesSeries):
             myfile.write(myresults.csvheaderShort())
         #elif not lastUnit==unit:
              #myfile.write(myresults.csvheaderShortUnitOnly())
-
-    resultValuesSeries = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
-        filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area")).\
-        order_by("resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
-            "resultid__intendedzspacing","resultid__resultid__variableid","resultid__resultid__unitsid")
+    if profileResult:
+        resultValuesSeries = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
+            filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area")).\
+            order_by("resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
+                "resultid__intendedzspacing","resultid__resultid__variableid","resultid__resultid__unitsid")
+    else:
+         resultValuesSeries = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
+            filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area")).\
+            order_by("valuedatetime","resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
+                "resultid__resultid__variableid","resultid__resultid__unitsid")
     #myfile.write(lastResult.csvheaderShort())
     myfile.write('\n')
     lastSamplingFeatureCode=''
@@ -675,6 +671,8 @@ def exportspreadsheet(request,resultValuesSeries):
     lastDepth=0
     depth = 0
     position=0
+    time = None
+    lastTime = None
     nextRow = False
     #resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode
     for myresults in resultValuesSeries:
@@ -685,14 +683,24 @@ def exportspreadsheet(request,resultValuesSeries):
         lastSamplingFeatureCode = samplingFeatureCode
         samplingFeatureCode=myresults.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturecode
         lastDepth = depth
-        depth = myresults.resultid.intendedzspacing
+        if profileResult:
+            depth = myresults.resultid.intendedzspacing
 
-        if not k==0 and (not lastSamplingFeatureCode == samplingFeatureCode or not depth==lastDepth):
-            myfile.write('\n')
-            myfile.write(myresults.csvoutput())
-            position=0
-        elif k==0:
-            myfile.write(myresults.csvoutput())
+            if not k==0 and (not lastSamplingFeatureCode == samplingFeatureCode or not depth==lastDepth):
+                myfile.write('\n')
+                myfile.write(myresults.csvoutput())
+                position=0
+            elif k==0:
+                myfile.write(myresults.csvoutput())
+        else:
+            lastTime = time
+            time = myresults.valuedatetime
+            if not k==0 and (not lastSamplingFeatureCode == samplingFeatureCode or not time==lastTime):
+                myfile.write('\n')
+                myfile.write(myresults.csvoutput())
+                position=0
+            elif k==0:
+                myfile.write(myresults.csvoutput())
         #else:
         #if variablesAndUnits.index(unicode(variable)+unicode(unit)) ==position:
         for i in range(position,variablesAndUnits.index(unicode(variable)+unicode(unit))):

@@ -1301,12 +1301,12 @@ class Measurementresultvalues(models.Model):
         return s
     def csvheader(self):
         s='databaseid,'
-        s+='Value,'
+        #s+='Value,'
         s += 'Date and Time,'
         s += 'Variable Name,'
         s += 'Unit Name,'
-        s += 'sampling feature/location,'
         s += 'processing level,'
+        s += 'sampling feature/location,'
         s += 'time aggregation interval,'
         s += 'time aggregation unit,'
         s +='annotation,'
@@ -1315,7 +1315,7 @@ class Measurementresultvalues(models.Model):
         return s
     def csvoutput(self):
         s = str(self.valueid)
-        s += ', {0}'.format(self.datavalue)
+        #s += ', {0}'.format(self.datavalue)
         s += ', {0}'.format(self.valuedatetime)
         s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
         s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
@@ -1338,6 +1338,13 @@ class Measurementresultvalues(models.Model):
         s = buildCitation(s,self)
 
             #s += ' {0}\"'.format(citation.citationlink)
+        return s
+    def csvheaderShort(self):
+        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(self.resultid.resultid.variableid.variablecode,self.resultid.resultid.unitsid.unitsname,self.resultid.resultid.processing_level)
+        return s
+    def csvoutputShort(self):
+        s = '{0}'.format(self.datavalue)
+        s += ','
         return s
     class Meta:
         managed = False
