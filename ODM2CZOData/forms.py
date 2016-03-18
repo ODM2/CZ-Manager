@@ -324,6 +324,7 @@ class FeatureactionsAdmin(admin.ModelAdmin):
     list_display = ['samplingfeatureid','action',]
     form=FeatureactionsAdminForm
     save_as = True
+    search_fields=['action__method__methodname','samplingfeatureid__samplingfeaturename']
 
 class DatasetsAdminForm(ModelForm):
     datasetabstract = forms.CharField(max_length=500, widget=forms.Textarea )

@@ -1,8 +1,4 @@
 <!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/
-
-
-
-
 -->
 
 {% extends "admin/base_site.html" %}
@@ -44,7 +40,7 @@
         <div class="app-{{ app.app_label }} module">
     <table>
               <caption>
-            <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">{{ app.name }}- go here for a list of all objects to edit</a>
+            <a href="{{ app.app_url }}" class="section" title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">List of all editable item types</a>
             </caption>
 				</table></div>
 
@@ -119,4 +115,3 @@
     </div>
 </div>
 {% endblock %}{% endblock %}
-
