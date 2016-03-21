@@ -138,19 +138,21 @@ def buildCitation(s, self):
         s +=','
         return  s
     for citation in citations:
-        citedauthors = Authorlists.objects.filter(citationid=citation.citationid)
+        citedauthors = Authorlists.objects.filter(citationid=citation.citationid).order_by("authororder")
         citedpersons = People.objects.filter(personid__in=citedauthors.values("personid"))
-        for author in citedpersons:
-            if authcount ==0:
-                s += ',\" {0}'.format(author.personlastname)
-            else:
-                s += ' {0}'.format(author.personlastname)
+        for citedauthor in citedauthors:
+            for author in citedpersons:
+                if citedauthor.personid.personid == author.personid:
+                    if authcount ==0:
+                        s += ',\" {0}'.format(author.personlastname)
+                    else:
+                        s += ' {0}'.format(author.personlastname)
 
-            authcount +=1
-            if authcount == citedpersons.count():
-                s += ' {0}.'.format(author.personfirstname)
-            else:
-                s += ' {0},'.format(author.personfirstname)
+                    authcount +=1
+                    if authcount == citedpersons.count():
+                        s += ' {0}.'.format(author.personfirstname)
+                    else:
+                        s += ' {0},'.format(author.personfirstname)
         s += ' {0}'.format(citation.title)
         s += '. {0}'.format(citation.publisher)
         s += ', {0}.\"'.format(citation.publicationyear)
@@ -294,7 +296,7 @@ class Authorlists(models.Model):
         #if self.authororder ==1:
             #s = 'FAU - '+ str(self.personid.personlastname)+","+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'\n'
         #else:
-        s = 'AU - '+ str(self.personid.personlastname)+","+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'\n'
+        s = 'AU  - '+ str(self.personid.personlastname)+","+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'\n'
         return s
 
 
@@ -390,8 +392,23 @@ class Citationextensionpropertyvalues(models.Model):
         #s ='"'+ str(self.propertyid)+'"\t'
         #return s
     def endnoteexport(self):
+        s=''
         if (str(self.propertyvalue).__len__()>0):
-            s = 'KW '+ str(self.propertyid) + ': '+str(self.propertyvalue) +'\n'
+            if str(self.propertyid)=='Citation Category - Paper, Book, Talk, Poster, Dissertation, Thesis, Undergrad Thesis, Report':
+                s+= 'TY  - '
+                if str(self.propertyvalue)=='Paper':
+                    s+= 'JOUR' +'\n'
+                if str(self.propertyvalue)=='Book':
+                    s+= 'BOOK' +'\n'
+                if str(self.propertyvalue)=='Talk':
+                    s+= 'CONF' +'\n'
+                if str(self.propertyvalue)=='Poster':
+                    s+= 'ABST' +'\n'
+                if str(self.propertyvalue)=='Dissertation' or  str(self.propertyvalue)=='Thesis' or  str(self.propertyvalue)=='Undergrad Thesis':
+                    s+= 'THES' +'\n'
+                if str(self.propertyvalue)=='Report':
+                    s+= 'RPRT' +'\n'
+            s += 'N1  - '+ str(self.propertyid) + ': '+str(self.propertyvalue) +'\n'
         else:
             s=''
         return s
@@ -440,10 +457,10 @@ class Citations(models.Model):
         s = 'TI\tPB\tPY\tcitationlink\t'
         return s
     def endnoteexport(self):
-        s = 'TI {0}\n'.format(self.title)
-        s += 'PB {0}\n'.format(self.publisher)
-        s += 'PY {0}\n'.format(self.publicationyear)
-        s += 'DI {0} \n'.format(self.citationlink)
+        s = 'TI  - {0}\n'.format(self.title)
+        s += 'PB  - {0}\n'.format(self.publisher)
+        s += 'PY  - {0}\n'.format(self.publicationyear)
+        s += 'DI  - {0} \n'.format(self.citationlink)
         return s
 
 class CvActiontype(models.Model):

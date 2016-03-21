@@ -155,6 +155,7 @@ class CitationsAdminForm(ModelForm):
 class CitationsAdmin(admin.ModelAdmin):
     list_display=('title','publisher','publicationyear', 'citation_link')
     form=CitationsAdminForm
+    search_fields = ['title','publisher','publicationyear','authorlists__personid__personfirstname', 'authorlists__personid__personlastname']
     def citation_link(self,obj):
        return link_list_display_DOI(obj.citationlink)
     citation_link.short_description = 'link to citation'
