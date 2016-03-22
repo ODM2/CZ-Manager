@@ -448,6 +448,16 @@ def duplicate_Dataloggerfilecolumns_event(ModelAdmin, request, queryset):
 duplicate_Dataloggerfilecolumns_event.short_description = "Duplicate selected datalogger file columns"
 
 class DataloggerfilecolumnsAdminForm(ModelForm):
+    resultid =AutoCompleteSelectField('result_lookup', required=True, help_text='result to extend as a soil profile result',label='Result')
+    def clean_resultid(self):
+      resultiduni= self.data['resultid']
+      resultid = None
+      for riduni in resultiduni.split("-"):
+          if riduni.isdigit():
+              resultid = riduni
+              continue
+      result = Results.objects.filter(resultid=resultid).get()
+      return result
     class Meta:
         model= Dataloggerfilecolumns
         fields = '__all__'
