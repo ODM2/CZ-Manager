@@ -165,13 +165,13 @@ mrvsSonadoraCond = Measurementresultvalues.objects.filter(resultid__resultid__va
     .filter(valuedatetime__gte='2014-01-01').filter(valuedatetime__lte='2016-03-23').order_by('valuedatetime')
 #result=Measurementresults.objects.filter(resultid=16153).get()
 
-annotationtextHigh = "Value above 1000 uS/cm, this is considered out of range for stream water temperature, Original value was "
+annotationtextHigh = "Value above 1000 uS/cm, this is considered out of range for stream conductivity, Original value was "
 annotationtextLow = "Values are out of range during this time period water level was low and probe was out of the water, Original value was "
-annotationtextDateRange = "Value below 15 uS/cm, this is considered out of range for stream water temperature, Original value was"
+annotationtextDateRange = "Value below 15 uS/cm, this is considered out of range for stream conductivity, Original value was"
 
 plevel = Processinglevels.objects.filter(processinglevelid=2).get()
 #newmr=newMeasurementResult(mrvsSonadoraCond,plevel,printvals,save) #got 16156
 newmr=Measurementresults.objects.filter(resultid=16156).get()
 printvals = False
-save = True
+save = False
 QAProcessLevelCreation(mrvsSonadoraCond,newmr,timeRangesToRemove,printvals,save,1000,15,annotationtextHigh,annotationtextLow,annotationtextDateRange)
