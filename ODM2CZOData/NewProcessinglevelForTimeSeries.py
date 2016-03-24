@@ -102,7 +102,7 @@ def QAProcessLevelCreation(SeriesToProcess,result,timeRangesToRemove,printvals,s
             if datavalue >highThreshold:
                 QAFlagHigh=True
                 datavalue = -6999
-            elif not QAFlagHigh:
+            elif not QAFlagOutofWater:
                 if printvals: print("good " + str(mrv))
             if datavalue <=lowThreshold:
                 QAFlagLow=True
