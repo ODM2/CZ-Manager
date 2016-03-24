@@ -96,11 +96,11 @@ def QAProcessLevelCreation(SeriesToProcess,result,timeRangesToRemove,printvals,s
             for range in timeRangesToRemove:
                 #if printvals: print(range[0] + ' to ' + range[1])
                 if valuedatetime >range[0] and valuedatetime < range[1]:
-                    QAFlagHigh=True
+                    QAFlagOutofWater=True
                     datavalue = -6999
                     if printvals: print("bad " + str(mrv))
             if datavalue >highThreshold:
-                QAFlagOutofWater=True
+                QAFlagHigh=True
                 datavalue = -6999
             elif not QAFlagHigh:
                 if printvals: print("good " + str(mrv))
@@ -119,7 +119,7 @@ def QAProcessLevelCreation(SeriesToProcess,result,timeRangesToRemove,printvals,s
                     newanno = Annotations(annotationtypecv=annotationtypecv,annotationcode="Value out of Range: High",
                                           annotationtext=annotationtext,annotationdatetime=annotationdatetime,annotationutcoffset=5,annotatorid=annotatorid)
                 elif QAFlagOutofWater:
-                    annotationtext = annotationtextLow+ str(flagdatavalue) + " on " + str(valuedatetime)
+                    annotationtext = annotationtextDateRange+ str(flagdatavalue) + " on " + str(valuedatetime)
                     annotationdatetime = datetime.now()
                     newanno = Annotations(annotationtypecv=annotationtypecv,annotationcode="Date range excluded",
                                           annotationtext=annotationtext,annotationdatetime=annotationdatetime,annotationutcoffset=5,annotatorid=annotatorid)
@@ -127,7 +127,7 @@ def QAProcessLevelCreation(SeriesToProcess,result,timeRangesToRemove,printvals,s
                 newmrvanno= Measurementresultvalueannotations(valueid=newmrv,annotationid=newanno)
                 if save: newmrvanno.save()
             if QAFlagLow:
-                annotationtext = annotationtextDateRange + str(flagdatavalue)
+                annotationtext = annotationtextLow + str(flagdatavalue)
                 annotationdatetime = datetime.now()
                 newanno = Annotations(annotationtypecv=annotationtypecv,annotationcode="Value out of Range: Low",
                                       annotationtext=annotationtext,annotationdatetime=annotationdatetime,annotationutcoffset=5,annotatorid=annotatorid)
@@ -156,7 +156,7 @@ annotationtextLow = "Values are out of range during this time period water level
 annotationtextDateRange = "Value below 0 C, this is considered out of range for stream water temperature, Original value was"
 #result to add the values too
 
-
+plevel = Processinglevels.objects.filter(processinglevelid=2).get()
 #result=Measurementresults.objects.filter(resultid=16153).get()
 #QAProcessLevelCreation(mrvsSonadoraTemp,result,timeRangesToRemove,printvals,save,43,0,annotationtextHigh,annotationtextLow,annotationtextDateRange)
 
@@ -169,7 +169,7 @@ annotationtextHigh = "Value above 1000 uS/cm, this is considered out of range fo
 annotationtextLow = "Values are out of range during this time period water level was low and probe was out of the water, Original value was "
 annotationtextDateRange = "Value below 15 uS/cm, this is considered out of range for stream conductivity, Original value was"
 
-plevel = Processinglevels.objects.filter(processinglevelid=2).get()
+
 #newmr=newMeasurementResult(mrvsSonadoraCond,plevel,printvals,save) #got 16156
 newmr=Measurementresults.objects.filter(resultid=16156).get()
 printvals = False
