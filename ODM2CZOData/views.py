@@ -289,6 +289,8 @@ def temp_pivot_chart_view(request):
     name_of_sampling_features = []
     name_of_variables = []
     name_of_units = []
+    ProcessingLevel = []
+
     myresultSeries = []
     myresultSeriesExport = None
     i = 0
@@ -633,25 +635,25 @@ def exportspreadsheet(request,resultValuesSeries,profileResult=True):
     variable = ''
     unit = ''
     firstheader = True
-    firstVar = None
-    firstUnit = None
+    processingCode = None
+    lastProcessingCode = None
     resultValuesHeaders = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
         filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area")).\
-        order_by("resultid__resultid__variableid","resultid__resultid__unitsid")#.distinct("resultid__resultid__variableid","resultid__resultid__unitsid")
+        order_by("resultid__resultid__variableid","resultid__resultid__unitsid","resultid__resultid__processing_level")#.distinct("resultid__resultid__variableid","resultid__resultid__unitsid")
     for myresults in resultValuesHeaders:
         lastVariable = variable
         variable=myresults.resultid.resultid.variableid.variable_name
         lastUnit = unit
         unit = myresults.resultid.resultid.unitsid
+        lastProcessingCode = processingCode
+        processingCode = myresults.resultid.resultid.processing_level
         #if not firstheader and firstVar==variable and firstUnit==unit:
             #only add the first instance of each variable, once one repeats your done.
             #break
-        if not lastVariable == variable or not lastUnit==unit:
-            variablesAndUnits.append(unicode(variable) + unicode(unit))
+        if not lastVariable == variable or not lastUnit==unit or not lastProcessingCode==processingCode:
+            variablesAndUnits.append(unicode(variable) + unicode(unit)+unicode(processingCode))
             if firstheader:
                 myfile.write(myresults.csvheader())
-                firstVar=variable
-                firstUnit=unit
                 firstheader = False
             myfile.write(myresults.csvheaderShort())
         #elif not lastUnit==unit:
@@ -665,7 +667,7 @@ def exportspreadsheet(request,resultValuesSeries,profileResult=True):
          resultValuesSeries = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
             filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area")).\
             order_by("valuedatetime","resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
-                "resultid__resultid__variableid","resultid__resultid__unitsid")
+                "resultid__resultid__variableid","resultid__resultid__unitsid","resultid__resultid__processing_level")
     #myfile.write(lastResult.csvheaderShort())
     myfile.write('\n')
     lastSamplingFeatureCode=''
@@ -685,6 +687,8 @@ def exportspreadsheet(request,resultValuesSeries,profileResult=True):
         lastSamplingFeatureCode = samplingFeatureCode
         samplingFeatureCode=myresults.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturecode
         lastDepth = depth
+        lastProcessingCode = processingCode
+        processingCode = myresults.resultid.resultid.processing_level
         if profileResult:
             depth = myresults.resultid.intendedzspacing
 
@@ -705,7 +709,7 @@ def exportspreadsheet(request,resultValuesSeries,profileResult=True):
                 myfile.write(myresults.csvoutput())
         #else:
         #if variablesAndUnits.index(unicode(variable)+unicode(unit)) ==position:
-        for i in range(position,variablesAndUnits.index(unicode(variable)+unicode(unit))):
+        for i in range(position,variablesAndUnits.index(unicode(variable)+unicode(unit)+unicode(processingCode))):
             myfile.write(",")
             position+=1
         myfile.write(myresults.csvoutputShort())
