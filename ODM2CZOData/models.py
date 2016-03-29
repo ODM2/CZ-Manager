@@ -296,7 +296,7 @@ class Authorlists(models.Model):
         #if self.authororder ==1:
             #s = 'FAU - '+ str(self.personid.personlastname)+","+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'\n'
         #else:
-        s = 'AU  - '+ str(self.personid.personlastname)+","+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'\n'
+        s = 'AU  - '+ str(self.personid.personlastname)+","+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'\r\n'
         return s
 
 
@@ -391,24 +391,41 @@ class Citationextensionpropertyvalues(models.Model):
     #def endnoteheader(self):
         #s ='"'+ str(self.propertyid)+'"\t'
         #return s
+    def pubType(self):
+        type = None
+        if (str(self.propertyvalue).__len__()>0):
+            if str(self.propertyid)=='Citation Category - Paper, Book, Talk, Poster, Dissertation, Thesis, Undergrad Thesis, Report':
+                if str(self.propertyvalue)=='Paper':
+                    type="Paper"
+                if str(self.propertyvalue)=='Book':
+                    type= "Book"
+                if str(self.propertyvalue)=='Talk':
+                    type= "Conference"
+                if str(self.propertyvalue)=='Poster':
+                    type= "Poster"
+                if str(self.propertyvalue)=='Dissertation' or  str(self.propertyvalue)=='Thesis' or  str(self.propertyvalue)=='Undergrad Thesis':
+                    type = "Thesis"
+                if str(self.propertyvalue)=='Report':
+                    type="Report"
+        return type
     def endnoteexport(self):
         s=''
         if (str(self.propertyvalue).__len__()>0):
             if str(self.propertyid)=='Citation Category - Paper, Book, Talk, Poster, Dissertation, Thesis, Undergrad Thesis, Report':
                 s+= 'TY  - '
                 if str(self.propertyvalue)=='Paper':
-                    s+= 'JOUR' +'\n'
+                    s+= 'JOUR' +'\r\n'
                 if str(self.propertyvalue)=='Book':
-                    s+= 'BOOK' +'\n'
+                    s+= 'BOOK' +'\r\n'
                 if str(self.propertyvalue)=='Talk':
-                    s+= 'CONF' +'\n'
+                    s+= 'CONF' +'\r\n'
                 if str(self.propertyvalue)=='Poster':
-                    s+= 'ABST' +'\n'
+                    s+= 'ABST' +'\r\n'
                 if str(self.propertyvalue)=='Dissertation' or  str(self.propertyvalue)=='Thesis' or  str(self.propertyvalue)=='Undergrad Thesis':
-                    s+= 'THES' +'\n'
+                    s+= 'THES' +'\r\n'
                 if str(self.propertyvalue)=='Report':
-                    s+= 'RPRT' +'\n'
-            s += 'N1  - '+ str(self.propertyid) + ': '+str(self.propertyvalue) +'\n'
+                    s+= 'RPRT' +'\r\n'
+            s += 'N1  - '+ str(self.propertyid) + ': '+str(self.propertyvalue) +'\r\n'
         else:
             s=''
         return s
@@ -457,10 +474,20 @@ class Citations(models.Model):
         s = 'TI\tPB\tPY\tcitationlink\t'
         return s
     def endnoteexport(self):
-        s = 'TI  - {0}\n'.format(self.title)
-        s += 'PB  - {0}\n'.format(self.publisher)
-        s += 'PY  - {0}\n'.format(self.publicationyear)
-        s += 'DI  - {0} \n'.format(self.citationlink)
+        propertyvalues = Citationextensionpropertyvalues.objects.filter(citationid=self.citationid)
+        pubType=None
+        for propertyvalue in propertyvalues:
+            if propertyvalue.pubType:
+                pubType=propertyvalue.pubType
+        if not pubType: ##"Conference""Poster""Thesis""Report"
+            pubType = "Unknown"
+        s = 'TI  - {0}\r\n'.format(self.title)
+        if pubType=="Paper":
+            s += 'JO  - {0}\r\n'.format(self.publisher)
+        else:
+            s += 'PB  - {0}\r\n'.format(self.publisher)
+        s += 'PY  - {0}\r\n'.format(self.publicationyear)
+        s += 'DI  - {0}\r\n'.format(self.citationlink)
         return s
 
 class CvActiontype(models.Model):

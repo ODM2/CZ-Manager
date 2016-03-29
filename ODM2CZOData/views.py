@@ -611,7 +611,7 @@ def exportcitations(request,citations,csv):
         if csv:
             myfile.write('\n')
         else:
-            myfile.write('ER \n')
+            myfile.write('ER  - \r\n\r\n')
         first=False
 
     if csv:
