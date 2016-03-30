@@ -107,12 +107,12 @@ def QAProcessLevelCreation(SeriesToProcess,result,timeRangesToRemove,printvals,s
                 QAFlagHigh=True
                 datavalue = -6999
                 if printvals: print("bad " + str(mrv))
-            elif not QAFlagOutofWater:
-                if printvals: print("good " + str(mrv))
-            if datavalue <=lowThreshold:
+            elif datavalue <=lowThreshold:
                 QAFlagLow=True
                 datavalue = -6999
                 if printvals: print("bad " + str(mrv))
+            elif not QAFlagOutofWater:
+                if printvals: print("good " + str(mrv))
             valuedatetime=mrv.valuedatetime
             valuedatetimeutcoffset=mrv.valuedatetimeutcoffset
             newmrv = Measurementresultvalues(resultid=result,datavalue=datavalue,valuedatetime=valuedatetime,

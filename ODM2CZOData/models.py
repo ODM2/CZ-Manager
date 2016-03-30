@@ -1353,7 +1353,6 @@ class Measurementresultvalues(models.Model):
         s += 'sampling feature/location,'
         s += 'time aggregation interval,'
         s += 'time aggregation unit,'
-        s +='annotation,'
         s +='citation,'
 
         return s
@@ -1367,27 +1366,22 @@ class Measurementresultvalues(models.Model):
         s += ',\" {0}\"'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)
         s += ', {0}'.format(self.resultid.timeaggregationinterval)
         s += ', {0},'.format(self.resultid.timeaggregationintervalunitsid)
-        mrvannotation = Measurementresultvalueannotations.objects.filter(valueid=self.valueid)
-        if mrvannotation.__len__()>0:
-            mrvannotat =mrvannotation[:1]
-            annotation = Annotations.objects.filter(annotationid=mrvannotat[0].annotationid.annotationid)
-            if annotation.__len__()>0:
-                annote = annotation[:1]
-                s += ',\" {0}\"'.format(annote[0])
-            else:
-                 s += ','
-        else:
-            s += ','
-
         s = buildCitation(s,self)
 
             #s += ' {0}\"'.format(citation.citationlink)
         return s
     def csvheaderShort(self):
-        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(self.resultid.resultid.variableid.variablecode,self.resultid.resultid.unitsid.unitsname,self.resultid.resultid.processing_level)
+        s = '\" {0} -unit-{1}-processing level-{2}\",annotation,'.format(self.resultid.resultid.variableid.variablecode,self.resultid.resultid.unitsid.unitsname,self.resultid.resultid.processing_level)
         return s
     def csvoutputShort(self):
         s = '{0}'.format(self.datavalue)
+        mrvannotation = Measurementresultvalueannotations.objects.filter(valueid=self.valueid)
+        id = self.valueid
+        annotations = Annotations.objects.filter(annotationid__in=mrvannotation)
+        s += ',\"'
+        for anno in annotations:
+            s += '{0} '.format(anno)
+        s += '\"'
         s += ','
         return s
     class Meta:
