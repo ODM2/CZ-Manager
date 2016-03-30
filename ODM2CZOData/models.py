@@ -477,8 +477,8 @@ class Citations(models.Model):
         propertyvalues = Citationextensionpropertyvalues.objects.filter(citationid=self.citationid)
         pubType=None
         for propertyvalue in propertyvalues:
-            if propertyvalue.pubType:
-                pubType=propertyvalue.pubType
+            if propertyvalue.pubType():
+                pubType=propertyvalue.pubType()
         if not pubType: ##"Conference""Poster""Thesis""Report"
             pubType = "Unknown"
         s = 'TI  - {0}\r\n'.format(self.title)
