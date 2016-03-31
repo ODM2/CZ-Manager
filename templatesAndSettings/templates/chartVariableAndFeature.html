@@ -13,9 +13,11 @@
 {# django-admin-shortcuts changes these blocks #}
 
 {% block breadcrumbs %}
+{% if authenticated %}
 	<div class="admin_shortcuts">
 		{% admin_shortcuts %}
 	</div>
+	{% endif %}
 {% endblock %}
 
  {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
@@ -107,8 +109,9 @@ $(document).ready(function() {
 	
 	});
 </script>
-{% admin_shortcuts_js %}{% endblock %}
 
+
+{% admin_shortcuts_js %}{% endblock %}
 {# end changes #}
 
 {% block coltype %}colM{% endblock %}
@@ -126,7 +129,7 @@ $(document).ready(function() {
 	 </div>
 	<div id='chartid' class="chart" style="height:75%; width:100%"></div>
 	
-	
+
 {% include 'FeatureAndVariableList.html' %}
 
 {% endblock %}

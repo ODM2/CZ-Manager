@@ -13,9 +13,11 @@
 {# django-admin-shortcuts changes these blocks #}
 
 {% block breadcrumbs %}
+{% if authenticated %}
 	<div class="admin_shortcuts">
 		{% admin_shortcuts %}
 	</div>
+	{% endif %}
 {% endblock %}
 
  {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>

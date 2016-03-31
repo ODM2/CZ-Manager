@@ -222,8 +222,11 @@ def relatedFeaturesFilter(request,done,selected_relatedfeatid,selected_resultid,
 
 
 def temp_pivot_chart_view(request):
+    authenticated=True
     if not request.user.is_authenticated():
         return HttpResponseRedirect('../')
+        authenticated=False
+
 
     selected_resultid = 15
     selected_featureactionid = 5
@@ -431,7 +434,7 @@ def temp_pivot_chart_view(request):
     else:
         #raise ValidationError(relatedFeatureList)
         return TemplateResponse(request,'chart.html',{ 'featureactionList': featureactionList,'prefixpath': CUSTOM_TEMPLATE_PATH, 'resultList': resultList,
-            'startDate':entered_start_date,'endDate':entered_end_date, 'SelectedResults':int_selectedresultid_ids,
+            'startDate':entered_start_date,'endDate':entered_end_date, 'SelectedResults':int_selectedresultid_ids,'authenticated':authenticated,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'graphType':graphType, 'xAxis': xAxis, 'yAxis': yAxis,'name_of_units':name_of_units,
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,},)
 #
@@ -554,7 +557,7 @@ def scatter_plot(request):
         response=exportspreadsheet(request,resultValuesSeries)
         return response
     return TemplateResponse(request,'soilsscatterplot.html',{'prefixpath': CUSTOM_TEMPLATE_PATH,
-        'xVariables':variables, 'yVariables':variables,
+        'xVariables':variables, 'yVariables':variables,'authenticated':authenticated,
         'xVariableSelection':xVariableSelection,'yVariableSelection':yVariableSelection,
         'fieldarea1':fieldarea1, 'fieldarea2':fieldarea2, 'fieldareas':fieldareas,
         'chartID': chartID, 'chart': chart,'title2': title2, 'graphType':graphType,
@@ -720,8 +723,9 @@ def exportspreadsheet(request,resultValuesSeries,profileResult=True):
     return response
 
 def graph_data(request):
-    #if not request.user.is_authenticated():
-        #return HttpResponseRedirect('../')
+    authenticated=True
+    if not request.user.is_authenticated():
+        authenticated=False
 
     selected_resultid = 9365
     selected_relatedfeatid = 15
@@ -930,6 +934,6 @@ def graph_data(request):
         name_of_units = removeDupsFromListOfStrings(name_of_units)
         #raise ValidationError(relatedFeatureList)
         return TemplateResponse(request,'chartVariableAndFeature.html',{'prefixpath': CUSTOM_TEMPLATE_PATH,  'variableList': variableList,
-             'SelectedVariables':int_selectedvariable_ids,
+             'SelectedVariables':int_selectedvariable_ids,'authenticated':authenticated,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'graphType':graphType, 'yAxis': yAxis,'name_of_units':name_of_units,
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid,},)

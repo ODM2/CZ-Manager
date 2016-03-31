@@ -31,8 +31,11 @@ option {
 				{% endif %}
               {% endfor %}
             </select></td>
-	<td><input type="submit" name="update_result_on_related_feature" value="Select Results by Grouping" />
-	</td></tr></table>
+	<td><input type="submit" name="update_result_on_related_feature" value="Select Results by Grouping" /></td></tr>
+		<tr><td><input type="submit" name="update_chart" value="Update Chart" />
+	<input type="submit" name="export_data" value="Export Data" /></td></tr>
+	</table>
+	<div id="" style="overflow:scroll; height:400px;">
 	<table >
 				<tr ><th scope="col" class="section">Variable Code</td>
 				<th scope="col"  class="section">Variable Name</th>
@@ -54,7 +57,6 @@ option {
 				
                 {% endfor %}
 			 </table>	
-			
+			</div>
 			<br>
-	<input type="submit" name="update_chart" value="Update Chart" />
-	<input type="submit" name="export_data" value="Export Data" /></form>
+</form>

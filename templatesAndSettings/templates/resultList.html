@@ -44,7 +44,15 @@ option {
               {% endfor %}
             </select></td>
 	<td><input type="submit" name="update_result_on_related_feature" value="Select Results with Slope/Transect Position" />
+	</td></tr>
+	<tr><td>	<input type="submit" name="update_chart" value="Update Chart" />
+	<input type="submit" name="export_data" value="Export Data" />
+	<input id="startDate" maxlength="100" value= "{{ startDate }}" name="startDate" type="text">
+			Start Date (format YYYY-MM-DD HH:MM) </input>
+			<input id="endDate" maxlength="100" value= "{{ endDate }}" name="endDate" type="text"/>
+			End Date (format YYYY-MM-DD HH:MM) </input>
 	</td></tr></table>
+	<div id="" style="overflow:scroll; height:400px;">
 	<table >
                 {% assign prefixpath '/admin/odm2testapp/' %}
 				<tr ><th scope="col" class="section">Result Series</td>
@@ -70,12 +78,8 @@ option {
 				
                 {% endfor %}
 			 </table>	
+			</div>
+			<br>
 			
 			<br>
-			<input id="startDate" maxlength="100" value= "{{ startDate }}" name="startDate" type="text">
-			Start Date (format YYYY-MM-DD HH:MM) </input>
-			<input id="endDate" maxlength="100" value= "{{ endDate }}" name="endDate" type="text"/>
-			End Date (format YYYY-MM-DD HH:MM) </input>
-			<br>
-	<input type="submit" name="update_chart" value="Update Chart" />
-	<input type="submit" name="export_data" value="Export Data" /></form>
+</form>
