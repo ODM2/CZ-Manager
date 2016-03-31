@@ -13,38 +13,29 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
 from django.db.models import Q
 from  django.core.exceptions import MultipleObjectsReturned
 
-def variableIDLookup(variablename):
-    vartext= re.split(',| ',variablename)
-    vartext = filter(lambda name: name.strip(), vartext)
-    variables = Variables.objects.all()
-    for text in vartext:
-        variables = Variables.objects.filter(variable_name__name__icontains=text)
-    try:
-        variable = variables.get()
-    except MultipleObjectsReturned:
-        print("multiple items match this name they are: ")
-        for var in variables:
-            print(var)
-        return None
-    return variable.variableid
 
-
-def searchModelColumnFor(name,Model,variable_column):
-    vartext= re.split(',| ',name)
-    vartext = filter(lambda name: name.strip(), vartext)
-    variables = Model.objects.all()
+#searchTextString = some string to search a models charField for
+# Model = the model in which to search
+# columnName = the name of the charField column to search in
+#return = if one model object matches the search string return the object
+# if multiple objects are returned print those objects and return None.
+# example: searchModelColumnFor(" milligrams per kilogram ",Units,'unitsname')
+def searchModelColumnFor(searchTextString,Model,columnName):
+    searchText= re.split(',| ',searchTextString)
+    searchText = filter(lambda name: name.strip(), searchText)
+    modelObjects = Model.objects.all()
 
     #variable_column = 'variable_name__name'
     search_type = 'icontains'
-    filter2 = variable_column + '__' + search_type
-    for search_string in vartext:
+    filter2 = columnName + '__' + search_type
+    for search_string in searchText:
         #namefield = "variable_name__name__icontains"
-        variables = variables.filter(**{ filter2: search_string })
+        modelObjects = modelObjects.filter(**{ filter2: search_string })
     try:
-        variable = variables.get()
+        variable = modelObjects.get()
     except MultipleObjectsReturned:
         print("multiple items match this name, they are: ")
-        for var in variables:
+        for var in modelObjects:
             print(var)
         return None
     return variable
