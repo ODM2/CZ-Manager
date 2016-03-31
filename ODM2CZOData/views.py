@@ -449,6 +449,9 @@ def removeDupsFromListOfStrings(listOfStrings):
     return result
 
 def scatter_plot(request):
+    authenticated=True
+    if not request.user.is_authenticated():
+        authenticated=False
     xVariableSelection=yVariableSelection=fieldarea1=fieldarea2=filteredFeatures=fieldareaRF=None
     xVar=None
     yVar=None
