@@ -64,9 +64,8 @@ mrvsSonadoraTemp = Measurementresultvalues.objects.filter(resultid__resultid__va
 printvals = True
 save = False
 annotationtextHigh = "Value above 43 degrees C, this is considered out of range for stream water temperature, Original value was "
-annotationtextLow = "Values are out of range during this time period water level was low and probe was out of the water, Original value was "
-annotationtextDateRange = "Value below 0 C, this is considered out of range for stream water temperature, Original value was"
-#result to add the values too
+annotationtextLow = "Value below 0 C, this is considered out of range for stream water temperature, Original value was"
+annotationtextDateRange = "Values are out of range during this time period water level was low and probe was out of the water, Original value was "
 
 plevel = Processinglevels.objects.filter(processinglevelid=2).get()
 #result=Measurementresults.objects.filter(resultid=16153).get()
@@ -78,8 +77,8 @@ mrvsSonadoraCond = Measurementresultvalues.objects.filter(resultid__resultid__va
 #result=Measurementresults.objects.filter(resultid=16153).get()
 
 annotationtextHigh = "Value above 1000 uS/cm, this is considered out of range for stream conductivity, Original value was "
-annotationtextLow = "Values are out of range during this time period water level was low and probe was out of the water, Original value was "
-annotationtextDateRange = "Value below 15 uS/cm, this is considered out of range for stream conductivity, Original value was"
+annotationtextLow = "Value below 15 uS/cm, this is considered out of range for stream conductivity, Original value was"
+annotationtextDateRange = "Values are out of range during this time period water level was low and probe was out of the water, Original value was "
 
 
 #newmr=newMeasurementResult(mrvsSonadoraCond,plevel,printvals,save) #got 16156
