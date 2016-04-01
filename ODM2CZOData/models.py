@@ -1219,7 +1219,8 @@ class Externalidentifiersystems(models.Model):
     identifiersystemorganizationid = models.ForeignKey('Organizations', db_column='identifiersystemorganizationid')
     externalidentifiersystemdescription = models.CharField(max_length=500, blank=True)
     externalidentifiersystemurl = models.CharField(max_length=255, blank=True)
-
+    def __unicode__(self):
+        return u"%s" % (self.externalidentifiersystemname)
     class Meta:
         managed = False
         db_table = 'externalidentifiersystems'
@@ -1693,6 +1694,7 @@ class Profileresultvalues(models.Model):
         s += 'depth,'
         #s += '\" {0}{1}\",'.format(self.resultid.resultid.variableid.variablecode,self.resultid.resultid.unitsid.unitsname)
         s += 'sampling feature/location,'
+        s += 'sampling feature uri,'
         s += 'method,'
         s +='citation'
         #s = buildCitation(s,self)
@@ -1716,6 +1718,11 @@ class Profileresultvalues(models.Model):
         #s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
         #s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
         s += ',\" {0}\"'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)
+        try:
+            sfei=Samplingfeatureexternalidentifiers.objects.filter(samplingfeatureid=self.resultid.resultid.featureactionid.samplingfeatureid).get()
+            s += ', {0}'.format(sfei.samplingfeatureexternalidentifieruri)
+        except Samplingfeatureexternalidentifiers.DoesNotExist:
+            s += ','
         s += ',\" {0}\"'.format(self.resultid.resultid.featureactionid.action.method.methoddescription)
         s = buildCitation(s,self)
         s += ','
@@ -1999,7 +2006,9 @@ class Samplingfeatureexternalidentifiers(models.Model):
     externalidentifiersystemid = models.ForeignKey(Externalidentifiersystems, db_column='externalidentifiersystemid')
     samplingfeatureexternalidentifier = models.CharField(max_length=255)
     samplingfeatureexternalidentifieruri = models.CharField(max_length=255, blank=True)
-
+    def __unicode__(self):
+        s = u"%s - %s - %s - %s" % (self.samplingfeatureid,  self.externalidentifiersystemid,self.samplingfeatureexternalidentifier,self.samplingfeatureexternalidentifieruri)
+        return s
     class Meta:
         managed = False
         db_table = 'samplingfeatureexternalidentifiers'

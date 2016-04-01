@@ -278,15 +278,15 @@ def temp_pivot_chart_view(request):
     if 'startDate' in request.POST:
         entered_start_date = request.POST['startDate']
     else:
-        entered_start_date = "2015-07-20"
+        entered_start_date = "2016-01-01"
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
     else:
-        entered_end_date = "2015-07-21"
+        entered_end_date = "2016-01-05"
     if entered_end_date =='':
-        entered_end_date = "2015-07-21"
+        entered_end_date = "2016-01-05"
     if entered_start_date=='':
-        entered_start_date = "2015-07-20"
+        entered_start_date = "2016-01-01"
 
     selected_results = []
     name_of_sampling_features = []
@@ -388,7 +388,11 @@ def temp_pivot_chart_view(request):
             tmpLocName = name_of_sampling_feature
         series.append({"name": tmpUnit +' - '+ tmpVariableName +' - '+ tmpLocName,"yAxis": tmpUnit, "data": data['datavalue'+str(i)]})
     i=0
-    for name_of_sampling_feature,name_of_variable in zip(name_of_sampling_features,name_of_variables) :
+    name_of_sampling_features = set(name_of_sampling_features)
+    sfname = None
+    oldsfname = None
+
+    for name_of_sampling_feature in name_of_sampling_features:
         i+=1
         if i ==1:
             titleStr += name_of_sampling_feature  #+ ', ' +name_of_variable
