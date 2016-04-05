@@ -18,6 +18,8 @@ from .models import Actions
 from .models import Relatedfeatures
 from .models import Profileresults
 from .models import Citationextensionpropertyvalues
+from .models import Datasetsresults
+from .models import Datasets
 from datetime import datetime
 import csv
 import time
@@ -69,8 +71,8 @@ from .forms import CitationsAdminForm
 from django.views.generic.edit import CreateView
 
 #class CreatePubView(CreateView):
-    #template_name = "publications2.html"
-    #model = Citations
+#    template_name = "publications2.html"
+#    model = Citations
 
 
 def publications(request):
@@ -461,15 +463,18 @@ def TimeSeriesGraphing(request,feature_action='All'):
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,},)
 
 
-def TimeSeriesGraphingShort(request,feature_action): #,startdate='',enddate=''
+def TimeSeriesGraphingShort(request,feature_action='NotSet',dataset='NotSet'): #,startdate='',enddate=''
     authenticated=True
     if not request.user.is_authenticated():
         #return HttpResponseRedirect('../')
         authenticated=False
     template = loader.get_template('chart2.html')
-
-    selected_featureactionid=int(feature_action)
-
+    useDataset = False
+    if dataset=='NotSet':
+        feature_action=int(feature_action)
+    else:
+        useDataset=True
+        dataset=int(dataset)
 
 
     if 'startDate' in request.POST:
@@ -495,10 +500,18 @@ def TimeSeriesGraphingShort(request,feature_action): #,startdate='',enddate=''
     myresultSeriesExport = None
     i = 0
     data = {}
-    resultList = Results.objects.filter(featureactionid=feature_action)
-    featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
-    featureActionLocation= featureAction.samplingfeatureid.samplingfeaturename
-    featureActionMethod= featureAction.action.method.methodname
+    featureActionLocation=None
+    featureActionMethod=None
+    datasetTitle=None
+    if not useDataset:
+        resultList = Results.objects.filter(featureactionid=feature_action)
+        featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
+        featureActionLocation= featureAction.samplingfeatureid.samplingfeaturename
+        featureActionMethod= featureAction.action.method.methodname
+    else:
+        datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
+        resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid"))
+        datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
     numresults = resultList.count()
     selectedMResultSeries = []
     selectionStr = ''
@@ -648,6 +661,7 @@ def TimeSeriesGraphingShort(request,feature_action): #,startdate='',enddate=''
         #raise ValidationError(relatedFeatureList)
         return TemplateResponse(request,template,{ 'prefixpath': CUSTOM_TEMPLATE_PATH,
                 'featureActionMethod':featureActionMethod,'featureActionLocation':featureActionLocation,
+                'datasetTitle':datasetTitle,'useDataset':useDataset,
             'startDate':entered_start_date,'endDate':entered_end_date, 'SelectedResults':int_selectedresultid_ids,'authenticated':authenticated,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2,'resultList': resultList,
             'graphType':graphType, 'xAxis': xAxis, 'yAxis': yAxis,'name_of_units':name_of_units,},)
@@ -785,6 +799,8 @@ def exportcitations(request,citations,csv):
     first= True
     citationpropvalues = Citationextensionpropertyvalues.objects.filter(citationid__in=citations).order_by("propertyid")
     authorheader = Authorlists.objects.filter(citationid__in=citations).order_by("authororder").distinct("authororder")
+    #MyTable.objects.extra(select={'int_name': 'CAST(t.name AS INTEGER)'},
+    #                  order_by=['int_name'])
     authheadercount=authorheader.__len__()
     citationpropheaders = citationpropvalues.distinct("propertyid").order_by("propertyid")
     for citation in citations:

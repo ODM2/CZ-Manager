@@ -102,8 +102,13 @@ $(document).ready(function() {
 
 
 <p><h1>
+{% if useDataset %}
+{{datasetTitle}}
+{% else %}
 Location - {{featureActionLocation}}<br>
 Method- {{featureActionMethod}}</h1></p>
+{% endif %}
+
     <div id='content-main'> {% csrf_token %}
 	 </div>
 	<div id='chartid' class="chart" style="height:75%; width:100%"></div>
