@@ -20,30 +20,6 @@ option {
 	<form action="" method="post">
 	{% csrf_token %} 
 	<table ><tr><td>
-	<select class="form-control" id="s1" name="SelectedFeatureAction">
-              <option value="All"><b>All</b></option>
-              {% for featureaction in featureactionList %}
-				{% if featureaction.featureactionid == SelectedFeatureAction %}
-					<option selected="selected" value="{{ featureaction.featureactionid }}">{{ featureaction }}</option>
-				{% else %}
-					<option  value="{{ featureaction.featureactionid }}">{{ featureaction }}</option>
-				{% endif %}
-              {% endfor %}
-            </select></td>
-	<td><input type="submit" name="update_result_list" value="Update Result List" /></td></tr>
-	<tr><td>
-	<select class="form-control" id="s2" name="SelectedRelatedFeature">
-              <option value="All"><b>All</b></option>
-              {% for relatedFeature in relatedFeatureList %}
-				{% if relatedFeature.relatedfeatureid.samplingfeatureid == SelectedRelatedFeature %}
-					<option selected="selected" value="{{ relatedFeature.relatedfeatureid.samplingfeatureid }}">{{ relatedFeature.relatedfeatureid }}</option>
-				{% else %}
-					<option  value="{{ relatedFeature.relatedfeatureid.samplingfeatureid }}">{{ relatedFeature.relatedfeatureid }}</option>
-				{% endif %}
-              {% endfor %}
-            </select></td>
-	<td><input type="submit" name="update_result_on_related_feature" value="Select Results with Slope/Transect Position" />
-	</td></tr>
 	<tr><td>		<input id="startDate" maxlength="100" value= "{{ startDate }}" name="startDate" type="text">
 			Start Date (format YYYY-MM-DD HH:MM) </input>
 			<input id="endDate" maxlength="100" value= "{{ endDate }}" name="endDate" type="text"/>

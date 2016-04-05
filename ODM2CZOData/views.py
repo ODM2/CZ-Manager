@@ -48,6 +48,7 @@ import re
 register = template.Library()
 from .models import Citations
 from .models import Authorlists
+from django.template import loader
 from .models import Extensionproperties
 from .forms import CitationsAdminForm
 #
@@ -112,10 +113,15 @@ def publications(request):
     else:
         return HttpResponseRedirect('../')
 
+
+#def index(request):
+   # return render_to_response('admin/app_index.html', context_instance=RequestContext(request))
+
 def AddSensor(request):
     if request.user.is_authenticated():
+        template = loader.get_template('AddSensor.html')
         context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
-        return TemplateResponse(request, 'AddSensor.html', context)
+        return TemplateResponse(request, template, context)
     else:
         return HttpResponseRedirect('../')
 
@@ -196,7 +202,7 @@ def get_name_of_units(selected_result):
      return name_of_units
 
 
-def relatedFeaturesFilter(request,done,selected_relatedfeatid,selected_resultid,resultType='Time series coverage'):
+def relatedFeaturesFilter(request,done,selected_relatedfeatid,selected_resultid,featureaction,resultType='Time series coverage',):
     #selected_relatedfeatid = 18
     if 'SelectedRelatedFeature' in request.POST and not 'update_result_list' in request.POST:
         if not request.POST['SelectedRelatedFeature'] == 'All':
@@ -205,37 +211,52 @@ def relatedFeaturesFilter(request,done,selected_relatedfeatid,selected_resultid,
             relatedFeatureList = Relatedfeatures.objects.filter(relatedfeatureid=int(selected_relatedfeatid)).distinct('relatedfeatureid')
             relatedFeatureListLong = Relatedfeatures.objects.filter(relatedfeatureid=int(selected_relatedfeatid))#.select_related('samplingfeatureid','relationshiptypecv','relatedfeatureid')
             samplingfeatids= relatedFeatureListLong.values_list('samplingfeatureid', flat=True)
-            resultList = Results.objects.filter(featureactionid__in=Featureactions.objects.filter(samplingfeatureid__in=samplingfeatids))#.select_related('variable','feature_action')
+            if featureaction=='All':
+                resultList = Results.objects.filter(featureactionid__in=Featureactions.objects.filter(samplingfeatureid__in=samplingfeatids))#.select_related('variable','feature_action')
+            else:
+                resultList = Results.objects.filter(featureactionid__in=Featureactions.
+                                                    objects.filter(samplingfeatureid__in=samplingfeatids)).filter(featureactionid=featureaction)
             if 'update_result_on_related_feature' in request.POST:
                 #raise ValidationError(relatedFeatureList)
                 selected_relatedfeatid= relatedFeatureList[0].relatedfeatureid.samplingfeatureid
                 selected_resultid= resultList[0].resultid
         else:
             selected_relatedfeatid= request.POST['SelectedRelatedFeature']
-            resultList = Results.objects.filter(result_type=resultType) # remove slice just for testing [:25]
+            if featureaction=='All':
+                resultList = Results.objects.filter(result_type=resultType) # remove slice just for testing [:25]
+            else:
+                resultList = Results.objects.filter(result_type=resultType).filter(featureactionid=featureaction)
     else:
         selected_relatedfeatid='All'
-        resultList = Results.objects.filter(result_type=resultType)# remove slice just for testing
+        if featureaction=='All':
+            resultList = Results.objects.filter(result_type=resultType)# remove slice just for testing [:25]
+        else:
+            resultList = Results.objects.filter(result_type=resultType).filter(featureactionid=featureaction)
     return selected_relatedfeatid, done, resultList,selected_resultid
 
 
 
 
-def temp_pivot_chart_view(request):
+def TimeSeriesGraphing(request,feature_action='All'):
     authenticated=True
     if not request.user.is_authenticated():
         return HttpResponseRedirect('../')
         authenticated=False
 
-
-    selected_resultid = 15
-    selected_featureactionid = 5
-    selected_relatedfeatid = 18
+    template = loader.get_template('chart.html')
+    selected_relatedfeatid=None
+    selected_resultid=None
+    if feature_action=='All':
+        selected_resultid = 15
+        selected_featureactionid = 5
+        selected_relatedfeatid = 18
+    else:
+        selected_featureactionid=int(feature_action)
 
     #relatedfeatureList
     #update_result_on_related_feature
     done=False
-    selected_relatedfeatid, done, resultList,selected_resultid = relatedFeaturesFilter(request, done,selected_relatedfeatid,selected_resultid)
+    selected_relatedfeatid, done, resultList,selected_resultid = relatedFeaturesFilter(request, done,selected_relatedfeatid,selected_resultid,feature_action)
 
     if 'SelectedFeatureAction' in request.POST and not done:
         #raise ValidationError(done)
@@ -336,22 +357,19 @@ def temp_pivot_chart_view(request):
         else:
              name_of_units.append(tmpname)
 
+
         myresultSeries.append(Measurementresultvalues.objects.all().filter(~Q(datavalue__lte=-6999))\
         .filter(valuedatetime__gt= entered_start_date)\
         .filter(valuedatetime__lt = entered_end_date)\
                     .filter(resultid=selectedMResult).order_by('-valuedatetime'))
-        if myresultSeriesExport:
-            myresultSeriesExport = myresultSeriesExport | Measurementresultvalues.objects.all()\
-                .filter(valuedatetime__gt= entered_start_date)\
-                .filter(valuedatetime__lt = entered_end_date)\
-                    .filter(resultid=selectedMResult).order_by('-valuedatetime')
-        else:
-            myresultSeriesExport = Measurementresultvalues.objects.all()\
-                .filter(valuedatetime__gt= entered_start_date)\
-                .filter(valuedatetime__lt = entered_end_date)\
-                    .filter(resultid=selectedMResult).order_by('-valuedatetime')
+
         data.update({'datavalue' + str(i): []})
 
+
+    myresultSeriesExport = Measurementresultvalues.objects.all()\
+                .filter(valuedatetime__gt= entered_start_date)\
+                .filter(valuedatetime__lt = entered_end_date)\
+                    .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
     i = 0
 
     for myresults in myresultSeries:
@@ -437,10 +455,202 @@ def temp_pivot_chart_view(request):
         return response
     else:
         #raise ValidationError(relatedFeatureList)
-        return TemplateResponse(request,'chart.html',{ 'featureactionList': featureactionList,'prefixpath': CUSTOM_TEMPLATE_PATH, 'resultList': resultList,
+        return TemplateResponse(request,template,{ 'featureactionList': featureactionList,'prefixpath': CUSTOM_TEMPLATE_PATH, 'resultList': resultList,
             'startDate':entered_start_date,'endDate':entered_end_date, 'SelectedResults':int_selectedresultid_ids,'authenticated':authenticated,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'graphType':graphType, 'xAxis': xAxis, 'yAxis': yAxis,'name_of_units':name_of_units,
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,},)
+
+
+def TimeSeriesGraphingShort(request,feature_action): #,startdate='',enddate=''
+    authenticated=True
+    if not request.user.is_authenticated():
+        #return HttpResponseRedirect('../')
+        authenticated=False
+    template = loader.get_template('chart2.html')
+
+    selected_featureactionid=int(feature_action)
+
+
+
+    if 'startDate' in request.POST:
+        entered_start_date = request.POST['startDate']
+    else:
+        entered_start_date = "2016-01-01"
+    if 'endDate' in request.POST:
+        entered_end_date = request.POST['endDate']
+    else:
+        entered_end_date = "2016-01-05"
+    if entered_end_date =='':
+        entered_end_date = "2016-01-05"
+    if entered_start_date=='':
+        entered_start_date = "2016-01-01"
+
+    selected_results = []
+    name_of_sampling_features = []
+    name_of_variables = []
+    name_of_units = []
+    ProcessingLevel = []
+
+    myresultSeries = []
+    myresultSeriesExport = None
+    i = 0
+    data = {}
+    resultList = Results.objects.filter(featureactionid=feature_action)
+    featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
+    featureActionLocation= featureAction.samplingfeatureid.samplingfeaturename
+    featureActionMethod= featureAction.action.method.methodname
+    numresults = resultList.count()
+    selectedMResultSeries = []
+    selectionStr = ''
+    for i in range(0,numresults):
+        selectionStr = str('selection' + str(i))
+        if selectionStr in request.POST:
+            #raise ValidationError(request.POST[selectionStr])
+            for result in resultList:
+                if int(request.POST[selectionStr]) == result.resultid:
+                    selectedMResultSeries.append(int(request.POST[selectionStr]))
+
+    #selectedMResultSeries = Results.objects.filter(featureactionid=feature_action)
+    i=0
+    if selectedMResultSeries.__len__()==0:
+        selectedMResultSeries.append(resultList[0].resultid)
+
+    for selectedMResult in selectedMResultSeries:
+        i +=1
+        selected_result = Results.objects.filter(resultid=selectedMResult)
+        selected_results.append(selected_result)
+        #name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
+
+        tmpname = get_name_of_sampling_feature(selected_result)
+        name_of_sampling_features.append(tmpname)
+
+
+        tmpname = get_name_of_variable(selected_result)
+        if name_of_variables.__len__() >0:
+            namefound=False
+            for name in name_of_variables:
+                if name == tmpname:
+                    namefound=True
+            if not namefound:
+                 name_of_variables.append(tmpname)
+            else:
+                 name_of_variables.append('')
+        else:
+              name_of_variables.append(tmpname)
+
+        tmpname = get_name_of_units(selected_result)
+        if name_of_units.__len__() >0:
+            namefound=False
+            for name in name_of_units:
+                if name == tmpname:
+                    namefound=True
+            if not namefound:
+                name_of_units.append(tmpname)
+            else:
+                name_of_units.append('')
+        else:
+             name_of_units.append(tmpname)
+
+
+        myresultSeries.append(Measurementresultvalues.objects.all().filter(~Q(datavalue__lte=-6999))\
+        .filter(valuedatetime__gt= entered_start_date)\
+        .filter(valuedatetime__lt = entered_end_date)\
+                    .filter(resultid=selectedMResult).order_by('-valuedatetime'))
+
+        data.update({'datavalue' + str(i): []})
+
+
+    myresultSeriesExport = Measurementresultvalues.objects.all()\
+                .filter(valuedatetime__gt= entered_start_date)\
+                .filter(valuedatetime__lt = entered_end_date)\
+                    .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
+
+    i = 0
+
+    for myresults in myresultSeries:
+        i+=1
+        for result in myresults:
+            start = datetime.datetime(1970,1,1)
+            delta = result.valuedatetime-start
+            mills = delta.total_seconds()*1000
+            data['datavalue' + str(i)].append([mills, result.datavalue]) #dumptoMillis(result.valuedatetime)
+            #data['datavalue'].extend(tmplist )
+            #data['valuedatetime'].append(dumptoMillis(result.valuedatetime))
+
+
+    #build strings for graph labels
+    i = 0
+    seriesStr = ''
+    series = []
+    titleStr = ''
+    tmpUnit = ''
+    tmpVariableName = ''
+    tmpLocName= ''
+    for name_of_unit,name_of_sampling_feature,name_of_variable in zip(name_of_units,name_of_sampling_features,name_of_variables) :
+        i+=1
+        if i==1 and not name_of_unit == '':
+            seriesStr +=name_of_unit
+        elif not name_of_unit == '':
+                tmpUnit = name_of_unit
+                seriesStr+=' - '+name_of_unit
+        if not name_of_variable=='':
+            tmpVariableName = name_of_variable
+        if not name_of_unit == '':
+            tmpUnit = name_of_unit
+        if not name_of_sampling_feature =='':
+            tmpLocName = name_of_sampling_feature
+        series.append({"name": tmpUnit +' - '+ tmpVariableName +' - '+ tmpLocName,"yAxis": tmpUnit, "data": data['datavalue'+str(i)]})
+    i=0
+    name_of_sampling_features = set(name_of_sampling_features)
+    sfname = None
+    oldsfname = None
+
+    for name_of_sampling_feature in name_of_sampling_features:
+        i+=1
+        if i ==1:
+            titleStr += name_of_sampling_feature  #+ ', ' +name_of_variable
+        else:
+            titleStr += ' - '  +name_of_sampling_feature #+name_of_variable+ ', '
+
+    chartID = 'chart_id'
+    chart = {"renderTo": chartID, "type": 'scatter',  "zoomType": 'xy',}
+    title2 = {"text": titleStr}
+    xAxis = {"type": 'datetime', "title": {"text": 'Date'},}
+    yAxis = {"title": {"text": seriesStr}}
+    graphType = 'line'
+    opposite = False
+
+
+    int_selectedresultid_ids = []
+    for int_selectedresultid in selectedMResultSeries:
+        int_selectedresultid_ids.append(int(int_selectedresultid))
+    csvexport = False
+    #if the user hit the export csv button export the measurement results to csv
+
+    if request.REQUEST.get('export_data'):
+        response = exportspreadsheet(request,myresultSeriesExport,False)
+        csvexport=True
+        # k=0
+        # myfile = StringIO.StringIO()
+        # for myresults in myresultSeriesExport:
+        #     for result in myresults:
+        #         if k==0:
+        #             myfile.write(result.csvheader())
+        #             myfile.write('\n')
+        #         myfile.write(result.csvoutput())
+        #         myfile.write('\n')
+        #         k+=1
+        #response = HttpResponse(myfile.getvalue(),content_type='text/csv')
+        #response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
+    if csvexport:
+        return response
+    else:
+        #raise ValidationError(relatedFeatureList)
+        return TemplateResponse(request,template,{ 'prefixpath': CUSTOM_TEMPLATE_PATH,
+                'featureActionMethod':featureActionMethod,'featureActionLocation':featureActionLocation,
+            'startDate':entered_start_date,'endDate':entered_end_date, 'SelectedResults':int_selectedresultid_ids,'authenticated':authenticated,
+             'chartID': chartID, 'chart': chart,'series': series, 'title2': title2,'resultList': resultList,
+            'graphType':graphType, 'xAxis': xAxis, 'yAxis': yAxis,'name_of_units':name_of_units,},)
 #
 #From http://stackoverflow.com/questions/8200342/removing-duplicate-strings-from-a-list-in-python
 def removeDupsFromListOfStrings(listOfStrings):

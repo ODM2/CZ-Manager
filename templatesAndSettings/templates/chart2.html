@@ -1,0 +1,124 @@
+<!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/
+
+
+
+
+-->
+
+{% extends "admin/base_site.html" %}
+{% load admin_extras %}
+{% load static %}
+{% load i18n admin_static admin_shortcuts_tags %}
+
+{# django-admin-shortcuts changes these blocks #}
+
+{% block breadcrumbs %}
+{% if authenticated %}
+	<div class="admin_shortcuts">
+		{% admin_shortcuts %}
+	</div>
+	{% endif %}
+{% endblock %}
+
+ {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
+{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+
+
+{% block extrahead %}
+{{ block.super }}<title>
+	{% block title %}{% endblock %}
+  </title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    
+	 <script src="https://code.highcharts.com/4.1.10/highcharts.js"></script>
+	 <script>
+    var chart_id = 'chartid'
+    var chart = {{ chart|safe }}
+    var title2 = {{ title2|safe }}
+    var xAxis = {{ xAxis|safe }}
+    var yAxis = {{ yAxis|safe }}
+    var series = {{ series|safe }}
+	var graphType =   '{{graphType|safe }}'
+	var name_of_units = {{name_of_units|safe}}
+
+$(document).ready(function() {
+	
+	var opposite2 = false;
+	yaxes = [];
+	for (var i=0; i<name_of_units.length; i++) {
+		name = name_of_units[i];
+		//alert(name);
+		 
+		axi = {id: name,
+		labels: {
+                format: '{value}',
+                style: {
+                    color: Highcharts.getOptions().colors[i]
+                }
+            },
+		title: {
+			text: name
+		},
+		//lineWidth: 2,
+        //lineColor: Highcharts.getOptions().colors[i],
+		opposite: opposite2
+		};
+		yaxes.push(axi);
+		opposite2 = !opposite2;
+	}
+	//yAxis[1] = yAxis2.replace('"','');
+	var chart =$('#chartid').highcharts({
+		chart: {renderTo: chart_id, type: graphType,  zoomType: 'x',},
+        title: title2,
+        xAxis: xAxis,
+        yAxis:yaxes,
+        series: series,
+		tooltip: {
+    formatter: function() {
+        return ''+
+                 ' Value: ' + this.y + 
+                '-- Date: '+ Highcharts.dateFormat(' %e-%b-%Y %I:%M %p', this.x);
+    }
+},
+    });
+	
+	//alert(name_of_units.length);
+	
+	
+	});
+</script>
+{% admin_shortcuts_js %}{% endblock %}
+
+{# end changes #}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+
+
+
+{% block content %}
+
+
+<p><h1>
+Location - {{featureActionLocation}}<br>
+Method- {{featureActionMethod}}</h1></p>
+    <div id='content-main'> {% csrf_token %}
+	 </div>
+	<div id='chartid' class="chart" style="height:75%; width:100%"></div>
+	
+<br>
+
+{% include 'StartEndDate.html' %}
+
+{% endblock %}
+
+
+{% block overwrite %}
+<!-- Overwrite the base.html jQuery load and put in head for Highcharts to work -->
+{% endblock %}
+{% block extrajs %}
+<!-- Maps the Python template context variables from views.py to the Highchart js variables -->
+
+{% endblock %}
