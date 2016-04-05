@@ -463,7 +463,7 @@ def TimeSeriesGraphing(request,feature_action='All'):
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,},)
 
 
-def TimeSeriesGraphingShort(request,feature_action='NotSet',dataset='NotSet'): #,startdate='',enddate=''
+def TimeSeriesGraphingShort(request,feature_action='NotSet',dataset='NotSet',resultidu='NotSet',startdate='NotSet',enddate='NotSet'): #,startdate='',enddate=''
     authenticated=True
     if not request.user.is_authenticated():
         #return HttpResponseRedirect('../')
@@ -479,12 +479,16 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',dataset='NotSet'): #
 
     if 'startDate' in request.POST:
         entered_start_date = request.POST['startDate']
-    else:
+    elif startdate=='NotSet':
         entered_start_date = "2016-01-01"
+    else:
+        entered_start_date = startdate
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
-    else:
+    elif startdate=='NotSet':
         entered_end_date = "2016-01-05"
+    else:
+        entered_end_date = enddate
     if entered_end_date =='':
         entered_end_date = "2016-01-05"
     if entered_start_date=='':
@@ -526,7 +530,10 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',dataset='NotSet'): #
     #selectedMResultSeries = Results.objects.filter(featureactionid=feature_action)
     i=0
     if selectedMResultSeries.__len__()==0:
-        selectedMResultSeries.append(resultList[0].resultid)
+        if resultidu == 'NotSet':
+            selectedMResultSeries.append(resultList[0].resultid)
+        else:
+            selectedMResultSeries.append(int(resultidu))
 
     for selectedMResult in selectedMResultSeries:
         i +=1
@@ -660,9 +667,10 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',dataset='NotSet'): #
     else:
         #raise ValidationError(relatedFeatureList)
         return TemplateResponse(request,template,{ 'prefixpath': CUSTOM_TEMPLATE_PATH,
+                                                   'startDate':entered_start_date,'endDate':entered_end_date,
                 'featureActionMethod':featureActionMethod,'featureActionLocation':featureActionLocation,
-                'datasetTitle':datasetTitle,'useDataset':useDataset,
-            'startDate':entered_start_date,'endDate':entered_end_date, 'SelectedResults':int_selectedresultid_ids,'authenticated':authenticated,
+                'datasetTitle':datasetTitle,'useDataset':useDataset,'startdate':startdate,'enddate':enddate,
+             'SelectedResults':int_selectedresultid_ids,'authenticated':authenticated,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2,'resultList': resultList,
             'graphType':graphType, 'xAxis': xAxis, 'yAxis': yAxis,'name_of_units':name_of_units,},)
 #
