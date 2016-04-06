@@ -19,12 +19,16 @@ option {
     
 	<form action="" method="post">
 	{% csrf_token %} 
-	<table ><tr><td>
+	<table >
+	{% for method in methods %}
+	<tr><td>
 		{% if not useDataset %}
 <p>{{method.methoddescription}}</p>
 <p>for more go to <a href="{{method.methodlink}}">{{method.methodlink}}</a>
 {% endif %}
-</td></tr></table>
+</td></tr>
+{% endfor %}
+</table>
 	<table ><tr><td>
 	<tr><td>		<input id="startDate" maxlength="100" value= "{{ startDate }}" name="startDate" type="text">
 			Start Date (format YYYY-MM-DD HH:MM) </input>
@@ -37,7 +41,6 @@ option {
 
 	<div id="" style="overflow:scroll; height:400px;">
 	<table >
-                {% assign prefixpath '/admin/odm2testapp/' %}
 				<tr ><th scope="col" class="section">Result Series</td>
 				<th scope="col"  class="sortable column-resultid">id</th>
 				<th scope="col"  class="sortable column-resultid">Variable</th>

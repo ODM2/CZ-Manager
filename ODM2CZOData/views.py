@@ -464,15 +464,20 @@ def TimeSeriesGraphing(request,feature_action='All'):
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,},)
 
 
-def TimeSeriesGraphingShort(request,feature_action='NotSet',dataset='NotSet',resultidu='NotSet',startdate='NotSet',enddate='NotSet'): #,startdate='',enddate=''
+def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='NotSet',dataset='NotSet',resultidu='NotSet',startdate='NotSet',enddate='NotSet'): #,startdate='',enddate=''
     authenticated=True
     if not request.user.is_authenticated():
         #return HttpResponseRedirect('../')
         authenticated=False
     template = loader.get_template('chart2.html')
     useDataset = False
+    useSamplingFeature=False
     if dataset=='NotSet':
-        feature_action=int(feature_action)
+        if samplingfeature=='NotSet':
+            feature_action=int(feature_action)
+        else:
+            samplingfeature=int(samplingfeature)
+            useSamplingFeature=True
     else:
         useDataset=True
         dataset=int(dataset)
@@ -508,14 +513,22 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',dataset='NotSet',res
     featureActionLocation=None
     featureActionMethod=None
     datasetTitle=None
-    method=None
+    methods=None
+    samplefeature=None
     if not useDataset:
-        resultList = Results.objects.filter(featureactionid=feature_action)
-        featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
-        featureActionLocation= featureAction.samplingfeatureid.samplingfeaturename
-        featureActionMethod= featureAction.action.method.methodname
-        action = Actions.objects.filter(actionid=featureAction.action.actionid).get()
-        method = Methods.objects.filter(methodid=action.method.methodid).get()
+        if useSamplingFeature:
+            samplefeature = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
+            feature_actions = Featureactions.objects.filter(samplingfeatureid=samplefeature)
+            resultList = Results.objects.filter(featureactionid__in=feature_actions)
+            actions = Actions.objects.filter(actionid__in=feature_actions.values("action"))
+            methods = Methods.objects.filter(methodid__in=actions.values("method"))
+        else:
+            resultList = Results.objects.filter(featureactionid=feature_action)
+            featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
+            featureActionLocation= featureAction.samplingfeatureid.samplingfeaturename
+            featureActionMethod= featureAction.action.method.methodname
+            action = Actions.objects.filter(actionid=featureAction.action.actionid).get()
+            methods = Methods.objects.filter(methodid=action.method.methodid)
 
     else:
         datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
@@ -675,7 +688,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',dataset='NotSet',res
             'startDate':entered_start_date,'endDate':entered_end_date,
             'featureActionMethod':featureActionMethod,'featureActionLocation':featureActionLocation,
             'datasetTitle':datasetTitle,'useDataset':useDataset,'startdate':startdate,'enddate':enddate,
-             'SelectedResults':int_selectedresultid_ids,'authenticated':authenticated,'method':method,
+             'SelectedResults':int_selectedresultid_ids,'authenticated':authenticated,'methods':methods,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2,'resultList': resultList,
             'graphType':graphType, 'xAxis': xAxis, 'yAxis': yAxis,'name_of_units':name_of_units,},)
 #
