@@ -106,9 +106,11 @@ $(document).ready(function() {
 {{datasetTitle}}
 {% else %}
 Location - {{featureActionLocation}}<br>
-Method- {{featureActionMethod}}</h1></p>
 {% endif %}
-
+{% if not useSamplingFeature %}
+Method- {{featureActionMethod}}
+{% endif %}
+</h1></p>
     <div id='content-main'> {% csrf_token %}
 	 </div>
 	<div id='chartid' class="chart" style="height:75%; width:100%"></div>

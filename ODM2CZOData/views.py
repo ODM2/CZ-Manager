@@ -522,6 +522,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
             resultList = Results.objects.filter(featureactionid__in=feature_actions)
             actions = Actions.objects.filter(actionid__in=feature_actions.values("action"))
             methods = Methods.objects.filter(methodid__in=actions.values("method"))
+            featureActionLocation= samplefeature.samplingfeaturename
         else:
             resultList = Results.objects.filter(featureactionid=feature_action)
             featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
@@ -685,7 +686,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
     else:
         #raise ValidationError(relatedFeatureList)
         return TemplateResponse(request,template,{ 'prefixpath': CUSTOM_TEMPLATE_PATH,
-            'startDate':entered_start_date,'endDate':entered_end_date,
+            'startDate':entered_start_date,'endDate':entered_end_date,'useSamplingFeature':useSamplingFeature,
             'featureActionMethod':featureActionMethod,'featureActionLocation':featureActionLocation,
             'datasetTitle':datasetTitle,'useDataset':useDataset,'startdate':startdate,'enddate':enddate,
              'SelectedResults':int_selectedresultid_ids,'authenticated':authenticated,'methods':methods,
