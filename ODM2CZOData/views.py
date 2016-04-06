@@ -519,12 +519,12 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
         if useSamplingFeature:
             samplefeature = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
             feature_actions = Featureactions.objects.filter(samplingfeatureid=samplefeature)
-            resultList = Results.objects.filter(featureactionid__in=feature_actions)
+            resultList = Results.objects.filter(featureactionid__in=feature_actions).filter(~Q(processing_level=4))
             actions = Actions.objects.filter(actionid__in=feature_actions.values("action"))
             methods = Methods.objects.filter(methodid__in=actions.values("method"))
             featureActionLocation= samplefeature.samplingfeaturename
         else:
-            resultList = Results.objects.filter(featureactionid=feature_action)
+            resultList = Results.objects.filter(featureactionid=feature_action).filter(~Q(processing_level=4))
             featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
             featureActionLocation= featureAction.samplingfeatureid.samplingfeaturename
             featureActionMethod= featureAction.action.method.methodname
@@ -533,7 +533,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
 
     else:
         datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
-        resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid"))
+        resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid")).filter(~Q(processing_level=4))
         datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
     numresults = resultList.count()
     selectedMResultSeries = []
