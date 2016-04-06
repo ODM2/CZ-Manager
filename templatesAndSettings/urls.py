@@ -28,6 +28,7 @@ urlpatterns = patterns('',
     url(r'^' + URL_PATH +'graph/featureaction=(?P<feature_action>(\d+))/$', views.TimeSeriesGraphing, name="TimeSeriesGraphing"), # (?:featureaction-(?P<featureaction>\d+)/)?$  (?P<variable_a>(\d+) (?P<feature_action>(\d+))
     url(r'^' + URL_PATH +'graphfa/dataset=(?P<dataset>(\d+))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
     url(r'^' + URL_PATH +'graphfa/featureaction=(?P<feature_action>(\d+))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
+    url(r'^' + URL_PATH +'graphfa/featureaction=(?P<feature_action>(\d+))/startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
     url(r'^' + URL_PATH +'graphfa/dataset=(?P<dataset>(\d+))/resultidu=(?P<resultidu>(\d+))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
     url(r'^' + URL_PATH +'graphfa/featureaction=(?P<feature_action>(\d+))/resultidu=(?P<resultidu>(\d+))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
      url(r'^' + URL_PATH +'graphfa/dataset=(?P<dataset>(\d+))/startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),

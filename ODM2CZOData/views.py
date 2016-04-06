@@ -51,6 +51,7 @@ register = template.Library()
 from .models import Citations
 from .models import Authorlists
 from django.template import loader
+from .models import Methods
 from .models import Extensionproperties
 from .forms import CitationsAdminForm
 #
@@ -507,11 +508,15 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',dataset='NotSet',res
     featureActionLocation=None
     featureActionMethod=None
     datasetTitle=None
+    method=None
     if not useDataset:
         resultList = Results.objects.filter(featureactionid=feature_action)
         featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
         featureActionLocation= featureAction.samplingfeatureid.samplingfeaturename
         featureActionMethod= featureAction.action.method.methodname
+        action = Actions.objects.filter(actionid=featureAction.action.actionid).get()
+        method = Methods.objects.filter(methodid=action.method.methodid).get()
+
     else:
         datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
         resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid"))
@@ -667,10 +672,10 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',dataset='NotSet',res
     else:
         #raise ValidationError(relatedFeatureList)
         return TemplateResponse(request,template,{ 'prefixpath': CUSTOM_TEMPLATE_PATH,
-                                                   'startDate':entered_start_date,'endDate':entered_end_date,
-                'featureActionMethod':featureActionMethod,'featureActionLocation':featureActionLocation,
-                'datasetTitle':datasetTitle,'useDataset':useDataset,'startdate':startdate,'enddate':enddate,
-             'SelectedResults':int_selectedresultid_ids,'authenticated':authenticated,
+            'startDate':entered_start_date,'endDate':entered_end_date,
+            'featureActionMethod':featureActionMethod,'featureActionLocation':featureActionLocation,
+            'datasetTitle':datasetTitle,'useDataset':useDataset,'startdate':startdate,'enddate':enddate,
+             'SelectedResults':int_selectedresultid_ids,'authenticated':authenticated,'method':method,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2,'resultList': resultList,
             'graphType':graphType, 'xAxis': xAxis, 'yAxis': yAxis,'name_of_units':name_of_units,},)
 #
