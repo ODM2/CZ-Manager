@@ -20,7 +20,8 @@
 	{% endif %}
 {% endblock %}
 
- {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
+ {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}
+</style>
 {{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
 
 
@@ -29,9 +30,10 @@
 	{% block title %}{% endblock %}
   </title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    
 	 <script src="https://code.highcharts.com/4.1.10/highcharts.js"></script>
-	 <script>
+	 
+
+	<script>
     var chart_id = 'chartid'
     var chart = {{ chart|safe }}
     var title2 = {{ title2|safe }}
@@ -40,7 +42,7 @@
     var series = {{ series|safe }}
 	var graphType =   '{{graphType|safe }}'
 	var name_of_units = {{name_of_units|safe}}
-
+	
 $(document).ready(function() {
 	
 	var opposite2 = false;
@@ -107,7 +109,7 @@ $(document).ready(function() {
 {% else %}
 Location - {{featureActionLocation}}<br>
 {% endif %}
-{% if not useSamplingFeature %}
+{% if not useSamplingFeature and not useDataset %}
 Method- {{featureActionMethod}}
 {% endif %}
 </h1></p>
