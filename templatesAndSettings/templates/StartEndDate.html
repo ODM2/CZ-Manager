@@ -13,6 +13,8 @@ select {
 option {
           border: solid 1px #DDDDDD; 
 }
+.loadinggif {
+    background:url('http://www.hsi.com.hk/HSI-Net/pages/images/en/share/ajax-loader.gif') no-repeat right center;
 </style>
 <br>
 <br>
@@ -35,7 +37,7 @@ option {
 			<input id="endDate" maxlength="100" value= "{{ endDate }}" name="endDate" type="text"/>
 			End Date (format YYYY-MM-DD HH:MM) </input></td><td>
 			<input type="submit" name="update_chart" value="Update Chart" />
-	<input type="submit" name="export_data" value="Export Data" />
+	<input type="submit" id="submitid"  name="export_data" value="Export Data" disabled />
 
 	</td></tr></table>
 
