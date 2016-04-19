@@ -67,6 +67,7 @@ from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
 from templatesAndSettings.settings import MEDIA_URL
 from .models import Profileresults
 import cStringIO as StringIO
+#from io import StringIO
 from ajax_select import make_ajax_field
 from ajax_select.fields import autoselect_fields_check_can_add
 from ajax_select.admin import AjaxSelectAdmin
@@ -93,7 +94,7 @@ def link_list_display_DOI(link):
     if match:
         return u'<a href="http://dx.doi.org/%s">%s</a>'% (link, link)
     else:
-        return u'<a href="%s/">%s</a>'% (link, link)
+        return u'<a href="%s">%s</a>'% (link, link)
 
 
 class ResultsdataqualityAdminForm(ModelForm):
