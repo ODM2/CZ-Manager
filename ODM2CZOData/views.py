@@ -1151,13 +1151,14 @@ def graph_data(request):
         unitAndVariable = tmpVariableName + " " + tmpUnit
         #raise ValidationError(data['datavalue'+unitAndVariable])
         #raise ValidationError(name_of_unit)
-        if lastUnitAndVariable != unitAndVariable and update:
+        key = 'datavalue'+unitAndVariable
+        if lastUnitAndVariable != unitAndVariable and update and key in data:
             series.append({"name":tmpUnit +' - '+tmpVariableName,"yAxis": tmpUnit, "data": data['datavalue'+unitAndVariable]}) #removewd from name +' - '+ tmpLocName
             if titleStr =='':
                 titleStr = tmpVariableName
             else:
                 titleStr += ' - '+ tmpVariableName
-        elif i==numberofLocations and len(series)==0:
+        elif i==numberofLocations and len(series)==0 and key in data:
              #raise ValidationError(name_of_unit)
              series.append({"name":tmpUnit +' - '+tmpVariableName,"yAxis": tmpUnit, "data": data['datavalue'+unitAndVariable]})
              if titleStr =='':
