@@ -978,7 +978,7 @@ def exportspreadsheet(request,resultValuesSeries,profileResult=True):
         myfile.write(myresults.csvoutputShort())
         position+=1
         k+=1
-    response = HttpResponse(myfile.getvalue(),content_type='text/csv')
+    response = StreamingHttpResponse(myfile.getvalue(),content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
     return response
 
