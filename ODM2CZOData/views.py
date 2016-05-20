@@ -1,3 +1,4 @@
+__author__ = 'leonmi'
 from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.db.models import Sum, Avg
@@ -54,6 +55,9 @@ from django.template import loader
 from .models import Methods
 from .models import Extensionproperties
 from .forms import CitationsAdminForm
+from django.http import StreamingHttpResponse
+from django.core import mail
+
 #
 # class FeatureactionsAutocomplete(autocomplete.Select2QuerySetView):
 #     def get_queryset(self):
