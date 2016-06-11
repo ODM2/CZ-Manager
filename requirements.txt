@@ -1,10 +1,10 @@
 django==1.6.5
-django-uuidfield
-django-ajax-selects
 django-admin-shortcuts
-djangocms_admin_style
+django-ajax-selects
 django-apptemplates
 django-daterange-filter
 django-import-export
-django-jquery 
+django-jquery
+django-uuidfield
+djangocms_admin_style
 psycopg2

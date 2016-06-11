@@ -1,0 +1,4 @@
+include README.rst
+include *.txt
+recursive-include odm2djangoadmin *.py
+recursive-include odm2djangoadmin *.html
