@@ -56,7 +56,8 @@ def process_datalogger_file(f,fileid, databeginson,columnheaderson):
         with io.open(MEDIA_ROOT +  f.name , 'rt', encoding='ascii') as f:
             #reader = csv.reader(f)
             reader, reader2 = itertools.tee(csv.reader(f))
-            columnsinCSV = len(next(reader2))
+            for i in range(0,databeginson):
+                columnsinCSV = len(next(reader2))
             rowColumnMap = list()
             dateTimeColumnNum = -1
             DataloggerfilecolumnSet = Dataloggerfilecolumns.objects.filter(dataloggerfileid=fileid.dataloggerfileid)

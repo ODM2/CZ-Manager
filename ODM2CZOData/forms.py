@@ -149,6 +149,7 @@ class DatasetcitationsAdmin(admin.ModelAdmin):
     form=DatasetcitationsAdminForm
 
 
+
 class CitationsAdminForm(ModelForm):
     class Meta:
         model= Citations
@@ -700,7 +701,7 @@ class UnitsAdminForm(ModelForm):
         fields = '__all__'
 class UnitsAdmin(admin.ModelAdmin):
     form=UnitsAdminForm
-    search_fields = ['units_type__name','unitsabbreviation__name','unitsname__name']
+    search_fields = ['unit_type__name','unitsabbreviation__name','unitsname__name']
 
 class DataloggerprogramfilesAdminForm(ModelForm):
     def upload_file(request):
