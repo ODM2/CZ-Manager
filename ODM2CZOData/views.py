@@ -517,6 +517,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
     featureActionLocation=None
     featureActionMethod=None
     datasetTitle=None
+    datasetAbstract=None
     methods=None
     samplefeature=None
     if not useDataset:
@@ -539,6 +540,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
         datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
         resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid")).filter(~Q(processing_level=4))
         datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
+        datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
     numresults = resultList.count()
     selectedMResultSeries = []
     selectionStr = ''
@@ -692,7 +694,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
         return TemplateResponse(request,template,{ 'prefixpath': CUSTOM_TEMPLATE_PATH,
             'startDate':entered_start_date,'endDate':entered_end_date,'useSamplingFeature':useSamplingFeature,
             'featureActionMethod':featureActionMethod,'featureActionLocation':featureActionLocation,
-            'datasetTitle':datasetTitle,'useDataset':useDataset,'startdate':startdate,'enddate':enddate,
+            'datasetTitle':datasetTitle,'datasetAbstract':datasetAbstract,'useDataset':useDataset,'startdate':startdate,'enddate':enddate,
              'SelectedResults':int_selectedresultid_ids,'authenticated':authenticated,'methods':methods,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2,'resultList': resultList,
             'graphType':graphType, 'xAxis': xAxis, 'yAxis': yAxis,'name_of_units':name_of_units,},)

@@ -118,7 +118,9 @@ Method- {{featureActionMethod}}
 	<div id='chartid' class="chart" style="height:75%; width:100%"></div>
 	
 <br>
-
+{% if useDataset %}
+{{datasetAbstract}}
+{% endif %}
 {% include 'StartEndDate.html' %}
 
 {% endblock %}
