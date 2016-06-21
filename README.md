@@ -1,10 +1,11 @@
 
 # odm2djangoadmin
-This is a Django admin app for Observation Data Model 2 (ODM2).
+This is a Django admin app for Observation Data Model 2 (ODM2). ODM2 was created through National Science Foundation Grant EAR-1224638.
+
 Django models exist for all ODM2 tables. Forms for ODM2Core and some additional tables have been created. Graphing of measurement result values via highcharts are implemented. Data logger files can be imported as long as data logger file columns and results are properly setup.   
 ODM2 can be found here: https://github.com/ODM2
 
-in the folder templatesAndSeetings you will find settings.py which contains all of the database and local file system settings which need to be configured to get a copy of this application working. This was developed using a postgresql version of ODM2 data model, additional modifications will be needed to make this work with MSSQL or another database. 
+In the folder templatesAndSettings you will find settings.py which contains all of the database and local file system settings which need to be configured to get a copy of this application working. This was developed using a postgresql version of ODM2 data model, additional modifications will be needed to make this work with MSSQL or another database. 
 
 You might find issues with psycopg2 on windows 
 
