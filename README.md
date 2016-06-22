@@ -1,5 +1,5 @@
 
-# odm2 Admin
+# ODM2 Admin
 This is a Django admin app for Observation Data Model 2 (ODM2). ODM2 was created through National Science Foundation Grant EAR-1224638.
 
 Django models exist for all ODM2 tables. Forms for ODM2Core and some additional tables have been created. Graphing of measurement result values via highcharts are implemented. Data logger files can be imported as long as data logger file columns and results are properly setup.   
