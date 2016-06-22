@@ -47,6 +47,16 @@ $(document).ready(function() {
 	
 	var opposite2 = false;
 	yaxes = [];
+	
+	for (var i=0; i<series.length; i++){
+	data = series[i].data;
+		for(var j=0; j<data.length; j++){
+			if(data[j][1]=='null'){
+				data[j][1] = null;
+			}
+			}
+	}
+	
 	for (var i=0; i<name_of_units.length; i++) {
 		name = name_of_units[i];
 		//alert(name);
@@ -121,8 +131,9 @@ Method- {{featureActionMethod}}
 {% if useDataset %}
 {{datasetAbstract}}
 {% endif %}
-{% include 'StartEndDate.html' %}
-
+{% include 'StartEndDateEmail.html' %}
+<br><br>
+<p>Data from this site are a product the <a href="http://criticalzone.org/luquillo/">Luquillo Critical Zone Observatory</a></p>
 {% endblock %}
 
 
