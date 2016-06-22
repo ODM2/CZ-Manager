@@ -6,21 +6,7 @@ from django.shortcuts import render_to_response
 #from odm2testapp.forms import VariablesForm
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from .models import Measurementresultvalues
-from .models import Profileresultvalues
-from .models import Dataloggerfiles
-from .models import Dataloggerfilecolumns
-from .models import Featureactions
-from .models import Samplingfeatures
-from .models import Variables
-from .models import Units
-from .models import Results
-from .models import Actions
-from .models import Relatedfeatures
-from .models import Profileresults
-from .models import Citationextensionpropertyvalues
-from .models import Datasetsresults
-from .models import Datasets
+from .models import *
 from datetime import datetime
 import csv
 import time
@@ -31,6 +17,7 @@ from django.views.generic import ListView
 import csv
 import io
 import binascii
+import math
 import unicodedata
 from io import TextIOWrapper
 import cStringIO as StringIO
