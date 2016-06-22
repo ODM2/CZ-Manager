@@ -372,7 +372,12 @@ def TimeSeriesGraphing(request,feature_action='All'):
             start = datetime.datetime(1970,1,1)
             delta = result.valuedatetime-start
             mills = delta.total_seconds()*1000
-            data['datavalue' + str(i)].append([mills, result.datavalue]) #dumptoMillis(result.valuedatetime)
+            if math.isnan(result.datavalue):
+                dataval='null'
+            else:
+                dataval = result.datavalue
+            data['datavalue' + str(i)].append([mills, dataval])
+            #data['datavalue' + str(i)].append([mills, result.datavalue]) #dumptoMillis(result.valuedatetime)
             #data['datavalue'].extend(tmplist )
             #data['valuedatetime'].append(dumptoMillis(result.valuedatetime))
 
