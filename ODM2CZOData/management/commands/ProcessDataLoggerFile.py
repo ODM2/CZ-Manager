@@ -47,7 +47,7 @@ class Command(BaseCommand):
         parser.add_argument('cmdline', nargs=1, type=bool)
     @transaction.atomic
     def handle(self,*args,**options):#(f,fileid, databeginson,columnheaderson, cmd):
-        cmdline = args[4]
+        cmdline = bool(args[4])
         if cmdline:
             file = MEDIA_ROOT + args[0]#f[0]
             fileid = args[1] #fileid[0]
@@ -56,9 +56,10 @@ class Command(BaseCommand):
         else:
             file = MEDIA_ROOT +  args[0].name
             fileid = args[1]
-        check_dates = args[5]
-        databeginson = args[2] #int(databeginson[0])
-        columnheaderson= args[3] #int(columnheaderson[0])
+        check_dates = bool(args[5])
+        databeginson = int(args[2]) #int(databeginson[0])
+        print(databeginson)
+        columnheaderson= int(args[3]) #int(columnheaderson[0])
         try:
             with io.open(file, 'rt', encoding='ascii') as f:
                 #reader = csv.reader(f)
