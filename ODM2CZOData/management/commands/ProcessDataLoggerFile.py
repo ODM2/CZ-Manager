@@ -128,7 +128,7 @@ class Command(BaseCommand):
                                 #only one measurement result is allowed per result
                                 value = row[colnum.columnnum]
                                 if check_dates:
-                                    mrvs = Measurementresultvalues.objects.filter(resultid=mresults)
+                                    mrvs = Measurementresultvalues.objects.filter(resultid=measurementresult)
                                 for mresults in measurementresult:
                                     try:
                                         if(value==''):
