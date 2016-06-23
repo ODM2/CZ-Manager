@@ -701,7 +701,7 @@ class UnitsAdminForm(ModelForm):
         fields = '__all__'
 class UnitsAdmin(admin.ModelAdmin):
     form=UnitsAdminForm
-    search_fields = ['unit_type__name','unitsabbreviation__name','unitsname__name']
+    search_fields = ['unit_type__name','unitsabbreviation','unitsname__name']
 
 class DataloggerprogramfilesAdminForm(ModelForm):
     def upload_file(request):

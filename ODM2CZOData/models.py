@@ -49,91 +49,6 @@ def handle_uploaded_file(f,id):
     except IndexError:
         raise ValidationError('encountered a problem with row '+row)
 
-#using atomic transaction should improve the speed of loading the data.
-@transaction.atomic
-def process_datalogger_file(f,fileid, databeginson,columnheaderson):
-    try:
-        with io.open(MEDIA_ROOT +  f.name , 'rt', encoding='ascii') as f:
-            #reader = csv.reader(f)
-            reader, reader2 = itertools.tee(csv.reader(f))
-            for i in range(0,databeginson):
-                columnsinCSV = len(next(reader2))
-            rowColumnMap = list()
-            dateTimeColumnNum = -1
-            DataloggerfilecolumnSet = Dataloggerfilecolumns.objects.filter(dataloggerfileid=fileid.dataloggerfileid)
-            i=0
-            numCols=DataloggerfilecolumnSet.count()
-            if numCols == 0:
-                raise ValidationError(_('This file has no dataloggerfilecolumns associated with it. '), code='noDataloggerfilecolumns')
-            if not numCols == columnsinCSV:
-                 raise ValidationError(_('The number of columns in the '+ str(columnsinCSV) +' csv file do not match the number of'+
-                                       ' dataloggerfilecolumns '+ str(numCols) + ' associated with the dataloggerfile in the database. '), code='ColumnMisMatch')
-            for row in reader:
-                #map the column objects to the column in the file assumes first row in file contains columnlabel.
-                if i==columnheaderson:
-
-                    for dloggerfileColumns in DataloggerfilecolumnSet:
-                        foundColumn=False
-                        for j in range(numCols):
-                            #raise ValidationError(" in file " + row[j] + " in obj column label "+dloggerfileColumns.columnlabel)
-                            if row[j] == dloggerfileColumns.columnlabel:
-                                foundColumn=True
-                                dloggerfileColumns.columnnum = j
-                                rowColumnMap += [dloggerfileColumns]
-                        if not foundColumn:
-                             raise ValidationError(_('Cannot find a column in the CSV matching the dataloggerfilecolumn '+
-                                                     str(dloggerfileColumns.columnlabel) ), code='ColumnMisMatch')
-                        #if you didn't find a matching name for this column amoung the dloggerfileColumns raise error
-
-                elif i >= databeginson:
-
-                    #assume date is first column for the moment
-                    try:
-                        dateT = time.strptime(row[0],"%m/%d/%Y %H:%M")#'1/1/2013 0:10
-                        datestr = time.strftime("%Y-%m-%d %H:%M",dateT)
-                    except ValueError:
-                        try:
-                            dateT = time.strptime(row[0],"%m/%d/%Y %H:%M:%S")#'1/1/2013 0:10
-                            datestr = time.strftime("%Y-%m-%d %H:%M:%S",dateT)
-                        except ValueError:
-                            try:
-                                dateT = time.strptime(row[0],"%Y-%m-%d %H:%M:%S")#'1/1/2013 0:10
-                                datestr = time.strftime("%Y-%m-%d %H:%M:%S",dateT)
-                            except ValueError:
-                                dateT = time.strptime(row[0],"%Y-%m-%d %H:%M:%S.%f")#'1/1/2013 0:10
-                                datestr = time.strftime("%Y-%m-%d %H:%M:%S",dateT)
-                    #for each column in the data table
-                    #raise ValidationError("".join(str(rowColumnMap)))
-                    for colnum in rowColumnMap:
-                        #x[0] for x in my_tuples
-                        #colnum[0] = column number, colnum[1] = dataloggerfilecolumn object
-                        if not colnum.columnnum ==0:
-                            #raise ValidationError("result: " + str(colnum.resultid) + " datavalue "+
-                                                  #str(row[colnum.columnnum])+ " dateTime " + datestr)
-                            #thisresultid = colnum.resultid #result.values('resultid')
-
-                            measurementresult = Measurementresults.objects.filter(resultid= colnum.resultid)
-                            if  measurementresult.count() == 0:
-                                raise ValidationError(_('No Measurement results for column ' + colnum.columnlabel + ' Add measurement results for'+
-                                                  'each column. Both results and measurement results are needed.' ))
-                            #only one measurement result is allowed per result
-                            value = row[colnum.columnnum]
-                            for mresults in measurementresult:
-                                try:
-                                    if(value==''):
-                                        raise IntegrityError
-                                    Measurementresultvalues(resultid=mresults
-                                                ,datavalue=row[colnum.columnnum],
-                                                valuedatetime=datestr,valuedatetimeutcoffset=4).save()
-                                except IntegrityError:
-                                    pass
-                                    #Measurementresultvalues.delete()
-                                #row[0] is this column object
-                i+=1
-        Measurementresults.objects.raw("SELECT odm2.\"MeasurementResultValsToResultsCountvalue\"()")
-
-    except IndexError:
-        raise ValidationError('encountered a problem with row '+row)
 
 
 def buildCitation(s, self):
@@ -1033,7 +948,8 @@ class ProcessDataloggerfile(models.Model):
         db_table = 'odm2extra\".\"processdataloggerfile'
         verbose_name= 'process data logger file'
     def save(self, *args, **kwargs):
-        process_datalogger_file(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid, self.databeginson, self.columnheaderson)
+        #ProcessDataLoggerFile(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid, self.databeginson, self.columnheaderson, False)
+        management.call_command('ProcessDataLoggerFile',self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid, self.databeginson, self.columnheaderson, False)
         super(ProcessDataloggerfile, self).save(*args, **kwargs)
     # def get_actions(self, request):
     #     #Disable delete
