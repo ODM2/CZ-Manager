@@ -947,7 +947,7 @@ class ProcessDataloggerfile(models.Model):
         verbose_name= 'process data logger file'
     def save(self, *args, **kwargs):
         #ProcessDataLoggerFile(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid, self.databeginson, self.columnheaderson, False)
-        management.call_command('ProcessDataLoggerFile',self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid, self.databeginson, self.columnheaderson, False)
+        management.call_command('ProcessDataLoggerFile',self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid, self.databeginson, self.columnheaderson, False, False)
         super(ProcessDataloggerfile, self).save(*args, **kwargs)
     # def get_actions(self, request):
     #     #Disable delete

@@ -43,6 +43,7 @@ class Command(BaseCommand):
         parser.add_argument('dataloggerfileid', nargs=1)
         parser.add_argument('databeginson', nargs=1, type=int)
         parser.add_argument('columnheaderson', nargs=1, type=int)
+        parser.add_argument('check_dates', nargs=1, type=bool)
         parser.add_argument('cmdline', nargs=1, type=bool)
     @transaction.atomic
     def handle(self,*args,**options):#(f,fileid, databeginson,columnheaderson, cmd):
@@ -51,10 +52,11 @@ class Command(BaseCommand):
             file = MEDIA_ROOT + args[0]#f[0]
             fileid = args[1] #fileid[0]
             fileid = Dataloggerfiles.objects.filter(dataloggerfilename=fileid).get()
+
         else:
             file = MEDIA_ROOT +  args[0].name
             fileid = args[1]
-
+        check_dates = args[5]
         databeginson = args[2] #int(databeginson[0])
         columnheaderson= args[3] #int(columnheaderson[0])
         try:
@@ -124,16 +126,23 @@ class Command(BaseCommand):
                                                       'each column. Both results and measurement results are needed.' ))
                                 #only one measurement result is allowed per result
                                 value = row[colnum.columnnum]
+                                if check_dates:
+                                    mrvs = Measurementresultvalues.objects.filter(resultid=mresults)
                                 for mresults in measurementresult:
                                     try:
                                         if(value==''):
                                             raise IntegrityError
-                                        try:
-                                            mrv = Measurementresultvalues.objects.filter(valuedatetime=datestr).filter(resultid=mresults).get()
-                                        except ObjectDoesNotExist:
-                                            Measurementresultvalues(resultid=mresults
-                                                        ,datavalue=row[colnum.columnnum],
-                                                        valuedatetime=datestr,valuedatetimeutcoffset=4).save()
+                                        if check_dates: #this check is really slowing down ingestion so I added a flag to turn it off
+                                            try:
+                                                mrv = mrvs.filter(valuedatetime=datestr).get()
+                                            except ObjectDoesNotExist:
+                                                Measurementresultvalues(resultid=mresults
+                                                            ,datavalue=row[colnum.columnnum],
+                                                            valuedatetime=datestr,valuedatetimeutcoffset=4).save()
+                                        else:
+                                             Measurementresultvalues(resultid=mresults
+                                                            ,datavalue=row[colnum.columnnum],
+                                                            valuedatetime=datestr,valuedatetimeutcoffset=4).save()
                                     except IntegrityError:
                                         pass
                                         #Measurementresultvalues.delete()
