@@ -11,9 +11,9 @@
 from __future__ import unicode_literals
 
 from django.db import models
+
 from templatesAndSettings.settings import MEDIA_ROOT
-from django.db import transaction
-from django.db import IntegrityError
+
 #from django.contrib.gis.db import models
 import time
 #from django.forms import ModelFormWithFileField
@@ -23,11 +23,9 @@ import time
 import csv
 import io
 from uuidfield import UUIDField
-import re
-
+from django.core import management
 from django.core.exceptions import ValidationError
-import itertools
-from django.utils.translation import ugettext as _
+
 
 def handle_uploaded_file(f,id):
     destination = io.open(MEDIA_ROOT + '/resultvalues/' + f.name +'.csv', 'wb+')
