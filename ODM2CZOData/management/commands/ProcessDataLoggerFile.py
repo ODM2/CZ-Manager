@@ -72,10 +72,10 @@ class Command(BaseCommand):
                 i=0
                 numCols=DataloggerfilecolumnSet.count()
                 if numCols == 0:
-                    raise CommandError(_('This file has no dataloggerfilecolumns associated with it. '), code='noDataloggerfilecolumns')
+                    raise CommandError('This file has no dataloggerfilecolumns associated with it. ')
                 if not numCols == columnsinCSV:
-                     raise CommandError(_('The number of columns in the '+ str(columnsinCSV) +' csv file do not match the number of'+
-                                           ' dataloggerfilecolumns '+ str(numCols) + ' associated with the dataloggerfile in the database. '), code='ColumnMisMatch')
+                     raise CommandError('The number of columns in the '+ str(columnsinCSV) +' csv file do not match the number of'+
+                                           ' dataloggerfilecolumns '+ str(numCols) + ' associated with the dataloggerfile in the database. ')
                 for row in reader:
                     #map the column objects to the column in the file assumes first row in file contains columnlabel.
                     if i==columnheaderson:
@@ -89,8 +89,8 @@ class Command(BaseCommand):
                                     dloggerfileColumns.columnnum = j
                                     rowColumnMap += [dloggerfileColumns]
                             if not foundColumn:
-                                 raise CommandError(_('Cannot find a column in the CSV matching the dataloggerfilecolumn '+
-                                                         str(dloggerfileColumns.columnlabel) ), code='ColumnMisMatch')
+                                 raise CommandError('Cannot find a column in the CSV matching the dataloggerfilecolumn '+
+                                                         str(dloggerfileColumns.columnlabel) )
                             #if you didn't find a matching name for this column amoung the dloggerfileColumns raise error
 
                     elif i >= databeginson:
@@ -122,8 +122,8 @@ class Command(BaseCommand):
 
                                 measurementresult = Measurementresults.objects.filter(resultid= colnum.resultid)
                                 if  measurementresult.count() == 0:
-                                    raise ValidationError(_('No Measurement results for column ' + colnum.columnlabel + ' Add measurement results for'+
-                                                      'each column. Both results and measurement results are needed.' ))
+                                    raise CommandError('No Measurement results for column ' + colnum.columnlabel + ' Add measurement results for'+
+                                                      'each column. Both results and measurement results are needed.' )
                                 #only one measurement result is allowed per result
                                 value = row[colnum.columnnum]
                                 if check_dates:
