@@ -136,7 +136,7 @@ class Command(BaseCommand):
                                             raise IntegrityError
                                         if check_dates: #this check is really slowing down ingestion so I added a flag to turn it off
                                             try:
-                                                mrv = mrvs.filter(valuedatetime=datestr).get()
+                                                mrv = mrvs.filter(valuedatetime=datestr).filter(resultid=mresults.resultid).get()
                                             except ObjectDoesNotExist:
                                                 Measurementresultvalues(resultid=mresults
                                                             ,datavalue=row[colnum.columnnum],
