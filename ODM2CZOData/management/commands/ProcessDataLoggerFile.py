@@ -113,6 +113,9 @@ class Command(BaseCommand):
                                     datestr = time.strftime("%Y-%m-%d %H:%M:%S",dateT)
                         #for each column in the data table
                         #raise ValidationError("".join(str(rowColumnMap)))
+                        if check_dates:
+                            mrs = Results.objects.filter(resultid__in = rowColumnMap.values("resultid"))
+                            mrvs = Measurementresultvalues.objects.filter(resultid__in=mrs)
                         for colnum in rowColumnMap:
                             #x[0] for x in my_tuples
                             #colnum[0] = column number, colnum[1] = dataloggerfilecolumn object
@@ -127,8 +130,6 @@ class Command(BaseCommand):
                                                       'each column. Both results and measurement results are needed.' )
                                 #only one measurement result is allowed per result
                                 value = row[colnum.columnnum]
-                                if check_dates:
-                                    mrvs = Measurementresultvalues.objects.filter(resultid=measurementresult)
                                 for mresults in measurementresult:
                                     try:
                                         if(value==''):
