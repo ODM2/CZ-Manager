@@ -114,7 +114,7 @@ class Command(BaseCommand):
                         #for each column in the data table
                         #raise ValidationError("".join(str(rowColumnMap)))
                         if check_dates:
-                            mrs = Results.objects.filter(resultid__in = rowColumnMap.values("resultid"))
+                            mrs = Results.objects.filter(resultid__in = DataloggerfilecolumnSet.values("resultid"))
                             mrvs = Measurementresultvalues.objects.filter(resultid__in=mrs)
                         for colnum in rowColumnMap:
                             #x[0] for x in my_tuples
