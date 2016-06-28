@@ -36,15 +36,16 @@ import json
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
 import re
 register = template.Library()
-from .models import Citations
-from .models import Authorlists
 from django.template import loader
-from .models import Methods
-from .models import Extensionproperties
 from .forms import CitationsAdminForm
+from .forms import CitationextensionpropertyvaluesAdminForm
+from .forms import AuthorlistsAdminForm
 from django.http import StreamingHttpResponse
 from django.core import mail
-
+from subprocess import *
+import sys as sys
+from django.core import management
+from django.shortcuts import render_to_response
 #
 # class FeatureactionsAutocomplete(autocomplete.Select2QuerySetView):
 #     def get_queryset(self):
@@ -60,12 +61,95 @@ from django.core import mail
 #             #qs = qs.filter(__istartswith=self.q)
 #
 #         return self.q
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import FormView
 
-#class CreatePubView(CreateView):
+#class CreatePubView(FormView):
 #    template_name = "publications2.html"
 #    model = Citations
+from django.forms.models import inlineformset_factory
+from django.db import IntegrityError
 
+def add_pub(request,citationid='NotSet'):
+
+    AuthorInlineFormSet = inlineformset_factory(Citations,Authorlists,extra=6)
+    CitationPorpertyInlineFormSet = inlineformset_factory(Citations,Citationextensionpropertyvalues)
+    #citation_form=CitationsAdminForm(request.POST,instance=citation)
+    if request.method=="POST":
+        citation= Citations.objects.filter(citationid=citationid).get()
+        Authorformset=AuthorInlineFormSet(request.POST,request.FILES,instance=citation)
+        CitationPorpertyformset = CitationPorpertyInlineFormSet(request.POST,request.FILES,instance=citation)
+        citation_form=CitationsAdminForm(request.POST,request.FILES,instance=citation)
+        if Authorformset.is_valid():
+            Authorformset.save()
+        if CitationPorpertyformset.is_valid():
+            CitationPorpertyformset.save()
+        # for eform in Authorformset.forms:
+        #     #eform.cleaned_data.citaionid eform.cleaned_data.personid, eform.cleaned_data.authororder
+        #     if eform.changed_data.__len__()>0:
+        #         if  'DELETE' in eform.changed_data:
+        #             eform.delete()
+        #         else:
+        #             eform.save()
+        # for eform in CitationPorpertyformset.forms:
+        #     if eform.changed_data.__len__()>0:
+        #         eform.save()
+        if citation_form.is_valid():
+            citation_form.save()
+        #if Authorformset.is_valid() and CitationPorpertyformset.is_valid():
+            #Authorformset.save()
+            #CitationPorpertyformset.save()
+            #citation_form.save()
+        return HttpResponseRedirect('../../pubview/citationid=' + str(citationid) +'/')
+    elif not citationid=='NotSet':
+        citation= Citations.objects.filter(citationid=citationid).get()
+        Authorformset = AuthorInlineFormSet(instance=citation)
+        Authorformset.empty_permitted=False
+        CitationPorpertyformset = CitationPorpertyInlineFormSet(instance=citation)
+        CitationPorpertyformset.empty_permitted=False
+        citation_form=CitationsAdminForm(instance=citation)
+    else:
+        Authorformset=AuthorInlineFormSet(instance=Authorlists())
+        CitationPorpertyformset = CitationPorpertyInlineFormSet(instance=Citationextensionpropertyvalues())
+        citation_form=CitationsAdminForm(instance=Citations())
+    return render(request, 'publications3.html', {'Authorformset':Authorformset,'CitationPorpertyformset':CitationPorpertyformset,'citation_form':citation_form,})
+#
+# def add_pub(request,citation='NotSet'):
+#     #citation_form
+#     #author_form
+#     #citation_property_form
+#     author_forms= []
+#     citation_property_forms=[]
+#     if request.method=="POST":
+#         citation_form=CitationsAdminForm(request.POST,instance=Citations())
+#         author_forms=[AuthorlistsAdminForm(request.POST,prefix=str(x),instance=Authorlists()) for x in range(0,3)]
+#         citation_property_forms=[CitationextensionpropertyvaluesAdminForm(request.POST,prefix=str(x),instance=Citationextensionpropertyvalues())for x in range(0,3)]
+#         if citation_form.is_valid():
+#             new_citation= citation_form.save()
+#             citationid= new_citation.citationid
+#             for af in author_forms:
+#                 if af.is_valid():
+#                     new_author = af.save(commit=False)
+#                     new_author.citationid = new_citation
+#                     new_author.save()
+#             for cpf in citation_property_forms:
+#                 if cpf.is_valid():
+#                     new_cepv = cpf.save(commit=False)
+#                     new_cepv.citationid = new_citation
+#                     new_cepv.save()
+#             return HttpResponseRedirect('/pubview/citationid=' + str(citationid))
+#     elif not citation=='NotSet':
+#         citation_form=CitationsAdminForm(instance=Citations.objects.filter(citationid=citation).get())
+#         authors = Authorlists.objects.filter(citationid=citation)
+#         for auth in authors:
+#             author_forms.append(AuthorlistsAdminForm(instance=auth))
+#         cepvs= Citationextensionpropertyvalues.objects.filter(citationid=citation)
+#         for cepv in cepvs:
+#             citation_property_forms.append(CitationextensionpropertyvaluesAdminForm(instance=cepv))
+#     else:
+#         citation_form=CitationsAdminForm(instance=Citations())
+#         author_forms=[AuthorlistsAdminForm(prefix=str(x), instance=Authorlists()) for x in range(0,3)]
+#         citation_property_forms=[CitationextensionpropertyvaluesAdminForm(prefix=str(x), instance=Citationextensionpropertyvalues()) for x in range(0,3)]
+#     return TemplateResponse(request, 'publications2.html',{'citation_form':citation_form,'author_forms':author_forms,'citation_property_forms':citation_property_forms,})
 
 def publications(request):
     if request.user.is_authenticated():

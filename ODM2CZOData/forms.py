@@ -151,11 +151,13 @@ class DatasetcitationsAdmin(admin.ModelAdmin):
 
 
 class CitationsAdminForm(ModelForm):
+    title = forms.CharField(max_length=255, widget=forms.Textarea, label="Publication Title")
     class Meta:
         model= Citations
         fields = '__all__'
 class CitationsAdmin(admin.ModelAdmin):
     list_display=('title','publisher','publicationyear', 'citation_link')
+
     form=CitationsAdminForm
     search_fields = ['title','publisher','publicationyear','authorlists__personid__personfirstname', 'authorlists__personid__personlastname']
     def citation_link(self,obj):

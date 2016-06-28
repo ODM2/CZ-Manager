@@ -1,0 +1,64 @@
+
+{% extends "admin/base_site.html" %}
+{% load admin_extras %}
+{% load static %}
+
+{% load i18n  admin_shortcuts_tags %}
+{# django-admin-shortcuts changes these blocks #}
+{% block breadcrumbs %}
+	<div class="admin_shortcuts">
+		{% admin_shortcuts %}
+	</div>
+{% endblock %}
+
+ {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
+{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}{% admin_shortcuts_js %}{% endblock %}
+
+{# end changes #}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% block content %}
+<form action="." method="post">
+{% csrf_token %} 
+    <div>
+        <h1>Add or Change Publication</h1>
+			{{ citation_form.title.label_tag }}{{ citation_form.title}}
+			{{ citation_form.publisher.label_tag}}{{ citation_form.publisher}}
+			{{ citation_form.publicationyear.label_tag}}{{ citation_form.publicationyear}}
+			{{ citation_form.citationlink.label_tag}}{{ citation_form.citationlink}}
+			<br>
+<table >
+  				<tr ><th scope="col" class="section">citation</td>
+				<th scope="col"  class="section">person</th>
+				<th scope="col"  class="section">Author Order</th>
+				<th scope="col"  class="section">Bridgeid</th>
+				<th scope="col"  class="section">delete</th></tr>
+            {{ Authorformset.management_form }}
+				{% for form in Authorformset %}
+					<tr>{% for field in form %}
+						<td>{{ field.label_tag }} {{ field }}</td>
+					{% endfor %}</tr>
+				{% endfor %}</table>
+						<br>
+<table >
+			<tr ><th scope="col" class="section">citation</td>
+				<th scope="col"  class="section">propertyid</th>
+				<th scope="col"  class="section">propertyvalue</th>
+				<th scope="col"  class="section">Bridgeid</th>
+				<th scope="col"  class="section">delete</th></tr>			
+            {{ CitationPorpertyformset.management_form }}
+				{% for form in CitationPorpertyformset %}
+					<tr>{% for field in form %}
+						<td>{{ field.label_tag }} {{ field }}</td>
+					{% endfor %}</tr>
+				{% endfor %}</table>
+				        
+    </div>
+	<input type="submit" name="add_citation" value="Save" />
+</form>
+{% endblock %}

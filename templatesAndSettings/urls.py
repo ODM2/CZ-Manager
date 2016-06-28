@@ -46,7 +46,8 @@ urlpatterns = patterns('',
     url(r'^' + URL_PATH +'chartVariableAndFeature.html', views.graph_data, name="graph_data"),
      url(r'^' + URL_PATH +'soilsscatterplot.html', views.scatter_plot, name="scatter_plot"),
     url(r'^' + URL_PATH +'publications.html', views.publications, name="publications"),
-      #  url(r'^' + URL_PATH +'publications2.html', views.CreatePubView.as_view(), name="publications2"),
+    url(r'^' + URL_PATH +'pubview/citationid=(?P<citationid>(\d+))/$', views.add_pub, name="add_pub"),
+    url(r'^' + URL_PATH +'pubview', views.add_pub),
     #for uploaded files like dataloggerfiles
     #url(r'^' + MEDIA_URL +'(?P<path>.*)$', 'django.views.static.serve', {
     #        'document_root': MEDIA_ROOT,
