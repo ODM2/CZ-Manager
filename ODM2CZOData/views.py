@@ -70,49 +70,50 @@ from django.forms.models import inlineformset_factory
 from django.db import IntegrityError
 
 def add_pub(request,citationid='NotSet'):
-
-    AuthorInlineFormSet = inlineformset_factory(Citations,Authorlists,extra=6)
-    CitationPorpertyInlineFormSet = inlineformset_factory(Citations,Citationextensionpropertyvalues)
-    #citation_form=CitationsAdminForm(request.POST,instance=citation)
-    if request.method=="POST":
-        citation= Citations.objects.filter(citationid=citationid).get()
-        Authorformset=AuthorInlineFormSet(request.POST,request.FILES,instance=citation)
-        CitationPorpertyformset = CitationPorpertyInlineFormSet(request.POST,request.FILES,instance=citation)
-        citation_form=CitationsAdminForm(request.POST,request.FILES,instance=citation)
-        if Authorformset.is_valid():
-            Authorformset.save()
-        if CitationPorpertyformset.is_valid():
-            CitationPorpertyformset.save()
-        # for eform in Authorformset.forms:
-        #     #eform.cleaned_data.citaionid eform.cleaned_data.personid, eform.cleaned_data.authororder
-        #     if eform.changed_data.__len__()>0:
-        #         if  'DELETE' in eform.changed_data:
-        #             eform.delete()
-        #         else:
-        #             eform.save()
-        # for eform in CitationPorpertyformset.forms:
-        #     if eform.changed_data.__len__()>0:
-        #         eform.save()
-        if citation_form.is_valid():
-            citation_form.save()
-        #if Authorformset.is_valid() and CitationPorpertyformset.is_valid():
-            #Authorformset.save()
-            #CitationPorpertyformset.save()
-            #citation_form.save()
-        return HttpResponseRedirect('../../pubview/citationid=' + str(citationid) +'/')
-    elif not citationid=='NotSet':
-        citation= Citations.objects.filter(citationid=citationid).get()
-        Authorformset = AuthorInlineFormSet(instance=citation)
-        Authorformset.empty_permitted=False
-        CitationPorpertyformset = CitationPorpertyInlineFormSet(instance=citation)
-        CitationPorpertyformset.empty_permitted=False
-        citation_form=CitationsAdminForm(instance=citation)
+    if request.user.is_authenticated():
+        AuthorInlineFormSet = inlineformset_factory(Citations,Authorlists,extra=6)
+        CitationPorpertyInlineFormSet = inlineformset_factory(Citations,Citationextensionpropertyvalues)
+        #citation_form=CitationsAdminForm(request.POST,instance=citation)
+        if request.method=="POST":
+            citation= Citations.objects.filter(citationid=citationid).get()
+            Authorformset=AuthorInlineFormSet(request.POST,request.FILES,instance=citation)
+            CitationPorpertyformset = CitationPorpertyInlineFormSet(request.POST,request.FILES,instance=citation)
+            citation_form=CitationsAdminForm(request.POST,request.FILES,instance=citation)
+            if Authorformset.is_valid():
+                Authorformset.save()
+            if CitationPorpertyformset.is_valid():
+                CitationPorpertyformset.save()
+            # for eform in Authorformset.forms:
+            #     #eform.cleaned_data.citaionid eform.cleaned_data.personid, eform.cleaned_data.authororder
+            #     if eform.changed_data.__len__()>0:
+            #         if  'DELETE' in eform.changed_data:
+            #             eform.delete()
+            #         else:
+            #             eform.save()
+            # for eform in CitationPorpertyformset.forms:
+            #     if eform.changed_data.__len__()>0:
+            #         eform.save()
+            if citation_form.is_valid():
+                citation_form.save()
+            #if Authorformset.is_valid() and CitationPorpertyformset.is_valid():
+                #Authorformset.save()
+                #CitationPorpertyformset.save()
+                #citation_form.save()
+            return HttpResponseRedirect('../../pubview/citationid=' + str(citationid) +'/')
+        elif not citationid=='NotSet':
+            citation= Citations.objects.filter(citationid=citationid).get()
+            Authorformset = AuthorInlineFormSet(instance=citation)
+            Authorformset.empty_permitted=False
+            CitationPorpertyformset = CitationPorpertyInlineFormSet(instance=citation)
+            CitationPorpertyformset.empty_permitted=False
+            citation_form=CitationsAdminForm(instance=citation)
+        else:
+            Authorformset=AuthorInlineFormSet(instance=Authorlists())
+            CitationPorpertyformset = CitationPorpertyInlineFormSet(instance=Citationextensionpropertyvalues())
+            citation_form=CitationsAdminForm(instance=Citations())
+        return render(request, 'publications3.html', {'Authorformset':Authorformset,'CitationPorpertyformset':CitationPorpertyformset,'citation_form':citation_form,})
     else:
-        Authorformset=AuthorInlineFormSet(instance=Authorlists())
-        CitationPorpertyformset = CitationPorpertyInlineFormSet(instance=Citationextensionpropertyvalues())
-        citation_form=CitationsAdminForm(instance=Citations())
-    return render(request, 'publications3.html', {'Authorformset':Authorformset,'CitationPorpertyformset':CitationPorpertyformset,'citation_form':citation_form,})
-#
+        return HttpResponseRedirect('../../')
 # def add_pub(request,citation='NotSet'):
 #     #citation_form
 #     #author_form
@@ -152,44 +153,44 @@ def add_pub(request,citationid='NotSet'):
 #     return TemplateResponse(request, 'publications2.html',{'citation_form':citation_form,'author_forms':author_forms,'citation_property_forms':citation_property_forms,})
 
 def publications(request):
-    if request.user.is_authenticated():
-        citationList = Citations.objects.all()
-        authList = Authorlists.objects.all()
-        selectedTag = 'CZO Authors'
-        if 'filterTags' in request.POST:
-            if not request.POST['filterTags'] == 'All':
-                selectedTag = request.POST['filterTags']
-                if request.POST['filterTags'] == 'CZO Authors':
-                    citationList =Citations.objects.filter(citationid__in=authList.values("citationid"))
-                else:
-                    citationList =Citations.objects.filter(publisher__icontains=selectedTag)
+    #if request.user.is_authenticated():
+    citationList = Citations.objects.all()
+    authList = Authorlists.objects.all()
+    selectedTag = 'CZO Authors'
+    if 'filterTags' in request.POST:
+        if not request.POST['filterTags'] == 'All':
+            selectedTag = request.POST['filterTags']
+            if request.POST['filterTags'] == 'CZO Authors':
+                citationList =Citations.objects.filter(citationid__in=authList.values("citationid"))
             else:
-                selectedTag = 'All'
+                citationList =Citations.objects.filter(publisher__icontains=selectedTag)
         else:
-            citationList =Citations.objects.filter(citationid__in=authList.values("citationid"))
-        filterTags=['CZO Authors','All','AGU', 'LCZO Meeting']
-
-        citationCategories = Citationextensionpropertyvalues.objects.filter(propertyid=5).distinct("propertyvalue") #citation category Extensionproperties
-        selectedCategory = None
-        if 'citationCategories' in request.POST:
-            if not request.POST['citationCategories'] == 'All':
-                selectedCategory = request.POST['citationCategories']
-                citationPropValueFilter = Citationextensionpropertyvalues.objects.filter(propertyvalue__icontains=selectedCategory)
-                citationList = citationList.filter(citationid__in=citationPropValueFilter.values("citationid"))
-            else:
-                selectedCategory = 'All'
-        #context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
-        if request.REQUEST.get('export_data'):
-            response=exportcitations(request,citationList, True)
-            return response
-        if request.REQUEST.get('export_endnote'):
-            response=exportcitations(request,citationList, False)
-            return response
-        return TemplateResponse(request,'publications.html',{'citationList': citationList,'authList':authList,
-                'filterTags':filterTags,'citationCategories':citationCategories,'selectedCategory':selectedCategory,
-                'selectedTag':selectedTag,'prefixpath': CUSTOM_TEMPLATE_PATH,})
+            selectedTag = 'All'
     else:
-        return HttpResponseRedirect('../')
+        citationList =Citations.objects.filter(citationid__in=authList.values("citationid"))
+    filterTags=['CZO Authors','All','AGU', 'LCZO Meeting']
+
+    citationCategories = Citationextensionpropertyvalues.objects.filter(propertyid=5).distinct("propertyvalue") #citation category Extensionproperties
+    selectedCategory = None
+    if 'citationCategories' in request.POST:
+        if not request.POST['citationCategories'] == 'All':
+            selectedCategory = request.POST['citationCategories']
+            citationPropValueFilter = Citationextensionpropertyvalues.objects.filter(propertyvalue__icontains=selectedCategory)
+            citationList = citationList.filter(citationid__in=citationPropValueFilter.values("citationid"))
+        else:
+            selectedCategory = 'All'
+    #context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
+    if request.REQUEST.get('export_data'):
+        response=exportcitations(request,citationList, True)
+        return response
+    if request.REQUEST.get('export_endnote'):
+        response=exportcitations(request,citationList, False)
+        return response
+    return TemplateResponse(request,'publications.html',{'citationList': citationList,'authList':authList,
+            'filterTags':filterTags,'citationCategories':citationCategories,'selectedCategory':selectedCategory,
+            'selectedTag':selectedTag,'prefixpath': CUSTOM_TEMPLATE_PATH,})
+    #else:
+        #return HttpResponseRedirect('../')
 
 
 #def index(request):
