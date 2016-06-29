@@ -32,30 +32,44 @@
 			{{ citation_form.publicationyear.label_tag}}{{ citation_form.publicationyear}}
 			{{ citation_form.citationlink.label_tag}}{{ citation_form.citationlink}}
 			<br>
-<table >
-  				<tr ><th scope="col" class="section">citation</td>
+<h1>Add or Change Authors for this publication</h1>
+			<table >
 				<th scope="col"  class="section">person</th>
 				<th scope="col"  class="section">Author Order</th>
-				<th scope="col"  class="section">Bridgeid</th>
-				<th scope="col"  class="section">delete</th></tr>
+				<th scope="col"  class="section">Delete</th></tr>
             {{ Authorformset.management_form }}
 				{% for form in Authorformset %}
-					<tr>{% for field in form %}
-						<td>{{ field.label_tag }} {{ field }}</td>
-					{% endfor %}</tr>
+					<tr>
+					<td>{{form.bridgeid}}{{form.personid.label_tag}}{{form.personid}}</td>
+					<td>{{form.authororder.label_tag}}{{form.authororder}}</td>
+					<td>{{form.DELETE.label_tag}}{{form.DELETE}}</td>
+					</tr>
 				{% endfor %}</table>
 						<br>
-<table >
-			<tr ><th scope="col" class="section">citation</td>
-				<th scope="col"  class="section">propertyid</th>
-				<th scope="col"  class="section">propertyvalue</th>
-				<th scope="col"  class="section">Bridgeid</th>
+
+<h1>Add or Change Additional details about this publication</h1>
+						<table >
+			<tr >
+				<th scope="col"  class="section">Property</th>
+				<th scope="col"  class="section">Value</th>
 				<th scope="col"  class="section">delete</th></tr>			
             {{ CitationPorpertyformset.management_form }}
 				{% for form in CitationPorpertyformset %}
-					<tr>{% for field in form %}
-						<td>{{ field.label_tag }} {{ field }}</td>
-					{% endfor %}</tr>
+				{% if form.propertyid.value == 6 or form.propertyid.value == 2  %}
+					
+					<tr><td>{{form.bridgeid}}{{form.propertyid}}</td>
+					{% if form.propertyvalue.value == 'True' %}
+					<td>Value: <input type="checkbox" value={{form.propertyvalue.value}} checked /></td>
+					{% else %}
+					<td>Value: <input type="checkbox" value={{form.propertyvalue.value}} /></td>
+					{% endif %}
+					<td>{{form.DELETE.label_tag}}{{form.DELETE}}</td></tr>
+				{% else %}
+					<tr ><td>{{form.bridgeid}}{{form.propertyid}}</td>
+					<td>Value: {{form.propertyvalue}}</td>
+					<td>{{form.DELETE.label_tag}}{{form.DELETE}}</td></tr>
+				{% endif %}
+					
 				{% endfor %}</table>
 				        
     </div>
