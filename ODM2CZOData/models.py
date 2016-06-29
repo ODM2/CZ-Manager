@@ -294,7 +294,7 @@ class Citationextensionpropertyvalues(models.Model):
     bridgeid = models.AutoField(primary_key=True)
     citationid = models.ForeignKey('Citations', db_column='citationid')
     propertyid = models.ForeignKey('Extensionproperties', db_column='propertyid')
-    propertyvalue = models.CharField(max_length=255)
+    propertyvalue = models.CharField(max_length=255, blank=True, null=True)
     def __unicode__(self):
         s = u"%s - %s - %s" % (self.citationid, self.propertyid, self.propertyvalue)
         return s
