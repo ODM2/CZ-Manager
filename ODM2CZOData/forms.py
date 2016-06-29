@@ -223,7 +223,7 @@ class SamplingfeaturesAdminForm(ModelForm):
                                     " where long and lat are in decimal degrees. If you don't want to add a location"+
                                       " leave default value of POINT(0 0).",
                                     max_length=500, widget=forms.Textarea(),) #attrs={'readonly':'readonly'}
-    samplingfeaturedescription = CharField(max_length=500, label= "feature description", widget=forms.Textarea, required=False)
+    samplingfeaturedescription = CharField(max_length=5000, label= "feature description", widget=forms.Textarea, required=False)
     featuregeometry.initial = "POINT(0 0)"
     featuregeometry.required=False
     class Meta:
@@ -332,7 +332,7 @@ class FeatureactionsAdmin(admin.ModelAdmin):
     search_fields=['action__method__methodname','samplingfeatureid__samplingfeaturename']
 
 class DatasetsAdminForm(ModelForm):
-    datasetabstract = forms.CharField(max_length=500, widget=forms.Textarea )
+    datasetabstract = forms.CharField(max_length=5000, widget=forms.Textarea )
     class Meta:
         model= Datasets
         fields = '__all__'
@@ -368,7 +368,7 @@ class AffiliationsAdmin(admin.ModelAdmin):
     form=AffiliationsAdminForm
 
 class ActionsAdminForm(ModelForm):
-    actiondescription = CharField(max_length=500, label= "Action description", widget=forms.Textarea, required=False)
+    actiondescription = CharField(max_length=5000, label= "Action description", widget=forms.Textarea, required=False)
     class Meta:
         model= Actions
         fields = '__all__'
@@ -391,7 +391,7 @@ class ActionByAdmin(admin.ModelAdmin):
 
 
 class MethodsAdminForm(ModelForm):
-    methoddescription = CharField(max_length=500, label= "Method description", widget=forms.Textarea, required=False)
+    methoddescription = CharField(max_length=5000, label= "Method description", widget=forms.Textarea, required=False)
 
     #methodtypecv= TermModelChoiceField(CvMethodtype.objects.all().order_by('term'))
     #organizationid= OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
@@ -735,7 +735,7 @@ class InstrumentoutputvariablesAdmin(admin.ModelAdmin):
 
 
 class EquipmentmodelsAdminForm(ModelForm):
-    modeldescription = CharField(max_length=500, label= "model description", widget=forms.Textarea)
+    modeldescription = CharField(max_length=5000, label= "model description", widget=forms.Textarea)
     #change from a check box to a yes no choice with radio buttons.
     isinstrument = TypedChoiceField( label="Is this an instrument?",
                    coerce=lambda x: x == 'True',

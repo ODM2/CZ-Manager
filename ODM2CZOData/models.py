@@ -95,7 +95,7 @@ class Actionby(models.Model):
     actionid = models.ForeignKey('Actions',verbose_name="action", db_column='actionid')
     affiliationid = models.ForeignKey('Affiliations',verbose_name="person by affiliation", db_column='affiliationid')
     isactionlead = models.BooleanField(verbose_name="is lead person on action")
-    roledescription = models.CharField(max_length=500,verbose_name="person's role on this action", blank=True)
+    roledescription = models.CharField(max_length=5000,verbose_name="person's role on this action", blank=True)
     def __unicode__(self):
         s = u"%s" % (self.actionid)
         if self.affiliationid:
@@ -142,7 +142,7 @@ class Actions(models.Model):
     begindatetimeutcoffset = models.IntegerField(verbose_name='begin date time clock off set (from GMT)', default=4)
     enddatetime = models.DateTimeField(verbose_name='end date time',blank=True, null=True)
     enddatetimeutcoffset = models.IntegerField(verbose_name='end date time clock off set (from GMT)', default=4)
-    actiondescription = models.CharField(verbose_name='action description',max_length=500, blank=True)
+    actiondescription = models.CharField(verbose_name='action description',max_length=5000, blank=True)
     actionfilelink = models.CharField(verbose_name='action file link',max_length=255, blank=True)
     def __unicode__(self):
         s = u"%s" % (self.action_type)
@@ -882,7 +882,7 @@ class Dataloggerfilecolumns(models.Model):
     instrumentoutputvariableid = models.ForeignKey('Instrumentoutputvariables',
                                 verbose_name="instrument output variable", db_column='instrumentoutputvariableid')
     columnlabel = models.CharField(verbose_name="column label", max_length=50)
-    columndescription = models.CharField(verbose_name = "column description", max_length=500, blank=True)
+    columndescription = models.CharField(verbose_name = "column description", max_length=5000, blank=True)
     measurementequation = models.CharField(verbose_name="measurement equation", max_length=255, blank=True)
     scaninterval = models.FloatField(verbose_name="scan interval (time)", blank=True, null=True)
     scanintervalunitsid = models.ForeignKey('Units', verbose_name="scan interval units",
@@ -913,7 +913,7 @@ class Dataloggerfiles(models.Model):
     dataloggerfileid = models.AutoField(primary_key=True)
     programid = models.ForeignKey('Dataloggerprogramfiles', db_column='programid')
     dataloggerfilename = models.CharField(max_length=255)
-    dataloggerfiledescription = models.CharField(max_length=500, blank=True)
+    dataloggerfiledescription = models.CharField(max_length=5000, blank=True)
     #dataloggerfilelink = models.CharField(max_length=255, blank=True)
     dataloggerfilelink = models.FileField(upload_to='dataloggerfiles') #upload_to='.'
     def __unicode__(self):
@@ -962,7 +962,7 @@ class Dataloggerprogramfiles(models.Model):
     programid = models.AutoField(primary_key=True)
     affiliationid = models.ForeignKey(Affiliations, db_column='affiliationid')
     programname = models.CharField(max_length=255)
-    programdescription = models.CharField(max_length=500, blank=True)
+    programdescription = models.CharField(max_length=5000, blank=True)
     programversion = models.CharField(max_length=50, blank=True)
     #programfilelink = models.CharField(max_length=255, blank=True)
     programfilelink = models.FileField(upload_to='dataloggerprogramfiles') #+ '/' + programname.__str__() settings.MEDIA_ROOT upload_to='/upfiles/'
@@ -984,7 +984,7 @@ class Dataquality(models.Model):
     dataqualityvalue = models.FloatField(blank=True, null=True,verbose_name="data quality value")
     dataqualityvalueunitsid = models.ForeignKey('Units', related_name='+', db_column='dataqualityvalueunitsid',
                                                 verbose_name="data quality value units", blank=True, null=True)
-    dataqualitydescription = models.CharField(max_length=500, blank=True, verbose_name="data quality description")
+    dataqualitydescription = models.CharField(max_length=5000, blank=True, verbose_name="data quality description")
     dataqualitylink = models.CharField(max_length=255, blank=True, verbose_name="data quality link")
     def __unicode__(self):
         return u"%s - %s - %s" % (self.dataqualitycode, self.dataqualityvalue, self.dataqualityvalueunitsid)
@@ -1013,7 +1013,7 @@ class Datasets(models.Model):
     datasettypecv = models.ForeignKey(CvDatasettypecv, verbose_name="dataset type", db_column='datasettypecv')
     datasetcode = models.CharField(verbose_name="dataset code", max_length=50)
     datasettitle = models.CharField(verbose_name="dataset title", max_length=255)
-    datasetabstract = models.CharField(verbose_name = "dataset abstract", max_length=500)
+    datasetabstract = models.CharField(verbose_name = "dataset abstract", max_length=5000)
     def __unicode__(self):
         s = u"%s" % (self.datasetcode)
         if self.datasettitle:
@@ -1070,7 +1070,7 @@ class Equipment(models.Model):
     equipmentvendorid = models.ForeignKey('Organizations', db_column='equipmentvendorid')
     equipmentpurchasedate = models.DateTimeField()
     equipmentpurchaseordernumber = models.CharField(max_length=50, blank=True)
-    equipmentdescription = models.CharField(max_length=500, blank=True)
+    equipmentdescription = models.CharField(max_length=5000, blank=True)
     equipmentdocumentationlink = models.CharField(max_length=255, blank=True)
 
     class Meta:
@@ -1094,7 +1094,7 @@ class Equipmentmodels(models.Model):
                                             db_column='modelmanufacturerid')
     modelpartnumber = models.CharField(max_length=50, blank=True, verbose_name="model part number")
     modelname = models.CharField(max_length=255, verbose_name="model name")
-    modeldescription = models.CharField(max_length=500, blank=True,null=True, verbose_name="model description")
+    modeldescription = models.CharField(max_length=5000, blank=True,null=True, verbose_name="model description")
     isinstrument = models.BooleanField(verbose_name="Is this an instrument?")
     modelspecificationsfilelink = models.CharField(max_length=255,
                                 verbose_name="link to manual for equipment", blank=True)
@@ -1123,7 +1123,7 @@ class Equipmentused(models.Model):
 class Extensionproperties(models.Model):
     propertyid = models.AutoField(primary_key=True)
     propertyname = models.CharField(max_length=255, verbose_name="property name")
-    propertydescription = models.CharField(max_length=500, blank=True, verbose_name="property description")
+    propertydescription = models.CharField(max_length=5000, blank=True, verbose_name="property description")
     propertydatatypecv = models.ForeignKey(CvPropertydatatype, db_column='propertydatatypecv', verbose_name="property data type")
     propertyunitsid = models.ForeignKey('Units',  db_column='propertyunitsid', blank=True, null=True, verbose_name="units for property")
     def __unicode__(self):
@@ -1139,7 +1139,7 @@ class Externalidentifiersystems(models.Model):
     externalidentifiersystemid = models.AutoField(primary_key=True)
     externalidentifiersystemname = models.CharField(max_length=255)
     identifiersystemorganizationid = models.ForeignKey('Organizations', db_column='identifiersystemorganizationid')
-    externalidentifiersystemdescription = models.CharField(max_length=500, blank=True)
+    externalidentifiersystemdescription = models.CharField(max_length=5000, blank=True)
     externalidentifiersystemurl = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
         return u"%s" % (self.externalidentifiersystemname)
@@ -1388,7 +1388,7 @@ class Methods(models.Model):
                       "here: http://vocabulary.odm2.org/methodtype/", db_column='methodtypecv')
     methodcode = models.CharField(verbose_name='method code',max_length=50)
     methodname = models.CharField(verbose_name='method name',max_length=255)
-    methoddescription = models.CharField(verbose_name='method description', max_length=500, blank=True)
+    methoddescription = models.CharField(verbose_name='method description', max_length=5000, blank=True)
     methodlink = models.CharField(verbose_name='web link for method', max_length=255, blank=True)
     organizationid = models.ForeignKey('Organizations', verbose_name='organization', db_column='organizationid', blank=True, null=True)
     def __unicode__(self):
@@ -1408,7 +1408,7 @@ class Modelaffiliations(models.Model):
     modelid = models.ForeignKey('Models', db_column='modelid')
     affiliationid = models.ForeignKey(Affiliations, db_column='affiliationid')
     isprimary = models.BooleanField()
-    roledescription = models.CharField(max_length=500, blank=True)
+    roledescription = models.CharField(max_length=5000, blank=True)
 
     class Meta:
         managed = False
@@ -1419,7 +1419,7 @@ class Models(models.Model):
     modelid = models.AutoField(primary_key=True)
     modelcode = models.CharField(max_length=50)
     modelname = models.CharField(max_length=255)
-    modeldescription = models.CharField(max_length=500, blank=True)
+    modeldescription = models.CharField(max_length=5000, blank=True)
     version = models.CharField(max_length=255, blank=True)
     modellink = models.CharField(max_length=255, blank=True)
 
@@ -1433,7 +1433,7 @@ class Organizations(models.Model):
     organizationtypecv = models.ForeignKey( CvOrganizationtype, verbose_name="organization type", db_column='organizationtypecv')
     organizationcode = models.CharField(verbose_name="organization code", max_length=50)
     organizationname = models.CharField(verbose_name="organization name", max_length=255)
-    organizationdescription = models.CharField(verbose_name="organization description", max_length=500, blank=True)
+    organizationdescription = models.CharField(verbose_name="organization description", max_length=5000, blank=True)
     organizationlink = models.CharField(verbose_name="organization web link", max_length=255, blank=True)
     parentorganizationid = models.ForeignKey('self',verbose_name="parent organization", db_column='parentorganizationid',blank=True, null=True, default=1)
     def __unicode__(self):
@@ -1526,8 +1526,8 @@ class Pointcoverageresultvalues(models.Model):
 class Processinglevels(models.Model):
     processinglevelid = models.AutoField(primary_key=True)
     processinglevelcode = models.CharField(verbose_name='processing level code',max_length=50)
-    definition = models.CharField(max_length=500, blank=True)
-    explanation = models.CharField(max_length=500, blank=True)
+    definition = models.CharField(max_length=5000, blank=True)
+    explanation = models.CharField(max_length=5000, blank=True)
     def __unicode__(self):
         s = u"%s " % (self.processinglevelcode)
         if self.definition:
@@ -1942,7 +1942,7 @@ class Samplingfeatures(models.Model):
     sampling_feature_type = models.ForeignKey(CvSamplingfeaturetype, db_column='samplingfeaturetypecv')
     samplingfeaturecode = models.CharField(verbose_name='sampling feature code',max_length=50)
     samplingfeaturename = models.CharField(verbose_name='sampling feature name',max_length=255, blank=True, null=True)
-    samplingfeaturedescription = models.CharField(verbose_name='sampling feature description', max_length=500, blank=True)
+    samplingfeaturedescription = models.CharField(verbose_name='sampling feature description', max_length=5000, blank=True)
     sampling_feature_geo_type = models.ForeignKey(CvSamplingfeaturegeotype,db_column='samplingfeaturegeotypecv', default= "Point", null=True)
     featuregeometry = models.TextField(verbose_name='feature geometry',blank=True, null=True)  #GeometryField This field type is a guess.
     elevation_m = models.FloatField(verbose_name='elevation',blank=True, null=True)
@@ -2015,7 +2015,7 @@ class Simulations(models.Model):
     simulationid = models.AutoField(primary_key=True)
     actionid = models.ForeignKey(Actions, db_column='actionid')
     simulationname = models.CharField(max_length=255)
-    simulationdescription = models.CharField(max_length=500, blank=True)
+    simulationdescription = models.CharField(max_length=5000, blank=True)
     simulationstartdatetime = models.DateTimeField()
     simulationstartdatetimeutcoffset = models.IntegerField()
     simulationenddatetime = models.DateTimeField()
@@ -2073,7 +2073,7 @@ class Spatialreferences(models.Model):
     spatialreferenceid = models.AutoField(primary_key=True)
     srscode = models.CharField(max_length=50, blank=True)
     srsname = models.CharField(max_length=255)
-    srsdescription = models.CharField(max_length=500, blank=True)
+    srsdescription = models.CharField(max_length=5000, blank=True)
     srslink = models.CharField(max_length=255, blank=True)
 
     class Meta:
@@ -2195,7 +2195,7 @@ class Taxonomicclassifiers(models.Model):
                               "http://vocabulary.odm2.org/taxonomicclassifiertype/  for more info")
     taxonomicclassifiername = models.CharField(verbose_name='taxonomic classifier name', max_length=255)
     taxonomicclassifiercommonname = models.CharField(verbose_name='taxonomic classifier common name',max_length=255, blank=True)
-    taxonomicclassifierdescription = models.CharField(verbose_name='taxonomic classifier description',max_length=500, blank=True)
+    taxonomicclassifierdescription = models.CharField(verbose_name='taxonomic classifier description',max_length=5000, blank=True)
     parent_taxonomic_classifier = models.ForeignKey('self', db_column='parenttaxonomicclassifierid', blank=True, null=True)
     def __unicode__(self):
         s = u"%s" % (self.taxonomicclassifiername)
