@@ -1045,24 +1045,29 @@ def exportspreadsheet(request,resultValuesSeries,profileResult=True):
 
             if not k==0 and (not lastSamplingFeatureCode == samplingFeatureCode or not depth==lastDepth):
                 myfile.write('\n')
-                myfile.write(myresults.csvoutput())
+                temp = myresults.csvoutput()
+                myfile.write(temp)
                 position=0
             elif k==0:
-                myfile.write(myresults.csvoutput())
+                temp = myresults.csvoutput()
+                myfile.write(temp)
         else:
             lastTime = time
             time = myresults.valuedatetime
             if not k==0 and (not lastSamplingFeatureCode == samplingFeatureCode or not time==lastTime):
                 myfile.write('\n')
-                myfile.write(myresults.csvoutput())
+                temp = myresults.csvoutput()
+                myfile.write(temp)
                 position=0
             elif k==0:
-                myfile.write(myresults.csvoutput())
+                temp = myresults.csvoutput()
+                myfile.write(temp)
         #else:
         #if variablesAndUnits.index(unicode(variable)+unicode(unit)) ==position:
         for i in range(position,variablesAndUnits.index(unicode(variable)+unicode(unit)+unicode(processingCode))):
             myfile.write(",")
             position+=1
+        temp=myresults.csvoutputShort()
         myfile.write(myresults.csvoutputShort())
         position+=1
         k+=1
