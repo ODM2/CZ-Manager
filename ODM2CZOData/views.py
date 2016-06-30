@@ -105,25 +105,45 @@ def add_pub(request,citationid='NotSet'):
                     #form.save()
             if citation_form.is_valid():
                 citation_form.save()
-            #if Authorformset.is_valid() and CitationPorpertyformset.is_valid():
-                #Authorformset.save()
-                #CitationPorpertyformset.save()
-                #citation_form.save()
             return HttpResponseRedirect('../../pubview/citationid=' + str(citationid) +'/')
         elif not citationid=='NotSet':
             citation= Citations.objects.filter(citationid=citationid).get()
             Authorformset = AuthorInlineFormSet(instance=citation)
+
             #Authorformset.empty_permitted=False
             Citationpropertyformset = CitationpropertyInlineFormSet(instance=citation)
             #CitationPorpertyformset.empty_permitted=True
             citation_form=CitationsAdminForm(instance=citation)
         else:
             AuthorInlineFormSet = inlineformset_factory(Citations,Authorlists,extra=6)
-            CitationpropertyInlineFormSet = inlineformset_factory(Citations,Citationextensionpropertyvalues,extra=9)
+            CitationpropertyInlineFormSet = inlineformset_factory(Citations,Citationextensionpropertyvalues,extra=12)
             Authorformset=AuthorInlineFormSet(instance=Authorlists())
+            # i=1
+            # for form in Authorformset:
+            #     form.fields['authororder'].initial = i
+            #     i+=1
             Citationpropertyformset = CitationpropertyInlineFormSet(instance=Citationextensionpropertyvalues())
             citation_form=CitationsAdminForm(instance=Citations())
             citationidnew=''
+        i=1
+        for form in Authorformset:
+            if form.fields['authororder'].initial == None:
+                form.fields['authororder'].initial = i
+            i+=1
+        #for form in Citationpropertyformset:
+
+            #if  'propertyid' in form.initial: #not propertyid==None
+                #propertyid = form.initial['propertyid'] #.initial #type number
+                #extensionprop = Extensionproperties.objects.filter(propertyid=propertyid).get()
+                #name = extensionprop.propertydatatypecv
+                #typecv = CvPropertydatatype.objects.filter(name=name.name).get()
+                #if typecv.name == "Boolean":
+                    #form.fields['propertyvalue'].widget = widgets.CheckboxInput
+                    #form.fields['propertyvalue']= models.BooleanField()
+            #elif citationid=='NotSet':
+
+            #if form.fields['authororder'].initial == None:
+
         return render(request, 'publications3.html', {'Authorformset':Authorformset, 'Citationpropertyformset':Citationpropertyformset,'citation_form':citation_form,})
     else:
         return HttpResponseRedirect('../../')

@@ -52,6 +52,7 @@
 					<td>{{form.authororder.label_tag}}{{form.authororder}}</td>
 					<td>{{form.DELETE.label_tag}}{{form.DELETE}}</td>
 					</tr>
+					
 				{% endfor %}</table>
 						<br>
 
@@ -63,28 +64,19 @@
 				<th scope="col"  class="section">delete</th></tr>			
             {{ Citationpropertyformset.management_form }}
 				{% for form in Citationpropertyformset %}
-				{% if form.propertyid.value == 6 or form.propertyid.value == 2  %}
-					
-					<tr><td>{{form.bridgeid}}{{form.propertyid}}</td>
-					{% if form.propertyvalue.value == 'True' %}
-					<td>Value: <input type="checkbox" value={{form.propertyvalue.value}} checked /></td>
-					{% else %}
-					<td>Value: <input type="checkbox" value={{form.propertyvalue.value}} /></td>
-					{% endif %}
-					<td>{{form.DELETE.label_tag}}{{form.DELETE}}</td></tr>
-				{% else %}
+				
 					<tr ><td>{{form.bridgeid}}{{form.propertyid}}</td>
 					<td>Value: {{form.propertyvalue}}</td>
 					<td>{{form.DELETE.label_tag}}{{form.DELETE}}</td></tr>
-				{% endif %}
 					
 				{% endfor %}</table>
 				        
     <div class="submit-row">
 	<table>
 			<tr><td>
+			<input type="submit" name="delete_citation" class="deletelink" value="Delete" />
 	<input type="submit" name="add_citation" class="default" value="Save" />
-	<input type="submit" name="delete_citation" class="default" value="Delete" />
+	
 			</td></tr></table>
 	</fieldset>
 	</div></div>
