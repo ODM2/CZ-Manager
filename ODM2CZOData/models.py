@@ -77,7 +77,7 @@ def buildCitation(s, self):
         s += ' {0}'.format(citation.title)
         s += '. {0}'.format(citation.publisher)
         s += ', {0}'.format(citation.publicationyear)
-        s += ' DOI: {0}\"'.format(citation.citationlink) #doesn't work not sure why
+        s += ' DOI: <a href=\"{0}\">{1}</a>\"'.format(citation.citationlink, citation.citationlink) #doesn't work not sure why
     return s
 
 class Actionannotations(models.Model):
