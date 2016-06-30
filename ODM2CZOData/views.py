@@ -101,7 +101,10 @@ def add_pub(request,citationid='NotSet'):
             Citationpropertyformset = CitationpropertyInlineFormSet(request.POST,instance=citation)
 
             if Authorformset.is_valid():
-                Authorformset.save()
+                try:
+                    Authorformset.save()
+                except IntegrityError:
+                    pass
             if Citationpropertyformset.is_valid():
                 Citationpropertyformset.save()
             #for form in CitationPorpertyformset:

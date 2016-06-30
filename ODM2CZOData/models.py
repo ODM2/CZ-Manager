@@ -199,8 +199,8 @@ class Annotations(models.Model):
 class Authorlists(models.Model):
     bridgeid = models.AutoField(primary_key=True)
     citationid = models.ForeignKey('Citations', verbose_name='citation', db_column='citationid')
-    personid = models.ForeignKey('People', verbose_name='person', db_column='personid')
-    authororder = models.IntegerField(verbose_name='author order')
+    personid = models.ForeignKey('People', verbose_name='person', db_column='personid', blank=True, null=True)
+    authororder = models.IntegerField(verbose_name='author order', blank=True, null=True)
 
     class Meta:
         managed = False
