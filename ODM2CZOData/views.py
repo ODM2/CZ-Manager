@@ -71,28 +71,38 @@ from django.db import IntegrityError
 
 def add_pub(request,citationid='NotSet'):
     if request.user.is_authenticated():
+        #if 'citationidnew' in request.POST:
+            #if not request.POST['citationidnew'] == '':
+                #citationid = int(request.POST['citationidnew'])
+                #citationidnew = citationid
         AuthorInlineFormSet = inlineformset_factory(Citations,Authorlists,extra=6)
-        CitationPorpertyInlineFormSet = inlineformset_factory(Citations,Citationextensionpropertyvalues)
+        CitationpropertyInlineFormSet = inlineformset_factory(Citations,Citationextensionpropertyvalues)
         #citation_form=CitationsAdminForm(request.POST,instance=citation)
         if request.method=="POST":
-            citation= Citations.objects.filter(citationid=citationid).get()
-            Authorformset=AuthorInlineFormSet(request.POST,request.FILES,instance=citation)
-            CitationPorpertyformset = CitationPorpertyInlineFormSet(request.POST,request.FILES,instance=citation)
-            citation_form=CitationsAdminForm(request.POST,request.FILES,instance=citation)
+            if 'delete_citation' in request.POST:
+                citation= Citations.objects.filter(citationid=citationid).get()
+                citation.delete()
+                return HttpResponseRedirect('../../publications.html')
+            if citationid == 'NotSet':
+                citation= Citations(title=request.POST['title'],publisher=request.POST['publisher'],publicationyear=int(request.POST['publicationyear']),citationlink=request.POST['citationlink'])
+                #if citation.is_valid():
+                citation.save()
+                citationid=citation.citationid
+                citation_form=CitationsAdminForm(request.POST,instance=citation)
+            else:
+                citation= Citations.objects.filter(citationid=citationid).get()
+                citation_form=CitationsAdminForm(request.POST,instance=citation)
+            #citation= Citations.objects.filter(citationid=citationid).get()
+            Authorformset=AuthorInlineFormSet(request.POST,instance=citation)
+            Citationpropertyformset = CitationpropertyInlineFormSet(request.POST,instance=citation)
+
             if Authorformset.is_valid():
                 Authorformset.save()
-            if CitationPorpertyformset.is_valid():
-                CitationPorpertyformset.save()
-            # for eform in Authorformset.forms:
-            #     #eform.cleaned_data.citaionid eform.cleaned_data.personid, eform.cleaned_data.authororder
-            #     if eform.changed_data.__len__()>0:
-            #         if  'DELETE' in eform.changed_data:
-            #             eform.delete()
-            #         else:
-            #             eform.save()
-            # for eform in CitationPorpertyformset.forms:
-            #     if eform.changed_data.__len__()>0:
-            #         eform.save()
+            if Citationpropertyformset.is_valid():
+                Citationpropertyformset.save()
+            #for form in CitationPorpertyformset:
+                #if form.changed_data.__len__() > 0:
+                    #form.save()
             if citation_form.is_valid():
                 citation_form.save()
             #if Authorformset.is_valid() and CitationPorpertyformset.is_valid():
@@ -103,15 +113,18 @@ def add_pub(request,citationid='NotSet'):
         elif not citationid=='NotSet':
             citation= Citations.objects.filter(citationid=citationid).get()
             Authorformset = AuthorInlineFormSet(instance=citation)
-            Authorformset.empty_permitted=False
-            CitationPorpertyformset = CitationPorpertyInlineFormSet(instance=citation)
-            CitationPorpertyformset.empty_permitted=False
+            #Authorformset.empty_permitted=False
+            Citationpropertyformset = CitationpropertyInlineFormSet(instance=citation)
+            #CitationPorpertyformset.empty_permitted=True
             citation_form=CitationsAdminForm(instance=citation)
         else:
+            AuthorInlineFormSet = inlineformset_factory(Citations,Authorlists,extra=6)
+            CitationpropertyInlineFormSet = inlineformset_factory(Citations,Citationextensionpropertyvalues,extra=9)
             Authorformset=AuthorInlineFormSet(instance=Authorlists())
-            CitationPorpertyformset = CitationPorpertyInlineFormSet(instance=Citationextensionpropertyvalues())
+            Citationpropertyformset = CitationpropertyInlineFormSet(instance=Citationextensionpropertyvalues())
             citation_form=CitationsAdminForm(instance=Citations())
-        return render(request, 'publications3.html', {'Authorformset':Authorformset,'CitationPorpertyformset':CitationPorpertyformset,'citation_form':citation_form,})
+            citationidnew=''
+        return render(request, 'publications3.html', {'Authorformset':Authorformset, 'Citationpropertyformset':Citationpropertyformset,'citation_form':citation_form,})
     else:
         return HttpResponseRedirect('../../')
 # def add_pub(request,citation='NotSet'):

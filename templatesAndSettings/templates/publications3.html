@@ -23,19 +23,27 @@
 
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
 {% block content %}
+<div id="content" class="colM">
 <form action="." method="post">
 {% csrf_token %} 
-    <div>
+    <div id="content-main">
         <h1>Add or Change Publication</h1>
-			{{ citation_form.title.label_tag }}{{ citation_form.title}}
-			{{ citation_form.publisher.label_tag}}{{ citation_form.publisher}}
-			{{ citation_form.publicationyear.label_tag}}{{ citation_form.publicationyear}}
-			{{ citation_form.citationlink.label_tag}}{{ citation_form.citationlink}}
+		<fieldset class="module aligned">
+		{{ citation_form.management_form }}
+		<input type='hidden' value='{{citation_form.citationid }}' name='citationidnew'>
+			<table>
+			<tr><td>
+			{{ citation_form.title.label_tag }}{{ citation_form.title }}</td><td>{{ citation_form.publisher.label_tag }}{{ citation_form.publisher }}</td>
+			</tr>
+			<tr><td>
+			{{ citation_form.publicationyear.label_tag }}{{ citation_form.publicationyear }}</td><td>{{ citation_form.citationlink.label_tag }}{{ citation_form.citationlink }}</td>
+			</tr></table>
 			<br>
+			
 <h1>Add or Change Authors for this publication</h1>
 			<table >
-				<th scope="col"  class="section">person</th>
-				<th scope="col"  class="section">Author Order</th>
+				<th scope="col"  class="section">Author</th>
+				<th scope="col"  class="section">Order</th>
 				<th scope="col"  class="section">Delete</th></tr>
             {{ Authorformset.management_form }}
 				{% for form in Authorformset %}
@@ -53,8 +61,8 @@
 				<th scope="col"  class="section">Property</th>
 				<th scope="col"  class="section">Value</th>
 				<th scope="col"  class="section">delete</th></tr>			
-            {{ CitationPorpertyformset.management_form }}
-				{% for form in CitationPorpertyformset %}
+            {{ Citationpropertyformset.management_form }}
+				{% for form in Citationpropertyformset %}
 				{% if form.propertyid.value == 6 or form.propertyid.value == 2  %}
 					
 					<tr><td>{{form.bridgeid}}{{form.propertyid}}</td>
@@ -72,7 +80,14 @@
 					
 				{% endfor %}</table>
 				        
-    </div>
-	<input type="submit" name="add_citation" value="Save" />
+    <div class="submit-row">
+	<table>
+			<tr><td>
+	<input type="submit" name="add_citation" class="default" value="Save" />
+	<input type="submit" name="delete_citation" class="default" value="Delete" />
+			</td></tr></table>
+	</fieldset>
+	</div></div>
 </form>
+</div>
 {% endblock %}
