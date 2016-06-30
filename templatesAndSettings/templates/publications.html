@@ -31,6 +31,17 @@
 <form action="" method="post" name="publications">
 {% csrf_token %} 
 <table ><td>
+<select  class="form-control" id="s3" name="selectedAuthor">
+			  <option  value="All">All</option>
+              {% for person in peopleList %}
+				{% if person.personid == selectedAuthor %}
+					<option selected="selected" value="{{ person.personid }}">{{ person.personlastname }}, {{ person.personfirstname }}</option>
+				{% else %}
+					<option  value="{{ person.personid }}">{{ person.personlastname }}, {{ person.personfirstname }}</option>
+				{% endif %}
+              {% endfor %}
+            </select></td>
+<td>
 <select  class="form-control" id="s3" name="filterTags">
               {% for filterTag in filterTags %}
 				{% if filterTag == selectedTag %}
@@ -57,7 +68,7 @@
 			<input type="submit" name="export_endnote" value="Export in endnote format" />
 			</td>
 			</table>
-			<h1><a href="./pubview/new/">Add new publication</a></h1>
+			<h2><a href="./pubview/new/">Add new publication</a></h2>
 <table >
                
 				<tr ><th scope="col" class="section">title, CZO Author</td>

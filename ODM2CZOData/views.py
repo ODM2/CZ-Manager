@@ -68,6 +68,8 @@ from django.views.generic.edit import FormView
 #    model = Citations
 from django.forms.models import inlineformset_factory
 from django.db import IntegrityError
+from django.forms import widgets
+from django.db import models
 
 def add_pub(request,citationid='NotSet'):
     if request.user.is_authenticated():
@@ -76,6 +78,7 @@ def add_pub(request,citationid='NotSet'):
                 #citationid = int(request.POST['citationidnew'])
                 #citationidnew = citationid
         AuthorInlineFormSet = inlineformset_factory(Citations,Authorlists,extra=6)
+
         CitationpropertyInlineFormSet = inlineformset_factory(Citations,Citationextensionpropertyvalues)
         #citation_form=CitationsAdminForm(request.POST,instance=citation)
         if request.method=="POST":
@@ -94,6 +97,7 @@ def add_pub(request,citationid='NotSet'):
                 citation_form=CitationsAdminForm(request.POST,instance=citation)
             #citation= Citations.objects.filter(citationid=citationid).get()
             Authorformset=AuthorInlineFormSet(request.POST,instance=citation)
+
             Citationpropertyformset = CitationpropertyInlineFormSet(request.POST,instance=citation)
 
             if Authorformset.is_valid():
@@ -189,7 +193,10 @@ def publications(request):
     #if request.user.is_authenticated():
     citationList = Citations.objects.all()
     authList = Authorlists.objects.all()
+    peopleList = People.objects.filter(personid__in=authList.values("personid"))
     selectedTag = 'CZO Authors'
+    selectedAuthor= 'All'
+
     if 'filterTags' in request.POST:
         if not request.POST['filterTags'] == 'All':
             selectedTag = request.POST['filterTags']
@@ -201,6 +208,14 @@ def publications(request):
             selectedTag = 'All'
     else:
         citationList =Citations.objects.filter(citationid__in=authList.values("citationid"))
+
+    if 'selectedAuthor' in request.POST:
+        if not request.POST['selectedAuthor'] == 'All':
+            selectedAuthor= int(request.POST['selectedAuthor'])
+            authored = Authorlists.objects.filter(personid=selectedAuthor)
+            citationList = citationList.filter(citationid__in=authored.values("citationid"))
+
+
     filterTags=['CZO Authors','All','AGU', 'LCZO Meeting']
 
     citationCategories = Citationextensionpropertyvalues.objects.filter(propertyid=5).distinct("propertyvalue") #citation category Extensionproperties
@@ -221,7 +236,7 @@ def publications(request):
         return response
     return TemplateResponse(request,'publications.html',{'citationList': citationList,'authList':authList,
             'filterTags':filterTags,'citationCategories':citationCategories,'selectedCategory':selectedCategory,
-            'selectedTag':selectedTag,'prefixpath': CUSTOM_TEMPLATE_PATH,})
+            'selectedTag':selectedTag,'peopleList':peopleList,'selectedAuthor':selectedAuthor,'prefixpath': CUSTOM_TEMPLATE_PATH,})
     #else:
         #return HttpResponseRedirect('../')
 
