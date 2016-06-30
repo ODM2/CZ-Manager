@@ -123,7 +123,7 @@ def add_pub(request,citationid='NotSet'):
             citation_form=CitationsAdminForm(instance=citation)
         else:
             AuthorInlineFormSet = inlineformset_factory(Citations,Authorlists,extra=6)
-            CitationpropertyInlineFormSet = inlineformset_factory(Citations,Citationextensionpropertyvalues,extra=12)
+            CitationpropertyInlineFormSet = inlineformset_factory(Citations,Citationextensionpropertyvalues,extra=8)
             Authorformset=AuthorInlineFormSet(instance=Authorlists())
             # i=1
             # for form in Authorformset:
