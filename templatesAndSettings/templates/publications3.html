@@ -28,7 +28,7 @@
 {% csrf_token %} 
 <h2><a href="../../publications.html">Return to publication list</a></h2>
     <div id="content-main">
-        <h1>Add or Change Publication</h1>
+        <h1>Add or change publication</h1>
 		<fieldset class="module aligned">
 		{{ citation_form.management_form }}
 		<input type='hidden' value='{{citation_form.citationid }}' name='citationidnew'>
@@ -41,7 +41,7 @@
 			</tr></table>
 			<br>
 			
-<h1>Add or Change Authors for this publication</h1>
+<h1>Add or change authors for this publication</h1>
 			<table >
 				<th scope="col"  class="section">Author</th>
 				<th scope="col"  class="section">Order</th>
@@ -57,7 +57,7 @@
 				{% endfor %}</table>
 						<br>
 
-<h1>Add or Change Additional details about this publication</h1>
+<h1>Add or change additional details about this publication</h1>
 						<table >
 			<tr >
 				<th scope="col"  class="section">Property</th>
