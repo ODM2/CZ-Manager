@@ -804,7 +804,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
         int_selectedresultid_ids.append(int(int_selectedresultid))
     csvexport = False
     #if the user hit the export csv button export the measurement results to csv
-
+    if request.get('export_data'):
         response = exportspreadsheet(request,myresultSeriesExport,False)
         csvexport=True
         # k=0
