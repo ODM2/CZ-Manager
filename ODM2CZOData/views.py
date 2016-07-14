@@ -231,10 +231,10 @@ def publications(request):
         else:
             selectedCategory = 'All'
     #context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
-    if request.REQUEST.get('export_data'):
+    if request.get('export_data'):
         response=exportcitations(request,citationList, True)
         return response
-    if request.REQUEST.get('export_endnote'):
+    if request.get('export_endnote'):
         response=exportcitations(request,citationList, False)
         return response
     return TemplateResponse(request,'publications.html',{'citationList': citationList,'authList':authList,
@@ -571,7 +571,7 @@ def TimeSeriesGraphing(request,feature_action='All'):
     csvexport = False
     #if the user hit the export csv button export the measurement results to csv
 
-    if request.REQUEST.get('export_data'):
+    if request.get('export_data'):
         response = exportspreadsheet(request,myresultSeriesExport,False)
         csvexport=True
         # k=0
@@ -805,7 +805,6 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
     csvexport = False
     #if the user hit the export csv button export the measurement results to csv
 
-    if request.REQUEST.get('export_data'):
         response = exportspreadsheet(request,myresultSeriesExport,False)
         csvexport=True
         # k=0
@@ -823,6 +822,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
     if csvexport:
         return response
     else:
+    if request.get('export_data'):
         #raise ValidationError(relatedFeatureList)
         return TemplateResponse(request,template,{ 'prefixpath': CUSTOM_TEMPLATE_PATH,
             'startDate':entered_start_date,'endDate':entered_end_date,'useSamplingFeature':useSamplingFeature,
@@ -949,7 +949,7 @@ def scatter_plot(request):
     yAxis = {"title": {"text": str(yVar)}}
     xAxis = {"title": {"text": str(xVar)}}
     graphType = 'scatter'
-    if request.REQUEST.get('export_data'):
+    if request.get('export_data'):
         resultValuesSeries=prvx |prvy
         response=exportspreadsheet(request,resultValuesSeries)
         return response
@@ -1329,7 +1329,7 @@ def graph_data(request):
         int_selectedvariable_ids.append(int(int_selectedvariableid))
     csvexport = False
     #if the user hit the export csv button export the measurement results to csv
-    if request.REQUEST.get('export_data'):
+    if request.get('export_data'):
         resultValuesSeries = resultValuesSeries.order_by("resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
                 "resultid__intendedzspacing","resultid__resultid__variableid","resultid__resultid__unitsid")
         response=exportspreadsheet(request,resultValuesSeries)
