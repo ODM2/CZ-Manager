@@ -14,14 +14,15 @@ https://github.com/nwcell/psycopg2-windows
 
 You may need to copy a folder from from C:\Users\<user name>\AppData\Local\Temp\2\pip_build_Administrator\psycopg\ into your python library for instance C:\Python27\Lib\site-packages\psycopg2\ 
 
-using django 1.6.5
+using django 1.6.5 curently testing 1.9.7
 python 2.7
-
-dependency on django-uuidfield https://github.com/dcramer/django-uuidfield
-dependency on django-ajax-selects https://github.com/crucialfelix/django-ajax-selects
-dependency on django-admin-shortcuts https://github.com/alesdotio/django-admin-shortcuts/
-dependency on djangocms_admin_style https://github.com/divio/djangocms-admin-style
-dependency on django-apptemplates https://pypi.python.org/pypi/django-apptemplates/
-dependency on django-daterange-filter https://pypi.python.org/pypi/django-daterange-filter/1.1.1
-dependency on django-import-export https://django-import-export.readthedocs.org/en/latest/installation.html
-dependency on django-jquery 
+run pip install for each of these
+psycopg2 
+django-uuidfield https://github.com/dcramer/django-uuidfield
+django-ajax-selects https://github.com/crucialfelix/django-ajax-selects
+django-admin-shortcuts https://github.com/alesdotio/django-admin-shortcuts/
+djangocms_admin_style https://github.com/divio/djangocms-admin-style
+django-apptemplates https://pypi.python.org/pypi/django-apptemplates/
+django-daterange-filter https://pypi.python.org/pypi/django-daterange-filter/1.1.1
+django-import-export https://django-import-export.readthedocs.org/en/latest/installation.html
+django-jquery 
