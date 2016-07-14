@@ -822,7 +822,6 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
     if csvexport:
         return response
     else:
-    if request.get('export_data'):
         #raise ValidationError(relatedFeatureList)
         return TemplateResponse(request,template,{ 'prefixpath': CUSTOM_TEMPLATE_PATH,
             'startDate':entered_start_date,'endDate':entered_end_date,'useSamplingFeature':useSamplingFeature,
