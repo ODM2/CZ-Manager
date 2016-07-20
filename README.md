@@ -28,6 +28,7 @@ django-ajax-selects https://github.com/crucialfelix/django-ajax-selects
 django-admin-shortcuts https://github.com/alesdotio/django-admin-shortcuts/
 
 djangocms_admin_style https://github.com/divio/djangocms-admin-style
+use this version: pip install djangocms-admin-style==0.2.7 
 
 django-apptemplates https://pypi.python.org/pypi/django-apptemplates/
 
