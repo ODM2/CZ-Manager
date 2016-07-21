@@ -14,7 +14,7 @@ https://github.com/nwcell/psycopg2-windows
 
 You may need to copy a folder from from C:\Users\<user name>\AppData\Local\Temp\2\pip_build_Administrator\psycopg\ into your python library for instance C:\Python27\Lib\site-packages\psycopg2\ 
 
-using django 1.6.5 curently testing 1.9.7
+support tested for django 1.6.5 and 1.9.x
 
 python 2.7
 run pip install for each of these
