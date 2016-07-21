@@ -231,10 +231,10 @@ def publications(request):
         else:
             selectedCategory = 'All'
     #context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
-    if request.get('export_data'):
+    if 'export_data' in request.POST:
         response=exportcitations(request,citationList, True)
         return response
-    if request.get('export_endnote'):
+    if 'export_endnote' in request.POST:
         response=exportcitations(request,citationList, False)
         return response
     return TemplateResponse(request,'publications.html',{'citationList': citationList,'authList':authList,
@@ -571,7 +571,8 @@ def TimeSeriesGraphing(request,feature_action='All'):
     csvexport = False
     #if the user hit the export csv button export the measurement results to csv
 
-    if request.get('export_data'):
+    if 'export_data' in request.POST:
+    #if request.get('export_data'):
         response = exportspreadsheet(request,myresultSeriesExport,False)
         csvexport=True
         # k=0
@@ -804,7 +805,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
         int_selectedresultid_ids.append(int(int_selectedresultid))
     csvexport = False
     #if the user hit the export csv button export the measurement results to csv
-    if request.get('export_data'):
+    if 'export_data' in request.POST:
         response = exportspreadsheet(request,myresultSeriesExport,False)
         csvexport=True
         # k=0
@@ -948,7 +949,7 @@ def scatter_plot(request):
     yAxis = {"title": {"text": str(yVar)}}
     xAxis = {"title": {"text": str(xVar)}}
     graphType = 'scatter'
-    if request.get('export_data'):
+    if 'export_data' in request.POST:
         resultValuesSeries=prvx |prvy
         response=exportspreadsheet(request,resultValuesSeries)
         return response
@@ -1328,7 +1329,7 @@ def graph_data(request):
         int_selectedvariable_ids.append(int(int_selectedvariableid))
     csvexport = False
     #if the user hit the export csv button export the measurement results to csv
-    if request.get('export_data'):
+    if 'export_data' in request.POST:
         resultValuesSeries = resultValuesSeries.order_by("resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
                 "resultid__intendedzspacing","resultid__resultid__variableid","resultid__resultid__unitsid")
         response=exportspreadsheet(request,resultValuesSeries)
