@@ -13,17 +13,19 @@
 {# django-admin-shortcuts changes these blocks #}
 
 {% block breadcrumbs %}
-	<div class="admin_shortcuts">
-		{% admin_shortcuts %}
-	</div>
+    <div class="admin_shortcuts">
+        {% admin_shortcuts %}
+    </div>
 {% endblock %}
 
- {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
-{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+{% block extrastyle %}
+    <style type="text/css">{% admin_shortcuts_css %}</style>
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}"/>{% endblock %}
 
 
 {% block extrahead %}
-{{ block.super }}{% admin_shortcuts_js %}{% endblock %}
+    {{ block.super }}{% admin_shortcuts_js %}{% endblock %}
 
 {# end changes #}
 
@@ -35,26 +37,33 @@
 
 
 {% block content %}
-<div id="content-main">
+    <div id="content-main">
 
 
-<div class="app-odm2testapp module">
-        <table>
-               
-				<tr ><td class="section"><h1>Graphs</h1></td></tr>
-				<tr>
-				<th scope="row"><a href="chart.html">
-                    {% trans 'Time Series' %}</a></th>
-                </tr>
-				<tr>
-				<th scope="row"><a href="chartVariableAndFeature.html">
-                    {% trans 'Soils Data' %}</a></th>
-                </tr>
-                <th scope="row"><a href="soilsscatterplot.html">
-                    {% trans 'Soils Scatter Plot' %}</a></th>
-                </tr>
-				
-        </table>
+    <div class="app-odm2testapp module">
+    <table>
+
+        <tr>
+            <td class="section"><h1>Graphs</h1></td>
+        </tr>
+        <tr>
+            <th scope="row"><a href="chart.html">
+                {% trans 'Time Series' %}</a></th>
+        </tr>
+        <tr>
+            <th scope="row"><a href="chartVariableAndFeature.html">
+                {% trans 'Soils Data' %}</a></th>
+        </tr>
+        <tr>
+            <th scope="row"><a href="soilsscatterplot.html">
+                {% trans 'Soils Scatter Plot' %}</a></th>
+        </tr>
+        <tr>
+             <th scope="row"><a href="mapdata.html">
+                {% trans 'Map Sample Locations' %}</a></th>
+        </tr>
+
+    </table>
 
 
 {% endblock %}

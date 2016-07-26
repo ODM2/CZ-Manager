@@ -47,3 +47,17 @@ log
 *.log
 .idea
 
+ODM2CZOData/__init__.pyc
+ODM2CZOData/admin.pyc
+ODM2CZOData/forms.pyc
+ODM2CZOData/lookups.pyc
+ODM2CZOData/management/__init__.pyc
+ODM2CZOData/models.pyc
+ODM2CZOData/templatetags/__init__.pyc
+ODM2CZOData/templatetags/admin_extras.pyc
+ODM2CZOData/views.pyc
+templatesAndSettings/__init__.pyc
+templatesAndSettings/base.pyc
+templatesAndSettings/settings.pyc
+templatesAndSettings/urls.pyc
+templatesAndSettings/wsgi.pyc

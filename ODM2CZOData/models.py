@@ -943,7 +943,7 @@ class ProcessDataloggerfile(models.Model):
         return s
     class Meta:
         managed = True
-        db_table = 'odm2extra\".\"processdataloggerfile'
+        db_table = r'odm2extra"."processdataloggerfile'
         verbose_name= 'process data logger file'
     def save(self, *args, **kwargs):
         #ProcessDataLoggerFile(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid, self.databeginson, self.columnheaderson, False)
@@ -1186,7 +1186,7 @@ class FeatureactionsNames(models.Model):
         return u"%s" % self.name
     class Meta:
         managed= True
-        db_table = 'odm2extra\".\"featureactionsNames'
+        db_table = r'odm2extra"."featureactionsNames'
         verbose_name= 'feature action names'
 
 
@@ -1323,7 +1323,7 @@ class MeasurementresultvalueFile(models.Model):
         s = u"%s" % (self.resultid)
         return s
     class Meta:
-        db_table = 'odm2extra\".\"Measurementresultvaluefile'
+        db_table = r'odm2extra"."Measurementresultvaluefile'
         verbose_name='measurement result value file'
     def save(self, *args, **kwargs):
         handle_uploaded_file(self.valueFile.file,self.resultid)
