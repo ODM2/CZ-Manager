@@ -39,7 +39,7 @@ MEDIA_URL = media_url
 CUSTOM_TEMPLATE_PATH = custom_template_path
 #ADMIN_SHORTCUTS_PATH=admin_shortcuts_path
 URL_PATH = url_path
-STATIC_ROOT = static_root
+#STATIC_ROOT = static_root
 #https://github.com/mishbahr/django-modeladmin-reorder
 #{'app': 'auth', 'models': ('auth.User', 'auth.Group')},
 # ADMIN_REORDER = ('odm2testsite',
@@ -164,15 +164,16 @@ WSGI_APPLICATION = 'templatesAndSettings.wsgi.application'
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 DATABASES = {
     'default': {
-        'ENGINE':  ODM2_configs['ENGINE'],
+        'ENGINE': ODM2_configs['ENGINE'],
         'NAME': ODM2_configs['NAME'],
         'USER': ODM2_configs['USER'],
         'PASSWORD': ODM2_configs['PASSWORD'],
         'HOST': ODM2_configs['HOST'],
         'PORT': ODM2_configs['PORT'],
-     'OPTIONS': ODM2_configs['OPTIONS'],
+        'OPTIONS': ODM2_configs['OPTIONS'],
 
-}}
+    }
+}
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/
 

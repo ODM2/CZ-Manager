@@ -46,6 +46,7 @@ urlpatterns = patterns('',
     url(r'^' + URL_PATH +'chartVariableAndFeature.html', views.graph_data, name="graph_data"),
      url(r'^' + URL_PATH +'soilsscatterplot.html', views.scatter_plot, name="scatter_plot"),
     url(r'^' + URL_PATH +'publications.html', views.publications, name="publications"),
+    url(r'^' + URL_PATH + 'mapdata.html', views.web_map, name="web_map"),
     url(r'^' + URL_PATH +'pubview/citationid=(?P<citationid>(\d+))/$', views.add_pub, name="add_pub"),
     url(r'^' + URL_PATH +'pubview', views.add_pub),
     #for uploaded files like dataloggerfiles

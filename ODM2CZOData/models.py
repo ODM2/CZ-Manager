@@ -87,7 +87,7 @@ class Actionannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'actionannotations'
+        db_table = r'odm2"."actionannotations'
 
 
 class Actionby(models.Model):
@@ -105,7 +105,7 @@ class Actionby(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'actionby'
+        db_table = r'odm2"."actionby'
         verbose_name='action by'
         verbose_name_plural='action by'
 
@@ -117,7 +117,7 @@ class Actiondirectives(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'actiondirectives'
+        db_table = r'odm2"."actiondirectives'
 
 
 class Actionextensionpropertyvalues(models.Model):
@@ -128,7 +128,7 @@ class Actionextensionpropertyvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'actionextensionpropertyvalues'
+        db_table = r'odm2"."actionextensionpropertyvalues'
 
 
 class Actions(models.Model):
@@ -151,7 +151,7 @@ class Actions(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'actions'
+        db_table = r'odm2"."actions'
         verbose_name='action'
 
 
@@ -173,7 +173,7 @@ class Affiliations(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'affiliations'
+        db_table = r'odm2"."affiliations'
         verbose_name='affiliation (relate people and organizations)'
         verbose_name_plural='affiliation (relate people and organizations)'
 
@@ -193,7 +193,7 @@ class Annotations(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'annotations'
+        db_table = r'odm2"."annotations'
 
 
 class Authorlists(models.Model):
@@ -204,7 +204,7 @@ class Authorlists(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'authorlists'
+        db_table = r'odm2"."authorlists'
         verbose_name='author list'
         verbose_name_plural= 'author list'
     def csvheader(self):
@@ -229,7 +229,7 @@ class Calibrationactions(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'calibrationactions'
+        db_table = r'odm2"."calibrationactions'
 
 
 class Calibrationreferenceequipment(models.Model):
@@ -239,7 +239,7 @@ class Calibrationreferenceequipment(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'calibrationreferenceequipment'
+        db_table = r'odm2"."calibrationreferenceequipment'
 
 
 class Calibrationstandards(models.Model):
@@ -249,7 +249,7 @@ class Calibrationstandards(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'calibrationstandards'
+        db_table = r'odm2"."calibrationstandards'
 
 
 class Categoricalresults(models.Model):
@@ -265,7 +265,7 @@ class Categoricalresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'categoricalresults'
+        db_table = r'odm2"."categoricalresults'
 
 
 class Categoricalresultvalueannotations(models.Model):
@@ -275,7 +275,7 @@ class Categoricalresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'categoricalresultvalueannotations'
+        db_table = r'odm2"."categoricalresultvalueannotations'
 
 
 class Categoricalresultvalues(models.Model):
@@ -287,7 +287,7 @@ class Categoricalresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'categoricalresultvalues'
+        db_table = r'odm2"."categoricalresultvalues'
 
 
 class Citationextensionpropertyvalues(models.Model):
@@ -300,7 +300,7 @@ class Citationextensionpropertyvalues(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'citationextensionpropertyvalues'
+        db_table = r'odm2"."citationextensionpropertyvalues'
         verbose_name='citation extension property'
         verbose_name_plural='citation extension properties'
     def csvheader(self):
@@ -360,7 +360,7 @@ class Citationexternalidentifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'citationexternalidentifiers'
+        db_table = r'odm2"."citationexternalidentifiers'
 
 
 class Citations(models.Model):
@@ -378,7 +378,7 @@ class Citations(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'citations'
+        db_table = r'odm2"."citations'
         ordering = ['title']
         verbose_name = 'citation'
     def csvheader(self):
@@ -423,7 +423,7 @@ class CvActiontype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_actiontype'
+        db_table = r'odm2"."cv_actiontype'
         ordering = ['term','name']
 
 
@@ -439,7 +439,7 @@ class CvAggregationstatistic(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_aggregationstatistic'
+        db_table = r'odm2"."cv_aggregationstatistic'
         ordering = ['term','name']
 
 
@@ -456,7 +456,7 @@ class CvAnnotationtype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_annotationtype'
+        db_table = r'odm2"."cv_annotationtype'
         ordering = ['term','name']
 
 
@@ -472,7 +472,7 @@ class CvCensorcode(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_censorcode'
+        db_table = r'odm2"."cv_censorcode'
         ordering = ['term','name']
 
 
@@ -489,7 +489,7 @@ class CvDataqualitytype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_dataqualitytype'
+        db_table = r'odm2"."cv_dataqualitytype'
         ordering = ['term','name']
 
 
@@ -505,7 +505,7 @@ class CvDatasettypecv(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_datasettypecv'
+        db_table = r'odm2"."cv_datasettypecv'
         ordering = ['term','name']
 
 
@@ -518,7 +518,7 @@ class CvDirectivetype(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'cv_directivetype'
+        db_table = r'odm2"."cv_directivetype'
         ordering = ['term','name']
 
 
@@ -534,7 +534,7 @@ class CvElevationdatum(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_elevationdatum'
+        db_table = r'odm2"."cv_elevationdatum'
         verbose_name='elevation datum'
         ordering = ['term','name']
 
@@ -548,7 +548,7 @@ class CvEquipmenttype(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'cv_equipmenttype'
+        db_table = r'odm2"."cv_equipmenttype'
         ordering = ['term','name']
 
 
@@ -564,7 +564,7 @@ class CvMethodtype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_methodtype'
+        db_table = r'odm2"."cv_methodtype'
         ordering = ['term','name']
 
 
@@ -580,7 +580,7 @@ class CvOrganizationtype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_organizationtype'
+        db_table = r'odm2"."cv_organizationtype'
         ordering = ['term','name']
 
 
@@ -596,7 +596,7 @@ class CvPropertydatatype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_propertydatatype'
+        db_table = r'odm2"."cv_propertydatatype'
         ordering = ['term','name']
 
 
@@ -612,7 +612,7 @@ class CvQualitycode(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_qualitycode'
+        db_table = r'odm2"."cv_qualitycode'
         ordering = ['term','name']
 
 
@@ -626,7 +626,7 @@ class CvReferencematerialmedium(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'cv_referencematerialmedium'
+        db_table = r'odm2"."cv_referencematerialmedium'
         ordering = ['term','name']
 
 
@@ -642,7 +642,7 @@ class CvRelationshiptype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_relationshiptype'
+        db_table = r'odm2"."cv_relationshiptype'
         ordering = ['term','name']
 
 
@@ -658,7 +658,7 @@ class CvResulttype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_resulttype'
+        db_table = r'odm2"."cv_resulttype'
         ordering = ['term','name']
 
 
@@ -674,7 +674,7 @@ class CvMedium(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_medium'
+        db_table = r'odm2"."cv_medium'
         ordering = ['term','name']
 
 
@@ -691,7 +691,7 @@ class CvSamplingfeaturegeotype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_samplingfeaturegeotype'
+        db_table = r'odm2"."cv_samplingfeaturegeotype'
         verbose_name='sampling feature geo type'
         ordering = ['term','name']
 
@@ -708,7 +708,7 @@ class CvSamplingfeaturetype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_samplingfeaturetype'
+        db_table = r'odm2"."cv_samplingfeaturetype'
         verbose_name='sampling feature type'
         ordering = ['term','name']
 
@@ -725,7 +725,7 @@ class CvSitetype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_sitetype'
+        db_table = r'odm2"."cv_sitetype'
         ordering = ['term','name']
 
 
@@ -741,7 +741,7 @@ class CvSpatialoffsettype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_spatialoffsettype'
+        db_table = r'odm2"."cv_spatialoffsettype'
         ordering = ['term','name']
 
 
@@ -757,7 +757,7 @@ class CvSpeciation(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_speciation'
+        db_table = r'odm2"."cv_speciation'
         ordering = ['term','name']
 
 
@@ -773,7 +773,7 @@ class CvSpecimenmedium(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_specimenmedium'
+        db_table = r'odm2"."cv_specimenmedium'
         ordering = ['term','name']
 
 
@@ -789,7 +789,7 @@ class CvSpecimentype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_specimentype'
+        db_table = r'odm2"."cv_specimentype'
         ordering = ['term','name']
 
 
@@ -805,7 +805,7 @@ class CvStatus(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_status'
+        db_table = r'odm2"."cv_status'
         ordering = ['term','name']
 
 
@@ -821,7 +821,7 @@ class CvTaxonomicclassifiertype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_taxonomicclassifiertype'
+        db_table = r'odm2"."cv_taxonomicclassifiertype'
         ordering = ['term','name']
         verbose_name="taxonomic classifier"
 
@@ -838,7 +838,7 @@ class CvUnitstype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_unitstype'
+        db_table = r'odm2"."cv_unitstype'
         ordering = ['term','name']
 
 
@@ -854,7 +854,7 @@ class CvVariablename(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_variablename'
+        db_table = r'odm2"."cv_variablename'
         ordering = ['term','name']
 
 
@@ -871,7 +871,7 @@ class CvVariabletype(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'cv_variabletype'
+        db_table = r'odm2"."cv_variabletype'
         ordering = ['term','name']
 
 
@@ -905,7 +905,7 @@ class Dataloggerfilecolumns(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'dataloggerfilecolumns'
+        db_table = r'odm2"."dataloggerfilecolumns'
         verbose_name='data logger file column'
 
 
@@ -921,7 +921,7 @@ class Dataloggerfiles(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'dataloggerfiles'
+        db_table = r'odm2"."dataloggerfiles'
         verbose_name='data logger file'
 
 
@@ -942,8 +942,8 @@ class ProcessDataloggerfile(models.Model):
         s += u"- Processed on %s" % (self.date_processed)
         return s
     class Meta:
-        managed = True
-        db_table = 'odm2extra\".\"processdataloggerfile'
+        managed = False
+        db_table = r'odm2extra"."processdataloggerfile'
         verbose_name= 'process data logger file'
     def save(self, *args, **kwargs):
         #ProcessDataLoggerFile(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid, self.databeginson, self.columnheaderson, False)
@@ -972,7 +972,7 @@ class Dataloggerprogramfiles(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'dataloggerprogramfiles'
+        db_table = r'odm2"."dataloggerprogramfiles'
         verbose_name= 'data logger program file'
 
 
@@ -990,7 +990,7 @@ class Dataquality(models.Model):
         return u"%s - %s - %s" % (self.dataqualitycode, self.dataqualityvalue, self.dataqualityvalueunitsid)
     class Meta:
         managed = False
-        db_table = 'dataquality'
+        db_table = r'odm2"."dataquality'
         verbose_name='data quality'
         verbose_name_plural = 'data quality'
 
@@ -1003,7 +1003,7 @@ class Datasetcitations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'datasetcitations'
+        db_table = r'odm2"."datasetcitations'
         verbose_name='dataset citation'
 
 
@@ -1021,7 +1021,7 @@ class Datasets(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'datasets'
+        db_table = r'odm2"."datasets'
         verbose_name= 'dataset'
 
 
@@ -1036,7 +1036,7 @@ class Datasetsresults(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'datasetsresults'
+        db_table = r'odm2"."datasetsresults'
         verbose_name='dataset result'
 
 
@@ -1046,7 +1046,7 @@ class Derivationequations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'derivationequations'
+        db_table = r'odm2"."derivationequations'
 
 
 class Directives(models.Model):
@@ -1056,7 +1056,7 @@ class Directives(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'directives'
+        db_table = r'odm2"."directives'
 
 
 class Equipment(models.Model):
@@ -1075,7 +1075,7 @@ class Equipment(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'equipment'
+        db_table = r'odm2"."equipment'
 
 
 class Equipmentannotations(models.Model):
@@ -1085,7 +1085,7 @@ class Equipmentannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'equipmentannotations'
+        db_table = r'odm2"."equipmentannotations'
 
 
 class Equipmentmodels(models.Model):
@@ -1106,7 +1106,7 @@ class Equipmentmodels(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'equipmentmodels'
+        db_table = r'odm2"."equipmentmodels'
         verbose_name="equipment model"
 
 
@@ -1117,7 +1117,7 @@ class Equipmentused(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'equipmentused'
+        db_table = r'odm2"."equipmentused'
 
 
 class Extensionproperties(models.Model):
@@ -1130,7 +1130,7 @@ class Extensionproperties(models.Model):
         return u"%s - %s" % (self.propertyname,self.propertydescription)
     class Meta:
         managed = False
-        db_table = 'extensionproperties'
+        db_table = r'odm2"."extensionproperties'
         verbose_name='extension property'
         verbose_name_plural='extension properties'
 
@@ -1145,7 +1145,7 @@ class Externalidentifiersystems(models.Model):
         return u"%s" % (self.externalidentifiersystemname)
     class Meta:
         managed = False
-        db_table = 'externalidentifiersystems'
+        db_table = r'odm2"."externalidentifiersystems'
 
 
 class Featureactions(models.Model):
@@ -1172,7 +1172,7 @@ class Featureactions(models.Model):
     #     super(Featureactions, self).save(*args, **kwargs)
     class Meta:
         managed = False
-        db_table = 'featureactions'
+        db_table = r'odm2"."featureactions'
         verbose_name='action at sampling feature'
         verbose_name_plural='action at sampling feature'
 
@@ -1185,8 +1185,8 @@ class FeatureactionsNames(models.Model):
     def __unicode__(self):
         return u"%s" % self.name
     class Meta:
-        managed= True
-        db_table = 'odm2extra\".\"featureactionsNames'
+        managed= False
+        db_table = r'odm2extra"."featureactionsNames'
         verbose_name= 'feature action names'
 
 
@@ -1205,7 +1205,7 @@ class Instrumentoutputvariables(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'instrumentoutputvariables'
+        db_table = r'odm2"."instrumentoutputvariables'
         verbose_name="instrument output variable"
 
 
@@ -1217,7 +1217,7 @@ class Maintenanceactions(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'maintenanceactions'
+        db_table = r'odm2"."maintenanceactions'
 
 
 class Measurementresults(models.Model):
@@ -1240,7 +1240,7 @@ class Measurementresults(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'measurementresults'
+        db_table = r'odm2"."measurementresults'
         ordering = ['censorcodecv','resultid']
         verbose_name='measurement result'
 
@@ -1252,7 +1252,7 @@ class Measurementresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'measurementresultvalueannotations'
+        db_table = r'odm2"."measurementresultvalueannotations'
 
 
 class Measurementresultvalues(models.Model):
@@ -1309,7 +1309,7 @@ class Measurementresultvalues(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'measurementresultvalues'
+        db_table = r'odm2"."measurementresultvalues'
         verbose_name='measurement result value'
 
 
@@ -1323,7 +1323,8 @@ class MeasurementresultvalueFile(models.Model):
         s = u"%s" % (self.resultid)
         return s
     class Meta:
-        db_table = 'odm2extra\".\"Measurementresultvaluefile'
+        managed = False
+        db_table = r'odm2extra"."Measurementresultvaluefile'
         verbose_name='measurement result value file'
     def save(self, *args, **kwargs):
         handle_uploaded_file(self.valueFile.file,self.resultid)
@@ -1337,7 +1338,7 @@ class Methodannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'methodannotations'
+        db_table = r'odm2"."methodannotations'
 
 
 class Methodcitations(models.Model):
@@ -1351,7 +1352,7 @@ class Methodcitations(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'methodcitations'
+        db_table = r'odm2"."methodcitations'
         verbose_name='method citation'
 
 
@@ -1363,7 +1364,7 @@ class Methodextensionpropertyvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'methodextensionpropertyvalues'
+        db_table = r'odm2"."methodextensionpropertyvalues'
 
 
 class Methodexternalidentifiers(models.Model):
@@ -1375,7 +1376,7 @@ class Methodexternalidentifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'methodexternalidentifiers'
+        db_table = r'odm2"."methodexternalidentifiers'
 
 
 class Methods(models.Model):
@@ -1398,7 +1399,7 @@ class Methods(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'methods'
+        db_table = r'odm2"."methods'
         verbose_name='method'
         ordering = ["methodname"]
 
@@ -1412,7 +1413,7 @@ class Modelaffiliations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'modelaffiliations'
+        db_table = r'odm2"."modelaffiliations'
 
 
 class Models(models.Model):
@@ -1425,7 +1426,7 @@ class Models(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'models'
+        db_table = r'odm2"."models'
 
 
 class Organizations(models.Model):
@@ -1443,7 +1444,7 @@ class Organizations(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'organizations'
+        db_table = r'odm2"."organizations'
         verbose_name='organization'
 
 
@@ -1459,7 +1460,7 @@ class People(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'people'
+        db_table = r'odm2"."people'
         verbose_name='people'
         verbose_name_plural='people'
         ordering = ["personlastname"]
@@ -1474,7 +1475,7 @@ class Personexternalidentifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'personexternalidentifiers'
+        db_table = r'odm2"."personexternalidentifiers'
 
 
 class Pointcoverageresults(models.Model):
@@ -1492,7 +1493,7 @@ class Pointcoverageresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'pointcoverageresults'
+        db_table = r'odm2"."pointcoverageresults'
 
 
 class Pointcoverageresultvalueannotations(models.Model):
@@ -1502,7 +1503,7 @@ class Pointcoverageresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'pointcoverageresultvalueannotations'
+        db_table = r'odm2"."pointcoverageresultvalueannotations'
 
 
 class Pointcoverageresultvalues(models.Model):
@@ -1520,7 +1521,7 @@ class Pointcoverageresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'pointcoverageresultvalues'
+        db_table = r'odm2"."pointcoverageresultvalues'
 
 
 class Processinglevels(models.Model):
@@ -1535,7 +1536,7 @@ class Processinglevels(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'processinglevels'
+        db_table = r'odm2"."processinglevels'
         verbose_name='processing level'
 
 
@@ -1574,7 +1575,7 @@ class Profileresults(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'profileresults'
+        db_table = r'odm2"."profileresults'
         verbose_name='profile result'
 
 
@@ -1585,7 +1586,7 @@ class Profileresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'profileresultvalueannotations'
+        db_table = r'odm2"."profileresultvalueannotations'
 
 class Profileresultvalues(models.Model):
     valueid = models.AutoField(primary_key=True)
@@ -1658,7 +1659,7 @@ class Profileresultvalues(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'profileresultvalues'
+        db_table = r'odm2"."profileresultvalues'
         verbose_name='profile result value'
 
 
@@ -1671,7 +1672,7 @@ class Referencematerialexternalidentifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'referencematerialexternalidentifiers'
+        db_table = r'odm2"."referencematerialexternalidentifiers'
 
 
 class Referencematerials(models.Model):
@@ -1687,7 +1688,7 @@ class Referencematerials(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'referencematerials'
+        db_table = r'odm2"."referencematerials'
 
 
 class Referencematerialvalues(models.Model):
@@ -1701,7 +1702,7 @@ class Referencematerialvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'referencematerialvalues'
+        db_table = r'odm2"."referencematerialvalues'
 
 
 class Relatedactions(models.Model):
@@ -1718,7 +1719,7 @@ class Relatedactions(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'relatedactions'
+        db_table = r'odm2"."relatedactions'
         verbose_name='related action (associates one action with another)'
         verbose_name_plural='related action (associates one action with another)'
 
@@ -1731,7 +1732,7 @@ class Relatedannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'relatedannotations'
+        db_table = r'odm2"."relatedannotations'
 
 
 class Relatedcitations(models.Model):
@@ -1742,7 +1743,7 @@ class Relatedcitations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'relatedcitations'
+        db_table = r'odm2"."relatedcitations'
 
 
 class Relateddatasets(models.Model):
@@ -1754,7 +1755,7 @@ class Relateddatasets(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'relateddatasets'
+        db_table = r'odm2"."relateddatasets'
 
 
 class Relatedequipment(models.Model):
@@ -1769,7 +1770,7 @@ class Relatedequipment(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'relatedequipment'
+        db_table = r'odm2"."relatedequipment'
 
 
 class Relatedfeatures(models.Model):
@@ -1782,7 +1783,7 @@ class Relatedfeatures(models.Model):
         return u"%s - %s - %s" % (self.samplingfeatureid, self.relationshiptypecv, self.relatedfeatureid)
     class Meta:
         managed = False
-        db_table = 'relatedfeatures'
+        db_table = r'odm2"."relatedfeatures'
         verbose_name= 'relate two feature'
 
 
@@ -1794,7 +1795,7 @@ class Relatedmodels(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'relatedmodels'
+        db_table = r'odm2"."relatedmodels'
 
 
 class Relatedresults(models.Model):
@@ -1807,7 +1808,7 @@ class Relatedresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'relatedresults'
+        db_table = r'odm2"."relatedresults'
 
 
 class Resultannotations(models.Model):
@@ -1819,7 +1820,7 @@ class Resultannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'resultannotations'
+        db_table = r'odm2"."resultannotations'
 
 
 class Resultderivationequations(models.Model):
@@ -1828,7 +1829,7 @@ class Resultderivationequations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'resultderivationequations'
+        db_table = r'odm2"."resultderivationequations'
 
 
 class Resultextensionpropertyvalues(models.Model):
@@ -1839,7 +1840,7 @@ class Resultextensionpropertyvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'resultextensionpropertyvalues'
+        db_table = r'odm2"."resultextensionpropertyvalues'
 
 
 class Resultnormalizationvalues(models.Model):
@@ -1848,7 +1849,7 @@ class Resultnormalizationvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'resultnormalizationvalues'
+        db_table = r'odm2"."resultnormalizationvalues'
 
 class Results(models.Model):
     resultid = models.AutoField(primary_key=True, verbose_name="result")
@@ -1875,7 +1876,7 @@ class Results(models.Model):
         return u"%s - %s - ID: %s" % (self.variableid, self.featureactionid, self.resultid)
     class Meta:
         managed = False
-        db_table = 'results'
+        db_table = r'odm2"."results'
         verbose_name='result'
         ordering = ["variableid"]
 
@@ -1888,7 +1889,7 @@ class Resultsdataquality(models.Model):
         return u"%s - %s" % (self.resultid, self.dataqualityid)
     class Meta:
         managed = False
-        db_table = 'resultsdataquality'
+        db_table = r'odm2"."resultsdataquality'
         verbose_name='results data quality'
         verbose_name_plural = 'results data quality'
 
@@ -1904,7 +1905,7 @@ class Samplingfeatureannotations(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'samplingfeatureannotations'
+        db_table = r'odm2"."samplingfeatureannotations'
 
 
 class Samplingfeatureextensionpropertyvalues(models.Model):
@@ -1919,7 +1920,7 @@ class Samplingfeatureextensionpropertyvalues(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'samplingfeatureextensionpropertyvalues'
+        db_table = r'odm2"."samplingfeatureextensionpropertyvalues'
 
 
 class Samplingfeatureexternalidentifiers(models.Model):
@@ -1933,7 +1934,7 @@ class Samplingfeatureexternalidentifiers(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'samplingfeatureexternalidentifiers'
+        db_table = r'odm2"."samplingfeatureexternalidentifiers'
 
 
 class Samplingfeatures(models.Model):
@@ -1956,7 +1957,7 @@ class Samplingfeatures(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'samplingfeatures'
+        db_table = r'odm2"."samplingfeatures'
         verbose_name='sampling feature'
 
 
@@ -1975,7 +1976,7 @@ class Sectionresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'sectionresults'
+        db_table = r'odm2"."sectionresults'
 
 
 class Sectionresultvalueannotations(models.Model):
@@ -1985,7 +1986,7 @@ class Sectionresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'sectionresultvalueannotations'
+        db_table = r'odm2"."sectionresultvalueannotations'
 
 
 class Sectionresultvalues(models.Model):
@@ -2008,7 +2009,7 @@ class Sectionresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'sectionresultvalues'
+        db_table = r'odm2"."sectionresultvalues'
 
 
 class Simulations(models.Model):
@@ -2027,7 +2028,7 @@ class Simulations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'simulations'
+        db_table = r'odm2"."simulations'
 
 
 class Sites(models.Model):
@@ -2039,7 +2040,7 @@ class Sites(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'sites'
+        db_table = r'odm2"."sites'
 
 
 class Spatialoffsets(models.Model):
@@ -2054,7 +2055,7 @@ class Spatialoffsets(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'spatialoffsets'
+        db_table = r'odm2"."spatialoffsets'
 
 
 class Spatialreferenceexternalidentifiers(models.Model):
@@ -2066,7 +2067,7 @@ class Spatialreferenceexternalidentifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'spatialreferenceexternalidentifiers'
+        db_table = r'odm2"."spatialreferenceexternalidentifiers'
 
 
 class Spatialreferences(models.Model):
@@ -2078,7 +2079,7 @@ class Spatialreferences(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'spatialreferences'
+        db_table = r'odm2"."spatialreferences'
 
 
 class Specimenbatchpostions(models.Model):
@@ -2088,7 +2089,7 @@ class Specimenbatchpostions(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'specimenbatchpostions'
+        db_table = r'odm2"."specimenbatchpostions'
 
 
 class Specimens(models.Model):
@@ -2099,7 +2100,7 @@ class Specimens(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'specimens'
+        db_table = r'odm2"."specimens'
 
 
 class Specimentaxonomicclassifiers(models.Model):
@@ -2110,7 +2111,7 @@ class Specimentaxonomicclassifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'specimentaxonomicclassifiers'
+        db_table = r'odm2"."specimentaxonomicclassifiers'
 
 
 class Spectraresults(models.Model):
@@ -2128,7 +2129,7 @@ class Spectraresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'spectraresults'
+        db_table = r'odm2"."spectraresults'
 
 
 class Spectraresultvalueannotations(models.Model):
@@ -2138,7 +2139,7 @@ class Spectraresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'spectraresultvalueannotations'
+        db_table = r'odm2"."spectraresultvalueannotations'
 
 
 class Spectraresultvalues(models.Model):
@@ -2157,7 +2158,7 @@ class Spectraresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'spectraresultvalues'
+        db_table = r'odm2"."spectraresultvalues'
 
 
 class Taxonomicclassifierexternalidentifiers(models.Model):
@@ -2169,7 +2170,7 @@ class Taxonomicclassifierexternalidentifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'taxonomicclassifierexternalidentifiers'
+        db_table = r'odm2"."taxonomicclassifierexternalidentifiers'
 
 # I needed to add a sequence and set it as the default for the primary key to make the Taxonomic Classifiers class work
 # this is the SQL
@@ -2204,7 +2205,7 @@ class Taxonomicclassifiers(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = 'taxonomicclassifiers'
+        db_table = r'odm2"."taxonomicclassifiers'
         verbose_name='taxonomic classifier'
 
 
@@ -2223,7 +2224,7 @@ class Timeseriesresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'timeseriesresults'
+        db_table = r'odm2"."timeseriesresults'
 
 
 class Timeseriesresultvalueannotations(models.Model):
@@ -2233,7 +2234,7 @@ class Timeseriesresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'timeseriesresultvalueannotations'
+        db_table = r'odm2"."timeseriesresultvalueannotations'
 
 
 class Timeseriesresultvalues(models.Model):
@@ -2249,7 +2250,7 @@ class Timeseriesresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'timeseriesresultvalues'
+        db_table = r'odm2"."timeseriesresultvalues'
 
 
 class Trajectoryresults(models.Model):
@@ -2263,7 +2264,7 @@ class Trajectoryresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'trajectoryresults'
+        db_table = r'odm2"."trajectoryresults'
 
 
 class Trajectoryresultvalueannotations(models.Model):
@@ -2273,7 +2274,7 @@ class Trajectoryresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'trajectoryresultvalueannotations'
+        db_table = r'odm2"."trajectoryresultvalueannotations'
 
 
 class Trajectoryresultvalues(models.Model):
@@ -2298,7 +2299,7 @@ class Trajectoryresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'trajectoryresultvalues'
+        db_table = r'odm2"."trajectoryresultvalues'
 
 
 class Transectresults(models.Model):
@@ -2314,7 +2315,7 @@ class Transectresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'transectresults'
+        db_table = r'odm2"."transectresults'
 
 
 class Transectresultvalueannotations(models.Model):
@@ -2324,7 +2325,7 @@ class Transectresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'transectresultvalueannotations'
+        db_table = r'odm2"."transectresultvalueannotations'
 
 
 class Transectresultvalues(models.Model):
@@ -2348,7 +2349,7 @@ class Transectresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'transectresultvalues'
+        db_table = r'odm2"."transectresultvalues'
 
 
 class Units(models.Model):
@@ -2371,7 +2372,7 @@ class Units(models.Model):
     class Meta:
         managed = False
         ordering = ('unitsabbreviation','unitsname',)
-        db_table = 'units'
+        db_table = r'odm2"."units'
         verbose_name='unit'
 
 
@@ -2383,7 +2384,7 @@ class Variableextensionpropertyvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'variableextensionpropertyvalues'
+        db_table = r'odm2"."variableextensionpropertyvalues'
 
 
 class Variableexternalidentifiers(models.Model):
@@ -2395,7 +2396,7 @@ class Variableexternalidentifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'variableexternalidentifiers'
+        db_table = r'odm2"."variableexternalidentifiers'
 
 
 
@@ -2419,6 +2420,5 @@ class Variables(models.Model):
     class Meta:
         managed = False
         ordering = ('variablecode','variable_name',)
-        db_table = 'variables'
+        db_table = r'odm2"."variables'
         verbose_name='variable'
-    
