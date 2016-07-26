@@ -20,13 +20,13 @@ template_debug = True
 ODM2_configs = {
 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'odm2',
+        'NAME': 'odm2admin',
         'USER': 'lsetiawan',
-        'PASSWORD': '804351182ok',
+        'PASSWORD': '',
         'HOST': 'localhost', #micro server  '52.20.81.11'
         'PORT': '5432',
      'OPTIONS': {
-      'options': '-c search_path=odm2,odm2extra'
+      'options': '-c search_path=admin,odm2,odm2extra'
     }
 }
 
