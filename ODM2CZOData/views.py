@@ -364,7 +364,12 @@ def relatedFeaturesFilter(request,done,selected_relatedfeatid,selected_resultid,
             resultList = Results.objects.filter(result_type=resultType).filter(featureactionid=featureaction)
     return selected_relatedfeatid, done, resultList,selected_resultid
 
-
+def web_map(request):
+    if request.user.is_authenticated():
+        context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
+        return render(request, 'mapdata.html', context)
+    else:
+        return HttpResponseRedirect('../')
 
 
 def TimeSeriesGraphing(request,feature_action='All'):
