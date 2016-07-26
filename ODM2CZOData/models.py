@@ -2422,4 +2422,3 @@ class Variables(models.Model):
         ordering = ('variablecode','variable_name',)
         db_table = r'odm2"."variables'
         verbose_name='variable'
-    
