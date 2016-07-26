@@ -20,7 +20,7 @@ template_debug = True
 ODM2_configs = {
 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'odm2admin',
+        'NAME': 'odm2',
         'USER': 'lsetiawan',
         'PASSWORD': '',
         'HOST': 'localhost', #micro server  '52.20.81.11'

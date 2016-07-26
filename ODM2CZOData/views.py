@@ -46,6 +46,7 @@ from subprocess import *
 import sys as sys
 from django.core import management
 from django.shortcuts import render_to_response
+from django.contrib.gis.geos import GEOSGeometry
 #
 # class FeatureactionsAutocomplete(autocomplete.Select2QuerySetView):
 #     def get_queryset(self):
@@ -366,7 +367,11 @@ def relatedFeaturesFilter(request,done,selected_relatedfeatid,selected_resultid,
 
 def web_map(request):
     if request.user.is_authenticated():
-        context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
+        features = Samplingfeatures.objects.all()
+        site_list = [GEOSGeometry(site.featuregeometry).coords for site in features]
+
+        context = {
+            'prefixpath': CUSTOM_TEMPLATE_PATH, 'sites': site_list}
         return render(request, 'mapdata.html', context)
     else:
         return HttpResponseRedirect('../')

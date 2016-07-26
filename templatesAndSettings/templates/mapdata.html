@@ -72,8 +72,9 @@
             'Imagery &copy; <a href="http://mapbox.com">Mapbox</a>', id: 'mapbox.streets'
         }).addTo(myMap);
 
-
-        //L.marker([47.552045, -122.2569533333333]).addTo(myMap).bindPopup('<b>15.38.38.jpg</b><br /><input id="bttn" data-name="15.38.38" type="button" onclick="panorama()" value="panoramic map">');
+        {% for site in sites %}
+            L.marker([{{ site.1 }}, {{ site.0 }}]).addTo(myMap);
+        {% endfor %}
         //L.marker([47.55245, -122.25605]).addTo(myMap).bindPopup('<b>15.41.04.jpg</b><br /><input id="bttn" data-name="15.41.04" type="button" onclick="panorama()" value="panoramic map">');
         //L.marker([47.55258333333333, -122.2558133333333]).addTo(myMap).bindPopup('<b>15.41.21.jpg</b><br /><input id="bttn" data-name="15.41.21" type="button" onclick="panorama()" value="panoramic map">');
         //L.marker([47.55260833333333, -122.25548]).addTo(myMap).bindPopup('<b>15.41.39.jpg</b><br /><input id="bttn" data-name="15.41.39" type="button" onclick="panorama()" value="panoramic map">');
@@ -82,7 +83,6 @@
         //L.marker([47.55291666666667, -122.2548883333333]).addTo(myMap).bindPopup('<b>15.42.22.jpg</b><br /><input id="bttn" data-name="15.42.22" type="button" onclick="panorama()" value="panoramic map">');
         //L.marker([47.55557166666667, -122.2546416666667]).addTo(myMap).bindPopup('<b>15.49.39.jpg</b><br /><input id="bttn" data-name="15.49.39" type="button" onclick="panorama()" value="panoramic map">');
         //L.marker([47.55567166666667, -122.254645]).addTo(myMap).bindPopup('<b>15.50.09.jpg</b><br /><input id="bttn" data-name="15.50.09" type="button" onclick="panorama()" value="panoramic map">');
-
 
         // Basemaps Choices
         basemaps = {
