@@ -1,0 +1,101 @@
+<!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/
+
+
+
+
+-->
+
+{% extends "admin/base_site.html" %}
+{% load admin_extras %}
+{% load static %}
+{% load i18n admin_static admin_shortcuts_tags %}
+
+{# django-admin-shortcuts changes these blocks #}
+
+{% block breadcrumbs %}
+    {% if authenticated %}
+        <div class="admin_shortcuts">
+            {% admin_shortcuts %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block extrastyle %}
+    <style type="text/css">{% admin_shortcuts_css %}</style>
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}"/>{% endblock %}
+
+
+{% block extrahead %}
+    {{ block.super }}<title>
+    {% block title %}{% endblock %}
+</title>
+     <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.css" />
+    <script src="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.js"></script>
+    <style>
+        .leaflet-google-layer {
+            z-index: 0;
+        }
+
+        .leaflet-map-pane {
+            z-index: 100;
+        }
+
+        html, body{
+            width:100%;
+            height:100%;
+        }
+    </style>
+    {% admin_shortcuts_js %}{% endblock %}
+
+{# end changes #}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+
+
+
+{% block content %}
+    <div id='content-main'> {% csrf_token %}</div>
+    <h1>Map the Data!</h1>
+    <div style="width:100%; height:750px;" id="map"></div>
+    <script type='text/javascript'>
+        // Create Map and set view to LatLong: 40.5768984073, -75.3840872376 with zoom level 7
+        var myMap = L.map('map').setView([47.552045, -122.2569533333333], 16);
+
+        var osm = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
+            maxZoom: 18,
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+            '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+            'Imagery &copy; <a href="http://mapbox.com">Mapbox</a>', id: 'mapbox.streets'
+        }).addTo(myMap);
+
+        {% for site in sites %}
+            L.marker([{{ site.1 }}, {{ site.0 }}]).addTo(myMap);
+        {% endfor %}
+        //L.marker([47.55245, -122.25605]).addTo(myMap).bindPopup('<b>15.41.04.jpg</b><br /><input id="bttn" data-name="15.41.04" type="button" onclick="panorama()" value="panoramic map">');
+        //L.marker([47.55258333333333, -122.2558133333333]).addTo(myMap).bindPopup('<b>15.41.21.jpg</b><br /><input id="bttn" data-name="15.41.21" type="button" onclick="panorama()" value="panoramic map">');
+        //L.marker([47.55260833333333, -122.25548]).addTo(myMap).bindPopup('<b>15.41.39.jpg</b><br /><input id="bttn" data-name="15.41.39" type="button" onclick="panorama()" value="panoramic map">');
+        //L.marker([47.55269666666667, -122.2552133333333]).addTo(myMap).bindPopup('<b>15.41.56.jpg</b><br /><input id="bttn" data-name="15.41.56" type="button" onclick="panorama()" value="panoramic map">');
+        //L.marker([47.55281666666666, -122.2550033333333]).addTo(myMap).bindPopup('<b>15.42.09.jpg</b><br /><input id="bttn" data-name="15.42.09" type="button" onclick="panorama()" value="panoramic map">');
+        //L.marker([47.55291666666667, -122.2548883333333]).addTo(myMap).bindPopup('<b>15.42.22.jpg</b><br /><input id="bttn" data-name="15.42.22" type="button" onclick="panorama()" value="panoramic map">');
+        //L.marker([47.55557166666667, -122.2546416666667]).addTo(myMap).bindPopup('<b>15.49.39.jpg</b><br /><input id="bttn" data-name="15.49.39" type="button" onclick="panorama()" value="panoramic map">');
+        //L.marker([47.55567166666667, -122.254645]).addTo(myMap).bindPopup('<b>15.50.09.jpg</b><br /><input id="bttn" data-name="15.50.09" type="button" onclick="panorama()" value="panoramic map">');
+
+        // Basemaps Choices
+        basemaps = {
+            'OSM': osm
+        };
+
+        // Overlay Choices
+        overlayMaps = {};
+
+        // Put Control on map
+        L.control.layers(basemaps, overlayMaps).addTo(myMap);
+
+    </script>
+
+
+{% endblock %}

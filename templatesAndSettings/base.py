@@ -60,7 +60,7 @@ INSTALLED_APPS = (
     'daterange_filter',
     'ajax_select',
     'django.contrib.admin',
-    #'django.contrib.gis',
+    'django.contrib.gis',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
