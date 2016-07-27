@@ -369,9 +369,14 @@ def web_map(request):
     if request.user.is_authenticated():
         features = Samplingfeatures.objects.all()
         site_list = [GEOSGeometry(site.featuregeometry).coords for site in features]
+        # site_list = [feat.__dict__ for feat in features]
+        #
+        # for site in site_list:
+        #     site.pop('_state', None)
+        #     site['featuregeometry'] = GEOSGeometry(site['featuregeometry']).coords
 
         context = {
-            'prefixpath': CUSTOM_TEMPLATE_PATH, 'sites': site_list}
+            'prefixpath': CUSTOM_TEMPLATE_PATH, 'sites': site_list, 'features':features}
         return render(request, 'mapdata.html', context)
     else:
         return HttpResponseRedirect('../')

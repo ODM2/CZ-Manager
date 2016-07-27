@@ -6,13 +6,13 @@ Keep this file untracked
 secret_key = 'random_secret_key_like_so_7472873649836'
 
 
-media_root = '/Users/lsetiawan/Desktop/shared_ubuntu/APL/ODM2/ODM2-Admin/ODM2CZOData/upfiles/'
+media_root = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin/ODM2CZOData/upfiles/'
 media_url = '/odm2testapp/upfiles/'
 # Application definition
 custom_template_path = '/admin/ODM2CZOData/'
 #admin_shortcuts_path = '/admin/'
 url_path = 'admin/'
-static_root = '/Users/lsetiawan/Desktop/shared_ubuntu/APL/ODM2/ODM2-Admin/static'#'C:/Users/leonmi/Google Drive/ODM2Djangoadmin/static'
+static_root = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin/static'
 debug = True
 template_debug = True
 # Database
@@ -20,11 +20,11 @@ template_debug = True
 ODM2_configs = {
 
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'odm2',
-        'USER': 'lsetiawan',
-        'PASSWORD': '',
-        'HOST': 'localhost', #micro server  '52.20.81.11'
-        'PORT': '5432',
+        'NAME': 'x',
+        'USER': 'x',
+        'PASSWORD': 'x',
+        'HOST': 'x', #micro server  '52.20.81.11'
+        'PORT': 'x',
      'OPTIONS': {
       'options': '-c search_path=admin,odm2,odm2extra'
     }
