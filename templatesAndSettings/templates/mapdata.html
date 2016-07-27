@@ -73,7 +73,10 @@
         }).addTo(myMap);
 
         {% for site in features %}
-            L.marker({{ site.featuregeometry|get_lat_lng }}).addTo(myMap).bindPopup('<p>{{ site.samplingfeaturecode }}</p>');
+            L.marker({{ site.featuregeometry|get_lat_lng }}).addTo(myMap).bindPopup(
+                    '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
+                    + '<br>Coordinates: {{ site.featuregeometry|get_lat_lng }}</p>'
+            );
         {% endfor %}
 
         // Basemaps Choices
