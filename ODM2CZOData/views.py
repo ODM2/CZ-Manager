@@ -908,10 +908,11 @@ def scatter_plot(request):
     ydata=[]
     rvx=rvy=prvx=prvy=xlocs=ylocs=None
     if xVar and yVar:
-        rvx=pr.filter(variableid=xVar)
+        rvx=pr.filter(variableid=xVar).values('resultid')
+        print(rvx)
         prvx=Profileresultvalues.objects.filter(~Q(datavalue=-6999))\
         .filter(~Q(datavalue=-888.88)).filter(resultid__in=rvx).order_by("resultid__resultid__unitsid","resultid__resultid__featureactionid__samplingfeatureid","zlocation")
-        rvy=pr.filter(variableid=yVar)
+        rvy=pr.filter(variableid=yVar).values('resultid')
         prvy=Profileresultvalues.objects.filter(~Q(datavalue=-6999))\
         .filter(~Q(datavalue=-888.88)).filter(resultid__in=rvy).order_by("resultid__resultid__unitsid","resultid__resultid__featureactionid__samplingfeatureid","zlocation")
 
@@ -1170,7 +1171,7 @@ def graph_data(request):
     #need to go through featureaction to get to results
     variableList = None
     #need the feature actions for all of the sampling features related to this sampling feature
-    sampling_features = Relatedfeatures.objects.filter(relatedfeatureid=selected_relatedfeatid)
+    sampling_features = Relatedfeatures.objects.filter(relatedfeatureid__exact=selected_relatedfeatid).values('samplingfeatureid')
     #select the feature actions for all of the related features.
     feature_actions = Featureactions.objects.filter(samplingfeatureid__in = sampling_features)
     featureresults = Results.objects.filter(featureactionid__in=feature_actions).order_by("variableid","unitsid")\
@@ -1249,8 +1250,7 @@ def graph_data(request):
             name_of_units.append(tmpname)
         else:
              name_of_units.append(tmpname)
-
-        resultValues= Profileresultvalues.objects.all().filter(resultid=selectedMResult)#.order_by("-zlocation")
+        resultValues= Profileresultvalues.objects.all().filter(resultid__exact=selectedMResult.resultid)#.order_by("-zlocation")
 
         if not resultValuesSeries:
             resultValuesSeries = resultValues
@@ -1337,7 +1337,8 @@ def graph_data(request):
     withProfileResults = Profileresults.objects.all()
     results = Results.objects.filter(resultid__in=withProfileResults)
     featureAction = Featureactions.objects.filter(featureactionid__in=results.values("featureactionid"))
-    relatedFeatureList = Relatedfeatures.objects.filter(samplingfeatureid__in=featureAction).order_by('relatedfeatureid').distinct('relatedfeatureid') #
+    samplefeatid = Featureactions.objects.filter(featureactionid__in=results).values('samplingfeatureid')
+    relatedFeatureList = Relatedfeatures.objects.filter(samplingfeatureid__in=samplefeatid).order_by('relatedfeatureid').distinct('relatedfeatureid') #
     #relatedFeatureList = sorted(relatedFeatureList, key=operator.attrgetter('relatedfeatureid__samplingfeaturecode')) #relatedFeatureList.order_by('relatedfeatureid__samplingfeaturecode')
     int_selectedvariable_ids = []
     for int_selectedvariableid in selectedMVariableSeries:
