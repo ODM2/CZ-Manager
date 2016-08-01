@@ -20,12 +20,14 @@ lib
 lib64
 /odm2testsite/__pycache__
 __pycache__
-upfiles
-migrations
+
+templatesAndSettings/settings.py
 odm2djangoadmin.git
 omit
 static
-
+migrations
+upfiles
+backup migrations
 #  Installer logs
 pip-log.txt
 
