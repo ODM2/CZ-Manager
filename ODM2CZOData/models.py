@@ -704,7 +704,7 @@ class CvSamplingfeaturetype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
         s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
+        s += u"- %s" % (self.name)
         return s
     class Meta:
         managed = False
@@ -1948,6 +1948,7 @@ class Samplingfeatures(models.Model):
     featuregeometry = models.TextField(verbose_name='feature geometry',blank=True, null=True)  #GeometryField This field type is a guess.
     elevation_m = models.FloatField(verbose_name='elevation',blank=True, null=True)
     elevation_datum = models.ForeignKey(CvElevationdatum, db_column='elevationdatumcv', blank=True, null=True)
+
     def __unicode__(self):
         s = u"%s - %s" % (self.samplingfeatureid,  self.sampling_feature_type)
         if self.samplingfeaturecode:
