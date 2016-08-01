@@ -1,14 +1,16 @@
-#this came from https://djangosnippets.org/snippets/2196/
-#adds a collect tag for templates so you can build lists
+# this came from https://djangosnippets.org/snippets/2196/
+# adds a collect tag for templates so you can build lists
 
 from django import template
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import GEOSGeometry, Point
+from ODM2CZOData.models import Samplingfeatures
+from django.core.serializers.json import json, DjangoJSONEncoder
+from django.http import HttpResponse
 
 register = template.Library()
+
+
 @register.tag
-
-
-
 def collect(parser, token):
     bits = list(token.split_contents())
     if len(bits) > 3 and bits[-2] == 'as':
@@ -17,6 +19,7 @@ def collect(parser, token):
         return CollectNode(items, varname)
     else:
         raise template.TemplateSyntaxError('%r expected format is "item [item ...] as varname"' % bits[0])
+
 
 class CollectNode(template.Node):
     def __init__(self, items, varname):
@@ -37,6 +40,7 @@ class AssignNode(template.Node):
         context[self.name] = self.value.resolve(context, True)
         return ''
 
+
 def do_assign(parser, token):
     """
     Assign an expression to a variable in the current context.
@@ -53,11 +57,30 @@ def do_assign(parser, token):
     value = parser.compile_filter(bits[2])
     return AssignNode(bits[1], value)
 
+
 register = template.Library()
 register.tag('assign', do_assign)
 
+
+# Extra template tags for map
 @register.filter()
-def get_lat_lng(value):
+def get_lat_lng(value, gc):
     lat = GEOSGeometry(value).coords[1]
     lon = GEOSGeometry(value).coords[0]
-    return "[{0},{1}]".format(lat,lon)
+
+    if gc == 'lat':
+        return "{}".format(lat)
+    elif gc == 'lon':
+        return "{}".format(lon)
+
+
+@register.filter()
+def filter_coords(value):
+    sites = list()
+    for site in value:
+        lat = GEOSGeometry(site.featuregeometry).coords[1]
+        lon = GEOSGeometry(site.featuregeometry).coords[0]
+        if lat != 0 and lon != 0:
+            sites.append(site)
+
+    return sites
