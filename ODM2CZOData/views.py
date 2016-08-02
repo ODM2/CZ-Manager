@@ -368,23 +368,26 @@ def relatedFeaturesFilter(request,done,selected_relatedfeatid,selected_resultid,
 
 def web_map(request):
     if request.user.is_authenticated():
-        features = Samplingfeatures.objects.all()
-        site_list = [GEOSGeometry(site.featuregeometry).coords for site in features]
-
-        #
-        results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
-
-        # site_list = [feat.__dict__ for feat in features]
-        #
-        # for site in site_list:
-        #     site.pop('_state', None)
-        #     site['featuregeometry'] = GEOSGeometry(site['featuregeometry']).coords
-
-        context = {
-            'prefixpath': CUSTOM_TEMPLATE_PATH, 'sites': site_list, 'features':features,'results':results,}
-        return render(request, 'mapdata.html', context)
+        authenticated=True
     else:
-        return HttpResponseRedirect('../')
+        authenticated=False
+    features = Samplingfeatures.objects.all()
+    site_list = [GEOSGeometry(site.featuregeometry).coords for site in features]
+
+    #
+    results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
+
+    # site_list = [feat.__dict__ for feat in features]
+    #
+    # for site in site_list:
+    #     site.pop('_state', None)
+    #     site['featuregeometry'] = GEOSGeometry(site['featuregeometry']).coords
+
+    context = {
+        'prefixpath': CUSTOM_TEMPLATE_PATH, 'sites': site_list, 'features':features,'results':results,'authenticated':authenticated}
+    return render(request, 'mapdata.html', context)
+    #else:
+        #return HttpResponseRedirect('../')
 
 
 def TimeSeriesGraphing(request,feature_action='All'):
