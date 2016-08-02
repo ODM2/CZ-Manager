@@ -2,6 +2,7 @@
 #adds a collect tag for templates so you can build lists
 
 from django import template
+from django.contrib.gis.geos import GEOSGeometry
 
 register = template.Library()
 @register.tag
@@ -54,3 +55,9 @@ def do_assign(parser, token):
 
 register = template.Library()
 register.tag('assign', do_assign)
+
+@register.filter()
+def get_lat_lng(value):
+    lat = GEOSGeometry(value).coords[1]
+    lon = GEOSGeometry(value).coords[0]
+    return "[{0},{1}]".format(lat,lon)

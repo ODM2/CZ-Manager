@@ -24,6 +24,7 @@ urlpatterns = patterns('',
     url(r'^' + URL_PATH +'RecordAction.html', views.RecordAction, name="RecordAction"),
     url(r'^' + URL_PATH +'ManageCitations.html', views.ManageCitations, name="ManageCitations"),
     url(r'^' + URL_PATH +'chart.html', views.TimeSeriesGraphing, name="TimeSeriesGraphing"),
+    url(r'^' + URL_PATH + 'mapdata.html', views.web_map, name="WebMap"),
     url(r'^' + URL_PATH +'graph/$', views.TimeSeriesGraphing),
     url(r'^' + URL_PATH +'graph/featureaction=(?P<feature_action>(\d+))/$', views.TimeSeriesGraphing, name="TimeSeriesGraphing"), # (?:featureaction-(?P<featureaction>\d+)/)?$  (?P<variable_a>(\d+) (?P<feature_action>(\d+))
     url(r'^' + URL_PATH +'graphfa/featureaction=(?P<feature_action>(\d+))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
@@ -35,6 +36,11 @@ urlpatterns = patterns('',
     url(r'^' + URL_PATH +'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
     url(r'^' + URL_PATH +'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/resultidu=(?P<resultidu>(\d+))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
     url(r'^' + URL_PATH +'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/resultidu=(?P<resultidu>(\d+))/startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
+
+     url(r'^' + URL_PATH +'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/popup=(?P<popup>(^(?i)(true|false)))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
+    url(r'^' + URL_PATH +'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
+    url(r'^' + URL_PATH +'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/resultidu=(?P<resultidu>(\d+))/popup=(?P<popup>(^(?i)(true|false)))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
+    url(r'^' + URL_PATH +'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/resultidu=(?P<resultidu>(\d+))/startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/popup=(?P<popup>(^(?i)(true|false)))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
 
 
     url(r'^' + URL_PATH +'graphfa/dataset=(?P<dataset>(\d+))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),

@@ -1,0 +1,44 @@
+<!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/
+
+
+
+
+-->
+
+{% extends "admin/base_site.html" %}
+{% load admin_extras %}
+{% load static %}
+{% load i18n admin_static admin_shortcuts_tags %}
+
+{% block content %}
+
+
+
+<p><h3>
+{% if useDataset %}
+{{datasetTitle}}
+{% else %}
+Location - {{featureActionLocation}}<br>
+{% endif %}
+{% if not useSamplingFeature and not useDataset %}
+Method- {{featureActionMethod}}
+{% endif %}
+</h3></p>
+
+<br>
+{% if useDataset %}
+{{datasetAbstract}}
+{% endif %}
+{% include 'LocationDataInfo.html' %}
+<br><br>
+<p>Data from this site are a product the <a href="http://criticalzone.org/luquillo/">Luquillo Critical Zone Observatory</a></p>
+{% endblock %}
+
+
+{% block overwrite %}
+<!-- Overwrite the base.html jQuery load and put in head for Highcharts to work -->
+{% endblock %}
+{% block extrajs %}
+<!-- Maps the Python template context variables from views.py to the Highchart js variables -->
+
+{% endblock %}

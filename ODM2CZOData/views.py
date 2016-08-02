@@ -36,6 +36,7 @@ import json
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
 import re
 register = template.Library()
+from django.db.models import Min, Max
 from django.template import loader
 from .forms import CitationsAdminForm
 from .forms import CitationextensionpropertyvaluesAdminForm
@@ -46,6 +47,7 @@ from subprocess import *
 import sys as sys
 from django.core import management
 from django.shortcuts import render_to_response
+from django.contrib.gis.geos import GEOSGeometry
 #
 # class FeatureactionsAutocomplete(autocomplete.Select2QuerySetView):
 #     def get_queryset(self):
@@ -364,7 +366,25 @@ def relatedFeaturesFilter(request,done,selected_relatedfeatid,selected_resultid,
             resultList = Results.objects.filter(result_type=resultType).filter(featureactionid=featureaction)
     return selected_relatedfeatid, done, resultList,selected_resultid
 
+def web_map(request):
+    if request.user.is_authenticated():
+        features = Samplingfeatures.objects.all()
+        site_list = [GEOSGeometry(site.featuregeometry).coords for site in features]
 
+        #
+        results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
+
+        # site_list = [feat.__dict__ for feat in features]
+        #
+        # for site in site_list:
+        #     site.pop('_state', None)
+        #     site['featuregeometry'] = GEOSGeometry(site['featuregeometry']).coords
+
+        context = {
+            'prefixpath': CUSTOM_TEMPLATE_PATH, 'sites': site_list, 'features':features,'results':results,}
+        return render(request, 'mapdata.html', context)
+    else:
+        return HttpResponseRedirect('../')
 
 
 def TimeSeriesGraphing(request,feature_action='All'):
@@ -597,12 +617,15 @@ def TimeSeriesGraphing(request,feature_action='All'):
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,},)
 
 
-def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='NotSet',dataset='NotSet',resultidu='NotSet',startdate='NotSet',enddate='NotSet'): #,startdate='',enddate=''
+def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='NotSet',dataset='NotSet',resultidu='NotSet',startdate='NotSet',enddate='NotSet',popup='NotSet'): #,startdate='',enddate=''
     authenticated=True
     if not request.user.is_authenticated():
         #return HttpResponseRedirect('../')
         authenticated=False
-    template = loader.get_template('chart2.html')
+    if popup=='NotSet':
+        template = loader.get_template('chart2.html')
+    else:
+        template = loader.get_template('chartpopup.html')
     useDataset = False
     useSamplingFeature=False
     if dataset=='NotSet':
@@ -614,24 +637,30 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
     else:
         useDataset=True
         dataset=int(dataset)
-
-
+    useResultid = False
+    if resultidu!='NotSet':
+        useResultid=True
+        resultidu=int(resultidu)
     if 'startDate' in request.POST:
         entered_start_date = request.POST['startDate']
     elif startdate=='NotSet':
-        entered_start_date = "2016-01-01"
+        if useResultid:
+            entered_start_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Min('valuedatetime')).order_by('valuedatetime')[0].valuedatetime #.annotate(Min('price')).order_by('price')[0]
+        else:
+            entered_start_date = "2016-01-01"
     else:
-        entered_start_date = startdate
+        entered_start_date = "2016-01-01"
+
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
-    elif startdate=='NotSet':
-        entered_end_date = "2016-01-05"
+    elif enddate=='NotSet':
+        if useResultid:
+            entered_end_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Max('valuedatetime')).order_by('-valuedatetime')[0].valuedatetime
+        else:
+            entered_end_date = "2016-01-05"
     else:
-        entered_end_date = enddate
-    if entered_end_date =='':
         entered_end_date = "2016-01-05"
-    if entered_start_date=='':
-        entered_start_date = "2016-01-01"
+
 
     selected_results = []
     name_of_sampling_features = []
@@ -685,7 +714,11 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
     i=0
     if selectedMResultSeries.__len__()==0:
         if resultidu == 'NotSet':
-            selectedMResultSeries.append(resultList[0].resultid)
+            try:
+                selectedMResultSeries.append(resultList[0].resultid)
+            except IndexError:
+                html = "<html><body>No Data Available Yet.</body></html>"
+                return HttpResponse(html)
         else:
             selectedMResultSeries.append(int(resultidu))
 
@@ -893,10 +926,11 @@ def scatter_plot(request):
     ydata=[]
     rvx=rvy=prvx=prvy=xlocs=ylocs=None
     if xVar and yVar:
-        rvx=pr.filter(variableid=xVar)
+        rvx=pr.filter(variableid=xVar).values('resultid')
+        print(rvx)
         prvx=Profileresultvalues.objects.filter(~Q(datavalue=-6999))\
         .filter(~Q(datavalue=-888.88)).filter(resultid__in=rvx).order_by("resultid__resultid__unitsid","resultid__resultid__featureactionid__samplingfeatureid","zlocation")
-        rvy=pr.filter(variableid=yVar)
+        rvy=pr.filter(variableid=yVar).values('resultid')
         prvy=Profileresultvalues.objects.filter(~Q(datavalue=-6999))\
         .filter(~Q(datavalue=-888.88)).filter(resultid__in=rvy).order_by("resultid__resultid__unitsid","resultid__resultid__featureactionid__samplingfeatureid","zlocation")
 
@@ -1155,7 +1189,7 @@ def graph_data(request):
     #need to go through featureaction to get to results
     variableList = None
     #need the feature actions for all of the sampling features related to this sampling feature
-    sampling_features = Relatedfeatures.objects.filter(relatedfeatureid=selected_relatedfeatid)
+    sampling_features = Relatedfeatures.objects.filter(relatedfeatureid__exact=selected_relatedfeatid).values('samplingfeatureid')
     #select the feature actions for all of the related features.
     feature_actions = Featureactions.objects.filter(samplingfeatureid__in = sampling_features)
     featureresults = Results.objects.filter(featureactionid__in=feature_actions).order_by("variableid","unitsid")\
@@ -1234,8 +1268,7 @@ def graph_data(request):
             name_of_units.append(tmpname)
         else:
              name_of_units.append(tmpname)
-
-        resultValues= Profileresultvalues.objects.all().filter(resultid=selectedMResult)#.order_by("-zlocation")
+        resultValues= Profileresultvalues.objects.all().filter(resultid__exact=selectedMResult.resultid)#.order_by("-zlocation")
 
         if not resultValuesSeries:
             resultValuesSeries = resultValues
@@ -1322,7 +1355,8 @@ def graph_data(request):
     withProfileResults = Profileresults.objects.all()
     results = Results.objects.filter(resultid__in=withProfileResults)
     featureAction = Featureactions.objects.filter(featureactionid__in=results.values("featureactionid"))
-    relatedFeatureList = Relatedfeatures.objects.filter(samplingfeatureid__in=featureAction).order_by('relatedfeatureid').distinct('relatedfeatureid') #
+    samplefeatid = Featureactions.objects.filter(featureactionid__in=results).values('samplingfeatureid')
+    relatedFeatureList = Relatedfeatures.objects.filter(samplingfeatureid__in=samplefeatid).order_by('relatedfeatureid').distinct('relatedfeatureid') #
     #relatedFeatureList = sorted(relatedFeatureList, key=operator.attrgetter('relatedfeatureid__samplingfeaturecode')) #relatedFeatureList.order_by('relatedfeatureid__samplingfeaturecode')
     int_selectedvariable_ids = []
     for int_selectedvariableid in selectedMVariableSeries:
