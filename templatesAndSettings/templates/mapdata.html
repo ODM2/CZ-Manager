@@ -43,9 +43,6 @@
 	<script src="http://leaflet.github.io/Leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
     <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css">
 	
-	<script src="{% static "js/leaflet.awesome-markers.js" %}"></script>
-	<link rel="stylesheet" type="text/css" href="{% static "css/leaflet.awesome-markers.css" %}"/>
-
 	<style>
         .my-div-icon {
             color: green;
@@ -84,21 +81,7 @@
     <h1>Map the Data!</h1>
     <div style="width:100%; height:900px;" id="map"></div>
     <script type='text/javascript'>
-			var siteMarker = L.AwesomeMarkers.icon({
-			icon: 'fa fa-leaf',
-			//icon:'flag',
-			markerColor: 'green'
-			});
-		var DigMarker = L.AwesomeMarkers.icon({
-			icon: 'fa fa-pied-piper',
-			//icon: 'star',
-			markerColor: 'red'
-			});
-		var InsititutionMarker = L.AwesomeMarkers.icon({
-			icon: 'fa fa-university',
-			//icon: 'home',
-			markerColor: 'blue'
-			});
+			
         // Create Map and set view to LatLong: 40.5768984073, -75.3840872376 with zoom level 7
         var myMap = L.map('map').setView([ 18.28263, -65.77458], 14);
 		//var results = {{ results | safe }};
