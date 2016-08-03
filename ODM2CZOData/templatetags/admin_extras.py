@@ -56,8 +56,25 @@ def do_assign(parser, token):
 register = template.Library()
 register.tag('assign', do_assign)
 
+# Extra template tags for map
 @register.filter()
-def get_lat_lng(value):
+def get_lat_lng(value, gc):
     lat = GEOSGeometry(value).coords[1]
     lon = GEOSGeometry(value).coords[0]
-    return "[{0},{1}]".format(lat,lon)
+
+    if gc == 'lat':
+        return "{}".format(lat)
+    elif gc == 'lon':
+        return "{}".format(lon)
+
+
+@register.filter()
+def filter_coords(value):
+    sites = list()
+    for site in value:
+        lat = GEOSGeometry(site.featuregeometry).coords[1]
+        lon = GEOSGeometry(site.featuregeometry).coords[0]
+        if lat != 0 and lon != 0:
+            sites.append(site)
+
+    return sites
