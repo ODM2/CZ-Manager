@@ -1,8 +1,4 @@
 <!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/
-
-
-
-
 -->
 
 {% extends "admin/base_site.html" %}
@@ -48,16 +44,14 @@
     <link rel="stylesheet"
           href="https://dl.dropboxusercontent.com/u/64841654/leaflet-awesome-marker/css/leaflet.awesome-markers.css">
     <script src="https://dl.dropboxusercontent.com/u/64841654/leaflet-awesome-marker/js/leaflet.awesome-markers.js"></script>
-	
+
 	<style type="text/css">
         .leaflet-google-layer {
             z-index: 0;
         }
-
         .leaflet-map-pane {
             z-index: 100;
         }
-
         .legend {
             line-height: 18px;
             color: #555;
@@ -67,7 +61,6 @@
             box-shadow: -1px 3px 10px -1px rgba(0, 0, 0, 0.4);
             opacity: 0.9;
         }
-
         .legend-icon {
             background-image: url(https://dl.dropboxusercontent.com/u/64841654/leaflet-awesome-marker/img/markers-soft.png);
             background-repeat: no-repeat;
@@ -76,30 +69,25 @@
             text-align: center;
             float: left;
         }
-
         .legend-icon > i {
             color: #fff;
             margin-top: 10px;
             display: inline-block;
             font-size: 14px;
         }
-
         .legend-item {
             clear: both;
         }
-
         .legend-text {
             float: left;
             padding-top: 10px;
         }
-
         .awesome-marker {
             background-image: url("https://dl.dropboxusercontent.com/u/64841654/leaflet-awesome-marker/img/markers-soft.png") !important;
             background-repeat: no-repeat !important;
             height: 46px !important;
             width: 35px !important;
         }
-
         html, body {
             width: 100%;
             height: 100%;
@@ -132,9 +120,9 @@
                     }
             );
         {% endfor %}
-
         // Create Map and set view to LatLong: 18.28263, -65.77458 with zoom level 14
         var myMap = L.map('map').setView([ 18.28263, -65.77458], 14);
+        var m = null;
 		//var results = {{ results | safe }};
         var osm = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
             maxZoom: 22,
@@ -142,7 +130,6 @@
             '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
             'Imagery &copy; <a href="http://mapbox.com">Mapbox</a>', id: 'mapbox.streets'
         }).addTo(myMap);
-
         var markerClusters = L.markerClusterGroup(singleMarkerMode=true);
         {% for site in features|filter_coords %}
             var feat_obj = feature_list.filter(
@@ -172,42 +159,24 @@
                         + '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
                         + '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
                         + '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]</p>';
-
             {% endif %}
-
-            //new L.DivIcon({className: 'awesome-marker-icon-orange awesome-marker leaflet-zoom-animated leaflet-interactive', html: '<i class=" fa fa-eye  icon-white" aria-hidden="true"></i><p style="margin-top:20px;">{{ site.samplingfeaturecode }}</p>'
             var iconDiv = new L.DivIcon({
                 className: feat_obj[0].styleclass + ' awesome-marker leaflet-zoom-animated leaflet-interactive',
                 html: '<i class="fa '+  feat_obj[0].icon +' icon-white" aria-hidden="true"></i><p style="margin-top:20px;font-weight:bold;">{{ site.samplingfeaturecode }}</p>'
             });
-
-            // For use of AwesomeMarkers only
-            /*var myIcon = L.AwesomeMarkers.icon({
-                    icon: feat_obj[0].icon,
-                    prefix: 'fa',
-                    markerColor: feat_obj[0].color
-<<<<<<< HEAD
-                });*/
-
-=======
-                });
 			{% if  site.sampling_feature_type.name != "Site" or site.sampling_feature_type.name == "Observation well" %}
->>>>>>> d505edfddffc57bbc9e3fd86c92701cecf757507
-            var m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
-                icon: iconDiv,
-                title: '{{ site.samplingfeaturecode }}'
+                m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
+                    icon: iconDiv, title: '{{ site.samplingfeaturename }}'
                 }).bindPopup( popup,{minWidth: 600, maxHeight: 500, autoPan: true, closeButton: true,offset: [0, 100]} );
 				markerClusters.addLayer(m);
-			{% else %} 
-			var m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
-                    icon: myIcon, title: '{{ site.samplingfeaturename }}'
+			{% else %}
+                m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
+                    icon: iconDiv, title: '{{ site.samplingfeaturename }}'
                 }).addTo(myMap).bindPopup( popup,{minWidth: 600, maxHeight: 500, autoPan: true, closeButton: true,offset: [0, 100]} );
 			{% endif %}
         {% endfor %}
-
         var legend = L.control({position: 'bottomright'});
         legend.onAdd = function (myMap) {
-
         var div = L.DomUtil.create('div', 'info legend');
         div.innerHTML += '<h2>Sample Feature Types</h2>';
         // loop through our density intervals and generate a label with a colored square for each interval
@@ -220,25 +189,18 @@
                     '      <div class="legend-text">' + feature_list[i].name + '</div>' +
                     '</div>'
         }
-
             return div;
         };
-
         legend.addTo(myMap);
-
-
         // Basemaps Choices
         basemaps = {
             'OSM': osm
         };
         myMap.addLayer(markerClusters);
-
         // Overlay Choices
         overlayMaps = {};
-
         // Put Control on map
         L.control.layers(basemaps, overlayMaps).addTo(myMap);
-
     </script>
 
 
