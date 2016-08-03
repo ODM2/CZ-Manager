@@ -93,6 +93,13 @@
             padding-top: 10px;
         }
 
+        .awesome-marker {
+            background-image: url("https://dl.dropboxusercontent.com/u/64841654/leaflet-awesome-marker/img/markers-soft.png") !important;
+            background-repeat: no-repeat !important;
+            height: 46px !important;
+            width: 35px !important;
+        }
+
         html, body {
             width: 100%;
             height: 100%;
@@ -168,14 +175,22 @@
 
             {% endif %}
 
-            var myIcon = L.AwesomeMarkers.icon({
+            //new L.DivIcon({className: 'awesome-marker-icon-orange awesome-marker leaflet-zoom-animated leaflet-interactive', html: '<i class=" fa fa-eye  icon-white" aria-hidden="true"></i><p style="margin-top:20px;">{{ site.samplingfeaturecode }}</p>'
+            var iconDiv = new L.DivIcon({
+                className: feat_obj[0].styleclass + ' awesome-marker leaflet-zoom-animated leaflet-interactive',
+                html: '<i class="fa '+  feat_obj[0].icon +' icon-white" aria-hidden="true"></i><p style="margin-top:20px;font-weight:bold;">{{ site.samplingfeaturecode }}</p>'
+            });
+
+            // For use of AwesomeMarkers only
+            /*var myIcon = L.AwesomeMarkers.icon({
                     icon: feat_obj[0].icon,
                     prefix: 'fa',
                     markerColor: feat_obj[0].color
-                });
+                });*/
 
             var m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
-                    icon: myIcon, title: '{{ site.samplingfeaturename }}'
+                icon: iconDiv,
+                title: '{{ site.samplingfeaturecode }}'
                 }).bindPopup( popup,{minWidth: 600, maxHeight: 500, autoPan: true, closeButton: true,offset: [0, 100]} );
             markerClusters.addLayer(m);
         {% endfor %}
