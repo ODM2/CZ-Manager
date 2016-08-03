@@ -366,28 +366,34 @@ def relatedFeaturesFilter(request,done,selected_relatedfeatid,selected_resultid,
             resultList = Results.objects.filter(result_type=resultType).filter(featureactionid=featureaction)
     return selected_relatedfeatid, done, resultList,selected_resultid
 
+
 def web_map(request):
     if request.user.is_authenticated():
         authenticated=True
     else:
         authenticated=False
     features = Samplingfeatures.objects.all()
-    site_list = [GEOSGeometry(site.featuregeometry).coords for site in features]
 
-    #
+    legend_ref = [
+        dict(feature_type="Excavation", icon="fa-spoon", color="darkred",
+             style_class="awesome-marker-icon-darkred"),
+        dict(feature_type="Field area", icon="fa-map-o", color="darkblue",
+             style_class="awesome-marker-icon-darkblue"),
+        dict(feature_type="Landscape classification", icon="fa-bar-chart", color="darkpurple",
+             style_class="awesome-marker-icon-darkpurple"),
+        dict(feature_type="Observation well", icon="fa-eye", color="orange",
+             style_class="awesome-marker-icon-orange"),
+        dict(feature_type="Site", icon="fa-dot-circle-o", color="green", style_class="awesome-marker-icon-green"),
+        dict(feature_type="Stream gage", icon="fa-tint", color="blue", style_class="awesome-marker-icon-blue"),
+        dict(feature_type="Transect", icon="fa-area-chart", color="cadetblue",
+             style_class="awesome-marker-icon-cadetblue")
+    ]
+
     results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
 
-    # site_list = [feat.__dict__ for feat in features]
-    #
-    # for site in site_list:
-    #     site.pop('_state', None)
-    #     site['featuregeometry'] = GEOSGeometry(site['featuregeometry']).coords
-
     context = {
-        'prefixpath': CUSTOM_TEMPLATE_PATH, 'sites': site_list, 'features':features,'results':results,'authenticated':authenticated}
+        'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,'results':results,'authenticated':authenticated}
     return render(request, 'mapdata.html', context)
-    #else:
-        #return HttpResponseRedirect('../')
 
 
 def TimeSeriesGraphing(request,feature_action='All'):
