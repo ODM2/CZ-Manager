@@ -1163,11 +1163,14 @@ def exportspreadsheet(request,resultValuesSeries,profileResult=True):
     response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
     return response
 
-def graph_data(request):
+def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet', popup='NotSet'):
     authenticated=True
     if not request.user.is_authenticated():
         authenticated=False
-
+    if popup=='NotSet':
+        template = loader.get_template('chartVariableAndFeature.html')
+    else:
+        template = loader.get_template('profileresultgraphpopup.html')
     selected_resultid = 9365
     selected_relatedfeatid = 15
 
@@ -1182,19 +1185,29 @@ def graph_data(request):
         if not request.POST['SelectedRelatedFeature'] == 'All':
             #relatedFeature = Samplingfeatures.objects.filter(samplingfeatureid=selected_relatedfeatid) #Relatedfeatures.objects.filter(relatedfeatureid=int(selected_relatedfeatid)).distinct('relatedfeatureid')
             selected_relatedfeatid = int(request.POST['SelectedRelatedFeature'])
-        else:
-            selected_relatedfeatid = 15
             #relatedFeature = Samplingfeatures.objects.filter(samplingfeatureid=selected_relatedfeatid)
 
+    if selectedrelatedfeature != 'NotSet':
+        selected_relatedfeatid = int(selectedrelatedfeature)
     else:
         selected_relatedfeatid = 15
+
+    useSamplingFeature=False
+    if samplingfeature !='NotSet':
+        samplingfeature = int(samplingfeature)
+        useSamplingFeature=True
     #find variables found at the sampling feature
     #need to go through featureaction to get to results
     variableList = None
     #need the feature actions for all of the sampling features related to this sampling feature
-    sampling_features = Relatedfeatures.objects.filter(relatedfeatureid__exact=selected_relatedfeatid).values('samplingfeatureid')
-    #select the feature actions for all of the related features.
-    feature_actions = Featureactions.objects.filter(samplingfeatureid__in = sampling_features)
+    if not useSamplingFeature:
+        sampling_features = Relatedfeatures.objects.filter(relatedfeatureid__exact=selected_relatedfeatid).values('samplingfeatureid')
+        #select the feature actions for all of the related features.
+        feature_actions = Featureactions.objects.filter(samplingfeatureid__in = sampling_features)
+    else:
+        feature_actions = Featureactions.objects.filter(samplingfeatureid= samplingfeature)
+
+
     featureresults = Results.objects.filter(featureactionid__in=feature_actions).order_by("variableid","unitsid")\
         .filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
         filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Field area"))
@@ -1375,7 +1388,7 @@ def graph_data(request):
         #this removes duplicates from a list of strings
         name_of_units = removeDupsFromListOfStrings(name_of_units)
         #raise ValidationError(relatedFeatureList)
-        return TemplateResponse(request,'chartVariableAndFeature.html',{'prefixpath': CUSTOM_TEMPLATE_PATH,  'variableList': variableList,
+        return TemplateResponse(request,template,{'prefixpath': CUSTOM_TEMPLATE_PATH,  'variableList': variableList,
              'SelectedVariables':int_selectedvariable_ids,'authenticated':authenticated,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'graphType':graphType, 'yAxis': yAxis,'name_of_units':name_of_units,
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid,},)

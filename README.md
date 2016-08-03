@@ -19,6 +19,10 @@ support tested for django 1.6.5 and 1.9.x
 python 2.7
 run pip install for each of these
 
+for geoDjango you will need to install osgeo4w https://trac.osgeo.org/osgeo4w/
+https://docs.djangoproject.com/en/1.9/ref/contrib/gis/install/
+
+
 psycopg2 
 
 on ubuntu apt-get install python-psycopg2

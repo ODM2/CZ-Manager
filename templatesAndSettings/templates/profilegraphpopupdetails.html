@@ -1,0 +1,51 @@
+
+{% load admin_extras %}
+<style>
+select {
+    width:85%; 
+    overflow:hidden; 
+    white-space:pre; 
+    text-overflow:ellipsis;
+    
+    
+
+}
+option {
+          border: solid 1px #DDDDDD; 
+}
+</style>
+<br>
+<br>
+    
+	<form action="" method="post">
+	{% csrf_token %} 
+	<table >
+	
+		<tr><td><input type="submit" name="update_chart" value="Update Chart" />
+	<input type="submit" name="export_data" value="Export Data" /></td></tr>
+	</table>
+	<div id="" style="overflow:scroll; height:400px;">
+	<table >
+				<tr ><th scope="col" class="section">Variable Code</td>
+				<th scope="col"  class="section">Variable Name</th>
+				<th scope="col"  class="section">Variable Type</th></tr>
+				
+				{% for Variable in variableList %}
+					<tr class="row1">
+							<td ><input type="checkbox" class="action-checkbox-column" id="s1" 
+							{% for SelectedVariable in SelectedVariables %}
+								{% if Variable.variableid == SelectedVariable %}
+									checked  
+								{% endif %}
+							{% endfor %}
+							name="selection{{ forloop.counter0 }}" value="{{ Variable.variableid }}">{{ Variable.variablecode }} </input><br></td>
+								<td > {{Variable.variable_name}}</td>
+								<td >{{Variable.variable_type}}</td>
+								
+								</tr>
+				
+                {% endfor %}
+			 </table>	
+			</div>
+			<br>
+</form>

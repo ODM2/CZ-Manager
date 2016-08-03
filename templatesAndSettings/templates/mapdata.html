@@ -48,6 +48,10 @@
             color: green;
 		
         }
+		.my-div-excavation {
+            color: brown;
+		
+        }
 		.my-div-pit {
             color: blue;
 		
@@ -105,6 +109,15 @@
 						
 				); //.addTo(myMap)
 				//markerClusters.addLayer(m);
+				{% elif  site.sampling_feature_type.name == "Excavation"%}
+				var m = L.marker({{ site.featuregeometry|get_lat_lng }},{icon: new L.DivIcon({className: 'my-div-excavation',
+        html: '<i class="fa fa-spoon fa-2x" aria-hidden="true"></i>'+
+              '<div class="my-div-span">{{ site.samplingfeaturecode }}</div>'})}
+				,{title: "{{site.samplingfeaturecode}}"}).bindPopup(
+						'<p>Sampling Feature Code: {{ site.samplingfeaturecode }}<br>'
+						+ '<br>Coordinates: {{ site.featuregeometry|get_lat_lng }}'+
+						'<br> {{ site.sampling_feature_type}}<br><a  target="_blank" href="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true">view times series data in new page</a></p><iframe  width=600, height=600, src="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>',{minWidth: 600, maxHeight: 500, autoPan: true, closeButton: true,offset: [0, 100]}); //.addTo(myMap)
+				markerClusters.addLayer(m);
 				{% else %}
 				var m = L.marker({{ site.featuregeometry|get_lat_lng }},{icon: new L.DivIcon({className: 'my-div-pit',
         html: '<i class="fa fa-leaf fa-2x" aria-hidden="true"></i>'+
@@ -112,7 +125,7 @@
 				,{title: "{{site.samplingfeaturecode}}"}).bindPopup(
 						'<p>Sampling Feature Code: {{ site.samplingfeaturecode }}<br>'
 						+ '<br>Coordinates: {{ site.featuregeometry|get_lat_lng }}'+
-						'<br> {{ site.sampling_feature_type}}<br></p>',{autoPan: true, closeButton: true,}); //.addTo(myMap)
+						'<br> {{ site.sampling_feature_type}}<br></p>',{autoPan: true, closeButton: true,offset: [0, 100]}); //.addTo(myMap)
 				markerClusters.addLayer(m);
 				{% endif %}
 				
