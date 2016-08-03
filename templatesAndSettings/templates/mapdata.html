@@ -186,13 +186,23 @@
                     icon: feat_obj[0].icon,
                     prefix: 'fa',
                     markerColor: feat_obj[0].color
+<<<<<<< HEAD
                 });*/
 
+=======
+                });
+			{% if  site.sampling_feature_type.name != "Site" or site.sampling_feature_type.name == "Observation well" %}
+>>>>>>> d505edfddffc57bbc9e3fd86c92701cecf757507
             var m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
                 icon: iconDiv,
                 title: '{{ site.samplingfeaturecode }}'
                 }).bindPopup( popup,{minWidth: 600, maxHeight: 500, autoPan: true, closeButton: true,offset: [0, 100]} );
-            markerClusters.addLayer(m);
+				markerClusters.addLayer(m);
+			{% else %} 
+			var m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
+                    icon: myIcon, title: '{{ site.samplingfeaturename }}'
+                }).addTo(myMap).bindPopup( popup,{minWidth: 600, maxHeight: 500, autoPan: true, closeButton: true,offset: [0, 100]} );
+			{% endif %}
         {% endfor %}
 
         var legend = L.control({position: 'bottomright'});
