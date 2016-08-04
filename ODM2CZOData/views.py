@@ -367,15 +367,23 @@ def relatedFeaturesFilter(request,done,selected_relatedfeatid,selected_resultid,
     return selected_relatedfeatid, done, resultList,selected_resultid
 
 
-def web_map(request):
+def web_map(request,dataset='NotSet'):
     if request.user.is_authenticated():
         authenticated=True
     else:
         authenticated=False
-    features = Samplingfeatures.objects.all()
+    if dataset=='NotSet':
+        features = Samplingfeatures.objects.all()
+        results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
+    else:
+        dataset = int(dataset)
+        datasetresults = Datasetsresults.objects.filter(datasetid=dataset)
+        results = Results.objects.filter(resultid__in=datasetresults.values("resultid"))
+        fa = Featureactions.objects.filter(featureactionid__in=results.values("featureactionid"))
+        features = Samplingfeatures.objects.filter(samplingfeatureid__in=fa.values("samplingfeatureid"))
 
     legend_ref = [
-        dict(feature_type="Excavation", icon="fa-spoon", color="darkred",
+        dict(feature_type="Excavation", icon="fa-spoon", color="darkred", html="duck",
              style_class="awesome-marker-icon-darkred"),
         dict(feature_type="Field area", icon="fa-map-o", color="darkblue",
              style_class="awesome-marker-icon-darkblue"),
@@ -389,7 +397,7 @@ def web_map(request):
              style_class="awesome-marker-icon-cadetblue")
     ]
 
-    results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
+
 
     context = {
         'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,'results':results,'authenticated':authenticated}
@@ -625,6 +633,83 @@ def TimeSeriesGraphing(request,feature_action='All'):
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'graphType':graphType, 'xAxis': xAxis, 'yAxis': yAxis,'name_of_units':name_of_units,
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,},)
 
+
+def mappopuploader(request,feature_action='NotSet',samplingfeature='NotSet',dataset='NotSet',resultidu='NotSet',startdate='NotSet',enddate='NotSet',popup='NotSet'):
+    authenticated=True
+    if not request.user.is_authenticated():
+        #return HttpResponseRedirect('../')
+        authenticated=False
+    if popup=='NotSet':
+        template = loader.get_template('chart2.html')
+    else:
+        template = loader.get_template('chartpopup.html')
+    useDataset = False
+    useSamplingFeature=False
+    if dataset=='NotSet':
+        if samplingfeature=='NotSet':
+            feature_action=int(feature_action)
+        else:
+            samplingfeature=int(samplingfeature)
+            useSamplingFeature=True
+    else:
+        useDataset=True
+        dataset=int(dataset)
+    useResultid = False
+    if resultidu!='NotSet':
+        useResultid=True
+        resultidu=int(resultidu)
+    if 'startDate' in request.POST:
+        entered_start_date = request.POST['startDate']
+    elif startdate=='NotSet':
+        if useResultid:
+            entered_start_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Min('valuedatetime')).order_by('valuedatetime')[0].valuedatetime #.annotate(Min('price')).order_by('price')[0]
+        else:
+            entered_start_date = "2016-01-01"
+    else:
+        entered_start_date = "2016-01-01"
+
+    if 'endDate' in request.POST:
+        entered_end_date = request.POST['endDate']
+    elif enddate=='NotSet':
+        if useResultid:
+            entered_end_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Max('valuedatetime')).order_by('-valuedatetime')[0].valuedatetime
+        else:
+            entered_end_date = "2016-01-05"
+    else:
+        entered_end_date = "2016-01-05"
+    i = 0
+    featureActionLocation=None
+    featureActionMethod=None
+    datasetTitle=None
+    datasetAbstract=None
+    methods=None
+    samplefeature=None
+    if not useDataset:
+        if useSamplingFeature:
+            samplefeature = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
+            feature_actions = Featureactions.objects.filter(samplingfeatureid=samplefeature)
+            resultList = Results.objects.filter(featureactionid__in=feature_actions).filter(~Q(processing_level=4)).order_by("featureactionid__action__method")
+            actions = Actions.objects.filter(actionid__in=feature_actions.values("action"))
+            methods = Methods.objects.filter(methodid__in=actions.values("method"))
+            featureActionLocation= samplefeature.samplingfeaturename
+        else:
+            resultList = Results.objects.filter(featureactionid=feature_action).filter(~Q(processing_level=4)).order_by("featureactionid__action__method")
+            featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
+            featureActionLocation= featureAction.samplingfeatureid.samplingfeaturename
+            featureActionMethod= featureAction.action.method.methodname
+            action = Actions.objects.filter(actionid=featureAction.action.actionid).get()
+            methods = Methods.objects.filter(methodid=action.method.methodid)
+
+    else:
+        datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
+        resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid")).filter(~Q(processing_level=4)).order_by("featureactionid__action__method")
+        datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
+        datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
+    return TemplateResponse(request,template,{ 'prefixpath': CUSTOM_TEMPLATE_PATH,
+            'startDate':entered_start_date,'endDate':entered_end_date,'useSamplingFeature':useSamplingFeature,
+            'featureActionMethod':featureActionMethod,'featureActionLocation':featureActionLocation,
+            'datasetTitle':datasetTitle,'datasetAbstract':datasetAbstract,'useDataset':useDataset,'startdate':startdate,'enddate':enddate,
+             'authenticated':authenticated,'methods':methods,'resultList':resultList,},)
 
 def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='NotSet',dataset='NotSet',resultidu='NotSet',startdate='NotSet',enddate='NotSet',popup='NotSet'): #,startdate='',enddate=''
     authenticated=True
