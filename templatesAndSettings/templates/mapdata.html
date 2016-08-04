@@ -32,6 +32,10 @@
     {{ block.super }}<title>
     {% block title %}{% endblock %}
 </title>
+    <script
+			  src="https://code.jquery.com/jquery-1.12.4.min.js"
+			  integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+			  crossorigin="anonymous"></script>
     <script src="https://use.fontawesome.com/eb9894ac79.js"></script>
     <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.css"/>
     <script src="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.js"></script>
@@ -44,6 +48,8 @@
     <link rel="stylesheet"
           href="https://dl.dropboxusercontent.com/u/64841654/leaflet-awesome-marker/css/leaflet.awesome-markers.css">
     <script src="https://dl.dropboxusercontent.com/u/64841654/leaflet-awesome-marker/js/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://dl.dropboxusercontent.com/u/64841654/Leaflet.Legend/leaflet-legend.css">
+    <script src="https://dl.dropboxusercontent.com/u/64841654/Leaflet.Legend/leaflet-legend.js"></script>
 
 	<style type="text/css">
         .leaflet-google-layer {
@@ -60,6 +66,17 @@
             border-radius: 10px;
             box-shadow: -1px 3px 10px -1px rgba(0, 0, 0, 0.4);
             opacity: 0.9;
+        }
+        /*.datasets-listing{
+            color: #555;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: -1px 3px 10px -1px rgba(0, 0, 0, 0.4);
+            opacity: 0.9;
+            padding:20px;
+        }*/
+        #legend{
+            padding:20px;
         }
         .legend-icon {
             background-image: url(https://dl.dropboxusercontent.com/u/64841654/leaflet-awesome-marker/img/markers-soft.png);
@@ -108,6 +125,14 @@
 
     <div id='content-main'> {% csrf_token %}</div>
     <div style="width:100%; height:900px;" id="map"></div>
+    <div id="legend">
+       {% include 'DatasetsList.html' %}
+    </div>
+    {% comment %}
+    <script type="text/template" id="datasetsList">
+        {% include 'DatasetsList.html' %}
+    </script>
+    {% endcomment %}
     <script type='text/javascript'>
         var feature_list = [];
         {% for feats in legends %}
@@ -121,14 +146,14 @@
             );
         {% endfor %}
         // Create Map and set view to LatLong: 18.28263, -65.77458 with zoom level 14
-        var myMap = L.map('map').setView([ 18.28263, -65.77458], 14);
+        var myMap = L.map('map',{worldCopyJump:true}).setView([ 18.28263, -65.77458], 14);
         var m = null;
-		//var results = {{ results | safe }};
+
         var osm = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
-            maxZoom: 22,
+            maxZoom: 18,
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
             '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-            'Imagery &copy; <a href="http://mapbox.com">Mapbox</a>', id: 'mapbox.streets'
+            'Imagery &copy; <a href="http://mapbox.com">Mapbox</a>', id: 'mapbox.run-bike-hike'
         }).addTo(myMap);
         var markerClusters = L.markerClusterGroup(singleMarkerMode=true);
         {% for site in features|filter_coords %}
@@ -177,20 +202,40 @@
         {% endfor %}
         var legend = L.control({position: 'bottomright'});
         legend.onAdd = function (myMap) {
-        var div = L.DomUtil.create('div', 'info legend');
-        div.innerHTML += '<h2>Sample Feature Types</h2>';
-        // loop through our density intervals and generate a label with a colored square for each interval
-        for (var i = 0; i < feature_list.length; i++) {
-            div.innerHTML +=
-                    '<div class="legend-item">' +
-                    '      <div class="legend-icon ' + feature_list[i].styleclass + '">' +
-                    '           <i class="fa ' + feature_list[i].icon + '" aria-hidden="true"></i>' +
-                    '      </div>' +
-                    '      <div class="legend-text">' + feature_list[i].name + '</div>' +
-                    '</div>'
-        }
-            return div;
+            var div = L.DomUtil.create('div', 'info legend');
+            div.innerHTML += '<h2>Sample Feature Types</h2>';
+            // loop through our density intervals and generate a label with a colored square for each interval
+            for (var i = 0; i < feature_list.length; i++) {
+                div.innerHTML +=
+                        '<div class="legend-item">' +
+                        '      <div class="legend-icon ' + feature_list[i].styleclass + '">' +
+                        '           <i class="fa ' + feature_list[i].icon + '" aria-hidden="true"></i>' +
+                        '      </div>' +
+                        '      <div class="legend-text">' + feature_list[i].name + '</div>' +
+                        '</div>'
+            }
+                return div;
         };
+
+        /*var legend2 = L.control({position:'bottomleft'});
+        legend2.onAdd = function (myMap) {
+            var div = L.DomUtil.create('div', 'info datasets-listing');
+            div.innerHTML += document.getElementById('datasetsList').innerHTML;
+            return div;
+        };*/
+        // https://github.com/mikeskaug/Leaflet.Legend
+        var legend2 = new L.Control.Legend({
+                        position: 'topleft',
+                        collapsed: true,
+                        controlButton: {
+                            title: "Legend"
+                        }});
+        myMap.addControl( legend2 );
+
+        $(".legend-container").append( $("#legend") );
+        $(".legend-toggle").append( "<i class='legend-toggle-icon fa fa-filter fa-2x' style='color: #000;margin-left:5px;'></i>" );
+
+        //legend2.addTo(myMap);
         legend.addTo(myMap);
         // Basemaps Choices
         basemaps = {
@@ -202,6 +247,5 @@
         // Put Control on map
         L.control.layers(basemaps, overlayMaps).addTo(myMap);
     </script>
-
 
 {% endblock %}

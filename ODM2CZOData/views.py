@@ -372,7 +372,29 @@ def web_map(request):
         authenticated=True
     else:
         authenticated=False
+
     features = Samplingfeatures.objects.all()
+
+    datasets = Datasets.objects.all()
+    ids = [ds.datasetid for ds in datasets]
+
+    selections = request.POST.getlist('datasetselection')
+    if selections:
+        dataset_ids = []
+        selected = []
+        for selection in selections:
+            dataset_ids.append(int(selection))
+            selected.append(int(selection))
+        datasetresults = Datasetsresults.objects.filter(datasetid__in=dataset_ids)
+        results = Results.objects.filter(resultid__in=datasetresults.values("resultid"))
+        fa = Featureactions.objects.filter(featureactionid__in=results.values("featureactionid"))
+        features = Samplingfeatures.objects.filter(samplingfeatureid__in=fa.values("samplingfeatureid"))
+    else:
+        selected = ids
+        features = Samplingfeatures.objects.all()
+        results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
+
+
 
     legend_ref = [
         dict(feature_type="Excavation", icon="fa-spoon", color="darkred",
@@ -389,10 +411,10 @@ def web_map(request):
              style_class="awesome-marker-icon-cadetblue")
     ]
 
-    results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
 
     context = {
-        'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,'results':results,'authenticated':authenticated}
+        'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,'results':results,
+        'datasets':datasets,'selecteddatasets':selected,'authenticated':authenticated}
     return render(request, 'mapdata.html', context)
 
 
