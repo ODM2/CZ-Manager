@@ -22,9 +22,7 @@
 {{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
 
 
-{% block extrahead %}
-
-{{ block.super }}{% admin_shortcuts_js %}{% endblock %}
+{% block extrahead %}{{ block.super }}{% admin_shortcuts_js %}{% endblock %}
 
 {# end changes #}
 
@@ -77,6 +75,11 @@
                 <th scope="row"><a href="{{prefixpath }}equipmentmodels/">{% trans 'Add Sensor Model' %}</a></th>
                 <td><a href="{{prefixpath }}equipmentmodels/add/" class="addlink">{% trans 'Add' %}</a></td>
                 <td><a href="{{prefixpath }}equipmentmodels/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+
+              <th scope="row"><a href="{{prefixpath }}instrumentoutputvariables/">{% trans 'Add Output variables for the sensor' %}</a></th>
+                <td><a href="{{prefixpath }}instrumentoutputvariables/add/" class="addlink">{% trans 'Add' %}</a></td>
+                <td><a href="{{prefixpath }}instrumentoutputvariables/" class="changelink">{% trans 'Change' %}</a></td>
                 </tr>
 				<tr>
                  <th scope="row"><a href="{{prefixpath }}samplingfeatures/">{% trans 'Add Location of Sensor' %}</a></th>

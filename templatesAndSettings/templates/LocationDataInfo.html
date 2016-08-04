@@ -20,11 +20,12 @@ option {
 	<form action="" method="post">
 	{% csrf_token %} 
 	<table >
+	<p>collection methods include:</p>
 	{% for method in methods %}
 	<tr><td>
 		{% if not useDataset %}
-<p>{{method.methoddescription}}</p>
-<p>for more go to <a href="{{method.methodlink}}">{{method.methodlink}}</a>
+
+		<p>{{method.methodname}}</p>
 {% endif %}
 </td></tr>
 {% endfor %}
