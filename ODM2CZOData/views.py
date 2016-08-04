@@ -373,8 +373,6 @@ def web_map(request):
     else:
         authenticated=False
 
-    features = Samplingfeatures.objects.all()
-
     datasets = Datasets.objects.all()
     ids = [ds.datasetid for ds in datasets]
 
