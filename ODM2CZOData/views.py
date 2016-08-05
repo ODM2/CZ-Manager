@@ -662,7 +662,8 @@ def mappopuploader(request,feature_action='NotSet',samplingfeature='NotSet',data
         entered_start_date = request.POST['startDate']
     elif startdate=='NotSet':
         if useResultid:
-            entered_start_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Min('valuedatetime')).order_by('valuedatetime')[0].valuedatetime #.annotate(Min('price')).order_by('price')[0]
+            entered_start_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Min('valuedatetime'))\
+                .order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
         else:
             entered_start_date = "2016-01-01"
     else:
@@ -672,7 +673,8 @@ def mappopuploader(request,feature_action='NotSet',samplingfeature='NotSet',data
         entered_end_date = request.POST['endDate']
     elif enddate=='NotSet':
         if useResultid:
-            entered_end_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Max('valuedatetime')).order_by('-valuedatetime')[0].valuedatetime
+            entered_end_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Max('valuedatetime'))\
+                .order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
         else:
             entered_end_date = "2016-01-05"
     else:
@@ -739,7 +741,8 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
         entered_start_date = request.POST['startDate']
     elif startdate=='NotSet':
         if useResultid:
-            entered_start_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Min('valuedatetime')).order_by('valuedatetime')[0].valuedatetime #.annotate(Min('price')).order_by('price')[0]
+            entered_start_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Min('valuedatetime')).\
+            order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
         else:
             entered_start_date = "2016-01-01"
     else:
@@ -749,7 +752,8 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
         entered_end_date = request.POST['endDate']
     elif enddate=='NotSet':
         if useResultid:
-            entered_end_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Max('valuedatetime')).order_by('-valuedatetime')[0].valuedatetime
+            entered_end_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Max('valuedatetime')).\
+                order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
         else:
             entered_end_date = "2016-01-05"
     else:
