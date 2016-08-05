@@ -59,6 +59,7 @@ $(document).ready(function() {
 		//alert(name);
 		 
 		axi = {id: name,
+		max: 0.5,
 		labels: {
                 format: '{value}',
                 style: {
@@ -85,14 +86,31 @@ $(document).ready(function() {
 		tooltip: {
     formatter: function() {
         return ''+
-                 ' Value: ' + this.y + 
+                 ' Value: ' + this.y.name + 
                 '-- Date: '+ Highcharts.dateFormat(' %e-%b-%Y %I:%M %p', this.x);
     }
 },
     });
 	
 	//alert(name_of_units.length);
-	
+	//alert(name_of_units.length);
+	$('#extremesButton').click(function () {
+        var chart = $('#chartid').highcharts(),
+            yAxis = chart.yAxis[0];
+
+        yAxis.options.startOnTick = false;
+        yAxis.options.endOnTick = false;
+		var miny = Number(document.getElementById("miny").value);
+		var maxy = Number(document.getElementById("maxy").value);
+        if(!isNaN(miny) && !isNaN(maxy)){
+			chart.yAxis[0].setExtremes(miny, maxy);
+		}
+		var miny2 = Number(document.getElementById("miny2").value);
+		var maxy2 = Number(document.getElementById("maxy2").value);
+		if(!isNaN(miny2) && !isNaN(maxy2)){
+			chart.yAxis[1].setExtremes(miny2, minx2);
+		}
+    });
 	
 	});
 </script>
@@ -116,6 +134,13 @@ $(document).ready(function() {
 	<div id='chartid' class="chart" style="height:75%; width:100%"></div>
 	
 <br>
+<table><tr><td>
+<input id="miny"   name="new Minimum of left y-axis" type="number" value=0>new minimum of left y-axis</input></td>
+<td><input id="maxy"   name="new Maximum of left y-axis" type="number">new maximum of left y-axis</input></td>
+<td><button id="extremesButton" class="autocompare">Set extremes left y-axis</button></td></tr>
+<tr><td><input id="miny2"   name="new Minimum of left y-axis" type="number" value=0>new minimum of right y-axis</input></td>
+<td><input id="maxy2"   name="new Maximum of left y-axis" type="number">new maximum of right y-axis</input></td>
+<td><button id="extremesButton" class="autocompare">Set extremes right y-axis</button></td></tr>
 {% include 'resultList.html' %}
 
 {% endblock %}
