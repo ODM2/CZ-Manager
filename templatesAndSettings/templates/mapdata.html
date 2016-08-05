@@ -1,9 +1,3 @@
-<!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/
-
-
-
-
--->
 
 {% extends "admin/base_site.html" %}
 {% load admin_extras %}
@@ -36,6 +30,10 @@
     {{ block.super }}<title>
     {% block title %}{% endblock %}
 </title>
+    <script
+			  src="https://code.jquery.com/jquery-1.12.4.min.js"
+			  integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
+			  crossorigin="anonymous"></script>
     <script src="https://use.fontawesome.com/eb9894ac79.js"></script>
     <link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.css"/>
     <script src="https://npmcdn.com/leaflet@1.0.0-rc.2/dist/leaflet.js"></script>
@@ -48,16 +46,16 @@
     <link rel="stylesheet"
           href="https://dl.dropboxusercontent.com/u/64841654/leaflet-awesome-marker/css/leaflet.awesome-markers.css">
     <script src="https://dl.dropboxusercontent.com/u/64841654/leaflet-awesome-marker/js/leaflet.awesome-markers.js"></script>
-	
+    <link rel="stylesheet" href="https://dl.dropboxusercontent.com/u/64841654/Leaflet.Legend/leaflet-legend.css">
+    <script src="https://dl.dropboxusercontent.com/u/64841654/Leaflet.Legend/leaflet-legend.js"></script>
+
 	<style type="text/css">
         .leaflet-google-layer {
             z-index: 0;
         }
-
         .leaflet-map-pane {
             z-index: 100;
         }
-
         .legend {
             line-height: 18px;
             color: #555;
@@ -67,7 +65,17 @@
             box-shadow: -1px 3px 10px -1px rgba(0, 0, 0, 0.4);
             opacity: 0.9;
         }
-
+        /*.datasets-listing{
+            color: #555;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: -1px 3px 10px -1px rgba(0, 0, 0, 0.4);
+            opacity: 0.9;
+            padding:20px;
+        }*/
+        #legend{
+            padding:20px;
+        }
         .legend-icon {
             background-image: url(https://dl.dropboxusercontent.com/u/64841654/leaflet-awesome-marker/img/markers-soft.png);
             background-repeat: no-repeat;
@@ -76,23 +84,25 @@
             text-align: center;
             float: left;
         }
-
         .legend-icon > i {
             color: #fff;
             margin-top: 10px;
             display: inline-block;
             font-size: 14px;
         }
-
         .legend-item {
             clear: both;
         }
-
         .legend-text {
             float: left;
             padding-top: 10px;
         }
-
+        .awesome-marker {
+            background-image: url("https://dl.dropboxusercontent.com/u/64841654/leaflet-awesome-marker/img/markers-soft.png") !important;
+            background-repeat: no-repeat !important;
+            height: 46px !important;
+            width: 35px !important;
+        }
         html, body {
             width: 100%;
             height: 100%;
@@ -113,6 +123,14 @@
 
     <div id='content-main'> {% csrf_token %}</div>
     <div style="width:100%; height:900px;" id="map"></div>
+    <div id="legend">
+       {% include 'DatasetsList.html' %}
+    </div>
+    {% comment %}
+    <script type="text/template" id="datasetsList">
+        {% include 'DatasetsList.html' %}
+    </script>
+    {% endcomment %}
     <script type='text/javascript'>
         var feature_list = [];
         {% for feats in legends %}
@@ -125,17 +143,15 @@
                     }
             );
         {% endfor %}
-
         // Create Map and set view to LatLong: 18.28263, -65.77458 with zoom level 14
-        var myMap = L.map('map').setView([ 18.28263, -65.77458], 14);
-		//var results = {{ results | safe }};
+        var myMap = L.map('map',{worldCopyJump:true}).setView([ 18.28263, -65.77458], 14);
+        var m = null;
         var osm = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
-            maxZoom: 22,
+            maxZoom: 18,
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
             '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-            'Imagery &copy; <a href="http://mapbox.com">Mapbox</a>', id: 'mapbox.streets'
+            'Imagery &copy; <a href="http://mapbox.com">Mapbox</a>', id: 'mapbox.run-bike-hike'
         }).addTo(myMap);
-
         var markerClusters = L.markerClusterGroup(singleMarkerMode=true);
         {% for site in features|filter_coords %}
             var feat_obj = feature_list.filter(
@@ -165,61 +181,65 @@
                         + '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
                         + '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
                         + '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]</p>';
-
             {% endif %}
-
-            var myIcon = L.AwesomeMarkers.icon({
-                    icon: feat_obj[0].icon,
-                    prefix: 'fa',
-                    markerColor: feat_obj[0].color
-                });
+            var iconDiv = new L.DivIcon({
+                className: feat_obj[0].styleclass + ' awesome-marker leaflet-zoom-animated leaflet-interactive',
+                html: '<i class="fa '+  feat_obj[0].icon +' icon-white" aria-hidden="true"></i><p style="margin-top:20px;font-weight:bold;">{{ site.samplingfeaturecode }}</p>'
+            });
 			{% if  site.sampling_feature_type.name != "Site" or site.sampling_feature_type.name == "Observation well" %}
-            var m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
-                    icon: myIcon, title: '{{ site.samplingfeaturename }}'
+                m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
+                    icon: iconDiv, title: '{{ site.samplingfeaturename }}'
                 }).bindPopup( popup,{minWidth: 600, maxHeight: 500, autoPan: true, closeButton: true,offset: [0, 100]} );
 				markerClusters.addLayer(m);
-			{% else %} 
-			var m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
-                    icon: myIcon, title: '{{ site.samplingfeaturename }}'
+			{% else %}
+                m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
+                    icon: iconDiv, title: '{{ site.samplingfeaturename }}'
                 }).addTo(myMap).bindPopup( popup,{minWidth: 600, maxHeight: 500, autoPan: true, closeButton: true,offset: [0, 100]} );
 			{% endif %}
         {% endfor %}
-
         var legend = L.control({position: 'bottomright'});
         legend.onAdd = function (myMap) {
-
-        var div = L.DomUtil.create('div', 'info legend');
-        div.innerHTML += '<h2>Sample Feature Types</h2>';
-        // loop through our density intervals and generate a label with a colored square for each interval
-        for (var i = 0; i < feature_list.length; i++) {
-            div.innerHTML +=
-                    '<div class="legend-item">' +
-                    '      <div class="legend-icon ' + feature_list[i].styleclass + '">' +
-                    '           <i class="fa ' + feature_list[i].icon + '" aria-hidden="true"></i>' +
-                    '      </div>' +
-                    '      <div class="legend-text">' + feature_list[i].name + '</div>' +
-                    '</div>'
-        }
-
-            return div;
+            var div = L.DomUtil.create('div', 'info legend');
+            div.innerHTML += '<h2>Sample Feature Types</h2>';
+            // loop through our density intervals and generate a label with a colored square for each interval
+            for (var i = 0; i < feature_list.length; i++) {
+                div.innerHTML +=
+                        '<div class="legend-item">' +
+                        '      <div class="legend-icon ' + feature_list[i].styleclass + '">' +
+                        '           <i class="fa ' + feature_list[i].icon + '" aria-hidden="true"></i>' +
+                        '      </div>' +
+                        '      <div class="legend-text">' + feature_list[i].name + '</div>' +
+                        '</div>'
+            }
+                return div;
         };
-
+        /*var legend2 = L.control({position:'bottomleft'});
+        legend2.onAdd = function (myMap) {
+            var div = L.DomUtil.create('div', 'info datasets-listing');
+            div.innerHTML += document.getElementById('datasetsList').innerHTML;
+            return div;
+        };*/
+        // https://github.com/mikeskaug/Leaflet.Legend
+        var legend2 = new L.Control.Legend({
+                        position: 'topleft',
+                        collapsed: true,
+                        controlButton: {
+                            title: "Legend"
+                        }});
+        myMap.addControl( legend2 );
+        $(".legend-container").append( $("#legend") );
+        $(".legend-toggle").append( "<i class='legend-toggle-icon fa fa-filter fa-2x' style='color: #000;margin-left:5px;'></i>" );
+        //legend2.addTo(myMap);
         legend.addTo(myMap);
-
-
         // Basemaps Choices
         basemaps = {
             'OSM': osm
         };
         myMap.addLayer(markerClusters);
-
         // Overlay Choices
         overlayMaps = {};
-
         // Put Control on map
         L.control.layers(basemaps, overlayMaps).addTo(myMap);
-
     </script>
-
 
 {% endblock %}

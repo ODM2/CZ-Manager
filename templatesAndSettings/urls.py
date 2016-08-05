@@ -24,7 +24,7 @@ urlpatterns = patterns('',
     url(r'^' + URL_PATH +'RecordAction.html', views.RecordAction, name="RecordAction"),
     url(r'^' + URL_PATH +'ManageCitations.html', views.ManageCitations, name="ManageCitations"),
     url(r'^' + URL_PATH +'chart.html', views.TimeSeriesGraphing, name="TimeSeriesGraphing"),
-    url(r'^' + URL_PATH + 'mapdata/dataset=(?P<dataset>(\d+))/$', views.web_map, name="WebMap"),
+    url(r'^' + URL_PATH + 'mapdata.html/dataset=(?P<dataset>(\d+))/$', views.web_map, name="WebMap"),
     url(r'^' + URL_PATH + 'mapdata.html', views.web_map, name="WebMap"),
 
     url(r'^' + URL_PATH +'graph/$', views.TimeSeriesGraphing),
