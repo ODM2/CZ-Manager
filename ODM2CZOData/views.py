@@ -414,10 +414,51 @@ def web_map(request,dataset='NotSet'):
     ]
 
 
-
     context = {
-        'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,'results':results,'authenticated':authenticated}
+        'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,'results':results,
+        'datasets':datasets,'selecteddatasets':selected,'authenticated':authenticated}
     return render(request, 'mapdata.html', context)
+
+
+
+
+
+#
+# def web_map(request,dataset='NotSet'):
+#     if request.user.is_authenticated():
+#         authenticated=True
+#     else:
+#         authenticated=False
+#     if dataset=='NotSet':
+#         features = Samplingfeatures.objects.all()
+#         results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
+#     else:
+#         dataset = int(dataset)
+#         datasetresults = Datasetsresults.objects.filter(datasetid=dataset)
+#         results = Results.objects.filter(resultid__in=datasetresults.values("resultid"))
+#         fa = Featureactions.objects.filter(featureactionid__in=results.values("featureactionid"))
+#         features = Samplingfeatures.objects.filter(samplingfeatureid__in=fa.values("samplingfeatureid"))
+#
+#     legend_ref = [
+#         dict(feature_type="Excavation", icon="fa-spoon", color="darkred", html="duck",
+#              style_class="awesome-marker-icon-darkred"),
+#         dict(feature_type="Field area", icon="fa-map-o", color="darkblue",
+#              style_class="awesome-marker-icon-darkblue"),
+#         dict(feature_type="Landscape classification", icon="fa-bar-chart", color="darkpurple",
+#              style_class="awesome-marker-icon-darkpurple"),
+#         dict(feature_type="Observation well", icon="fa-eye", color="orange",
+#              style_class="awesome-marker-icon-orange"),
+#         dict(feature_type="Site", icon="fa-dot-circle-o", color="green", style_class="awesome-marker-icon-green"),
+#         dict(feature_type="Stream gage", icon="fa-tint", color="blue", style_class="awesome-marker-icon-blue"),
+#         dict(feature_type="Transect", icon="fa-area-chart", color="cadetblue",
+#              style_class="awesome-marker-icon-cadetblue")
+#     ]
+#
+#
+#
+#     context = {
+#         'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,'results':results,'authenticated':authenticated}
+#     return render(request, 'mapdata.html', context)
 
 
 def TimeSeriesGraphing(request,feature_action='All'):
