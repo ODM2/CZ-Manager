@@ -175,6 +175,14 @@
                         + '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
                         + '<br> {{ site.sampling_feature_type.name}}'
                         + '<br><a  target="_blank" href="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true">view times series data in new page</a></p><iframe  width=600, height=600, src="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
+			{% elif  site.sampling_feature_type.name == "Field area" %}
+                popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
+                        + '<hr />'
+                        + '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
+                        + '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
+                        + '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
+                        + '<br> {{ site.sampling_feature_type.name}}'
+                        + '<br><a  target="_blank" href="{{prefixpath}}../profilegraph/selectedrelatedfeature&#61;{{site.samplingfeatureid}}/popup=true">view times series data in new page</a></p><iframe  width=600, height=600, src="{{prefixpath}}../profilegraph/selectedrelatedfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
             {% else %}
                 popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
                         + '<hr />'
@@ -186,7 +194,7 @@
                 className: feat_obj[0].styleclass + ' awesome-marker leaflet-zoom-animated leaflet-interactive',
                 html: '<i class="fa '+  feat_obj[0].icon +' icon-white" aria-hidden="true"></i><p style="margin-top:20px;font-weight:bold;">{{ site.samplingfeaturecode }}</p>'
             });
-			{% if  site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" %}
+			{% if  site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" or site.sampling_feature_type.name == "Field area" %}
                 m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
                     icon: iconDiv, title: '{{ site.samplingfeaturename }}'
                 }).addTo(myMap).bindPopup( popup,{minWidth: 600, maxHeight: 500, autoPan: true, closeButton: true,offset: [0, 100]} );
