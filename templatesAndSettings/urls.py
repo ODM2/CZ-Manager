@@ -56,6 +56,7 @@ urlpatterns = patterns('',
 
     url(r'^' + URL_PATH +'profilegraph/samplingfeature=(?P<samplingfeature>(\d+))/$', views.graph_data, name="graph_data"),
     url(r'^' + URL_PATH +'profilegraph/samplingfeature=(?P<samplingfeature>(\d+))/popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])))/$', views.graph_data, name="graph_data"),
+    url(r'^' + URL_PATH +'profilegraph/selectedrelatedfeature=(?P<selectedrelatedfeature>(\d+))/popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])))/$', views.graph_data, name="graph_data"),
     url(r'^' + URL_PATH +'profilegraph/selectedrelatedfeature=(?P<selectedrelatedfeature>(\d+))/samplingfeature=(?P<samplingfeature>(\d+))/popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])))/$', views.graph_data, name="graph_data"),
 
 

@@ -389,8 +389,12 @@ def web_map(request,dataset='NotSet'):
             selected.append(int(selection))
         datasetresults = Datasetsresults.objects.filter(datasetid__in=dataset_ids)
         results = Results.objects.filter(resultid__in=datasetresults.values("resultid"))
+
         fa = Featureactions.objects.filter(featureactionid__in=results.values("featureactionid"))
-        features = Samplingfeatures.objects.filter(samplingfeatureid__in=fa.values("samplingfeatureid"))
+        features1 = Samplingfeatures.objects.filter(samplingfeatureid__in=fa.values("samplingfeatureid"))
+        relatedfeatures = Relatedfeatures.objects.filter(samplingfeatureid__in=features1.values("samplingfeatureid"))
+        features2 = Samplingfeatures.objects.filter(samplingfeatureid__in=relatedfeatures.values("relatedfeatureid"))
+        features = features1| features2
     else:
         selected = ids
         features = Samplingfeatures.objects.all()
