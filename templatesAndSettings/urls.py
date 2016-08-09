@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     # url(r'^$', 'tango_with_django_project_17.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
     url(r'^' + URL_PATH +'', include(admin.site.urls)),
+    url(r'^',admin.site.urls),
     (r'^' + URL_PATH +'lookups/', include(ajax_select_urls)),
     #(r'^ajax_select/', include('ajax_select.urls')),
      url(r'^',admin.site.urls),
@@ -25,7 +26,9 @@ urlpatterns = patterns('',
     url(r'^' + URL_PATH +'RecordAction.html', views.RecordAction, name="RecordAction"),
     url(r'^' + URL_PATH +'ManageCitations.html', views.ManageCitations, name="ManageCitations"),
     url(r'^' + URL_PATH +'chart.html', views.TimeSeriesGraphing, name="TimeSeriesGraphing"),
+    url(r'^' + URL_PATH + 'mapdata.html/dataset=(?P<dataset>(\d+))/$', views.web_map, name="WebMap"),
     url(r'^' + URL_PATH + 'mapdata.html', views.web_map, name="WebMap"),
+
     url(r'^' + URL_PATH +'graph/$', views.TimeSeriesGraphing),
     url(r'^' + URL_PATH +'graph/featureaction=(?P<feature_action>(\d+))/$', views.TimeSeriesGraphing, name="TimeSeriesGraphing"), # (?:featureaction-(?P<featureaction>\d+)/)?$  (?P<variable_a>(\d+) (?P<feature_action>(\d+))
     url(r'^' + URL_PATH +'graphfa/featureaction=(?P<feature_action>(\d+))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
@@ -38,11 +41,14 @@ urlpatterns = patterns('',
     url(r'^' + URL_PATH +'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/resultidu=(?P<resultidu>(\d+))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
     url(r'^' + URL_PATH +'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/resultidu=(?P<resultidu>(\d+))/startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
 
-     url(r'^' + URL_PATH +'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/popup=(?P<popup>(^(?i)(true|false)))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
+
+  url(r'^' + URL_PATH +'mappopup/featureaction=(?P<feature_action>(\d+))/$', views.mappopuploader, name="mappopuploader"),
+ url(r'^' + URL_PATH +'mappopup/samplingfeature=(?P<samplingfeature>(\d+))/popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])))/$', views.mappopuploader, name="mappopuploader"),
+
+     url(r'^' + URL_PATH +'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
     url(r'^' + URL_PATH +'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
     url(r'^' + URL_PATH +'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/resultidu=(?P<resultidu>(\d+))/popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
     url(r'^' + URL_PATH +'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/resultidu=(?P<resultidu>(\d+))/startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
-
 
     url(r'^' + URL_PATH +'graphfa/dataset=(?P<dataset>(\d+))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
     url(r'^' + URL_PATH +'graphfa/dataset=(?P<dataset>(\d+))/resultidu=(?P<resultidu>(\d+))/$', views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
@@ -51,6 +57,7 @@ urlpatterns = patterns('',
 
     url(r'^' + URL_PATH +'profilegraph/samplingfeature=(?P<samplingfeature>(\d+))/$', views.graph_data, name="graph_data"),
     url(r'^' + URL_PATH +'profilegraph/samplingfeature=(?P<samplingfeature>(\d+))/popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])))/$', views.graph_data, name="graph_data"),
+    url(r'^' + URL_PATH +'profilegraph/selectedrelatedfeature=(?P<selectedrelatedfeature>(\d+))/popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])))/$', views.graph_data, name="graph_data"),
     url(r'^' + URL_PATH +'profilegraph/selectedrelatedfeature=(?P<selectedrelatedfeature>(\d+))/samplingfeature=(?P<samplingfeature>(\d+))/popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff][Aa][Ll][Ss][Ee])))/$', views.graph_data, name="graph_data"),
 
 

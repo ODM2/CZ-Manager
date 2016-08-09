@@ -367,7 +367,7 @@ def relatedFeaturesFilter(request,done,selected_relatedfeatid,selected_resultid,
     return selected_relatedfeatid, done, resultList,selected_resultid
 
 
-def web_map(request):
+def web_map(request,dataset='NotSet'):
     if request.user.is_authenticated():
         authenticated=True
     else:
@@ -375,19 +375,30 @@ def web_map(request):
 
     datasets = Datasets.objects.all()
 
+    ids = [ds.datasetid for ds in datasets]
+
     selections = request.POST.getlist('datasetselection')
+    if dataset!='NotSet':
+        selections = list()
+        selections.append(int(dataset))
     if selections:
         dataset_ids = []
+
         selected = []
         for selection in selections:
             dataset_ids.append(int(selection))
             selected.append(int(selection))
         datasetresults = Datasetsresults.objects.filter(datasetid__in=dataset_ids)
         results = Results.objects.filter(resultid__in=datasetresults.values("resultid"))
+
         fa = Featureactions.objects.filter(featureactionid__in=results.values("featureactionid"))
-        features = Samplingfeatures.objects.filter(samplingfeatureid__in=fa.values("samplingfeatureid"))
+        features1 = Samplingfeatures.objects.filter(samplingfeatureid__in=fa.values("samplingfeatureid"))
+        relatedfeatures = Relatedfeatures.objects.filter(samplingfeatureid__in=features1.values("samplingfeatureid"))
+        features2 = Samplingfeatures.objects.filter(samplingfeatureid__in=relatedfeatures.values("relatedfeatureid"))
+        features = features1 | features2
     else:
-        selected = []
+        selected = ids
+
         features = Samplingfeatures.objects.all()
         results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
 
@@ -413,6 +424,47 @@ def web_map(request):
         'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,'results':results,
         'datasets':datasets,'selecteddatasets':selected,'authenticated':authenticated}
     return render(request, 'mapdata.html', context)
+
+
+
+
+
+#
+# def web_map(request,dataset='NotSet'):
+#     if request.user.is_authenticated():
+#         authenticated=True
+#     else:
+#         authenticated=False
+#     if dataset=='NotSet':
+#         features = Samplingfeatures.objects.all()
+#         results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
+#     else:
+#         dataset = int(dataset)
+#         datasetresults = Datasetsresults.objects.filter(datasetid=dataset)
+#         results = Results.objects.filter(resultid__in=datasetresults.values("resultid"))
+#         fa = Featureactions.objects.filter(featureactionid__in=results.values("featureactionid"))
+#         features = Samplingfeatures.objects.filter(samplingfeatureid__in=fa.values("samplingfeatureid"))
+#
+#     legend_ref = [
+#         dict(feature_type="Excavation", icon="fa-spoon", color="darkred", html="duck",
+#              style_class="awesome-marker-icon-darkred"),
+#         dict(feature_type="Field area", icon="fa-map-o", color="darkblue",
+#              style_class="awesome-marker-icon-darkblue"),
+#         dict(feature_type="Landscape classification", icon="fa-bar-chart", color="darkpurple",
+#              style_class="awesome-marker-icon-darkpurple"),
+#         dict(feature_type="Observation well", icon="fa-eye", color="orange",
+#              style_class="awesome-marker-icon-orange"),
+#         dict(feature_type="Site", icon="fa-dot-circle-o", color="green", style_class="awesome-marker-icon-green"),
+#         dict(feature_type="Stream gage", icon="fa-tint", color="blue", style_class="awesome-marker-icon-blue"),
+#         dict(feature_type="Transect", icon="fa-area-chart", color="cadetblue",
+#              style_class="awesome-marker-icon-cadetblue")
+#     ]
+#
+#
+#
+#     context = {
+#         'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,'results':results,'authenticated':authenticated}
+#     return render(request, 'mapdata.html', context)
 
 
 def TimeSeriesGraphing(request,feature_action='All'):
@@ -645,6 +697,85 @@ def TimeSeriesGraphing(request,feature_action='All'):
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,},)
 
 
+def mappopuploader(request,feature_action='NotSet',samplingfeature='NotSet',dataset='NotSet',resultidu='NotSet',startdate='NotSet',enddate='NotSet',popup='NotSet'):
+    authenticated=True
+    if not request.user.is_authenticated():
+        #return HttpResponseRedirect('../')
+        authenticated=False
+    if popup=='NotSet':
+        template = loader.get_template('chart2.html')
+    else:
+        template = loader.get_template('chartpopup.html')
+    useDataset = False
+    useSamplingFeature=False
+    if dataset=='NotSet':
+        if samplingfeature=='NotSet':
+            feature_action=int(feature_action)
+        else:
+            samplingfeature=int(samplingfeature)
+            useSamplingFeature=True
+    else:
+        useDataset=True
+        dataset=int(dataset)
+    useResultid = False
+    if resultidu!='NotSet':
+        useResultid=True
+        resultidu=int(resultidu)
+    if 'startDate' in request.POST:
+        entered_start_date = request.POST['startDate']
+    elif startdate=='NotSet':
+        if useResultid:
+            entered_start_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Min('valuedatetime'))\
+                .order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
+        else:
+            entered_start_date = "2016-01-01"
+    else:
+        entered_start_date = "2016-01-01"
+
+    if 'endDate' in request.POST:
+        entered_end_date = request.POST['endDate']
+    elif enddate=='NotSet':
+        if useResultid:
+            entered_end_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Max('valuedatetime'))\
+                .order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+        else:
+            entered_end_date = "2016-01-05"
+    else:
+        entered_end_date = "2016-01-05"
+    i = 0
+    featureActionLocation=None
+    featureActionMethod=None
+    datasetTitle=None
+    datasetAbstract=None
+    methods=None
+    samplefeature=None
+    if not useDataset:
+        if useSamplingFeature:
+            samplefeature = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
+            feature_actions = Featureactions.objects.filter(samplingfeatureid=samplefeature)
+            resultList = Results.objects.filter(featureactionid__in=feature_actions).filter(~Q(processing_level=4)).order_by("featureactionid__action__method")
+            actions = Actions.objects.filter(actionid__in=feature_actions.values("action"))
+            methods = Methods.objects.filter(methodid__in=actions.values("method"))
+            featureActionLocation= samplefeature.samplingfeaturename
+        else:
+            resultList = Results.objects.filter(featureactionid=feature_action).filter(~Q(processing_level=4)).order_by("featureactionid__action__method")
+            featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
+            featureActionLocation= featureAction.samplingfeatureid.samplingfeaturename
+            featureActionMethod= featureAction.action.method.methodname
+            action = Actions.objects.filter(actionid=featureAction.action.actionid).get()
+            methods = Methods.objects.filter(methodid=action.method.methodid)
+
+    else:
+        datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
+        resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid")).filter(~Q(processing_level=4)).order_by("featureactionid__action__method")
+        datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
+        datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
+    return TemplateResponse(request,template,{ 'prefixpath': CUSTOM_TEMPLATE_PATH,
+            'startDate':entered_start_date,'endDate':entered_end_date,'useSamplingFeature':useSamplingFeature,
+            'featureActionMethod':featureActionMethod,'featureActionLocation':featureActionLocation,
+            'datasetTitle':datasetTitle,'datasetAbstract':datasetAbstract,'useDataset':useDataset,'startdate':startdate,'enddate':enddate,
+             'authenticated':authenticated,'methods':methods,'resultList':resultList,},)
+
 def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='NotSet',dataset='NotSet',resultidu='NotSet',startdate='NotSet',enddate='NotSet',popup='NotSet'): #,startdate='',enddate=''
     authenticated=True
     if not request.user.is_authenticated():
@@ -673,7 +804,8 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
         entered_start_date = request.POST['startDate']
     elif startdate=='NotSet':
         if useResultid:
-            entered_start_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Min('valuedatetime')).order_by('valuedatetime')[0].valuedatetime #.annotate(Min('price')).order_by('price')[0]
+            entered_start_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Min('valuedatetime')).\
+            order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
         else:
             entered_start_date = "2016-01-01"
     else:
@@ -683,7 +815,8 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
         entered_end_date = request.POST['endDate']
     elif enddate=='NotSet':
         if useResultid:
-            entered_end_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Max('valuedatetime')).order_by('-valuedatetime')[0].valuedatetime
+            entered_end_date= Measurementresultvalues.objects.filter(resultid=resultidu).annotate(Max('valuedatetime')).\
+                order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
         else:
             entered_end_date = "2016-01-05"
     else:

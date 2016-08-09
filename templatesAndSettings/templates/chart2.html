@@ -30,9 +30,24 @@
 	{% block title %}{% endblock %}
   </title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-	 <script src="https://code.highcharts.com/4.1.10/highcharts.js"></script>
-	 
 
+
+{% admin_shortcuts_js %}{% endblock %}
+
+{# end changes #}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+
+
+
+{% block content %}
+	<script src="http://code.highcharts.com/modules/exporting.js"></script>
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	 <script src="https://rawgithub.com/RolandBanguiran/highcharts-scalable-yaxis/master/scalable-yaxis.js"></script>
+	 
 	<script>
     var chart_id = 'chartid'
     var chart = {{ chart|safe }}
@@ -47,7 +62,7 @@ $(document).ready(function() {
 	
 	var opposite2 = false;
 	yaxes = [];
-	
+
 	for (var i=0; i<series.length; i++){
 	data = series[i].data;
 		for(var j=0; j<data.length; j++){
@@ -60,8 +75,11 @@ $(document).ready(function() {
 	for (var i=0; i<name_of_units.length; i++) {
 		name = name_of_units[i];
 		//alert(name);
-		 
+		   
 		axi = {id: name,
+		scrollbar: {
+        enabled: true
+    },
 		labels: {
                 format: '{value}',
                 style: {
@@ -95,23 +113,29 @@ $(document).ready(function() {
     });
 	
 	//alert(name_of_units.length);
+	$('#extremesButton').click(function () {
+        var chart = $('#chartid').highcharts(),
+            yAxis = chart.yAxis[0];
+		if (yaxes.length <= 2){
+        yAxis.options.startOnTick = false;
+        yAxis.options.endOnTick = false;
+		var miny = Number(document.getElementById("miny").value);
+		var maxy = Number(document.getElementById("maxy").value);
+        if(!isNaN(miny) && !isNaN(maxy)){
+			chart.yAxis[0].setExtremes(miny, maxy);
+		}
+		var miny2 = Number(document.getElementById("miny2").value);
+		var maxy2 = Number(document.getElementById("maxy2").value);
+		if(!isNaN(miny2) && !isNaN(maxy2)){
+			chart.yAxis[1].setExtremes(miny2, minx2);
+		}
+		}
+    });
 	
 	
 	});
+	 
 </script>
-{% admin_shortcuts_js %}{% endblock %}
-
-{# end changes #}
-
-{% block coltype %}colM{% endblock %}
-
-{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
-
-
-
-
-{% block content %}
-
 
 <p><h1>
 {% if useDataset %}
@@ -125,12 +149,18 @@ Method- {{featureActionMethod}}
 </h1></p>
     <div id='content-main'> {% csrf_token %}
 	 </div>
-	<div id='chartid' class="chart" style="height:75%; width:100%"></div>
+	<div id='chartid' class="chart" style="height:75%; width:100 margin: 0 auto"></div>
 	
 <br>
 {% if useDataset %}
 {{datasetAbstract}}
 {% endif %}
+<table><tr><td>
+<input id="miny"   name="new Minimum of left y-axis" type="number" value=0>new minimum of left y-axis</input></td>
+<td><input id="maxy"   name="new Maximum of left y-axis" type="number">new maximum of left y-axis</input></td></tr>
+<tr><td><input id="miny2"   name="new Minimum of left y-axis" type="number" value=0>new minimum of right y-axis</input></td>
+<td><input id="maxy2"   name="new Maximum of left y-axis" type="number">new maximum of right y-axis</input></td>
+<td><button id="extremesButton" class="autocompare">Set extremes y-axis</button></td></tr>
 {% include 'StartEndDate.html' %}
 <br><br>
 <p>Data from this site are a product the <a href="http://criticalzone.org/luquillo/">Luquillo Critical Zone Observatory</a></p>

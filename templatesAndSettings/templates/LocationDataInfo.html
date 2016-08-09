@@ -21,18 +21,19 @@ option {
 	{% csrf_token %} 
 	<table >
 	<p>collection methods include:</p>
+	
 	{% for method in methods %}
 	<tr><td>
-		{% if not useDataset %}
-
-		<p>{{method.methodname}}</p>
-{% endif %}
-</td></tr>
-{% endfor %}
-</table>
-
-
-	<table >
+	{% if not useDataset %}
+			<table >
+			{% assign done 0 %}
+			{% for Result in resultList %}
+				{% if method.methodname == Result.featureactionid.action.method.methodname  %}
+					{% if not done == 1 %}
+						<p><a target="_blank", href="{{prefixpath}}../graphfa/featureaction&#61;{{Result.featureactionid.featureactionid}} ">{{method.methodname}}</a></p>
+					{% endif %}
+					{% assign done 1 %}
+				
 				<tr ><th scope="col" class="section">Result Series</td>
 				<th scope="col"  class="sortable column-resultid">id</th>
 				<th scope="col"  class="sortable column-resultid">Variable</th>
@@ -40,7 +41,7 @@ option {
 				<th scope="col"  class="sortable column-resultid">Location</th>
 				<th scope="col"  class="sortable column-resultid">Processing Level</th>
 				<th scope="col"  class="sortable column-resultid">Number of Records Available</th></tr>
-				{% for Result in resultList %}
+
 					<tr class="row1">
 							<td>{{ Result.feature_action }} </td>
 								<td >{{Result.resultid}}</td>
@@ -50,9 +51,15 @@ option {
 								<td > {{Result.processing_level}}</td>
 								<td > {{Result.valuecount}}</td>
 								</tr>
-				
-                {% endfor %}
+				{% endif %} 
+			{% endfor %}
 			 </table>	
+		{% endif %}
+</td></tr>
+{% endfor %}
+</table>
+
+
 			<br>
 			
 			<br>
