@@ -166,7 +166,7 @@
                         + '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
                         + '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
                         + '<br> {{ site.sampling_feature_type.name}}'
-                        + '<br> <a  target="_blank" href="{{prefixpath}}../graphfa/samplingfeature&#61;{{site.samplingfeatureid}}/startdate=2016-03-01/enddate=2016-03-10">view times series data in new page</a></p><iframe  width=600, height=600, src="{{prefixpath}}../graphfa/samplingfeature&#61;{{site.samplingfeatureid}}/startdate=2016-03-01/enddate=2016-03-10/popup=true" name="iframe_A"></iframe></p>';
+                        + '<br> <a  target="_blank" href="{{prefixpath}}../graphfa/samplingfeature&#61;{{site.samplingfeatureid}}">view times series data in new page</a></p><iframe  width=600, height=600, src="{{prefixpath}}../graphfa/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
             {% elif  site.sampling_feature_type.name == "Excavation" %}
                 popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
                         + '<hr />'
@@ -186,15 +186,16 @@
                 className: feat_obj[0].styleclass + ' awesome-marker leaflet-zoom-animated leaflet-interactive',
                 html: '<i class="fa '+  feat_obj[0].icon +' icon-white" aria-hidden="true"></i><p style="margin-top:20px;font-weight:bold;">{{ site.samplingfeaturecode }}</p>'
             });
-			{% if  site.sampling_feature_type.name != "Site" or site.sampling_feature_type.name == "Observation well" %}
-                m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
-                    icon: iconDiv, title: '{{ site.samplingfeaturename }}'
-                }).bindPopup( popup,{minWidth: 600, maxHeight: 500, autoPan: true, closeButton: true,offset: [0, 100]} );
-				markerClusters.addLayer(m);
-			{% else %}
+			{% if  site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" %}
                 m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
                     icon: iconDiv, title: '{{ site.samplingfeaturename }}'
                 }).addTo(myMap).bindPopup( popup,{minWidth: 600, maxHeight: 500, autoPan: true, closeButton: true,offset: [0, 100]} );
+				
+			{% else %}
+                m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
+                    icon: iconDiv, title: '{{ site.samplingfeaturename }}'
+                }).bindPopup( popup,{minWidth: 600, maxHeight: 500, autoPan: true, closeButton: true,offset: [0, 100]} );
+			markerClusters.addLayer(m);
 			{% endif %}
         {% endfor %}
         var legend = L.control({position: 'bottomright'});

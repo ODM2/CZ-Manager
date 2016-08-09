@@ -116,7 +116,7 @@ $(document).ready(function() {
 	$('#extremesButton').click(function () {
         var chart = $('#chartid').highcharts(),
             yAxis = chart.yAxis[0];
-
+		if (yaxes.length <= 2){
         yAxis.options.startOnTick = false;
         yAxis.options.endOnTick = false;
 		var miny = Number(document.getElementById("miny").value);
@@ -128,6 +128,7 @@ $(document).ready(function() {
 		var maxy2 = Number(document.getElementById("maxy2").value);
 		if(!isNaN(miny2) && !isNaN(maxy2)){
 			chart.yAxis[1].setExtremes(miny2, minx2);
+		}
 		}
     });
 	
