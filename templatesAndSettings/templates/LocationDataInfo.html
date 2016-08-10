@@ -20,7 +20,8 @@ option {
 	<form action="" method="post">
 	{% csrf_token %} 
 	<table >
-	<p>collection methods include:</p>
+	<p>Data available from: {{startDate}} to: {{endDate}} </p>
+	<p>Collection methods include:</p>
 	
 	{% for method in methods %}
 	<tr><td>
@@ -31,8 +32,7 @@ option {
 				{% if method.methodname == Result.featureactionid.action.method.methodname  %}
 					{% if not done == 1 %}
 						<p><a target="_blank", href="{{prefixpath}}../graphfa/featureaction&#61;{{Result.featureactionid.featureactionid}} ">{{method.methodname}}</a></p>
-					{% endif %}
-					{% assign done 1 %}
+
 				
 				<tr ><th scope="col" class="section">Result Series</td>
 				<th scope="col"  class="sortable column-resultid">id</th>
@@ -41,7 +41,8 @@ option {
 				<th scope="col"  class="sortable column-resultid">Location</th>
 				<th scope="col"  class="sortable column-resultid">Processing Level</th>
 				<th scope="col"  class="sortable column-resultid">Number of Records Available</th></tr>
-
+					{% endif %}
+					{% assign done 1 %}
 					<tr class="row1">
 							<td>{{ Result.feature_action }} </td>
 								<td >{{Result.resultid}}</td>
