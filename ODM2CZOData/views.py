@@ -748,12 +748,16 @@ def mappopuploader(request,feature_action='NotSet',samplingfeature='NotSet',data
         resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid")).filter(~Q(processing_level=4)).order_by("featureactionid__action__method")
         datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
         datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
-    startdate= Measurementresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Min('valuedatetime')).\
-    order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
 
-    enddate= Measurementresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Max('valuedatetime')).\
-    order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+    try:
+        startdate= Measurementresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Min('valuedatetime')).\
+        order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
 
+        enddate= Measurementresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Max('valuedatetime')).\
+        order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+    except IndexError:
+            html = "<html><body>No Data Available Yet.</body></html>"
+            return HttpResponse(html)
 
 
 
