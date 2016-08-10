@@ -9,6 +9,8 @@ from .forms import SamplingfeatureexternalidentifiersAdmin
 from .models import Affiliations
 from .forms import AffiliationsAdmin
 from .models import People
+from .forms import PeopleAdmin
+from .models import Personexternalidentifiers
 from .models import Actionby
 from .models import Organizations
 from .forms import OrganizationsAdmin
@@ -92,7 +94,8 @@ admin.site.register(Dataloggerfiles, DataloggerfilesAdmin)
 admin.site.register(Samplingfeatures,SamplingfeaturesAdmin)
 admin.site.register(Samplingfeatureexternalidentifiers,SamplingfeatureexternalidentifiersAdmin)
 admin.site.register(Affiliations,AffiliationsAdmin)
-admin.site.register(People)
+admin.site.register(People,PeopleAdmin)
+admin.site.register(Personexternalidentifiers)
 admin.site.register(Methods,MethodsAdmin)
 admin.site.register(Units,UnitsAdmin)
 admin.site.register(Actionby, ActionByAdmin)

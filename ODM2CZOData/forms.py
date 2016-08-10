@@ -41,6 +41,7 @@ from .models import CvRelationshiptype
 from .models import CvDatasettypecv
 from .models import Affiliations
 from .models import People
+from .models import Personexternalidentifiers
 from .models import Actionby
 from .models import Actions
 from .models import Dataloggerprogramfiles
@@ -61,6 +62,7 @@ from .models import Equipmentmodels
 from .models import Datasetsresults
 from .models import Dataquality
 from .models import Resultsdataquality
+from .models import Samplingfeatureexternalidentifiers
 
 from templatesAndSettings.settings import STATIC_URL
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
@@ -75,7 +77,6 @@ from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultip
 from .models import Measurementresults
 from .models import Measurementresultvalues
 from .models import Profileresultvalues
-from .models import Samplingfeatureexternalidentifiers
 # from .views import dataloggercolumnView
 from daterange_filter.filter import DateRangeFilter
 from django.utils.translation import ugettext_lazy as _
@@ -889,3 +890,19 @@ class EquipmentmodelsAdminForm(ModelForm):
 
 class EquipmentmodelsAdmin(admin.ModelAdmin):
     form = EquipmentmodelsAdminForm
+
+
+class PeopleAdminForm(ModelForm):
+    class Meta:
+        model = People
+        fields = '__all__'
+
+class ORCIDInLine(admin.StackedInline):
+    model = Personexternalidentifiers
+    extra = 0
+
+class PeopleAdmin(admin.ModelAdmin):
+    form = PeopleAdminForm
+    inlines = [ORCIDInLine]
+
+

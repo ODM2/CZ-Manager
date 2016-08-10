@@ -1473,6 +1473,12 @@ class Personexternalidentifiers(models.Model):
     personexternalidentifier = models.CharField(max_length=255)
     personexternalidentifieruri = models.CharField(max_length=255, blank=True)
 
+    def __unicode__(self):
+        s = u"%s - %s - %s - %s" % (
+        self.personid, self.externalidentifiersystemid, self.personexternalidentifier,
+        self.personexternalidentifieruri)
+        return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."personexternalidentifiers'
