@@ -174,7 +174,7 @@
                         + '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
                         + '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
                         + '<br> {{ site.sampling_feature_type.name}}'
-                        + '<br><a  target="_blank" href="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true">view times series data in new page</a></p><iframe  width=600, height=600, src="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
+                        + '<br><a  target="_blank" href="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true"> View soil profile data in new page</a></p><iframe  width=600, height=500, src="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
 			{% elif  site.sampling_feature_type.name == "Field area" %}
                 popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
                         + '<hr />'
@@ -182,7 +182,7 @@
                         + '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
                         + '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
                         + '<br> {{ site.sampling_feature_type.name}}'
-                        + '<br><a  target="_blank" href="{{prefixpath}}../profilegraph/selectedrelatedfeature&#61;{{site.samplingfeatureid}}/popup=true">view times series data in new page</a></p><iframe  width=600, height=600, src="{{prefixpath}}../profilegraph/selectedrelatedfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
+                        + '<br><a  target="_blank" href="{{prefixpath}}../profilegraph/selectedrelatedfeature&#61;{{site.samplingfeatureid}}/popup=true"> View data for this field area in new page</a></p><iframe  width=600, height=500, src="{{prefixpath}}../profilegraph/selectedrelatedfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
             {% else %}
                 popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
                         + '<hr />'
@@ -197,12 +197,12 @@
 			{% if  site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" or site.sampling_feature_type.name == "Field area" %}
                 m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
                     icon: iconDiv, title: '{{ site.samplingfeaturename }}'
-                }).addTo(myMap).bindPopup( popup,{minWidth: 600, maxHeight: 500, autoPan: true, closeButton: true,offset: [0, 100]} );
+                }).addTo(myMap).bindPopup( popup,{minWidth: 600, minHeight: 500,autoPanPadding: [10, 50],  autoPan: true, closeButton: true,offset: [0, 5]} );
 				
 			{% else %}
                 m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
                     icon: iconDiv, title: '{{ site.samplingfeaturename }}'
-                }).bindPopup( popup,{minWidth: 600, maxHeight: 500, autoPan: true, closeButton: true,offset: [0, 100]} );
+                }).bindPopup( popup,{minWidth: 600, minHeight: 500, autoPanPadding: [10, 50], autoPan: true, closeButton: true,offset: [0, 5]} );
 			markerClusters.addLayer(m);
 			{% endif %}
         {% endfor %}
