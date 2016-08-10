@@ -166,7 +166,7 @@
                         + '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
                         + '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
                         + '<br> {{ site.sampling_feature_type.name}}'
-                        + '<br> <a  target="_blank" href="{{prefixpath}}../graphfa/samplingfeature&#61;{{site.samplingfeatureid}}">view times series data in new page</a></p><iframe  width=600, height=600, src="{{prefixpath}}../graphfa/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
+                        + '<br> <a  target="_blank" href="{{prefixpath}}../graphfa/samplingfeature&#61;{{site.samplingfeatureid}}">view times series data in new page</a></p><iframe  width=600, height=600, src="{{prefixpath}}../mappopup/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
             {% elif  site.sampling_feature_type.name == "Excavation" %}
                 popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
                         + '<hr />'
@@ -174,7 +174,7 @@
                         + '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
                         + '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
                         + '<br> {{ site.sampling_feature_type.name}}'
-                        + '<br><a  target="_blank" href="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true"> View soil profile data in new page</a></p><iframe  width=600, height=500, src="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
+                        + '<br><a  target="_blank" href="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true"> View soil profile data in new page</a></p><iframe  width=600, height=500, src="{{prefixpath}}../mappopup/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
 			{% elif  site.sampling_feature_type.name == "Field area" %}
                 popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
                         + '<hr />'
