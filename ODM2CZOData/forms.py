@@ -289,7 +289,7 @@ class SamplingfeaturesAdmin(admin.ModelAdmin):
     form = SamplingfeaturesAdminForm
     inlines = [IGSNInline]
     search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name', 'samplingfeaturename',
-                     'samplingfeaturecode', 'samplingfeatureid']
+                     'samplingfeaturecode', 'samplingfeatureid','samplingfeatureexternalidentifiers__samplingfeatureexternalidentifier']
 
     list_display = ('samplingfeaturename', 'samplingfeaturecode', 'sampling_feature_type','igsn')
     save_as = True
@@ -904,5 +904,13 @@ class ORCIDInLine(admin.StackedInline):
 class PeopleAdmin(admin.ModelAdmin):
     form = PeopleAdminForm
     inlines = [ORCIDInLine]
+    search_fields = ['personfirstname','personlastname','personexternalidentifiers__personexternalidentifier']
+    list_display = ('personfirstname', 'personlastname','orcid')
+    save_as = True
+
+    def orcid(self, obj):
+        external_id = Personexternalidentifiers.objects.get(personid=obj.personid)
+        return external_id.personexternalidentifieruri
+
 
 
