@@ -4,6 +4,8 @@ from templatesAndSettings.settings import URL_PATH
 
 from .models import Samplingfeatures
 from .forms import SamplingfeaturesAdmin
+from .models import Samplingfeatureexternalidentifiers
+from .forms import SamplingfeatureexternalidentifiersAdmin
 from .models import Affiliations
 from .forms import AffiliationsAdmin
 from .models import People
@@ -88,6 +90,7 @@ admin.site.register(Dataloggerfilecolumns, DataloggerfilecolumnsAdmin)
 admin.site.register(Dataloggerprogramfiles,DataloggerprogramfilesAdmin)
 admin.site.register(Dataloggerfiles, DataloggerfilesAdmin)
 admin.site.register(Samplingfeatures,SamplingfeaturesAdmin)
+admin.site.register(Samplingfeatureexternalidentifiers,SamplingfeatureexternalidentifiersAdmin)
 admin.site.register(Affiliations,AffiliationsAdmin)
 admin.site.register(People)
 admin.site.register(Methods,MethodsAdmin)
