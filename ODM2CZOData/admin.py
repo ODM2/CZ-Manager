@@ -73,6 +73,8 @@ from .models import Extensionproperties
 from .forms import ExtensionpropertiesAdmin
 from .models import Citationextensionpropertyvalues
 from .forms import CitationextensionpropertyvaluesAdmin
+from .models import Externalidentifiersystems
+from .forms import ExternalidentifiersystemAdmin
 
 admin.site.register(Dataquality, DataqualityAdmin)
 admin.site.register(Resultsdataquality,ResultsdataqualityAdmin)
@@ -106,6 +108,7 @@ admin.site.register(Results,ResultsAdmin)
 admin.site.register(Relatedactions,RelatedactionsAdmin)
 admin.site.register(Variables, VariablesAdmin)
 admin.site.register(ProcessDataloggerfile)
+admin.site.register(Externalidentifiersystems,ExternalidentifiersystemAdmin)
 
 admin.site.register(Taxonomicclassifiers,TaxonomicclassifiersAdmin)
 admin.site.register(Datasets,DatasetsAdmin)

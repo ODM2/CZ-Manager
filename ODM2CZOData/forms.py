@@ -63,6 +63,7 @@ from .models import Datasetsresults
 from .models import Dataquality
 from .models import Resultsdataquality
 from .models import Samplingfeatureexternalidentifiers
+from .models import Externalidentifiersystems
 
 from templatesAndSettings.settings import STATIC_URL
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
@@ -291,13 +292,24 @@ class SamplingfeaturesAdmin(admin.ModelAdmin):
     search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name', 'samplingfeaturename',
                      'samplingfeaturecode', 'samplingfeatureid','samplingfeatureexternalidentifiers__samplingfeatureexternalidentifier']
 
-    list_display = ('samplingfeaturename', 'samplingfeaturecode', 'sampling_feature_type','igsn')
+    list_display = ('samplingfeaturecode', 'sampling_feature_type','igsn','dataset_code')
+    list_filter = (
+        ('sampling_feature_type', admin.RelatedOnlyFieldListFilter),
+    )
     save_as = True
 
     def igsn(self,obj):
         external_id = Samplingfeatureexternalidentifiers.objects.get(samplingfeatureid=obj.samplingfeatureid)
-        return external_id.samplingfeatureexternalidentifieruri
+        return u'<a href="{0}">{0}</a>'.format(external_id.samplingfeatureexternalidentifieruri)
+    igsn.allow_tags = True
 
+    def dataset_code(self,obj):
+        fid = Featureactions.objects.filter(samplingfeatureid=obj.samplingfeatureid)
+        ds = Datasets.objects.filter(datasetsresults__resultid__featureactionid__in=fid).distinct()
+        ds_list = list()
+        for d in ds:
+            ds_list.append(d.datasetcode)
+        return ", ".join(ds_list)
 
 def duplicate_results_event(ModelAdmin, request, queryset):
     for object in queryset:
@@ -423,6 +435,7 @@ class DatasetsAdminForm(ModelForm):
 
 class DatasetsAdmin(admin.ModelAdmin):
     form = DatasetsAdminForm
+    list_display = ['datasetcode','datasettitle','datasettypecv']
 
     def get_datasetsresults(self, object_id):
         datasetResults = Datasetsresults.objects.filter(datasetid=object_id)
@@ -899,18 +912,64 @@ class PeopleAdminForm(ModelForm):
 
 class ORCIDInLine(admin.StackedInline):
     model = Personexternalidentifiers
+    fieldsets = (
+        ('ORCID Information', {
+            'classes': ('collapse',),
+            'fields': ('bridgeid',
+                       'personid',
+                       'externalidentifiersystemid',
+                       'personexternalidentifier',
+                       'personexternalidentifieruri',
+                       )
+
+        }),
+    )
+    extra = 0
+
+class AffiliationInLine(admin.StackedInline):
+    model = Affiliations
+    fieldsets = (
+        ('Affiliation Information',{
+            'classes':('collapse',),
+            'fields':('affiliationid',
+                      'personid',
+                      'organizationid',
+                      'isprimaryorganizationcontact',
+                      'affiliationstartdate',
+                      'affiliationenddate',
+                      'primaryphone',
+                      'primaryemail',
+                      'primaryaddress',
+                      'personlink',)
+
+        }),
+    )
     extra = 0
 
 class PeopleAdmin(admin.ModelAdmin):
     form = PeopleAdminForm
-    inlines = [ORCIDInLine]
-    search_fields = ['personfirstname','personlastname','personexternalidentifiers__personexternalidentifier']
-    list_display = ('personfirstname', 'personlastname','orcid')
+    inlines = [AffiliationInLine, ORCIDInLine]
+    search_fields = ['personfirstname','personlastname','personexternalidentifiers__personexternalidentifier',
+                     'affiliations__organizationid__organizationname']
+    list_display = ('personlastname','personfirstname','orcid','affiliation')
     save_as = True
 
     def orcid(self, obj):
         external_id = Personexternalidentifiers.objects.get(personid=obj.personid)
-        return external_id.personexternalidentifieruri
+        return u'<a href="{0}">{0}</a>'.format(external_id.personexternalidentifieruri)
+    def affiliation(self,obj):
+        org = Organizations.objects.filter(affiliations__personid_id=obj.personid)
+        name_list = list()
+        for org_name in org:
+            name_list.append(org_name.organizationname)
+        return ", ".join(name_list)
+    orcid.allow_tags = True
 
+class ExternalidentifiersystemForm(ModelForm):
+    class Meta:
+        model = Externalidentifiersystems
+        fields = '__all__'
 
+class ExternalidentifiersystemAdmin(admin.ModelAdmin):
+    form = ExternalidentifiersystemForm
 
