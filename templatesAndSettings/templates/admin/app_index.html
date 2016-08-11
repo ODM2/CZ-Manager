@@ -50,10 +50,10 @@
                         <h1>People and Organizations</h1>
                     </caption>
                     <tr>
-                        <th scope="row"><a href="{{ prefixpath }}people/">
-                            {% trans 'People' %}</a></th>
-                        <td><a href="{{ prefixpath }}people/add/" class="addlink">{% trans 'Add' %}</a></td>
-                        <td><a href="{{ prefixpath }}people/" class="changelink">{% trans 'Change' %}</a></td>
+                        <th scope="row"><a href="{{ prefixpath }}organizations/">
+                            {% trans 'Organizations' %}</a></th>
+                        <td><a href="{{ prefixpath }}organizations/add/" class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}organizations/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
                     <tr>
                         <th scope="row"><a href="{{ prefixpath }}personexternalidentifiers/">
@@ -64,17 +64,17 @@
                                class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
                     <tr>
-                        <th scope="row"><a href="{{ prefixpath }}organizations/">
-                            {% trans 'Organizations' %}</a></th>
-                        <td><a href="{{ prefixpath }}organizations/add/" class="addlink">{% trans 'Add' %}</a></td>
-                        <td><a href="{{ prefixpath }}organizations/" class="changelink">{% trans 'Change' %}</a></td>
+                        <th scope="row"><a href="{{ prefixpath }}people/">
+                            {% trans 'People' %}</a></th>
+                        <td><a href="{{ prefixpath }}people/add/" class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}people/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
-                    <tr>
+                    {% comment %}<tr>
                         <th scope="row"><a href="{{ prefixpath }}affiliations/">
                             {% trans 'Affiliation (relate people and organizations)' %}</a></th>
                         <td><a href="{{ prefixpath }}affiliations/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}affiliations/" class="changelink">{% trans 'Change' %}</a></td>
-                    </tr>
+                    </tr>{% endcomment %}
                 </table>
             </div>
             <div class="app-ODM2CZOData module">

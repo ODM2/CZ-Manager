@@ -292,7 +292,7 @@ class SamplingfeaturesAdmin(admin.ModelAdmin):
     search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name', 'samplingfeaturename',
                      'samplingfeaturecode', 'samplingfeatureid','samplingfeatureexternalidentifiers__samplingfeatureexternalidentifier']
 
-    list_display = ('samplingfeaturecode', 'sampling_feature_type','igsn','dataset_code')
+    list_display = ('samplingfeaturecode','samplingfeaturename', 'sampling_feature_type','igsn','dataset_code')
     list_filter = (
         ('sampling_feature_type', admin.RelatedOnlyFieldListFilter),
     )
@@ -300,7 +300,7 @@ class SamplingfeaturesAdmin(admin.ModelAdmin):
 
     def igsn(self,obj):
         external_id = Samplingfeatureexternalidentifiers.objects.get(samplingfeatureid=obj.samplingfeatureid)
-        return u'<a href="{0}">{0}</a>'.format(external_id.samplingfeatureexternalidentifieruri)
+        return u'<a href="{0}" target="_blank">{0}</a>'.format(external_id.samplingfeatureexternalidentifieruri)
     igsn.allow_tags = True
 
     def dataset_code(self,obj):
@@ -460,14 +460,14 @@ class DatasetsAdmin(admin.ModelAdmin):
         return super(DatasetsAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
 
 
-class AffiliationsAdminForm(ModelForm):
-    class Meta:
-        model = Affiliations
-        fields = '__all__'
-
-
-class AffiliationsAdmin(admin.ModelAdmin):
-    form = AffiliationsAdminForm
+# class AffiliationsAdminForm(ModelForm):
+#     class Meta:
+#         model = Affiliations
+#         fields = '__all__'
+#
+#
+# class AffiliationsAdmin(admin.ModelAdmin):
+#     form = AffiliationsAdminForm
 
 
 class ActionsAdminForm(ModelForm):
@@ -956,7 +956,7 @@ class PeopleAdmin(admin.ModelAdmin):
 
     def orcid(self, obj):
         external_id = Personexternalidentifiers.objects.get(personid=obj.personid)
-        return u'<a href="{0}">{0}</a>'.format(external_id.personexternalidentifieruri)
+        return u'<a href="{0}" target="_blank">{0}</a>'.format(external_id.personexternalidentifieruri)
     def affiliation(self,obj):
         org = Organizations.objects.filter(affiliations__personid_id=obj.personid)
         name_list = list()
