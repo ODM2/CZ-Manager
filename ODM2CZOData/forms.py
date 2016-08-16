@@ -212,7 +212,7 @@ class DOIInline(admin.StackedInline):
 
 
 class CitationsAdmin(admin.ModelAdmin):
-    list_display = ('title', 'primary_author','et_al','publisher', 'publicationyear', 'doi', 'citation_link')
+    list_display = ('title', 'primary_author','publicationyear','other_author','publisher', 'doi', 'citation_link')
     inlines = [authorlistInline, DOIInline]
     form = CitationsAdminForm
     search_fields = ['title', 'publisher', 'publicationyear', 'authorlists__personid__personfirstname',
@@ -230,7 +230,7 @@ class CitationsAdmin(admin.ModelAdmin):
         first_author = self.author_list.get(authororder=1)
         return "{0}, {1}".format(first_author.personid.personlastname, first_author.personid.personfirstname)
 
-    def et_al(self,obj):
+    def other_author(self,obj):
         list_et_al = list()
         for author in self.author_list:
             if author.authororder != 1:
@@ -240,6 +240,7 @@ class CitationsAdmin(admin.ModelAdmin):
     doi.allow_tags = True
     citation_link.short_description = 'link to citation'
     citation_link.allow_tags = True
+    # primary_author.admin_order_field = 'authorlists__personid__personlastname'
 
 
 class CitationextensionpropertyvaluesAdminForm(ModelForm):
@@ -461,8 +462,13 @@ class OrganizationsAdminForm(ModelForm):
 
 
 class OrganizationsAdmin(admin.ModelAdmin):
-    list_display = ('organizationname', 'organizationdescription')
+    list_display = ('organizationname', 'organizationdescription','organization_link')
     form = OrganizationsAdminForm
+
+    def organization_link(self,org):
+        return '<a href={0} target="_blank">{0}</a>'.format(org.organizationlink)
+
+    organization_link.allow_tags = True
 
 
 class FeatureactionsAdminForm(ModelForm):
