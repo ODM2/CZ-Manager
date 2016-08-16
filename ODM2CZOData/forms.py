@@ -13,6 +13,8 @@ from django.shortcuts import render
 from import_export import resources
 from import_export.admin import ImportExportActionModelAdmin
 from django.contrib.admin import SimpleListFilter, RelatedFieldListFilter
+from django.contrib.gis.geos import WKBReader
+from django.contrib.gis.db import models
 
 from django.shortcuts import render_to_response
 from .models import Variables
@@ -64,6 +66,8 @@ from .models import Dataquality
 from .models import Resultsdataquality
 from .models import Samplingfeatureexternalidentifiers
 from .models import Externalidentifiersystems
+from .models import Citationexternalidentifiers
+from .models import Relatedfeatures
 
 from templatesAndSettings.settings import STATIC_URL
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
@@ -97,9 +101,9 @@ def link_list_display_DOI(link):
     if not match:
         match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])[[:graph:]])+", link)
     if match:
-        return u'<a href="http://dx.doi.org/%s">%s</a>' % (link, link)
+        return u'<a href="http://dx.doi.org/%s" target="_blank">%s</a>' % (link, link)
     else:
-        return u'<a href="%s">%s</a>' % (link, link)
+        return u'<a href="%s" target="_blank">%s</a>' % (link, link)
 
 
 class ResultsdataqualityAdminForm(ModelForm):
@@ -172,17 +176,44 @@ class DatasetcitationsAdmin(admin.ModelAdmin):
     form = DatasetcitationsAdminForm
 
 
+class authorlistInline(admin.StackedInline):
+    model = Authorlists
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('personid',
+                       'authororder',)
+        }),
+    )
+    extra = 0
+
+
+
 class CitationsAdminForm(ModelForm):
     title = forms.CharField(max_length=255, widget=forms.Textarea, label="Publication Title")
-
     class Meta:
         model = Citations
         fields = '__all__'
 
 
-class CitationsAdmin(admin.ModelAdmin):
-    list_display = ('title', 'publisher', 'publicationyear', 'citation_link')
+class DOIInline(admin.StackedInline):
+    model = Citationexternalidentifiers
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('bridgeid',
+                       'citationid',
+                       'externalidentifiersystemid',
+                       'citationexternalidentifier',
+                       'citationexternalidentifieruri')
+        }),
+    )
+    extra = 0
 
+
+class CitationsAdmin(admin.ModelAdmin):
+    list_display = ('title', 'primary_author','et_al','publisher', 'publicationyear', 'doi', 'citation_link')
+    inlines = [authorlistInline, DOIInline]
     form = CitationsAdminForm
     search_fields = ['title', 'publisher', 'publicationyear', 'authorlists__personid__personfirstname',
                      'authorlists__personid__personlastname']
@@ -190,6 +221,23 @@ class CitationsAdmin(admin.ModelAdmin):
     def citation_link(self, obj):
         return link_list_display_DOI(obj.citationlink)
 
+    def doi(self, obj):
+        external_id = Citationexternalidentifiers.objects.get(citationid=obj.citationid)
+        return u'<a href="http://dx.doi.org/{0}" target="_blank">{0}</a>'.format(external_id.citationexternalidentifier)
+
+    def primary_author(self,obj):
+        self.author_list = Authorlists.objects.filter(citationid=obj.citationid)
+        first_author = self.author_list.get(authororder=1)
+        return "{0}, {1}".format(first_author.personid.personlastname, first_author.personid.personfirstname)
+
+    def et_al(self,obj):
+        list_et_al = list()
+        for author in self.author_list:
+            if author.authororder != 1:
+                list_et_al.append("{0}, {1}".format(author.personid.personlastname, author.personid.personfirstname))
+        return ";".join(list_et_al)
+
+    doi.allow_tags = True
     citation_link.short_description = 'link to citation'
     citation_link.allow_tags = True
 
@@ -262,11 +310,12 @@ class SamplingfeatureexternalidentifiersAdminForm(ModelForm):
 class SamplingfeatureexternalidentifiersAdmin(admin.ModelAdmin):
     form = SamplingfeatureexternalidentifiersAdminForm
     search_fields = ['samplingfeatureexternalidentifier']
-    list_display = ('samplingfeatureexternalidentifier','samplingfeatureexternalidentifieruri')
+    list_display = ('samplingfeatureexternalidentifier', 'samplingfeatureexternalidentifieruri')
     save_as = True
 
 
 class SamplingfeaturesAdminForm(ModelForm):
+    wkb_r = WKBReader()
     featuregeometry = CharField(label="feature geometry (to add a point format is POINT(long, lat)" +
                                       " where long and lat are in decimal degrees. If you don't want to add a location" +
                                       " leave default value of POINT(0 0).",
@@ -290,26 +339,30 @@ class SamplingfeaturesAdmin(admin.ModelAdmin):
     form = SamplingfeaturesAdminForm
     inlines = [IGSNInline]
     search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name', 'samplingfeaturename',
-                     'samplingfeaturecode', 'samplingfeatureid','samplingfeatureexternalidentifiers__samplingfeatureexternalidentifier']
+                     'samplingfeaturecode', 'samplingfeatureid',
+                     'samplingfeatureexternalidentifiers__samplingfeatureexternalidentifier']
 
-    list_display = ('samplingfeaturecode','samplingfeaturename', 'sampling_feature_type','igsn','dataset_code')
+    list_display = ('samplingfeaturecode', 'samplingfeaturename', 'sampling_feature_type', 'igsn', 'dataset_code')
     list_filter = (
         ('sampling_feature_type', admin.RelatedOnlyFieldListFilter),
     )
     save_as = True
 
-    def igsn(self,obj):
+    def igsn(self, obj):
         external_id = Samplingfeatureexternalidentifiers.objects.get(samplingfeatureid=obj.samplingfeatureid)
-        return u'<a href="{0}" target="_blank">{0}</a>'.format(external_id.samplingfeatureexternalidentifieruri)
+        return u'<a href="https://app.geosamples.org/sample/igsn/{0}" target="_blank">{0}</a>'.format(
+            external_id.samplingfeatureexternalidentifier)
+
     igsn.allow_tags = True
 
-    def dataset_code(self,obj):
+    def dataset_code(self, obj):
         fid = Featureactions.objects.filter(samplingfeatureid=obj.samplingfeatureid)
         ds = Datasets.objects.filter(datasetsresults__resultid__featureactionid__in=fid).distinct()
         ds_list = list()
         for d in ds:
             ds_list.append(d.datasetcode)
         return ", ".join(ds_list)
+
 
 def duplicate_results_event(ModelAdmin, request, queryset):
     for object in queryset:
@@ -435,7 +488,7 @@ class DatasetsAdminForm(ModelForm):
 
 class DatasetsAdmin(admin.ModelAdmin):
     form = DatasetsAdminForm
-    list_display = ['datasetcode','datasettitle','datasettypecv']
+    list_display = ['datasetcode', 'datasettitle', 'datasettypecv']
 
     def get_datasetsresults(self, object_id):
         datasetResults = Datasetsresults.objects.filter(datasetid=object_id)
@@ -756,7 +809,7 @@ class MeasurementresultsAdmin(AjaxSelectAdmin):
 
     def data_link(self, obj):
         return u'<a href="%sfeatureactions/%s/">%s</a>' % (
-        CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid, obj.resultid.featureactionid)
+            CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid, obj.resultid.featureactionid)
 
     data_link.short_description = 'sampling feature action'
     data_link.allow_tags = True
@@ -816,7 +869,7 @@ class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin
 
     def feature_action_link(self, obj):
         return u'<a href="/admin/ODM2CZOData/featureactions/%s/">%s</a>' % (
-        obj.resultid.resultid.featureactionid.featureactionid, obj.resultid.resultid.featureactionid)
+            obj.resultid.resultid.featureactionid.featureactionid, obj.resultid.resultid.featureactionid)
 
     feature_action_link.short_description = 'feature action'
     feature_action_link.allow_tags = True
@@ -910,10 +963,11 @@ class PeopleAdminForm(ModelForm):
         model = People
         fields = '__all__'
 
+
 class ORCIDInLine(admin.StackedInline):
     model = Personexternalidentifiers
     fieldsets = (
-        ('ORCID Information', {
+        ('Details', {
             'classes': ('collapse',),
             'fields': ('bridgeid',
                        'personid',
@@ -925,50 +979,57 @@ class ORCIDInLine(admin.StackedInline):
         }),
     )
     extra = 0
+    verbose_name = 'ORCID'
+
 
 class AffiliationInLine(admin.StackedInline):
     model = Affiliations
     fieldsets = (
-        ('Affiliation Information',{
-            'classes':('collapse',),
-            'fields':('affiliationid',
-                      'personid',
-                      'organizationid',
-                      'isprimaryorganizationcontact',
-                      'affiliationstartdate',
-                      'affiliationenddate',
-                      'primaryphone',
-                      'primaryemail',
-                      'primaryaddress',
-                      'personlink',)
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('affiliationid',
+                       'personid',
+                       'organizationid',
+                       'isprimaryorganizationcontact',
+                       'affiliationstartdate',
+                       'affiliationenddate',
+                       'primaryphone',
+                       'primaryemail',
+                       'primaryaddress',
+                       'personlink',)
 
         }),
     )
     extra = 0
 
+
 class PeopleAdmin(admin.ModelAdmin):
     form = PeopleAdminForm
     inlines = [AffiliationInLine, ORCIDInLine]
-    search_fields = ['personfirstname','personlastname','personexternalidentifiers__personexternalidentifier',
+    search_fields = ['personfirstname', 'personlastname', 'personexternalidentifiers__personexternalidentifier',
                      'affiliations__organizationid__organizationname']
-    list_display = ('personlastname','personfirstname','orcid','affiliation')
+    list_display = ('personlastname', 'personfirstname', 'orcid', 'affiliation')
     save_as = True
 
     def orcid(self, obj):
         external_id = Personexternalidentifiers.objects.get(personid=obj.personid)
-        return u'<a href="{0}" target="_blank">{0}</a>'.format(external_id.personexternalidentifieruri)
-    def affiliation(self,obj):
+        return u'<a href="http://orcid.org/{0}" target="_blank">{0}</a>'.format(external_id.personexternalidentifier)
+
+    def affiliation(self, obj):
         org = Organizations.objects.filter(affiliations__personid_id=obj.personid)
         name_list = list()
         for org_name in org:
             name_list.append(org_name.organizationname)
         return ", ".join(name_list)
+
     orcid.allow_tags = True
+
 
 class ExternalidentifiersystemForm(ModelForm):
     class Meta:
         model = Externalidentifiersystems
         fields = '__all__'
+
 
 class ExternalidentifiersystemAdmin(admin.ModelAdmin):
     form = ExternalidentifiersystemForm

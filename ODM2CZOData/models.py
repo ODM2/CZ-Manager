@@ -202,6 +202,9 @@ class Authorlists(models.Model):
     personid = models.ForeignKey('People', verbose_name='person', db_column='personid', blank=True, null=True)
     authororder = models.IntegerField(verbose_name='author order', blank=True, null=True)
 
+    def __unicode__(self):
+        s = u"{0} - {1}".format(self.personid,self.authororder)
+        return s
     class Meta:
         managed = False
         db_table = r'odm2"."authorlists'
@@ -356,11 +359,15 @@ class Citationexternalidentifiers(models.Model):
     citationid = models.ForeignKey('Citations', db_column='citationid')
     externalidentifiersystemid = models.ForeignKey('Externalidentifiersystems', db_column='externalidentifiersystemid') #externalidentifiersystemid
     citationexternalidentifier = models.CharField(max_length=255, db_column="citationexternalidentifier")
-    citationexternalidentiferuri = models.CharField(max_length=255, blank=True, db_column="citationexternalidentiferuri")
+    citationexternalidentifieruri = models.CharField(max_length=255, blank=True, db_column="citationexternalidentifieruri")
 
+    def __unicode__(self):
+        s = u"{0} - {1}".format(self.externalidentifiersystemid, self.citationexternalidentifier)
+        return s
     class Meta:
         managed = False
         db_table = r'odm2"."citationexternalidentifiers'
+        verbose_name = 'citationexternalidentifier'
 
 
 class Citations(models.Model):
@@ -368,7 +375,7 @@ class Citations(models.Model):
     title = models.CharField(max_length=255)
     publisher = models.CharField(max_length=255)
     publicationyear = models.IntegerField(verbose_name='publication year')
-    citationlink = models.CharField(max_length=255, blank=True,verbose_name='DOI',)
+    citationlink = models.CharField(max_length=255, blank=True,verbose_name='Citation Link',)
     def __unicode__(self):
         s = u"%s" % (self.title)
         if self.publisher:
@@ -1454,7 +1461,7 @@ class People(models.Model):
     personmiddlename = models.CharField(max_length=255, verbose_name="middle name",blank=True)
     personlastname = models.CharField(max_length=255, verbose_name="last name")
     def __unicode__(self):
-        s = u"%s " % (self.personlastname)
+        s = u"%s" % (self.personlastname)
         if self.personfirstname:
             s += u", %s" % (self.personfirstname)
         return s
@@ -1482,6 +1489,7 @@ class Personexternalidentifiers(models.Model):
     class Meta:
         managed = False
         db_table = r'odm2"."personexternalidentifiers'
+        verbose_name_plural = 'ORCID (Person Unique Identifier)'
 
 
 class Pointcoverageresults(models.Model):

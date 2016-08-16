@@ -55,14 +55,14 @@
                         <td><a href="{{ prefixpath }}organizations/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}organizations/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
-                    <tr>
+                    {% comment %}<tr>
                         <th scope="row"><a href="{{ prefixpath }}personexternalidentifiers/">
                             {% trans 'ORCIDs' %}</a></th>
                         <td><a href="{{ prefixpath }}personexternalidentifiers/add/"
                                class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}personexternalidentifiers/"
                                class="changelink">{% trans 'Change' %}</a></td>
-                    </tr>
+                    </tr>{% endcomment %}
                     <tr>
                         <th scope="row"><a href="{{ prefixpath }}people/">
                             {% trans 'People' %}</a></th>
@@ -80,7 +80,7 @@
             <div class="app-ODM2CZOData module">
                 <table>
                     <caption>
-                        <h1>Variables and Units</h1>
+                        <h1>Variables, Units, and External Identifier Systems</h1>
                     </caption>
                     <tr>
                         <th scope="row"><a href="{{ prefixpath }}variables/">
@@ -154,14 +154,14 @@
                         <td><a href="{{ prefixpath }}samplingfeatures/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}samplingfeatures/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
-                    <tr>
+                    {% comment %}<tr>
                         <th scope="row"><a href="{{ prefixpath }}samplingfeatureexternalidentifiers/">
                             {% trans 'IGSNs' %}</a></th>
                         <td><a href="{{ prefixpath }}samplingfeatureexternalidentifiers/add/"
                                class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}samplingfeatureexternalidentifiers/"
                                class="changelink">{% trans 'Change' %}</a></td>
-                    </tr>
+                    </tr>{% endcomment %}
                     <tr>
                         <th scope="row"><a href="{{ prefixpath }}relatedfeatures/">
                             {% trans 'Relate two features' %}</a></th>
