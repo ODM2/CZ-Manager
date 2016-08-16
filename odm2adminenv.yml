@@ -1,4 +1,4 @@
-name: odm2admin2
+name: odm2adminenv
 channels:
 - conda-forge
 dependencies:
