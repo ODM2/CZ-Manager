@@ -159,7 +159,7 @@
                         return obj.name == '{{ site.sampling_feature_type.name }}'
                     });
             var popup = '';
-            {% if  site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" %}
+            {% if  site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" or site.sampling_feature_type.name == "Stream gage" %}
                 popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
                         + '<hr />'
                         + '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
