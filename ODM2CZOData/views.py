@@ -402,14 +402,17 @@ def web_map(request,dataset='NotSet'):
         features = Samplingfeatures.objects.all()
         results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
 
-
+    # start_date= Measurementresultvalues.objects.filter(resultid__in=results.values("resultid")).annotate(Min('valuedatetime'))\
+    #             .order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+    # end_date= Measurementresultvalues.objects.filter(resultid__in=results.values("resultid")).annotate(Max('valuedatetime'))\
+    #             .order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
 
     legend_ref = [
         dict(feature_type="Excavation", icon="fa-spoon", color="darkred",
              style_class="awesome-marker-icon-darkred"),
         dict(feature_type="Field area", icon="fa-map-o", color="darkblue",
              style_class="awesome-marker-icon-darkblue"),
-        dict(feature_type="Landscape classification", icon="fa-bar-chart", color="darkpurple",
+        dict(feature_type="Ecological land classification", icon="fa-bar-chart", color="darkpurple",
              style_class="awesome-marker-icon-darkpurple"),
         dict(feature_type="Observation well", icon="fa-eye", color="orange",
              style_class="awesome-marker-icon-orange"),
@@ -450,7 +453,7 @@ def web_map(request,dataset='NotSet'):
 #              style_class="awesome-marker-icon-darkred"),
 #         dict(feature_type="Field area", icon="fa-map-o", color="darkblue",
 #              style_class="awesome-marker-icon-darkblue"),
-#         dict(feature_type="Landscape classification", icon="fa-bar-chart", color="darkpurple",
+#         dict(feature_type="Ecological land classification", icon="fa-bar-chart", color="darkpurple",
 #              style_class="awesome-marker-icon-darkpurple"),
 #         dict(feature_type="Observation well", icon="fa-eye", color="orange",
 #              style_class="awesome-marker-icon-orange"),
@@ -1061,11 +1064,11 @@ def scatter_plot(request):
             title =str(xVar.variablecode) + " - " +str(yVar.variablecode)
     prv = Profileresults.objects.all()
     #second filter = exclude summary results attached to field areas
-    pr = Results.objects.filter(resultid__in=prv).filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification"))\
+    pr = Results.objects.filter(resultid__in=prv).filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Ecological land classification"))\
         .filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Field area"))
     #variables is the list to pass to the html template
     variables = Variables.objects.filter(variableid__in=pr.values("variableid"))
-    fieldareas = Samplingfeatures.objects.filter(sampling_feature_type="Landscape classification") #Field area
+    fieldareas = Samplingfeatures.objects.filter(sampling_feature_type="Ecological land classification") #Field area
     xlocation=[]
     ylocation=[]
     xdata=[]
@@ -1219,7 +1222,7 @@ def exportspreadsheet(request,resultValuesSeries,profileResult=True):
     firstheader = True
     processingCode = None
     lastProcessingCode = None
-    resultValuesHeaders = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
+    resultValuesHeaders = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Ecological land classification")).\
         filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area")).\
         order_by("resultid__resultid__variableid","resultid__resultid__unitsid","resultid__resultid__processing_level")#.distinct("resultid__resultid__variableid","resultid__resultid__unitsid")
     for myresults in resultValuesHeaders:
@@ -1352,7 +1355,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
 
 
     featureresults = Results.objects.filter(featureactionid__in=feature_actions).order_by("variableid","unitsid")\
-        .filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
+        .filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Ecological land classification")).\
         filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Field area"))
     variableList = Variables.objects.filter(variableid__in =featureresults.values("variableid"))
 
