@@ -43,7 +43,7 @@
                 </div>
             {% endfor %}
         {% endif %}
-        <div style="max-height: 600px;overflow: auto;">
+        <div>
             <div class="app-ODM2CZOData module">
                 <table>
                     <caption>
@@ -80,7 +80,7 @@
             <div class="app-ODM2CZOData module">
                 <table>
                     <caption>
-                        <h1>Variables, Units, and External Identifier Systems</h1>
+                        <h1>Variables and Units</h1>
                     </caption>
                     <tr>
                         <th scope="row"><a href="{{ prefixpath }}variables/">
@@ -100,14 +100,6 @@
                         <td><a href="{{ prefixpath }}taxonomicclassifiers/add/" class="addlink">{% trans 'Add' %}</a>
                         </td>
                         <td><a href="{{ prefixpath }}taxonomicclassifiers/" class="changelink">{% trans 'Change' %}</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><a href="{{ prefixpath }}externalidentifiersystems/">
-                            {% trans 'External identifier systems' %}</a></th>
-                        <td><a href="{{ prefixpath }}externalidentifiersystems/add/" class="addlink">{% trans 'Add' %}</a>
-                        </td>
-                        <td><a href="{{ prefixpath }}externalidentifiersystems/" class="changelink">{% trans 'Change' %}</a>
                         </td>
                     </tr>
                 </table>
@@ -370,7 +362,22 @@
                     </tr>
                 </table>
             </div>
+            <div class="app-ODM2CZOData module">
+                <table>
+                    <caption>
+                        <h1>External Identifier Systems</h1>
+                    </caption>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}externalidentifiersystems/">
+                            {% trans 'External identifier systems' %}</a></th>
+                        <td><a href="{{ prefixpath }}externalidentifiersystems/add/" class="addlink">{% trans 'Add' %}</a>
+                        </td>
+                        <td><a href="{{ prefixpath }}externalidentifiersystems/" class="changelink">{% trans 'Change' %}</a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
-
+    <h2><a href="#">Back to Top</a></h2>
     </div>
 {% endblock %}{% block sidebar %}{% endblock %}

@@ -13,8 +13,8 @@ from django.shortcuts import render
 from import_export import resources
 from import_export.admin import ImportExportActionModelAdmin
 from django.contrib.admin import SimpleListFilter, RelatedFieldListFilter
-from django.contrib.gis.geos import WKBReader
-from django.contrib.gis.db import models
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis import forms
 
 from django.shortcuts import render_to_response
 from .models import Variables
@@ -274,11 +274,17 @@ class VariablesAdminForm(ModelForm):
     # variablenamecv= TermModelChoiceField(CvVariablename.objects.all().order_by('term'))
     # speciationcv= TermModelChoiceField(CvSpeciation.objects.all().order_by('term'))
     # make these fields ajax type ahead fields with links to odm2 controlled vocabulary
+    variable_type = make_ajax_field(Variables, 'variable_type', 'cv_variable_type')
     variable_name = make_ajax_field(Variables, 'variable_name', 'cv_variable_name')
     variabledefinition = forms.CharField(max_length=500, widget=forms.Textarea)
     # variable_type = make_ajax_field(Variables,'variable_type','cv_variable_type')
     speciation = make_ajax_field(Variables, 'speciation', 'cv_speciation')
 
+
+    variable_name.help_text = u'view variable names here <a href="http://vocabulary.odm2.org/variablename/" target="_blank">http://vocabulary.odm2.org/variablename/</a>'
+    variable_name.allow_tags = True
+    variable_type.help_text = u'view variable types here <a href="http://vocabulary.odm2.org/variabletype/" target="_blank" >http://vocabulary.odm2.org/variabletype/</a>'
+    variable_type.allow_tags = True
     class Meta:
         model = Variables
         fields = '__all__'
@@ -316,20 +322,23 @@ class SamplingfeatureexternalidentifiersAdmin(admin.ModelAdmin):
 
 
 class SamplingfeaturesAdminForm(ModelForm):
-    wkb_r = WKBReader()
-    featuregeometry = CharField(label="feature geometry (to add a point format is POINT(long, lat)" +
-                                      " where long and lat are in decimal degrees. If you don't want to add a location" +
-                                      " leave default value of POINT(0 0).",
-                                max_length=500, widget=forms.Textarea(), )  # attrs={'readonly':'readonly'}
     samplingfeaturedescription = CharField(max_length=5000, label="feature description", widget=forms.Textarea,
                                            required=False)
-    featuregeometry.initial = "POINT(0 0)"
+    featuregeometry = forms.GeometryField(label="feature geometry (to add a point format is POINT(lat, lon)" +
+                                      " where long and lat are in decimal degrees. If you don't want to add a location" +
+                                      " leave default value of POINT(0 0).",srid=4326, widget=forms.OpenLayersWidget(
+        attrs={'display_raw':True}))
+
+    featuregeometry.initial = GEOSGeometry("POINT(0 0)")
     featuregeometry.required = False
+
+    def feature_geom(self):
+        featuregeometryval = self.data['featuregeometry']
+        return GEOSGeometry(featuregeometryval)
 
     class Meta:
         model = Samplingfeatures
         fields = '__all__'
-
 
 class IGSNInline(admin.StackedInline):
     model = Samplingfeatureexternalidentifiers
@@ -466,7 +475,7 @@ class OrganizationsAdmin(admin.ModelAdmin):
     form = OrganizationsAdminForm
 
     def organization_link(self,org):
-        return '<a href={0} target="_blank">{0}</a>'.format(org.organizationlink)
+        return u'<a href={0} target="_blank">{0}</a>'.format(org.organizationlink)
 
     organization_link.allow_tags = True
 
@@ -1025,10 +1034,14 @@ class PeopleAdmin(admin.ModelAdmin):
         org = Organizations.objects.filter(affiliations__personid_id=obj.personid)
         name_list = list()
         for org_name in org:
-            name_list.append(org_name.organizationname)
-        return ", ".join(name_list)
+            if org_name.parentorganizationid:
+                name_list.append(u'<a href="{0}">{1}, {2}</a>'.format(org_name.organizationlink, org_name.organizationname, org_name.parentorganizationid.organizationname))
+            else:
+                name_list.append(u'<a href="{0}">{1}</a>'.format(org_name.organizationlink,org_name.organizationname))
+        return u'; '.join(name_list)
 
     orcid.allow_tags = True
+    affiliation.allow_tags = True
 
 
 class ExternalidentifiersystemForm(ModelForm):

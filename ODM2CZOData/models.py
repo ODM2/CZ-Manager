@@ -14,7 +14,7 @@ from django.db import models
 
 from templatesAndSettings.settings import MEDIA_ROOT
 
-#from django.contrib.gis.db import models
+from django.contrib.gis.db import models
 import time
 #from django.forms import ModelFormWithFileField
 #from .forms import DataloggerprogramfilesAdminForm
@@ -693,9 +693,7 @@ class CvSamplingfeaturegeotype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_samplingfeaturegeotype'
@@ -710,9 +708,7 @@ class CvSamplingfeaturetype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s" % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_samplingfeaturetype'
@@ -855,10 +851,10 @@ class CvVariablename(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"{}".format(self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_variablename'
@@ -1960,6 +1956,7 @@ class Samplingfeatures(models.Model):
     samplingfeaturedescription = models.CharField(verbose_name='sampling feature description', max_length=5000, blank=True)
     sampling_feature_geo_type = models.ForeignKey(CvSamplingfeaturegeotype,db_column='samplingfeaturegeotypecv', default= "Point", null=True)
     featuregeometry = models.TextField(verbose_name='feature geometry',blank=True, null=True)  #GeometryField This field type is a guess.
+    # featuregeometry = models.GeometryField(verbose_name='feature geometry',blank=True, null=True)
     elevation_m = models.FloatField(verbose_name='elevation',blank=True, null=True)
     elevation_datum = models.ForeignKey(CvElevationdatum, db_column='elevationdatumcv', blank=True, null=True)
 
@@ -2406,7 +2403,7 @@ class Variableexternalidentifiers(models.Model):
     bridgeid = models.AutoField(primary_key=True)
     variableid = models.ForeignKey('Variables', db_column='variableid')
     externalidentifiersystemid = models.ForeignKey(Externalidentifiersystems, db_column='externalidentifiersystemid')
-    variableexternalidentifer = models.CharField(max_length=255)
+    variableexternalidentifier = models.CharField(max_length=255)
     variableexternalidentifieruri = models.CharField(max_length=255, blank=True)
 
     class Meta:

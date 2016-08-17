@@ -19,14 +19,14 @@ template_debug = True
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 ODM2_configs = {
 
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'x',
-        'USER': 'x',
-        'PASSWORD': 'x',
-        'HOST': 'x', #micro server  '52.20.81.11'
-        'PORT': 'x',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis', #'django.db.backends.postgresql_psycopg2',
+        'NAME': '',
+        'USER': 'postgres',
+        'PASSWORD': '',
+        'HOST': 'localhost', #micro server  '52.20.81.11'
+        'PORT': '5432',
      'OPTIONS': {
-      'options': '-c search_path=odm2,odm2extra'
+      'options': '-c search_path=admin,odm2,odm2extra'
     }
 }
 
