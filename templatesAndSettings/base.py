@@ -140,7 +140,8 @@ AJAX_LOOKUP_CHANNELS = {
     'featureaction_lookup': ('{}.lookups'.format(app_config['app_name']),  'FeatureactionsLookup'),
     'result_lookup': ('{}.lookups'.format(app_config['app_name']),  'ResultsLookup'),
     'profileresult_lookup': ('{}.lookups'.format(app_config['app_name']), 'ProfileResultsLookup'),
-    'measurementresult_lookup': ('{}.lookups'.format(app_config['app_name']), 'MeasurementResultsLookup')
+    'measurementresult_lookup': ('{}.lookups'.format(app_config['app_name']), 'MeasurementResultsLookup'),
+    'cv_taxonomic_classifier_type':('{}.lookups'.format(app_config['app_name']),'CvTaxonomicClassifierTypeLookup'),
     # define a custom lookup channel
 }
 

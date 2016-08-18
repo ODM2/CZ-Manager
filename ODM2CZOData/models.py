@@ -819,9 +819,7 @@ class CvTaxonomicclassifiertype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_taxonomicclassifiertype'
@@ -2202,9 +2200,9 @@ class Taxonomicclassifierexternalidentifiers(models.Model):
 class Taxonomicclassifiers(models.Model):
     taxonomicclassifierid = models.AutoField(primary_key=True)
     taxonomic_classifier_type = models.ForeignKey(CvTaxonomicclassifiertype, db_column='taxonomicclassifiertypecv',
-                    help_text="A vocabulary for describing types of taxonomies from which descriptive terms used "+
-                              "in an ODM2 database have been drawn. Taxonomic classifiers provide a way to classify"+
-                              " Results and Specimens according to terms from a formal taxonomy.. Check "+
+                    help_text="A vocabulary for describing types of taxonomies from which descriptive terms used "\
+                              "in an ODM2 database have been drawn. Taxonomic classifiers provide a way to classify"\
+                              " Results and Specimens according to terms from a formal taxonomy.. Check "\
                               "http://vocabulary.odm2.org/taxonomicclassifiertype/  for more info")
     taxonomicclassifiername = models.CharField(verbose_name='taxonomic classifier name', max_length=255)
     taxonomicclassifiercommonname = models.CharField(verbose_name='taxonomic classifier common name',max_length=255, blank=True)
@@ -2367,7 +2365,7 @@ class Transectresultvalues(models.Model):
 class Units(models.Model):
     unitsid = models.AutoField(primary_key=True)
     unit_type = models.ForeignKey(CvUnitstype,
-            help_text="A vocabulary for describing the type of the Unit or the more general quantity that the Unit " +
+            help_text="A vocabulary for describing the type of the Unit or the more general quantity that the Unit "
                       "represents. View unit type details here http://vocabulary.odm2.org/unitstype/"
             ,db_column='unitstypecv')
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)

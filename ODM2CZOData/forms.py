@@ -299,6 +299,14 @@ class VariablesAdmin(admin.ModelAdmin):
 
 
 class TaxonomicclassifiersAdminForm(ModelForm):
+    taxonomic_classifier_type = make_ajax_field(Taxonomicclassifiers, 'taxonomic_classifier_type', 'cv_taxonomic_classifier_type')
+    taxonomic_classifier_type.help_text = u'A vocabulary for describing types of taxonomies from which descriptive terms used ' \
+                                          u'in an ODM2 database have been drawn. Taxonomic classifiers provide a way to classify'\
+                                          u' Results and Specimens according to terms from a formal taxonomy. Check '\
+                                          u'<a href="http://vocabulary.odm2.org/taxonomicclassifiertype/" target="_blank">' \
+                                          u'http://vocabulary.odm2.org/taxonomicclassifiertype/</a>  for more info'
+    taxonomic_classifier_type.allow_tags = True
+
     class Meta:
         model = Taxonomicclassifiers
         fields = '__all__'
@@ -915,6 +923,10 @@ class MeasurementresultvalueFileForm(ModelForm):
 
 class UnitsAdminForm(ModelForm):
     unit_type = make_ajax_field(Units, 'unit_type', 'cv_unit_type')
+    unit_type.help_text = u'A vocabulary for describing the type of the Unit or the more general quantity that the Unit ' \
+                          u'represents. View unit type details here <a href="http://vocabulary.odm2.org/unitstype/" ' \
+                          u'target="_blank">http://vocabulary.odm2.org/unitstype/</a>'
+    unit_type.allow_tags = True
 
     class Meta:
         model = Units
