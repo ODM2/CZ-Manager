@@ -30,7 +30,13 @@
 
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
 
+{% block title %}
+    {{ 'shortcut_title'|get_title:2 }} | {{ "site_title"|get_title:2 }}
+{% endblock %}
 
+{% block branding%}
+    <h1>{{ "site_header"|get_title:2 }}</h1>
+{% endblock %}
 
 
 {% block content %}

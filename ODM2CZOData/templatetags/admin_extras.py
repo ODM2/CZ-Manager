@@ -3,6 +3,8 @@
 
 from django import template
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib import admin
+from templatesAndSettings.base import ADMIN_SHORTCUTS
 
 register = template.Library()
 @register.tag
@@ -78,3 +80,12 @@ def filter_coords(value):
             sites.append(site)
 
     return sites
+
+@register.filter()
+def get_title(value, short):
+    if value == 'site_title':
+        return admin.site.site_title
+    elif value == 'site_header':
+        return admin.site.site_header
+    elif value == 'shortcut_title':
+        return ADMIN_SHORTCUTS[0]['shortcuts'][short]['title']

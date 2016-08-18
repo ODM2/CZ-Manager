@@ -21,17 +21,21 @@
  {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
 {{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
 
+{% block title %}
+    {{ 'shortcut_title'|get_title:3 }} | {{ "site_title"|get_title:3 }}
+{% endblock %}
+
+{% block branding%}
+    <h1>{{ "site_header"|get_title:3 }}</h1>
+{% endblock %}
 
 {% block extrahead %}
 {{ block.super }}{% admin_shortcuts_js %}{% endblock %}
-
 {# end changes #}
 
 {% block coltype %}colM{% endblock %}
 
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
-
-
 
 
 {% block content %}

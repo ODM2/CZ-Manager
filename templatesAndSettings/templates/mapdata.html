@@ -24,11 +24,16 @@
 
 	{% endblock %}
 
+{% block title %}
+    Map Sample Locations | {{ "site_title"|get_title:6 }}
+{% endblock %}
+
+{% block branding%}
+    <h1>{{ "site_header"|get_title:6 }}</h1>
+{% endblock %}
 
 {% block extrahead %}<script src="https://use.fontawesome.com/57b6c04fb7.js"></script>
-    {{ block.super }}<title>
-    {% block title %}{% endblock %}
-</title>
+    {{ block.super }}
     <script
 			  src="https://code.jquery.com/jquery-1.12.4.min.js"
 			  integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
