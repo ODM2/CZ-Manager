@@ -83,7 +83,7 @@ ADMIN_SHORTCUTS = [
             {
                 'url': CUSTOM_TEMPLATE_PATH,
                 'app_name': '{}'.format(app_config['app_name']),
-                'title': 'Home',
+                'title': '{} Admin'.format(app_config['verbose_name']),
                 'class': 'home',
             },
             {
