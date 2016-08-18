@@ -33,11 +33,8 @@
                 <div class="app-{{ app.app_label }} module">
                     <table>
                         <caption>
-                            <a href="{{ app.app_url }}" class="section"
-                           title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">
-                                {{ app.name }}
-                            </a> | <a href=".." title="Django administrative apps">
-                            {% trans 'Site Administration' %}</a>
+                            <h1><a style="color: #888888;" href=".." title="Django administrative apps">
+                            {% trans 'Site Administration' %}</a></h1>
                         </caption>
                     </table>
                 </div>

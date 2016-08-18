@@ -1,6 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from ajax_select import urls as ajax_select_urls
+from django.http.response import HttpResponseRedirect
 
 from templatesAndSettings.settings import MEDIA_ROOT
 from templatesAndSettings.settings import MEDIA_URL
@@ -22,11 +23,10 @@ urlpatterns = patterns('',
     # url(r'^$', 'tango_with_django_project_17.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
     url(r'^' + URL_PATH +'', include(admin.site.urls)),
-    url(r'^',admin.site.urls),
-    (r'^' + URL_PATH +'lookups/', include(ajax_select_urls)),
+    url(r'^' + URL_PATH +'lookups/', include(ajax_select_urls)),
     #(r'^ajax_select/', include('ajax_select.urls')),
-     url(r'^',admin.site.urls),
-     url(r'^' + URL_PATH +'AddSensor.html', views.AddSensor, name="AddSensor"),
+    url(r'^$',lambda r: HttpResponseRedirect('admin/{}/'.format(app_config['app_name']))),
+    url(r'^' + URL_PATH +'AddSensor.html', views.AddSensor, name="AddSensor"),
     url(r'^' + URL_PATH +'chartIndex.html', views.chartIndex, name="chartIndex"),
     url(r'^' + URL_PATH +'AddProfile.html', views.AddProfile, name="AddProfile"),
     url(r'^' + URL_PATH +'RecordAction.html', views.RecordAction, name="RecordAction"),

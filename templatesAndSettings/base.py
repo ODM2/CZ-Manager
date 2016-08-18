@@ -80,7 +80,7 @@ ADMIN_SHORTCUTS = [
 
         'shortcuts': [
             {
-                'url': '/'+URL_PATH,
+                'url': CUSTOM_TEMPLATE_PATH,
                 'app_name': '{}'.format(app_config['app_name']),
                 'title': 'Home',
                 'class':'home',
