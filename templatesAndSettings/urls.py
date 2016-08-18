@@ -13,8 +13,8 @@ views = importlib.import_module("{}.views".format(app_config['app_name']))
 
 from django.views.generic import View
 admin.autodiscover()
-admin.site.site_header = 'CROSSCZO ODM2 Admin'
-admin.site.site_title = 'ODM2 Admin'
+admin.site.site_header = app_config['site_header']
+admin.site.site_title = app_config['site_title']
 
 #admin_site.admin_view()
 urlpatterns = patterns('',

@@ -2,6 +2,8 @@
   "app_configuration":{
     "app_name":"ODM2CZOData",
     "verbose_name":"ODM2CZOData",
+    "site_title":"ODM2 Admin",
+    "site_header":"ODM2 Admin",
     "map_config":{
       "lat":40.000,
       "lon":-95.000,
