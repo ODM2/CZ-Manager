@@ -2,24 +2,25 @@
 Django settings for odm2testsite project.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/1.7/topics/settings/
+https://docs.djangoproject.com/en/1.9/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.7/ref/settings/
+https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 from templatesAndSettings.settings import *
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-TEMPLATE_DIR =os.path.dirname(__file__)
+TEMPLATE_DIR = os.path.dirname(__file__)
 TEMPLATE_DIR_APP = os.path.join(os.path.dirname(__file__), '..')
 TEMPLATE_PATH = os.path.join(TEMPLATE_DIR, 'templates')
-#TEMPLATE_PATH2 = os.path.join(TEMPLATE_DIR, 'templates/odm2testapp')
-#print(TEMPLATE_PATH)
-TEMPLATE_DIRS = [TEMPLATE_PATH,] #TEMPLATE_PATH2,
+# TEMPLATE_PATH2 = os.path.join(TEMPLATE_DIR, 'templates/odm2testapp')
+# print(TEMPLATE_PATH)
+TEMPLATE_DIRS = [TEMPLATE_PATH, ]  # TEMPLATE_PATH2,
 
-#TEMPLATE_LOADERS = ('django.template.loaders.filesystem.Loader',)
+# TEMPLATE_LOADERS = ('django.template.loaders.filesystem.Loader',)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
@@ -30,18 +31,18 @@ SECRET_KEY = secret_key
 DEBUG = debug
 
 TEMPLATE_DEBUG = template_debug
-
+ADMINS = admin
 ALLOWED_HOSTS = []
 
 MEDIA_ROOT = media_root
 MEDIA_URL = media_url
 # Application definition
 CUSTOM_TEMPLATE_PATH = custom_template_path
-#ADMIN_SHORTCUTS_PATH=admin_shortcuts_path
+# ADMIN_SHORTCUTS_PATH=admin_shortcuts_path
 URL_PATH = url_path
 STATIC_ROOT = static_root
-#https://github.com/mishbahr/django-modeladmin-reorder
-#{'app': 'auth', 'models': ('auth.User', 'auth.Group')},
+# https://github.com/mishbahr/django-modeladmin-reorder
+# {'app': 'auth', 'models': ('auth.User', 'auth.Group')},
 # ADMIN_REORDER = ('odm2testsite',
 #                  {'app':'Odm2Testapp',
 #                   'auth':'staff',
@@ -66,7 +67,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'admin_reorder',
+    # 'admin_reorder',
 
 )
 TEMPLATE_LOADERS = (
@@ -74,7 +75,7 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
     'apptemplates.Loader',
 )
-#find icon images here https://github.com/alesdotio/django-admin-shortcuts/blob/master/admin_shortcuts/templatetags/admin_shortcuts_tags.py#L134
+# find icon images here https://github.com/alesdotio/django-admin-shortcuts/blob/master/admin_shortcuts/templatetags/admin_shortcuts_tags.py#L134
 ADMIN_SHORTCUTS = [
     {
 
@@ -83,43 +84,43 @@ ADMIN_SHORTCUTS = [
                 'url': CUSTOM_TEMPLATE_PATH,
                 'app_name': '{}'.format(app_config['app_name']),
                 'title': 'Home',
-                'class':'home',
+                'class': 'home',
             },
             {
                 'url_name': 'admin:{}_measurementresultvalues_changelist'.format(app_config['app_name']),
                 'app_name': '{}'.format(app_config['app_name']),
                 'title': 'Results',
-                'class':'archive',
+                'class': 'archive',
             },
             {
-                'url': '/'+URL_PATH+ 'AddSensor.html',
+                'url': '/' + URL_PATH + 'AddSensor.html',
                 'app_name': '{}'.format(app_config['app_name']),
                 'title': 'Add Sensor Data',
-                'class':'tool',
+                'class': 'tool',
             },
             {
-                'url': '/'+URL_PATH+'AddProfile.html',
+                'url': '/' + URL_PATH + 'AddProfile.html',
                 'app_name': '{}'.format(app_config['app_name']),
                 'title': 'Add Soil Profile Data',
-                'class':'flag',
+                'class': 'flag',
             },
             {
-                'url': '/'+URL_PATH+ 'RecordAction.html',
+                'url': '/' + URL_PATH + 'RecordAction.html',
                 'app_name': '{}'.format(app_config['app_name']),
                 'title': 'Record an Action',
-                'class':'notepad',
-            },
-             {
-                'url': '/'+URL_PATH+ 'ManageCitations.html',
-                'app_name': '{}'.format(app_config['app_name']),
-                'title': 'Manage Citations',
-                'class':'pencil',
+                'class': 'notepad',
             },
             {
-                'url': '/'+URL_PATH+ 'chartIndex.html',
+                'url': '/' + URL_PATH + 'ManageCitations.html',
+                'app_name': '{}'.format(app_config['app_name']),
+                'title': 'Manage Citations',
+                'class': 'pencil',
+            },
+            {
+                'url': '/' + URL_PATH + 'chartIndex.html',
                 'app_name': '{}'.format(app_config['app_name']),
                 'title': 'Graph My Data',
-                'class':'monitor',
+                'class': 'monitor',
             },
         ]
     },
@@ -129,19 +130,18 @@ ADMIN_SHORTCUTS_SETTINGS = {
     'open_new_window': False,
 }
 
-
-#https://github.com/crucialfelix/django-ajax-selects
+# https://github.com/crucialfelix/django-ajax-selects
 AJAX_LOOKUP_CHANNELS = {
     #  simple: search Person.objects.filter(name__icontains=q)
-    'cv_variable_name': ('{}.lookups'.format(app_config['app_name']),  'CvVariableNameLookup'),
-    'cv_variable_type': ('{}.lookups'.format(app_config['app_name']),  'CvVariableTypeLookup'),
-    'cv_unit_type': ('{}.lookups'.format(app_config['app_name']),  'CvUnitTypeLookup'),
-    'cv_speciation': ('{}.lookups'.format(app_config['app_name']),  'CvVariableSpeciationLookup'),
-    'featureaction_lookup': ('{}.lookups'.format(app_config['app_name']),  'FeatureactionsLookup'),
-    'result_lookup': ('{}.lookups'.format(app_config['app_name']),  'ResultsLookup'),
+    'cv_variable_name': ('{}.lookups'.format(app_config['app_name']), 'CvVariableNameLookup'),
+    'cv_variable_type': ('{}.lookups'.format(app_config['app_name']), 'CvVariableTypeLookup'),
+    'cv_unit_type': ('{}.lookups'.format(app_config['app_name']), 'CvUnitTypeLookup'),
+    'cv_speciation': ('{}.lookups'.format(app_config['app_name']), 'CvVariableSpeciationLookup'),
+    'featureaction_lookup': ('{}.lookups'.format(app_config['app_name']), 'FeatureactionsLookup'),
+    'result_lookup': ('{}.lookups'.format(app_config['app_name']), 'ResultsLookup'),
     'profileresult_lookup': ('{}.lookups'.format(app_config['app_name']), 'ProfileResultsLookup'),
     'measurementresult_lookup': ('{}.lookups'.format(app_config['app_name']), 'MeasurementResultsLookup'),
-    'cv_taxonomic_classifier_type':('{}.lookups'.format(app_config['app_name']),'CvTaxonomicClassifierTypeLookup'),
+    'cv_taxonomic_classifier_type': ('{}.lookups'.format(app_config['app_name']), 'CvTaxonomicClassifierTypeLookup'),
     # define a custom lookup channel
 }
 
@@ -150,32 +150,31 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    #'django.contrib.auth.middleware.SessionAuthenticationMiddleware', didn't work in production
+    # 'django.contrib.auth.middleware.SessionAuthenticationMiddleware', didn't work in production
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    #'admin_reorder.middleware.ModelAdminReorder',
+    # 'admin_reorder.middleware.ModelAdminReorder',
 )
 
 ROOT_URLCONF = 'templatesAndSettings.urls'
 
 WSGI_APPLICATION = 'templatesAndSettings.wsgi.application'
 
-
 # Database
-# https://docs.djangoproject.com/en/1.7/ref/settings/#databases
+# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 DATABASES = {
     'default': {
-        'ENGINE':  ODM2_configs['ENGINE'],
+        'ENGINE': ODM2_configs['ENGINE'],
         'NAME': ODM2_configs['NAME'],
         'USER': ODM2_configs['USER'],
         'PASSWORD': ODM2_configs['PASSWORD'],
         'HOST': ODM2_configs['HOST'],
         'PORT': ODM2_configs['PORT'],
-     'OPTIONS': ODM2_configs['OPTIONS'],
+        'OPTIONS': ODM2_configs['OPTIONS'],
 
-}}
+    }}
 # Internationalization
-# https://docs.djangoproject.com/en/1.7/topics/i18n/
+# https://docs.djangoproject.com/en/1.9/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -187,8 +186,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
+# https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = static_url
