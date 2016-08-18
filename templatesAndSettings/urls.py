@@ -1,11 +1,16 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from ajax_select import urls as ajax_select_urls
-from ODM2CZOData import views
 
 from templatesAndSettings.settings import MEDIA_ROOT
 from templatesAndSettings.settings import MEDIA_URL
 from templatesAndSettings.settings import URL_PATH
+from templatesAndSettings.settings import app_config
+# from ODM2CZOData import views # How can I use config file for this??
+import importlib
+views = importlib.import_module("{}.views".format(app_config['app_name']))
+# exec('from ' + app_config['app_name'] + ' import views')
+
 from django.views.generic import View
 admin.autodiscover()
 admin.site.site_header = 'ODM2 Admin'

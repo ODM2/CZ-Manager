@@ -285,6 +285,8 @@ class VariablesAdminForm(ModelForm):
     variable_name.allow_tags = True
     variable_type.help_text = u'view variable types here <a href="http://vocabulary.odm2.org/variabletype/" target="_blank" >http://vocabulary.odm2.org/variabletype/</a>'
     variable_type.allow_tags = True
+    speciation.help_text = u'view variable types here <a href="http://vocabulary.odm2.org/speciation/" target="_blank" >http://vocabulary.odm2.org/speciation/</a>'
+    speciation.allow_tags = True
     class Meta:
         model = Variables
         fields = '__all__'

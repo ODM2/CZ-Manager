@@ -48,6 +48,7 @@ import sys as sys
 from django.core import management
 from django.shortcuts import render_to_response
 from django.contrib.gis.geos import GEOSGeometry
+from templatesAndSettings.settings import app_config
 #
 # class FeatureactionsAutocomplete(autocomplete.Select2QuerySetView):
 #     def get_queryset(self):
@@ -372,7 +373,7 @@ def web_map(request,dataset='NotSet'):
         authenticated=True
     else:
         authenticated=False
-
+    map_config = app_config['map_config']
     datasets = Datasets.objects.all()
 
     ids = [ds.datasetid for ds in datasets]
@@ -425,7 +426,7 @@ def web_map(request,dataset='NotSet'):
 
     context = {
         'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,'results':results,
-        'datasets':datasets,'selecteddatasets':selected,'authenticated':authenticated}
+        'datasets':datasets,'selecteddatasets':selected,'authenticated':authenticated, 'map_config':map_config}
     return render(request, 'mapdata.html', context)
 
 

@@ -1,0 +1,19 @@
+{
+  "app_configuration":{
+    "app_name":"ODM2CZOData",
+    "verbose_name":"ODM2CZOData",
+    "map_config":{
+      "lat":40.000,
+      "lon":-95.000,
+      "zoom":5
+    },
+    "secret_key":"random_secret_key_like_so_7472873649836"
+  },
+  "database_configuration":{
+    "name":"x",
+    "user":"x",
+    "password":"x",
+    "host":"localhost",
+    "port":"5432"
+  }
+}

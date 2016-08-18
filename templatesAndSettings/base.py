@@ -54,7 +54,7 @@ STATIC_ROOT = static_root
 INSTALLED_APPS = (
     'jquery',
     'djangocms_admin_style',
-    'ODM2CZOData',
+    '{}'.format(app_config['app_name']),
     'import_export',
     'admin_shortcuts',
     'daterange_filter',
@@ -80,44 +80,44 @@ ADMIN_SHORTCUTS = [
 
         'shortcuts': [
             {
-                'url': CUSTOM_TEMPLATE_PATH,
-                'app_name': 'ODM2CZOData',
+                'url': '/'+URL_PATH,
+                'app_name': '{}'.format(app_config['app_name']),
                 'title': 'Home',
                 'class':'home',
             },
             {
-                'url_name': 'admin:ODM2CZOData_measurementresultvalues_changelist',
-                'app_name': 'ODM2CZOData',
+                'url_name': 'admin:{}_measurementresultvalues_changelist'.format(app_config['app_name']),
+                'app_name': '{}'.format(app_config['app_name']),
                 'title': 'Results',
                 'class':'archive',
             },
             {
                 'url': '/'+URL_PATH+ 'AddSensor.html',
-                'app_name': 'ODM2CZOData',
+                'app_name': '{}'.format(app_config['app_name']),
                 'title': 'Add Sensor Data',
                 'class':'tool',
             },
             {
                 'url': '/'+URL_PATH+'AddProfile.html',
-                'app_name': 'ODM2CZOData',
+                'app_name': '{}'.format(app_config['app_name']),
                 'title': 'Add Soil Profile Data',
                 'class':'flag',
             },
             {
                 'url': '/'+URL_PATH+ 'RecordAction.html',
-                'app_name': 'ODM2CZOData',
+                'app_name': '{}'.format(app_config['app_name']),
                 'title': 'Record an Action',
                 'class':'notepad',
             },
              {
                 'url': '/'+URL_PATH+ 'ManageCitations.html',
-                'app_name': 'ODM2CZOData',
+                'app_name': '{}'.format(app_config['app_name']),
                 'title': 'Manage Citations',
                 'class':'pencil',
             },
             {
                 'url': '/'+URL_PATH+ 'chartIndex.html',
-                'app_name': 'ODM2CZOData',
+                'app_name': '{}'.format(app_config['app_name']),
                 'title': 'Graph My Data',
                 'class':'monitor',
             },
@@ -133,14 +133,14 @@ ADMIN_SHORTCUTS_SETTINGS = {
 #https://github.com/crucialfelix/django-ajax-selects
 AJAX_LOOKUP_CHANNELS = {
     #  simple: search Person.objects.filter(name__icontains=q)
-    'cv_variable_name': ('ODM2CZOData.lookups',  'CvVariableNameLookup'),
-    'cv_variable_type': ('ODM2CZOData.lookups',  'CvVariableTypeLookup'),
-    'cv_unit_type': ('ODM2CZOData.lookups',  'CvUnitTypeLookup'),
-    'cv_speciation': ('ODM2CZOData.lookups',  'CvVariableSpeciationLookup'),
-    'featureaction_lookup': ('ODM2CZOData.lookups',  'FeatureactionsLookup'),
-    'result_lookup': ('ODM2CZOData.lookups',  'ResultsLookup'),
-    'profileresult_lookup': ('ODM2CZOData.lookups', 'ProfileResultsLookup'),
-    'measurementresult_lookup': ('ODM2CZOData.lookups', 'MeasurementResultsLookup')
+    'cv_variable_name': ('{}.lookups'.format(app_config['app_name']),  'CvVariableNameLookup'),
+    'cv_variable_type': ('{}.lookups'.format(app_config['app_name']),  'CvVariableTypeLookup'),
+    'cv_unit_type': ('{}.lookups'.format(app_config['app_name']),  'CvUnitTypeLookup'),
+    'cv_speciation': ('{}.lookups'.format(app_config['app_name']),  'CvVariableSpeciationLookup'),
+    'featureaction_lookup': ('{}.lookups'.format(app_config['app_name']),  'FeatureactionsLookup'),
+    'result_lookup': ('{}.lookups'.format(app_config['app_name']),  'ResultsLookup'),
+    'profileresult_lookup': ('{}.lookups'.format(app_config['app_name']), 'ProfileResultsLookup'),
+    'measurementresult_lookup': ('{}.lookups'.format(app_config['app_name']), 'MeasurementResultsLookup')
     # define a custom lookup channel
 }
 
