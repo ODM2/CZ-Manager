@@ -15,13 +15,13 @@ db_config = configurations['database_configuration']
 secret_key = '{}'.format(app_config['secret_key'])
 
 
-media_root = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin/{}/upfiles/'.format(app_config['app_name'])
+media_root = '{0}/{1}/upfiles/'.format(app_config['*_root'],app_config['app_name'])
 media_url = '/odm2testapp/upfiles/'
 # Application definition
 custom_template_path = '/admin/{}/'.format(app_config['app_name'])
 #admin_shortcuts_path = '/admin/'
 url_path = 'admin/'
-static_root = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin/static'
+static_root = '{}/static'.format(app_config['*_root'])
 debug = True
 template_debug = True
 # Database

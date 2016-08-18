@@ -50,3 +50,4 @@ log
 .idea/
 *.pyc
 .gitignore
+templatesAndSettings/config.json

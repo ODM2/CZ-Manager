@@ -6,7 +6,7 @@ from NSF Grant EAR-1331841 Luquillo CZO.
 Django models exist for all ODM2 tables. Forms for ODM2Core and some additional tables have been created. Graphing of measurement result values via highcharts are implemented. Data logger files can be imported as long as data logger file columns and results are properly setup.   
 ODM2 can be found here: https://github.com/ODM2
 
-In the folder templatesAndSettings you will find settings.py which contains all of the database and local file system settings which need to be configured to get a copy of this application working. This was developed using a postgresql version of ODM2 data model, additional modifications will be needed to make this work with MSSQL or another database. 
+In the folder templatesAndSettings you will find `config.json` which contains all of the database and local file system settings which need to be configured to get a copy of this application working. This was developed using a postgresql version of ODM2 data model, additional modifications will be needed to make this work with MSSQL or another database. 
 
 You might find issues with psycopg2 on windows 
 
@@ -45,3 +45,9 @@ django-daterange-filter https://pypi.python.org/pypi/django-daterange-filter/1.1
 django-import-export https://django-import-export.readthedocs.org/en/latest/installation.html
 
 django-jquery 
+
+**Alternate Installation**
+
+If you have conda python package manager, the environment configuration file `odm2adminenv.yml` can be installed to run ODM2-Admin.
+
+`$ conda env create -f odm2adminenv.yml`
