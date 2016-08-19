@@ -188,9 +188,9 @@ class authorlistInline(admin.StackedInline):
     extra = 0
 
 
-
 class CitationsAdminForm(ModelForm):
     title = forms.CharField(max_length=255, widget=forms.Textarea, label="Publication Title")
+
     class Meta:
         model = Citations
         fields = '__all__'
@@ -212,7 +212,8 @@ class DOIInline(admin.StackedInline):
 
 
 class CitationsAdmin(admin.ModelAdmin):
-    list_display = ('title', 'primary_author','publicationyear','other_author','publisher', 'doi', 'citation_link')
+    list_display = ('primary_author', 'publicationyear', 'title', 'other_author', 'publisher', 'doi', 'citation_link')
+    list_display_links = ['title']
     inlines = [authorlistInline, DOIInline]
     form = CitationsAdminForm
     search_fields = ['title', 'publisher', 'publicationyear', 'authorlists__personid__personfirstname',
@@ -225,12 +226,12 @@ class CitationsAdmin(admin.ModelAdmin):
         external_id = Citationexternalidentifiers.objects.get(citationid=obj.citationid)
         return u'<a href="http://dx.doi.org/{0}" target="_blank">{0}</a>'.format(external_id.citationexternalidentifier)
 
-    def primary_author(self,obj):
+    def primary_author(self, obj):
         self.author_list = Authorlists.objects.filter(citationid=obj.citationid)
         first_author = self.author_list.get(authororder=1)
         return "{0}, {1}".format(first_author.personid.personlastname, first_author.personid.personfirstname)
 
-    def other_author(self,obj):
+    def other_author(self, obj):
         list_et_al = list()
         for author in self.author_list:
             if author.authororder != 1:
@@ -280,13 +281,13 @@ class VariablesAdminForm(ModelForm):
     # variable_type = make_ajax_field(Variables,'variable_type','cv_variable_type')
     speciation = make_ajax_field(Variables, 'speciation', 'cv_speciation')
 
-
     variable_name.help_text = u'view variable names here <a href="http://vocabulary.odm2.org/variablename/" target="_blank">http://vocabulary.odm2.org/variablename/</a>'
     variable_name.allow_tags = True
     variable_type.help_text = u'view variable types here <a href="http://vocabulary.odm2.org/variabletype/" target="_blank" >http://vocabulary.odm2.org/variabletype/</a>'
     variable_type.allow_tags = True
     speciation.help_text = u'view variable types here <a href="http://vocabulary.odm2.org/speciation/" target="_blank" >http://vocabulary.odm2.org/speciation/</a>'
     speciation.allow_tags = True
+
     class Meta:
         model = Variables
         fields = '__all__'
@@ -299,10 +300,11 @@ class VariablesAdmin(admin.ModelAdmin):
 
 
 class TaxonomicclassifiersAdminForm(ModelForm):
-    taxonomic_classifier_type = make_ajax_field(Taxonomicclassifiers, 'taxonomic_classifier_type', 'cv_taxonomic_classifier_type')
+    taxonomic_classifier_type = make_ajax_field(Taxonomicclassifiers, 'taxonomic_classifier_type',
+                                                'cv_taxonomic_classifier_type')
     taxonomic_classifier_type.help_text = u'A vocabulary for describing types of taxonomies from which descriptive terms used ' \
-                                          u'in an ODM2 database have been drawn. Taxonomic classifiers provide a way to classify'\
-                                          u' Results and Specimens according to terms from a formal taxonomy. Check '\
+                                          u'in an ODM2 database have been drawn. Taxonomic classifiers provide a way to classify' \
+                                          u' Results and Specimens according to terms from a formal taxonomy. Check ' \
                                           u'<a href="http://vocabulary.odm2.org/taxonomicclassifiertype/" target="_blank">' \
                                           u'http://vocabulary.odm2.org/taxonomicclassifiertype/</a>  for more info'
     taxonomic_classifier_type.allow_tags = True
@@ -335,9 +337,10 @@ class SamplingfeaturesAdminForm(ModelForm):
     samplingfeaturedescription = CharField(max_length=5000, label="feature description", widget=forms.Textarea,
                                            required=False)
     featuregeometry = forms.GeometryField(label="feature geometry (to add a point format is POINT(lat, lon)" +
-                                      " where long and lat are in decimal degrees. If you don't want to add a location" +
-                                      " leave default value of POINT(0 0).",srid=4326, widget=forms.OpenLayersWidget(
-        attrs={'display_raw':True}))
+                                                " where long and lat are in decimal degrees. If you don't want to add a location" +
+                                                " leave default value of POINT(0 0).", srid=4326,
+                                          widget=forms.OpenLayersWidget(
+                                              attrs={'display_raw': True}))
 
     featuregeometry.initial = GEOSGeometry("POINT(0 0)")
     featuregeometry.required = False
@@ -349,6 +352,7 @@ class SamplingfeaturesAdminForm(ModelForm):
     class Meta:
         model = Samplingfeatures
         fields = '__all__'
+
 
 class IGSNInline(admin.StackedInline):
     model = Samplingfeatureexternalidentifiers
@@ -481,10 +485,10 @@ class OrganizationsAdminForm(ModelForm):
 
 
 class OrganizationsAdmin(admin.ModelAdmin):
-    list_display = ('organizationname', 'organizationdescription','organization_link')
+    list_display = ('organizationname', 'organizationdescription', 'organization_link')
     form = OrganizationsAdminForm
 
-    def organization_link(self,org):
+    def organization_link(self, org):
         return u'<a href={0} target="_blank">{0}</a>'.format(org.organizationlink)
 
     organization_link.allow_tags = True
@@ -550,6 +554,11 @@ class DatasetsAdmin(admin.ModelAdmin):
 
 class ActionsAdminForm(ModelForm):
     actiondescription = CharField(max_length=5000, label="Action description", widget=forms.Textarea, required=False)
+    action_type = make_ajax_field(Actions, 'action_type', 'cv_action_type')
+    action_type.help_text = u'A vocabulary for describing the type of actions performed in making observations. Depending' \
+                            u' on the action type, the action may or may not produce an observation result. view action type ' \
+                            u'details here <a href="http://vocabulary.odm2.org/actiontype/" target="_blank">http://vocabulary.odm2.org/actiontype/</a>'
+    action_type.allow_tags = True
 
     class Meta:
         model = Actions
@@ -557,8 +566,8 @@ class ActionsAdminForm(ModelForm):
 
 
 class ActionsAdmin(admin.ModelAdmin):
-    list_display = ('action_type', 'method', 'begindatetime')
-    list_display_links = ('action_type', 'method')
+    list_display = ('action_type', 'method', 'begindatetime', 'enddatetime')
+    list_display_links = ('action_type',)
     search_fields = ['action_type__name', 'method__methodname']  # ,
     form = ActionsAdminForm
 
@@ -570,14 +579,21 @@ class ActionByAdminForm(ModelForm):
 
 
 class ActionByAdmin(admin.ModelAdmin):
-    list_display = ('affiliationid', 'actionid')
-    list_display_links = ('affiliationid', 'actionid')  #
+    list_display = ('actionid', 'affiliationid')
+    # list_display_links = ('affiliationid', 'actionid')  #
     form = ActionByAdminForm
     # list_select_related = True
 
 
 class MethodsAdminForm(ModelForm):
     methoddescription = CharField(max_length=5000, label="Method description", widget=forms.Textarea, required=False)
+    methodtypecv = make_ajax_field(Methods, 'methodtypecv', 'cv_method_type')
+    methodtypecv.help_text = u'A vocabulary for describing types of Methods associated with creating observations. ' \
+                             u'MethodTypes correspond with ActionTypes in ODM2. An Action must be performed using an ' \
+                             u'appropriate MethodType - e.g., a specimen collection Action should be associated with a ' \
+                             u'specimen collection method. details for individual values ' \
+                             u'here: <a href="http://vocabulary.odm2.org/methodtype/" target="_blank">http://vocabulary.odm2.org/methodtype/</a>'
+    methodtypecv.allow_tags = True
 
     # methodtypecv= TermModelChoiceField(CvMethodtype.objects.all().order_by('term'))
     # organizationid= OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
@@ -588,7 +604,7 @@ class MethodsAdminForm(ModelForm):
 
 class MethodsAdmin(admin.ModelAdmin):
     list_display = ('methodname', 'methodtypecv', 'method_link')
-    list_display_links = ['methodname', 'method_link']
+    list_display_links = ['methodname']
     form = MethodsAdminForm
 
     # DOI matching reg expresion came from http://stackoverflow.com/questions/27910/finding-a-doi-in-a-document-or-page
@@ -936,6 +952,7 @@ class UnitsAdminForm(ModelForm):
 class UnitsAdmin(admin.ModelAdmin):
     form = UnitsAdminForm
     search_fields = ['unit_type__name', 'unitsabbreviation', 'unitsname']
+    list_display = ['unitsabbreviation', 'unitsname', 'unit_type']
 
 
 class DataloggerprogramfilesAdminForm(ModelForm):
@@ -1049,10 +1066,23 @@ class PeopleAdmin(admin.ModelAdmin):
         name_list = list()
         for org_name in org:
             if org_name.parentorganizationid:
-                name_list.append(u'<a href="{0}">{1}, {2}</a>'.format(org_name.organizationlink, org_name.organizationname, org_name.parentorganizationid.organizationname))
+                if org_name.organizationlink:
+                    name_list.append(u'<a href="{0}" target="_blank">{1}, {2}</a>'.format(org_name.organizationlink,
+                                                                                          org_name.organizationname,
+                                                                                          org_name.parentorganizationid.organizationname))
+                else:
+                    name_list.append(u'{0}, {1}'.format(org_name.organizationname,
+                                                          org_name.parentorganizationid.organizationname))
             else:
-                name_list.append(u'<a href="{0}">{1}</a>'.format(org_name.organizationlink,org_name.organizationname))
+                if org_name.organizationlink:
+                    name_list.append(
+                        u'<a href="{0}" target="_blank">{1}</a>'.format(org_name.organizationlink, org_name.organizationname))
+                else:
+                    name_list.append(
+                        u'{0}'.format(org_name.organizationname))
+
         return u'; '.join(name_list)
+
 
     orcid.allow_tags = True
     affiliation.allow_tags = True
@@ -1066,4 +1096,3 @@ class ExternalidentifiersystemForm(ModelForm):
 
 class ExternalidentifiersystemAdmin(admin.ModelAdmin):
     form = ExternalidentifiersystemForm
-

@@ -9,14 +9,6 @@
 
 {# django-admin-shortcuts changes these blocks #}
 
-{% block breadcrumbs %}
-    {% if authenticated %}
-        <div class="admin_shortcuts">
-            {% admin_shortcuts %}
-        </div>
-    {% endif %}
-{% endblock %}
-
 {% block extrastyle %}
     <style type="text/css">{% admin_shortcuts_css %}</style>
 	{{ block.super }}
@@ -25,11 +17,25 @@
 	{% endblock %}
 
 {% block title %}
-    Map Sample Locations | {{ "site_title"|get_title:6 }}
+    {{ short_title }} | {{ site_title }}
 {% endblock %}
 
-{% block branding%}
-    <h1>{{ "site_header"|get_title:6 }}</h1>
+{% block branding %}
+    <h1>{{ site_header }}</h1>
+{% endblock %}
+
+{% block nav-global %}
+    {% if authenticated %}
+        {% include 'user-tools.html' %}
+    {% endif %}
+{% endblock %}
+
+{% block breadcrumbs %}
+    {% if authenticated %}
+        <div class="admin_shortcuts">
+            {% admin_shortcuts %}
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block extrahead %}<script src="https://use.fontawesome.com/57b6c04fb7.js"></script>

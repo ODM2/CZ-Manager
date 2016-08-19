@@ -4,6 +4,8 @@ from .models import CvVariabletype
 from .models import CvUnitstype
 from .models import CvSpeciation
 from .models import CvTaxonomicclassifiertype
+from .models import CvMethodtype
+from .models import CvActiontype
 from .models import Featureactions
 from .models import Results
 from .models import Profileresults
@@ -228,11 +230,51 @@ class CvUnitTypeLookup(LookupChannel):
                (escape(obj.name),escape(obj.sourcevocabularyuri))
     #onClick="window.open('http://www.yahoo.com', '_blank')
 
+
 class CvTaxonomicClassifierTypeLookup(LookupChannel):
     model = CvTaxonomicclassifiertype
 
     def get_query(self,q,request):
         return CvTaxonomicclassifiertype.objects.filter(name__icontains=q).order_by('name') #
+
+    def get_result(self,obj):
+        return obj.name
+
+    def format_match(self,obj):
+        return self.format_item_display(obj)
+        #return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+
+    def format_item_display(self,obj):
+        #return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+        return u"%s  <a href= %s target='_blank'> reference link </a>" % \
+               (escape(obj.name),escape(obj.sourcevocabularyuri))
+    #onClick="window.open('http://www.yahoo.com', '_blank')
+
+
+class CvMethodTypeLookup(LookupChannel):
+    model = CvMethodtype
+
+    def get_query(self,q,request):
+        return CvMethodtype.objects.filter(name__icontains=q).order_by('name') #
+
+    def get_result(self,obj):
+        return obj.name
+
+    def format_match(self,obj):
+        return self.format_item_display(obj)
+        #return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+
+    def format_item_display(self,obj):
+        #return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+        return u"%s  <a href= %s target='_blank'> reference link </a>" % \
+               (escape(obj.name),escape(obj.sourcevocabularyuri))
+    #onClick="window.open('http://www.yahoo.com', '_blank')
+
+class CvActionTypeLookup(LookupChannel):
+    model = CvActiontype
+
+    def get_query(self,q,request):
+        return CvActiontype.objects.filter(name__icontains=q).order_by('name') #
 
     def get_result(self,obj):
         return obj.name

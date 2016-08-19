@@ -84,7 +84,7 @@ ADMIN_SHORTCUTS = [
                 'url': CUSTOM_TEMPLATE_PATH,
                 'app_name': '{}'.format(app_config['app_name']),
                 'title': '{} Admin'.format(app_config['verbose_name']),
-                'class': 'home',
+                'class': 'config',
             },
             {
                 'url_name': 'admin:{}_measurementresultvalues_changelist'.format(app_config['app_name']),
@@ -142,6 +142,8 @@ AJAX_LOOKUP_CHANNELS = {
     'profileresult_lookup': ('{}.lookups'.format(app_config['app_name']), 'ProfileResultsLookup'),
     'measurementresult_lookup': ('{}.lookups'.format(app_config['app_name']), 'MeasurementResultsLookup'),
     'cv_taxonomic_classifier_type': ('{}.lookups'.format(app_config['app_name']), 'CvTaxonomicClassifierTypeLookup'),
+    'cv_method_type':('{}.lookups'.format(app_config['app_name']),'CvMethodTypeLookup'),
+    'cv_action_type':('{}.lookups'.format(app_config['app_name']),'CvActionTypeLookup')
     # define a custom lookup channel
 }
 
