@@ -1087,7 +1087,6 @@ def scatter_plot(request):
     rvx=rvy=prvx=prvy=xlocs=ylocs=None
     if xVar and yVar:
         rvx=pr.filter(variableid=xVar).values('resultid')
-        print(rvx)
         prvx=Profileresultvalues.objects.filter(~Q(datavalue=-6999))\
         .filter(~Q(datavalue=-888.88)).filter(resultid__in=rvx).order_by("resultid__resultid__unitsid","resultid__resultid__featureactionid__samplingfeatureid","zlocation")
         rvy=pr.filter(variableid=yVar).values('resultid')

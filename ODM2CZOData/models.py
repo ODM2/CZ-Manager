@@ -374,7 +374,7 @@ class Citations(models.Model):
     citationid = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
     publisher = models.CharField(max_length=255)
-    publicationyear = models.IntegerField(verbose_name='publication year')
+    publicationyear = models.IntegerField(verbose_name='year')
     citationlink = models.CharField(max_length=255, blank=True,verbose_name='Citation Link',)
     def __unicode__(self):
         s = u"%s" % (self.title)

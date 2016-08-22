@@ -236,10 +236,11 @@ class CitationsAdmin(admin.ModelAdmin):
         for author in self.author_list:
             if author.authororder != 1:
                 list_et_al.append("{0}, {1}".format(author.personid.personlastname, author.personid.personfirstname))
-        return ";".join(list_et_al)
+        return "; ".join(list_et_al)
 
     doi.allow_tags = True
     citation_link.short_description = 'link to citation'
+    other_author.short_description = 'Other Authors'
     citation_link.allow_tags = True
     # primary_author.admin_order_field = 'authorlists__personid__personlastname'
 
@@ -1065,21 +1066,27 @@ class PeopleAdmin(admin.ModelAdmin):
         org = Organizations.objects.filter(affiliations__personid_id=obj.personid)
         name_list = list()
         for org_name in org:
-            if org_name.parentorganizationid:
-                if org_name.organizationlink:
-                    name_list.append(u'<a href="{0}" target="_blank">{1}, {2}</a>'.format(org_name.organizationlink,
-                                                                                          org_name.organizationname,
-                                                                                          org_name.parentorganizationid.organizationname))
-                else:
-                    name_list.append(u'{0}, {1}'.format(org_name.organizationname,
-                                                          org_name.parentorganizationid.organizationname))
+            if org_name.organizationlink:
+                name_list.append(
+                            u'<a href="{0}" target="_blank">{1}</a>'.format(org_name.organizationlink, org_name.organizationname))
             else:
-                if org_name.organizationlink:
-                    name_list.append(
-                        u'<a href="{0}" target="_blank">{1}</a>'.format(org_name.organizationlink, org_name.organizationname))
-                else:
-                    name_list.append(
-                        u'{0}'.format(org_name.organizationname))
+                name_list.append(
+                    u'{0}'.format(org_name.organizationname))
+            # if org_name.parentorganizationid:
+            #     if org_name.organizationlink:
+            #         name_list.append(u'<a href="{0}" target="_blank">{1}, {2}</a>'.format(org_name.organizationlink,
+            #                                                                               org_name.organizationname,
+            #                                                                               org_name.parentorganizationid.organizationname))
+            #     else:
+            #         name_list.append(u'{0}, {1}'.format(org_name.organizationname,
+            #                                               org_name.parentorganizationid.organizationname))
+            # else:
+            #     if org_name.organizationlink:
+            #         name_list.append(
+            #             u'<a href="{0}" target="_blank">{1}</a>'.format(org_name.organizationlink, org_name.organizationname))
+            #     else:
+            #         name_list.append(
+            #             u'{0}'.format(org_name.organizationname))
 
         return u'; '.join(name_list)
 
