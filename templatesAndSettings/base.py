@@ -86,12 +86,6 @@ ADMIN_SHORTCUTS = [
                 'class':'home',
             },
             {
-                'url_name': 'admin:ODM2CZOData_measurementresultvalues_changelist',
-                'app_name': 'ODM2CZOData',
-                'title': 'Results',
-                'class':'archive',
-            },
-            {
                 'url': '/'+URL_PATH+ 'AddSensor.html',
                 'app_name': 'ODM2CZOData',
                 'title': 'Add Sensor Data',
