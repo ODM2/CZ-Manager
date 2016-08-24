@@ -87,12 +87,6 @@ ADMIN_SHORTCUTS = [
                 'class': 'config',
             },
             {
-                'url_name': 'admin:{}_measurementresultvalues_changelist'.format(app_config['app_name']),
-                'app_name': '{}'.format(app_config['app_name']),
-                'title': 'Results',
-                'class': 'archive',
-            },
-            {
                 'url': '/' + URL_PATH + 'AddSensor.html',
                 'app_name': '{}'.format(app_config['app_name']),
                 'title': 'Add Sensor Data',
@@ -143,7 +137,8 @@ AJAX_LOOKUP_CHANNELS = {
     'measurementresult_lookup': ('{}.lookups'.format(app_config['app_name']), 'MeasurementResultsLookup'),
     'cv_taxonomic_classifier_type': ('{}.lookups'.format(app_config['app_name']), 'CvTaxonomicClassifierTypeLookup'),
     'cv_method_type':('{}.lookups'.format(app_config['app_name']),'CvMethodTypeLookup'),
-    'cv_action_type':('{}.lookups'.format(app_config['app_name']),'CvActionTypeLookup')
+    'cv_action_type':('{}.lookups'.format(app_config['app_name']),'CvActionTypeLookup'),
+    'cv_sampling_feature_type':('{}.lookups'.format(app_config['app_name']),'CvSamplingFeatureTypeLookup')
     # define a custom lookup channel
 }
 

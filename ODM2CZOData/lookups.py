@@ -6,6 +6,7 @@ from .models import CvSpeciation
 from .models import CvTaxonomicclassifiertype
 from .models import CvMethodtype
 from .models import CvActiontype
+from .models import CvSamplingfeaturetype
 from .models import Featureactions
 from .models import Results
 from .models import Profileresults
@@ -165,7 +166,7 @@ class CvVariableNameLookup(LookupChannel):
 
     def format_item_display(self,obj):
         #return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
-        return u"%s  <a href= %s target='_blank'> reference link </a>" % \
+        return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name),escape(obj.sourcevocabularyuri))
     #onClick="window.open('http://www.yahoo.com', '_blank')
 
@@ -185,7 +186,7 @@ class CvVariableSpeciationLookup(LookupChannel):
 
     def format_item_display(self,obj):
         #return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
-        return u"%s  <a href= %s target='_blank'> reference link </a>" % \
+        return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name),escape(obj.sourcevocabularyuri))
     #onClick="window.open('http://www.yahoo.com', '_blank')
 
@@ -206,7 +207,7 @@ class CvVariableTypeLookup(LookupChannel):
 
     def format_item_display(self,obj):
         #return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
-        return u"%s  <a href= %s target='_blank'> reference link </a>" % \
+        return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name),escape(obj.sourcevocabularyuri))
     #onClick="window.open('http://www.yahoo.com', '_blank')
 
@@ -226,7 +227,7 @@ class CvUnitTypeLookup(LookupChannel):
 
     def format_item_display(self,obj):
         #return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
-        return u"%s  <a href= %s target='_blank'> reference link </a>" % \
+        return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name),escape(obj.sourcevocabularyuri))
     #onClick="window.open('http://www.yahoo.com', '_blank')
 
@@ -246,7 +247,7 @@ class CvTaxonomicClassifierTypeLookup(LookupChannel):
 
     def format_item_display(self,obj):
         #return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
-        return u"%s  <a href= %s target='_blank'> reference link </a>" % \
+        return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name),escape(obj.sourcevocabularyuri))
     #onClick="window.open('http://www.yahoo.com', '_blank')
 
@@ -266,7 +267,7 @@ class CvMethodTypeLookup(LookupChannel):
 
     def format_item_display(self,obj):
         #return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
-        return u"%s  <a href= %s target='_blank'> reference link </a>" % \
+        return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name),escape(obj.sourcevocabularyuri))
     #onClick="window.open('http://www.yahoo.com', '_blank')
 
@@ -285,6 +286,25 @@ class CvActionTypeLookup(LookupChannel):
 
     def format_item_display(self,obj):
         #return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
-        return u"%s  <a href= %s target='_blank'> reference link </a>" % \
+        return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
+               (escape(obj.name),escape(obj.sourcevocabularyuri))
+    #onClick="window.open('http://www.yahoo.com', '_blank')
+
+class CvSamplingFeatureTypeLookup(LookupChannel):
+    model = CvSamplingfeaturetype
+
+    def get_query(self,q,request):
+        return CvSamplingfeaturetype.objects.filter(name__icontains=q).order_by('name') #
+
+    def get_result(self,obj):
+        return obj.name
+
+    def format_match(self,obj):
+        return self.format_item_display(obj)
+        #return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+
+    def format_item_display(self,obj):
+        #return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+        return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name),escape(obj.sourcevocabularyuri))
     #onClick="window.open('http://www.yahoo.com', '_blank')

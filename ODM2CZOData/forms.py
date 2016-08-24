@@ -296,8 +296,31 @@ class VariablesAdminForm(ModelForm):
 
 class VariablesAdmin(admin.ModelAdmin):
     form = VariablesAdminForm
-    list_display = ('variable_type', 'variable_name', 'variablecode', 'speciation')
+    list_display = ('variablecode','variable_name_linked','variable_type_linked', 'speciation_linked')
     search_fields = ['variable_type__name', 'variable_name__name', 'variablecode', 'speciation__name']
+
+    def variable_name_linked(self,obj):
+        if obj.variable_name:
+            return u'<a href="http://vocabulary.odm2.org/variablename/{0}" target="_blank">{1}</a>'.format(
+                obj.variable_name.term, obj.variable_name.name)
+    variable_name_linked.short_description = 'Variable Name'
+    variable_name_linked.allow_tags = True
+
+    def variable_type_linked(self, obj):
+        if obj.variable_type:
+            return u'<a href="http://vocabulary.odm2.org/variabletype/{0}" target="_blank">{1}</a>'.format(
+                obj.variable_type.term, obj.variable_type.name)
+
+    variable_type_linked.short_description = 'Variable Type'
+    variable_type_linked.allow_tags = True
+
+    def speciation_linked(self, obj):
+        if obj.speciation:
+            return u'<a href="http://vocabulary.odm2.org/speciation/{0}" target="_blank">{1}</a>'.format(
+                obj.speciation.term, obj.speciation.name)
+
+    speciation_linked.short_description = 'Speciation'
+    speciation_linked.allow_tags = True
 
 
 class TaxonomicclassifiersAdminForm(ModelForm):
@@ -335,6 +358,14 @@ class SamplingfeatureexternalidentifiersAdmin(admin.ModelAdmin):
 
 
 class SamplingfeaturesAdminForm(ModelForm):
+    sampling_feature_type = make_ajax_field(Samplingfeatures, 'sampling_feature_type', 'cv_sampling_feature_type')
+    sampling_feature_type.help_text = u'A vocabulary for describing the type of SamplingFeature. ' \
+                                      u'Many different SamplingFeature types can be represented in ODM2. ' \
+                                      u'SamplingFeatures of type Site and Specimen will be the most common, ' \
+                                      u'but many different types of varying levels of complexity can be used. ' \
+                                      u'details for individual values ' \
+                             u'here: <a href="http://vocabulary.odm2.org/samplingfeaturetype/" target="_blank">http://vocabulary.odm2.org/samplingfeaturetype/</a>'
+    sampling_feature_type.allow_tags = True
     samplingfeaturedescription = CharField(max_length=5000, label="feature description", widget=forms.Textarea,
                                            required=False)
     featuregeometry = forms.GeometryField(label="feature geometry (to add a point format is POINT(lat, lon)" +
@@ -367,7 +398,7 @@ class SamplingfeaturesAdmin(admin.ModelAdmin):
                      'samplingfeaturecode', 'samplingfeatureid',
                      'samplingfeatureexternalidentifiers__samplingfeatureexternalidentifier']
 
-    list_display = ('samplingfeaturecode', 'samplingfeaturename', 'sampling_feature_type', 'samplingfeaturedescription', 'igsn', 'dataset_code')
+    list_display = ('samplingfeaturecode', 'samplingfeaturename', 'sampling_feature_type_linked', 'samplingfeaturedescription', 'igsn', 'dataset_code')
     list_filter = (
         ('sampling_feature_type', admin.RelatedOnlyFieldListFilter),
     )
@@ -387,6 +418,14 @@ class SamplingfeaturesAdmin(admin.ModelAdmin):
         for d in ds:
             ds_list.append(d.datasetcode)
         return ", ".join(ds_list)
+
+    def sampling_feature_type_linked(self, obj):
+        if obj.sampling_feature_type:
+            return u'<a href="http://vocabulary.odm2.org/samplingfeaturetype/{0}" target="_blank">{1}</a>'.format(
+                obj.sampling_feature_type.term, obj.sampling_feature_type.name)
+
+    sampling_feature_type_linked.short_description = 'Sampling Feature Type'
+    sampling_feature_type_linked.allow_tags = True
 
 
 def duplicate_results_event(ModelAdmin, request, queryset):
@@ -604,7 +643,7 @@ class MethodsAdminForm(ModelForm):
 
 
 class MethodsAdmin(admin.ModelAdmin):
-    list_display = ('methodname', 'methodtypecv', 'method_link')
+    list_display = ('methodname', 'method_type_linked', 'method_link')
     list_display_links = ['methodname']
     form = MethodsAdminForm
 
@@ -614,6 +653,14 @@ class MethodsAdmin(admin.ModelAdmin):
 
     method_link.short_description = 'link to method documentation'
     method_link.allow_tags = True
+
+    def method_type_linked(self, obj):
+        if obj.methodtypecv:
+            return u'<a href="http://vocabulary.odm2.org/methodtype/{0}" target="_blank">{1}</a>'.format(
+                obj.methodtypecv.term, obj.methodtypecv.name)
+
+    method_type_linked.short_description = 'Method Type'
+    method_type_linked.allow_tags = True
 
 
 def duplicate_Dataloggerfiles_event(ModelAdmin, request, queryset):

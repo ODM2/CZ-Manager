@@ -1,4 +1,5 @@
 __author__ = 'leonmi'
+__author__ = 'leonmi'
 from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.db.models import Sum, Avg
@@ -251,7 +252,7 @@ def AddSensor(request):
     if request.user.is_authenticated():
         context = {'prefixpath': CUSTOM_TEMPLATE_PATH, 'name':request.user,
                    'authenticated':True, 'site_title': admin.site.site_title,
-                   'site_header':admin.site.site_header,'short_title':ADMIN_SHORTCUTS[0]['shortcuts'][2]['title']}
+                   'site_header':admin.site.site_header,'short_title':ADMIN_SHORTCUTS[0]['shortcuts'][1]['title']}
         return TemplateResponse(request, 'AddSensor.html', context)
     else:
         return HttpResponseRedirect('../')
@@ -260,7 +261,7 @@ def chartIndex(request):
     if request.user.is_authenticated():
         context = {'prefixpath': CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
-                   'site_header': admin.site.site_header, 'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][6]['title']}
+                   'site_header': admin.site.site_header, 'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][5]['title']}
         return TemplateResponse(request, 'chartIndex.html', context)
     else:
         return HttpResponseRedirect('../')
@@ -270,7 +271,7 @@ def AddProfile(request):
     if request.user.is_authenticated():
         context = {'prefixpath': CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
-                   'site_header': admin.site.site_header, 'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][3]['title']}
+                   'site_header': admin.site.site_header, 'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][2]['title']}
         return TemplateResponse(request, 'AddProfile.html', context)
     else:
         return HttpResponseRedirect('../')
@@ -279,7 +280,7 @@ def RecordAction(request):
     if request.user.is_authenticated():
         context = {'prefixpath': CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
-                   'site_header': admin.site.site_header, 'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][4]['title']}
+                   'site_header': admin.site.site_header, 'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][3]['title']}
         return TemplateResponse(request, 'RecordAction.html', context)
     else:
         return HttpResponseRedirect('../')
@@ -289,7 +290,7 @@ def ManageCitations(request):
     if request.user.is_authenticated():
         context = {'prefixpath': CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
-                   'site_header': admin.site.site_header, 'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][5]['title']}
+                   'site_header': admin.site.site_header, 'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][4]['title']}
         return TemplateResponse(request, 'ManageCitations.html', context)
     else:
         return HttpResponseRedirect('../')
@@ -858,6 +859,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
                 if int(request.POST[selectionStr]) == result.resultid:
                     selectedMResultSeries.append(int(request.POST[selectionStr]))
 
+
     #selectedMResultSeries = Results.objects.filter(featureactionid=feature_action)
     i=0
     if selectedMResultSeries.__len__()==0:
@@ -869,6 +871,20 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
                 return HttpResponse(html)
         else:
             selectedMResultSeries.append(int(resultidu))
+
+
+    if 'startDate' in request.POST:
+            entered_start_date = request.POST['startDate']
+    else:
+        entered_start_date= Measurementresultvalues.objects.filter(resultid__in=selectedMResultSeries).annotate(Min('valuedatetime')).\
+        order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
+
+    if 'endDate' in request.POST:
+        entered_end_date = request.POST['endDate']
+    else:
+        entered_end_date= Measurementresultvalues.objects.filter(resultid__in=selectedMResultSeries).annotate(Max('valuedatetime')).\
+        order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+
 
     for selectedMResult in selectedMResultSeries:
         i +=1
@@ -905,19 +921,6 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
                 name_of_units.append('')
         else:
              name_of_units.append(tmpname)
-    entered_start_date=None
-    entered_end_date=None
-    if 'startDate' in request.POST:
-            entered_start_date = request.POST['startDate']
-    else:
-        entered_start_date= Measurementresultvalues.objects.filter(resultid__in=selectedMResultSeries).annotate(Min('valuedatetime')).\
-        order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
-
-    if 'endDate' in request.POST:
-        entered_end_date = request.POST['endDate']
-    else:
-        entered_end_date= Measurementresultvalues.objects.filter(resultid__in=selectedMResultSeries).annotate(Max('valuedatetime')).\
-        order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
 
         myresultSeries.append(Measurementresultvalues.objects.all().filter(~Q(datavalue__lte=-6999))\
         .filter(valuedatetime__gt= entered_start_date)\
