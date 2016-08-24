@@ -367,7 +367,7 @@ class SamplingfeaturesAdmin(admin.ModelAdmin):
                      'samplingfeaturecode', 'samplingfeatureid',
                      'samplingfeatureexternalidentifiers__samplingfeatureexternalidentifier']
 
-    list_display = ('samplingfeaturecode', 'samplingfeaturename', 'sampling_feature_type', 'igsn', 'dataset_code')
+    list_display = ('samplingfeaturecode', 'samplingfeaturename', 'sampling_feature_type', 'samplingfeaturedescription', 'igsn', 'dataset_code')
     list_filter = (
         ('sampling_feature_type', admin.RelatedOnlyFieldListFilter),
     )
