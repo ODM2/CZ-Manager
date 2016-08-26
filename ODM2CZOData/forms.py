@@ -13,8 +13,9 @@ from django.shortcuts import render
 from import_export import resources
 from import_export.admin import ImportExportActionModelAdmin
 from django.contrib.admin import SimpleListFilter, RelatedFieldListFilter
-from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis import forms
+from django.contrib.gis.geos import GEOSGeometry, Point
+from django.contrib.gis import forms, admin
+from django.contrib.gis.db import models
 
 from django.shortcuts import render_to_response
 from .models import Variables
@@ -88,7 +89,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 import re
 
-
+from django.forms.widgets import Textarea
 # from .admin import MeasurementresultvaluesResource
 # AffiliationsChoiceField(People.objects.all().order_by('personlastname'),Organizations.objects.all().order_by('organizationname'))
 
@@ -366,32 +367,41 @@ class SamplingfeaturesAdminForm(ModelForm):
                                       u'details for individual values ' \
                              u'here: <a href="http://vocabulary.odm2.org/samplingfeaturetype/" target="_blank">http://vocabulary.odm2.org/samplingfeaturetype/</a>'
     sampling_feature_type.allow_tags = True
+
     samplingfeaturedescription = CharField(max_length=5000, label="feature description", widget=forms.Textarea,
                                            required=False)
-    featuregeometry = forms.GeometryField(label="feature geometry (to add a point format is POINT(lat, lon)" +
+
+    sampling_feature_geo_type = make_ajax_field(Samplingfeatures, 'sampling_feature_geo_type',
+                                                'cv_sampling_feature_geo_type')
+    sampling_feature_geo_type.help_text = u'A vocabulary for describing the geospatial feature type associated with a SamplingFeature. ' \
+                                          u'For example, Site SamplingFeatures are represented as points. ' \
+                                          u'In ODM2, each SamplingFeature may have only one geospatial type, ' \
+                                          u'but a geospatial types may range from simple points to a complex polygons ' \
+                                          u'or even three dimensional volumes. ' \
+                                      u'details for individual values ' \
+                                      u'here: <a href="http://vocabulary.odm2.org/samplingfeaturegeotype/" ' \
+                                          u'target="_blank">http://vocabulary.odm2.org/samplingfeaturegeotype/</a>'
+    sampling_feature_geo_type.allow_tags = True
+    featuregeometrywkt = forms.CharField(help_text="feature geometry (to add a point format is POINT(lat, lon)" +
                                                 " where long and lat are in decimal degrees. If you don't want to add a location" +
-                                                " leave default value of POINT(0 0).", srid=4326,
-                                          widget=forms.OpenLayersWidget(
-                                              attrs={'display_raw': True}))
+                                                " leave default value of POINT(0 0).",label='Featuregeometrywkt',
+                                          widget = forms.Textarea)
 
-    featuregeometry.initial = GEOSGeometry("POINT(0 0)")
-    featuregeometry.required = False
+    featuregeometrywkt.initial = GEOSGeometry("POINT(0 0)")
+    featuregeometrywkt.required = False
 
-    def feature_geom(self):
-        featuregeometryval = self.data['featuregeometry']
-        return GEOSGeometry(featuregeometryval)
+    featuregeometry = forms.PointField(widget=forms.OpenLayersWidget())
 
     class Meta:
         model = Samplingfeatures
         fields = '__all__'
-
 
 class IGSNInline(admin.StackedInline):
     model = Samplingfeatureexternalidentifiers
     extra = 0
 
 
-class SamplingfeaturesAdmin(admin.ModelAdmin):
+class SamplingfeaturesAdmin(admin.OSMGeoAdmin):
     form = SamplingfeaturesAdminForm
     inlines = [IGSNInline]
     search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name', 'samplingfeaturename',
@@ -399,9 +409,14 @@ class SamplingfeaturesAdmin(admin.ModelAdmin):
                      'samplingfeatureexternalidentifiers__samplingfeatureexternalidentifier']
 
     list_display = ('samplingfeaturecode', 'samplingfeaturename', 'sampling_feature_type_linked', 'samplingfeaturedescription', 'igsn', 'dataset_code')
-    list_filter = (
-        ('sampling_feature_type', admin.RelatedOnlyFieldListFilter),
-    )
+    # list_filter = (
+    #     ('sampling_feature_type', admin.RelatedOnlyFieldListFilter),
+    # )
+
+    # formfield_overrides = {
+    #     models.GeometryField: {'widget': Textarea}
+    # }
+
     save_as = True
 
     def igsn(self, obj):

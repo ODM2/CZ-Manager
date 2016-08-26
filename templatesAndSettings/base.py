@@ -138,7 +138,8 @@ AJAX_LOOKUP_CHANNELS = {
     'cv_taxonomic_classifier_type': ('{}.lookups'.format(app_config['app_name']), 'CvTaxonomicClassifierTypeLookup'),
     'cv_method_type':('{}.lookups'.format(app_config['app_name']),'CvMethodTypeLookup'),
     'cv_action_type':('{}.lookups'.format(app_config['app_name']),'CvActionTypeLookup'),
-    'cv_sampling_feature_type':('{}.lookups'.format(app_config['app_name']),'CvSamplingFeatureTypeLookup')
+    'cv_sampling_feature_type':('{}.lookups'.format(app_config['app_name']),'CvSamplingFeatureTypeLookup'),
+    'cv_sampling_feature_geo_type': ('{}.lookups'.format(app_config['app_name']), 'CvSamplingFeatureGeoTypeLookup')
     # define a custom lookup channel
 }
 

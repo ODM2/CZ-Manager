@@ -14,7 +14,8 @@ from django.db import models
 
 from templatesAndSettings.settings import MEDIA_ROOT
 
-from django.contrib.gis.db import models
+from django.contrib.gis.db import models as gis_models
+from django.contrib.gis.geos import GEOSGeometry
 import time
 #from django.forms import ModelFormWithFileField
 #from .forms import DataloggerprogramfilesAdminForm
@@ -446,7 +447,6 @@ class CvAggregationstatistic(models.Model):
         ordering = ['term','name']
 
 
-
 class CvAnnotationtype(models.Model):
     term = models.CharField(max_length=255)
     name = models.CharField(primary_key=True, max_length=255)
@@ -473,7 +473,6 @@ class CvCensorcode(models.Model):
         managed = False
         db_table = r'odm2"."cv_censorcode'
         ordering = ['term','name']
-
 
 
 class CvDataqualitytype(models.Model):
@@ -603,7 +602,6 @@ class CvQualitycode(models.Model):
         ordering = ['term','name']
 
 
-
 class CvReferencematerialmedium(models.Model):
     term = models.CharField(max_length=255)
     name = models.CharField(primary_key=True, max_length=255)
@@ -658,7 +656,6 @@ class CvMedium(models.Model):
         managed = False
         db_table = r'odm2"."cv_medium'
         ordering = ['term','name']
-
 
 
 class CvSamplingfeaturegeotype(models.Model):
@@ -818,7 +815,6 @@ class CvVariablename(models.Model):
         managed = False
         db_table = r'odm2"."cv_variablename'
         ordering = ['term','name']
-
 
 
 class CvVariabletype(models.Model):
@@ -1912,10 +1908,22 @@ class Samplingfeatures(models.Model):
     samplingfeaturename = models.CharField(verbose_name='sampling feature name',max_length=255, blank=True, null=True)
     samplingfeaturedescription = models.CharField(verbose_name='sampling feature description', max_length=5000, blank=True)
     sampling_feature_geo_type = models.ForeignKey(CvSamplingfeaturegeotype,db_column='samplingfeaturegeotypecv', default= "Point", null=True)
-    featuregeometry = models.TextField(verbose_name='feature geometry',blank=True, null=True)  #GeometryField This field type is a guess.
-    # featuregeometry = models.GeometryField(verbose_name='feature geometry',blank=True, null=True)
+    # featuregeometry = models.TextField(verbose_name='feature geometry',blank=True, null=True)  #GeometryField This field type is a guess.
+    featuregeometrywkt = models.TextField(verbose_name='feature geometry',blank=True, null=True)
+    featuregeometry = models.TextField()
     elevation_m = models.FloatField(verbose_name='elevation',blank=True, null=True)
     elevation_datum = models.ForeignKey(CvElevationdatum, db_column='elevationdatumcv', blank=True, null=True)
+
+    objects = gis_models.GeoManager()
+
+    def save(self, *args, **kwargs):
+        self.geometry = GEOSGeometry(self.featuregeometrywkt)
+        self.featuregeometry = self.geometry
+        super(Samplingfeatures, self).save(*args, **kwargs)
+
+    def get_geo_type(self):
+        geometry_type = self.geometry.geom_type
+        return str(geometry_type)
 
     def __unicode__(self):
         s = u"%s - %s" % (self.samplingfeatureid,  self.sampling_feature_type)
