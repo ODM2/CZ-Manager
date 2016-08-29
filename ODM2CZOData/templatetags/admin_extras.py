@@ -89,3 +89,8 @@ def get_title(value, short):
         return admin.site.site_header
     elif value == 'shortcut_title':
         return ADMIN_SHORTCUTS[0]['shortcuts'][short]['title']
+
+@register.filter()
+def in_field(value):
+    val = value.split(" ")
+    return val[0]

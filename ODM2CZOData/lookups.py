@@ -382,3 +382,23 @@ class CvSamplingFeatureGeoTypeLookup(LookupChannel):
         return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
+
+
+class CvElevationDatumLookup(LookupChannel):
+    model = CvElevationdatum
+
+    def get_query(self, q, request):
+        return CvElevationdatum.objects.filter(name__icontains=q).order_by('name')  #
+
+    def get_result(self, obj):
+        return obj.name
+
+    def format_match(self, obj):
+        return self.format_item_display(obj)
+        # return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+
+    def format_item_display(self, obj):
+        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+        return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
+               (escape(obj.name), escape(obj.sourcevocabularyuri))
+        # onClick="window.open('http://www.yahoo.com', '_blank')

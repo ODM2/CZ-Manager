@@ -59,6 +59,8 @@ INSTALLED_APPS = (
     'import_export',
     'admin_shortcuts',
     'daterange_filter',
+    # 'dal',
+    # 'dal_select2',
     'ajax_select',
     'django.contrib.admin',
     'django.contrib.gis',
@@ -139,7 +141,8 @@ AJAX_LOOKUP_CHANNELS = {
     'cv_method_type':('{}.lookups'.format(app_config['app_name']),'CvMethodTypeLookup'),
     'cv_action_type':('{}.lookups'.format(app_config['app_name']),'CvActionTypeLookup'),
     'cv_sampling_feature_type':('{}.lookups'.format(app_config['app_name']),'CvSamplingFeatureTypeLookup'),
-    'cv_sampling_feature_geo_type': ('{}.lookups'.format(app_config['app_name']), 'CvSamplingFeatureGeoTypeLookup')
+    'cv_sampling_feature_geo_type': ('{}.lookups'.format(app_config['app_name']), 'CvSamplingFeatureGeoTypeLookup'),
+    'cv_elevation_datum': ('{}.lookups'.format(app_config['app_name']), 'CvElevationDatumLookup'),
     # define a custom lookup channel
 }
 

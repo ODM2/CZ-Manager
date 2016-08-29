@@ -1917,12 +1917,19 @@ class Samplingfeatures(models.Model):
     objects = gis_models.GeoManager()
 
     def save(self, *args, **kwargs):
-        self.geometry = GEOSGeometry(self.featuregeometrywkt)
-        self.featuregeometry = self.geometry
+        # Figure out LOGIC!! 8/26/16
+        if self.featuregeometrywkt and GEOSGeometry(self.featuregeometry) == GEOSGeometry(self.featuregeometry):
+            print 'CHANGE'
+            self.geometry = GEOSGeometry(self.featuregeometrywkt)
+            self.featuregeometry = self.geometry
+        else:
+            self.featuregeometrywkt = GEOSGeometry(self.featuregeometry)
+        # else:
+        #     self.featuregeometrywkt = GEOSGeometry(self.featuregeometry)
         super(Samplingfeatures, self).save(*args, **kwargs)
 
     def get_geo_type(self):
-        geometry_type = self.geometry.geom_type
+        geometry_type = self.sampling_feature_geo_type
         return str(geometry_type)
 
     def __unicode__(self):

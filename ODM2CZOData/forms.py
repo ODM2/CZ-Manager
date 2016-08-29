@@ -80,6 +80,7 @@ from ajax_select import make_ajax_field
 from ajax_select.fields import autoselect_fields_check_can_add
 from ajax_select.admin import AjaxSelectAdmin
 from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
+from dal import autocomplete
 from .models import Measurementresults
 from .models import Measurementresultvalues
 from .models import Profileresultvalues
@@ -359,6 +360,8 @@ class SamplingfeatureexternalidentifiersAdmin(admin.ModelAdmin):
 
 
 class SamplingfeaturesAdminForm(ModelForm):
+    # sampling_feature_type = ModelChoiceField(queryset=CvSamplingfeaturetype.objects.all(),
+    #                                          widget=autocomplete.ModelSelect2(url='samplingfeaturetype-autocomplete'))
     sampling_feature_type = make_ajax_field(Samplingfeatures, 'sampling_feature_type', 'cv_sampling_feature_type')
     sampling_feature_type.help_text = u'A vocabulary for describing the type of SamplingFeature. ' \
                                       u'Many different SamplingFeature types can be represented in ODM2. ' \
@@ -373,6 +376,8 @@ class SamplingfeaturesAdminForm(ModelForm):
 
     sampling_feature_geo_type = make_ajax_field(Samplingfeatures, 'sampling_feature_geo_type',
                                                 'cv_sampling_feature_geo_type')
+    # sampling_feature_geo_type = ModelChoiceField(queryset=CvSamplingfeaturegeotype.objects.all(),
+    #                                          widget=autocomplete.ModelSelect2(url='samplingfeaturegeotype-autocomplete'))
     sampling_feature_geo_type.help_text = u'A vocabulary for describing the geospatial feature type associated with a SamplingFeature. ' \
                                           u'For example, Site SamplingFeatures are represented as points. ' \
                                           u'In ODM2, each SamplingFeature may have only one geospatial type, ' \
@@ -382,15 +387,29 @@ class SamplingfeaturesAdminForm(ModelForm):
                                       u'here: <a href="http://vocabulary.odm2.org/samplingfeaturegeotype/" ' \
                                           u'target="_blank">http://vocabulary.odm2.org/samplingfeaturegeotype/</a>'
     sampling_feature_geo_type.allow_tags = True
+    sampling_feature_geo_type.required = False
+
+    # elevation_datum = ModelChoiceField(queryset=CvElevationdatum.objects.all(),
+    #                                              widget=autocomplete.ModelSelect2(
+    #                                                  url='elevationdatum-autocomplete'),required=False)
+
+    elevation_datum = make_ajax_field(Samplingfeatures, 'elevation_datum',
+                                                'cv_elevation_datum')
+    elevation_datum.help_text = u'A vocabulary for describing vertical datums. ' \
+                               u'Vertical datums are used in ODM2 to specify the origin for elevations ' \
+                               u'assocated with SamplingFeatures.' \
+                                          u'details for individual values ' \
+                                          u'here: <a href="http://vocabulary.odm2.org/elevationdatum/" ' \
+                                          u'target="_blank">http://vocabulary.odm2.org/elevationdatum/</a>'
+    elevation_datum.allow_tags = True
     featuregeometrywkt = forms.CharField(help_text="feature geometry (to add a point format is POINT(lat, lon)" +
                                                 " where long and lat are in decimal degrees. If you don't want to add a location" +
                                                 " leave default value of POINT(0 0).",label='Featuregeometrywkt',
-                                          widget = forms.Textarea)
+                                          widget = forms.Textarea, required=False)
 
     featuregeometrywkt.initial = GEOSGeometry("POINT(0 0)")
-    featuregeometrywkt.required = False
 
-    featuregeometry = forms.PointField(widget=forms.OpenLayersWidget())
+    featuregeometry = forms.PointField(widget=forms.OpenLayersWidget(),required=False)
 
     class Meta:
         model = Samplingfeatures
@@ -409,6 +428,7 @@ class SamplingfeaturesAdmin(admin.OSMGeoAdmin):
                      'samplingfeatureexternalidentifiers__samplingfeatureexternalidentifier']
 
     list_display = ('samplingfeaturecode', 'samplingfeaturename', 'sampling_feature_type_linked', 'samplingfeaturedescription', 'igsn', 'dataset_code')
+    readonly_fields = ('samplingfeatureuuid',)
     # list_filter = (
     #     ('sampling_feature_type', admin.RelatedOnlyFieldListFilter),
     # )

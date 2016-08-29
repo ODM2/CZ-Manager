@@ -13,8 +13,6 @@ import importlib
 views = importlib.import_module("{}.views".format(app_config['app_name']))
 # exec('from ' + app_config['app_name'] + ' import views')
 
-from django.views.generic import View
-
 admin.autodiscover()
 admin.site.site_header = app_config['site_header']
 admin.site.site_title = app_config['site_title']
@@ -26,6 +24,7 @@ urlpatterns = patterns('',
                        # url(r'^blog/', include('blog.urls')),
                        url(r'^' + URL_PATH + '', include(admin.site.urls)),
                        url(r'^' + URL_PATH + 'lookups/', include(ajax_select_urls)),
+                       # url(r'^' + URL_PATH + '', include(autocomplete_urls)),
                        # (r'^ajax_select/', include('ajax_select.urls')),
                        url(r'^$', lambda r: HttpResponseRedirect('admin/{}/'.format(app_config['app_name']))),
                        url(r'^' + URL_PATH + 'AddSensor.html', views.AddSensor, name="AddSensor"),

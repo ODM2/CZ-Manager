@@ -1,5 +1,4 @@
 __author__ = 'leonmi'
-__author__ = 'leonmi'
 from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.db.models import Sum, Avg
