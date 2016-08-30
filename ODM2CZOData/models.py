@@ -1908,29 +1908,14 @@ class Samplingfeatures(models.Model):
     samplingfeaturename = models.CharField(verbose_name='sampling feature name',max_length=255, blank=True, null=True)
     samplingfeaturedescription = models.CharField(verbose_name='sampling feature description', max_length=5000, blank=True)
     sampling_feature_geo_type = models.ForeignKey(CvSamplingfeaturegeotype,db_column='samplingfeaturegeotypecv', default= "Point", null=True)
-    # featuregeometry = models.TextField(verbose_name='feature geometry',blank=True, null=True)  #GeometryField This field type is a guess.
-    featuregeometrywkt = models.TextField(verbose_name='feature geometry',blank=True, null=True)
-    featuregeometry = models.TextField()
+    featuregeometry = models.TextField(verbose_name='feature geometry',blank=True, null=True)  #GeometryField This field type is a guess.
     elevation_m = models.FloatField(verbose_name='elevation',blank=True, null=True)
     elevation_datum = models.ForeignKey(CvElevationdatum, db_column='elevationdatumcv', blank=True, null=True)
 
     objects = gis_models.GeoManager()
 
-    def save(self, *args, **kwargs):
-        # Figure out LOGIC!! 8/26/16
-        if self.featuregeometrywkt and GEOSGeometry(self.featuregeometry) == GEOSGeometry(self.featuregeometry):
-            print 'CHANGE'
-            self.geometry = GEOSGeometry(self.featuregeometrywkt)
-            self.featuregeometry = self.geometry
-        else:
-            self.featuregeometrywkt = GEOSGeometry(self.featuregeometry)
-        # else:
-        #     self.featuregeometrywkt = GEOSGeometry(self.featuregeometry)
-        super(Samplingfeatures, self).save(*args, **kwargs)
-
-    def get_geo_type(self):
-        geometry_type = self.sampling_feature_geo_type
-        return str(geometry_type)
+    def featuregeometrywkt(self):
+        return GEOSGeometry(self.featuregeometry)
 
     def __unicode__(self):
         s = u"%s - %s" % (self.samplingfeatureid,  self.sampling_feature_type)

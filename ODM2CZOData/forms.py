@@ -358,10 +358,31 @@ class SamplingfeatureexternalidentifiersAdmin(admin.ModelAdmin):
     list_display = ('samplingfeatureexternalidentifier', 'samplingfeatureexternalidentifieruri')
     save_as = True
 
-
 class SamplingfeaturesAdminForm(ModelForm):
-    # sampling_feature_type = ModelChoiceField(queryset=CvSamplingfeaturetype.objects.all(),
-    #                                          widget=autocomplete.ModelSelect2(url='samplingfeaturetype-autocomplete'))
+    class Meta:
+        model = Samplingfeatures
+        fields = ['sampling_feature_type', 'samplingfeaturecode', 'samplingfeaturename',
+                  'samplingfeaturedescription', 'sampling_feature_geo_type', 'featuregeometrywkt', 'featuregeometry',
+                  'elevation_m', 'elevation_datum']
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance')
+        if instance:
+            feat = instance.featuregeometrywkt()
+            print feat
+            uuid = instance.uuid()
+            initial = kwargs.get('initial', {})
+            initial['featuregeometrywkt'] = '{}'.format(feat)
+            kwargs['initial'] = initial
+            print initial
+        super(SamplingfeaturesAdminForm, self).__init__(*args, **kwargs)
+
+    featuregeometrywkt = forms.CharField(help_text="feature geometry (to add a point format is POINT(lat, lon)" +
+                                                " where long and lat are in decimal degrees. If you don't want to add a location" +
+                                                " leave default value of POINT(0 0).",label='Featuregeometrywkt',
+                                         widget=forms.Textarea, required=False)
+    featuregeometrywkt.initial = GEOSGeometry("POINT(0 0)")
+
     sampling_feature_type = make_ajax_field(Samplingfeatures, 'sampling_feature_type', 'cv_sampling_feature_type')
     sampling_feature_type.help_text = u'A vocabulary for describing the type of SamplingFeature. ' \
                                       u'Many different SamplingFeature types can be represented in ODM2. ' \
@@ -376,8 +397,6 @@ class SamplingfeaturesAdminForm(ModelForm):
 
     sampling_feature_geo_type = make_ajax_field(Samplingfeatures, 'sampling_feature_geo_type',
                                                 'cv_sampling_feature_geo_type')
-    # sampling_feature_geo_type = ModelChoiceField(queryset=CvSamplingfeaturegeotype.objects.all(),
-    #                                          widget=autocomplete.ModelSelect2(url='samplingfeaturegeotype-autocomplete'))
     sampling_feature_geo_type.help_text = u'A vocabulary for describing the geospatial feature type associated with a SamplingFeature. ' \
                                           u'For example, Site SamplingFeatures are represented as points. ' \
                                           u'In ODM2, each SamplingFeature may have only one geospatial type, ' \
@@ -389,10 +408,6 @@ class SamplingfeaturesAdminForm(ModelForm):
     sampling_feature_geo_type.allow_tags = True
     sampling_feature_geo_type.required = False
 
-    # elevation_datum = ModelChoiceField(queryset=CvElevationdatum.objects.all(),
-    #                                              widget=autocomplete.ModelSelect2(
-    #                                                  url='elevationdatum-autocomplete'),required=False)
-
     elevation_datum = make_ajax_field(Samplingfeatures, 'elevation_datum',
                                                 'cv_elevation_datum')
     elevation_datum.help_text = u'A vocabulary for describing vertical datums. ' \
@@ -402,18 +417,10 @@ class SamplingfeaturesAdminForm(ModelForm):
                                           u'here: <a href="http://vocabulary.odm2.org/elevationdatum/" ' \
                                           u'target="_blank">http://vocabulary.odm2.org/elevationdatum/</a>'
     elevation_datum.allow_tags = True
-    featuregeometrywkt = forms.CharField(help_text="feature geometry (to add a point format is POINT(lat, lon)" +
-                                                " where long and lat are in decimal degrees. If you don't want to add a location" +
-                                                " leave default value of POINT(0 0).",label='Featuregeometrywkt',
-                                          widget = forms.Textarea, required=False)
+    featuregeometry = forms.PointField(label='Featuregeometry',
+                                          widget = forms.OpenLayersWidget(), required=False)
 
-    featuregeometrywkt.initial = GEOSGeometry("POINT(0 0)")
-
-    featuregeometry = forms.PointField(widget=forms.OpenLayersWidget(),required=False)
-
-    class Meta:
-        model = Samplingfeatures
-        fields = '__all__'
+    featuregeometry.initial = GEOSGeometry("POINT(0 0)")
 
 class IGSNInline(admin.StackedInline):
     model = Samplingfeatureexternalidentifiers
@@ -429,13 +436,12 @@ class SamplingfeaturesAdmin(admin.OSMGeoAdmin):
 
     list_display = ('samplingfeaturecode', 'samplingfeaturename', 'sampling_feature_type_linked', 'samplingfeaturedescription', 'igsn', 'dataset_code')
     readonly_fields = ('samplingfeatureuuid',)
-    # list_filter = (
-    #     ('sampling_feature_type', admin.RelatedOnlyFieldListFilter),
-    # )
 
-    # formfield_overrides = {
-    #     models.GeometryField: {'widget': Textarea}
-    # }
+    # your own processing
+    def save_model(self, request, obj, form, change):
+        # for example:
+        obj.featuregeometry = '%s' % form.cleaned_data['featuregeometrywkt']
+        obj.save()
 
     save_as = True
 
