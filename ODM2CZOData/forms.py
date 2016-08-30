@@ -369,12 +369,9 @@ class SamplingfeaturesAdminForm(ModelForm):
         instance = kwargs.get('instance')
         if instance:
             feat = instance.featuregeometrywkt()
-            print feat
-            uuid = instance.uuid()
             initial = kwargs.get('initial', {})
             initial['featuregeometrywkt'] = '{}'.format(feat)
             kwargs['initial'] = initial
-            print initial
         super(SamplingfeaturesAdminForm, self).__init__(*args, **kwargs)
 
     featuregeometrywkt = forms.CharField(help_text="feature geometry (to add a point format is POINT(lat, lon)" +
