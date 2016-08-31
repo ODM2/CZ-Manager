@@ -6,16 +6,15 @@ from django.http.response import HttpResponseRedirect
 from templatesAndSettings.settings import MEDIA_ROOT
 from templatesAndSettings.settings import MEDIA_URL
 from templatesAndSettings.settings import URL_PATH
-from templatesAndSettings.settings import app_config
+from templatesAndSettings.settings import app_name, site_header, site_title
 # from ODM2CZOData import views # How can I use config file for this??
 import importlib
 
-views = importlib.import_module("{}.views".format(app_config['app_name']))
-# exec('from ' + app_config['app_name'] + ' import views')
+views = importlib.import_module("{}.views".format(app_name))
 
 admin.autodiscover()
-admin.site.site_header = app_config['site_header']
-admin.site.site_title = app_config['site_title']
+admin.site.site_header = site_header
+admin.site.site_title = site_title
 
 # admin_site.admin_view()
 urlpatterns = patterns('',
@@ -24,7 +23,7 @@ urlpatterns = patterns('',
                        # url(r'^blog/', include('blog.urls')),
                        url(r'^' + URL_PATH + '', include(admin.site.urls)),
                        url(r'^' + URL_PATH + 'lookups/', include(ajax_select_urls)),
-                       url(r'^$', lambda r: HttpResponseRedirect('admin/{}/'.format(app_config['app_name']))),
+                       url(r'^$', lambda r: HttpResponseRedirect('admin/{}/'.format(app_name))),
                        url(r'^' + URL_PATH + 'AddSensor.html', views.AddSensor, name="AddSensor"),
                        url(r'^' + URL_PATH + 'chartIndex.html', views.chartIndex, name="chartIndex"),
                        url(r'^' + URL_PATH + 'AddProfile.html', views.AddProfile, name="AddProfile"),

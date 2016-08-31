@@ -1,6 +1,6 @@
 from django.apps import AppConfig
-from templatesAndSettings.settings import app_config
+from templatesAndSettings.settings import app_name, verbose_name
 
 class ODM2AdminConfig(AppConfig):
-    name = '{}'.format(app_config['app_name'])
-    verbose_name = '{}'.format(app_config['verbose_name'])
+    name = '{}'.format(app_name)
+    verbose_name = '{}'.format(verbose_name)

@@ -2,25 +2,29 @@
 Keep this file untracked
 """
 
-import json
+# Custom App settings
+app_name = "ODM2CZOData" # This has to match the name of the folder that the app is saved
+verbose_name = "ODM2CZOData"
+site_title = "ODM2 Admin"
+site_header = "ODM2 Admin"
+map_config = {
+      "lat":0,
+      "lon":0,
+      "zoom":2
+    }
 
-json_data = open('./templatesAndSettings/config.json')
-configurations = json.load(json_data)
-json_data.close()
-
-app_config = configurations['app_configuration']
-db_config = configurations['database_configuration']
 
 # SECURITY WARNING: keep the secret key used in production secret!
-secret_key = '{}'.format(app_config['secret_key'])
+secret_key = 'random_secret_key_like_so_7472873649836'
+_root = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin'
 
-media_root = '{0}/{1}/upfiles/'.format(app_config['*_root'], app_config['app_name'])
+media_root = '{}'.format(_root)
 media_url = '/odm2testapp/upfiles/'
 
 # Application definition
-custom_template_path = '/admin/{}/'.format(app_config['app_name'])
+custom_template_path = '/admin/{}/'.format(app_name)
 url_path = 'admin/'
-static_root = '{}/static'.format(app_config['*_root'])
+static_root = '{}/static'.format(_root)
 debug = True
 template_debug = True
 # Database
@@ -28,11 +32,11 @@ template_debug = True
 ODM2_configs = {
 
     'ENGINE': 'django.contrib.gis.db.backends.postgis',  # 'django.db.backends.postgresql_psycopg2',
-    'NAME': '{}'.format(db_config['name']),
-    'USER': '{}'.format(db_config['user']),
-    'PASSWORD': '{}'.format(db_config['password']),
-    'HOST': '{}'.format(db_config['host']),
-    'PORT': '{}'.format(db_config['port']),
+    'NAME': 'name',
+    'USER': 'postgres',
+    'PASSWORD': 'password',
+    'HOST': 'localhost',
+    'PORT': '5432',
     'OPTIONS': {
         'options': '-c search_path=admin,odm2,odm2extra'
     }
@@ -42,6 +46,9 @@ ODM2_configs = {
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 static_url = '/static/'
 
-admins = [('{}'.format(admin['name']),'{}'.format(admin['email'])) for admin in configurations['admins']]
+admins = [{
+    "name":"first last",
+    "email":"email@example.com"
+  }]
 
 from templatesAndSettings.base import *

@@ -9,8 +9,9 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import os
 from templatesAndSettings.settings import *
+import os
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 TEMPLATE_DIR = os.path.dirname(__file__)
@@ -31,7 +32,7 @@ SECRET_KEY = secret_key
 DEBUG = debug
 
 TEMPLATE_DEBUG = template_debug
-ADMINS = admin
+ADMINS = admins
 ALLOWED_HOSTS = []
 
 MEDIA_ROOT = media_root
@@ -55,7 +56,7 @@ STATIC_ROOT = static_root
 INSTALLED_APPS = (
     'jquery',
     'djangocms_admin_style',
-    '{}'.format(app_config['app_name']),
+    '{}'.format(app_name),
     'import_export',
     'admin_shortcuts',
     'daterange_filter',
@@ -84,37 +85,37 @@ ADMIN_SHORTCUTS = [
         'shortcuts': [
             {
                 'url': CUSTOM_TEMPLATE_PATH,
-                'app_name': '{}'.format(app_config['app_name']),
-                'title': '{} Admin'.format(app_config['verbose_name']),
+                'app_name': '{}'.format(app_name),
+                'title': '{} Admin'.format(verbose_name),
                 'class': 'config',
             },
             {
                 'url': '/' + URL_PATH + 'AddSensor.html',
-                'app_name': '{}'.format(app_config['app_name']),
+                'app_name': '{}'.format(app_name),
                 'title': 'Add Sensor Data',
                 'class': 'tool',
             },
             {
                 'url': '/' + URL_PATH + 'AddProfile.html',
-                'app_name': '{}'.format(app_config['app_name']),
+                'app_name': '{}'.format(app_name),
                 'title': 'Add Soil Profile Data',
                 'class': 'flag',
             },
             {
                 'url': '/' + URL_PATH + 'RecordAction.html',
-                'app_name': '{}'.format(app_config['app_name']),
+                'app_name': '{}'.format(app_name),
                 'title': 'Record an Action',
                 'class': 'notepad',
             },
             {
                 'url': '/' + URL_PATH + 'ManageCitations.html',
-                'app_name': '{}'.format(app_config['app_name']),
+                'app_name': '{}'.format(app_name),
                 'title': 'Manage Citations',
                 'class': 'pencil',
             },
             {
                 'url': '/' + URL_PATH + 'chartIndex.html',
-                'app_name': '{}'.format(app_config['app_name']),
+                'app_name': '{}'.format(app_name),
                 'title': 'Graph My Data',
                 'class': 'monitor',
             },
@@ -129,20 +130,20 @@ ADMIN_SHORTCUTS_SETTINGS = {
 # https://github.com/crucialfelix/django-ajax-selects
 AJAX_LOOKUP_CHANNELS = {
     #  simple: search Person.objects.filter(name__icontains=q)
-    'cv_variable_name': ('{}.lookups'.format(app_config['app_name']), 'CvVariableNameLookup'),
-    'cv_variable_type': ('{}.lookups'.format(app_config['app_name']), 'CvVariableTypeLookup'),
-    'cv_unit_type': ('{}.lookups'.format(app_config['app_name']), 'CvUnitTypeLookup'),
-    'cv_speciation': ('{}.lookups'.format(app_config['app_name']), 'CvVariableSpeciationLookup'),
-    'featureaction_lookup': ('{}.lookups'.format(app_config['app_name']), 'FeatureactionsLookup'),
-    'result_lookup': ('{}.lookups'.format(app_config['app_name']), 'ResultsLookup'),
-    'profileresult_lookup': ('{}.lookups'.format(app_config['app_name']), 'ProfileResultsLookup'),
-    'measurementresult_lookup': ('{}.lookups'.format(app_config['app_name']), 'MeasurementResultsLookup'),
-    'cv_taxonomic_classifier_type': ('{}.lookups'.format(app_config['app_name']), 'CvTaxonomicClassifierTypeLookup'),
-    'cv_method_type':('{}.lookups'.format(app_config['app_name']),'CvMethodTypeLookup'),
-    'cv_action_type':('{}.lookups'.format(app_config['app_name']),'CvActionTypeLookup'),
-    'cv_sampling_feature_type':('{}.lookups'.format(app_config['app_name']),'CvSamplingFeatureTypeLookup'),
-    'cv_sampling_feature_geo_type': ('{}.lookups'.format(app_config['app_name']), 'CvSamplingFeatureGeoTypeLookup'),
-    'cv_elevation_datum': ('{}.lookups'.format(app_config['app_name']), 'CvElevationDatumLookup'),
+    'cv_variable_name': ('{}.lookups'.format(app_name), 'CvVariableNameLookup'),
+    'cv_variable_type': ('{}.lookups'.format(app_name), 'CvVariableTypeLookup'),
+    'cv_unit_type': ('{}.lookups'.format(app_name), 'CvUnitTypeLookup'),
+    'cv_speciation': ('{}.lookups'.format(app_name), 'CvVariableSpeciationLookup'),
+    'featureaction_lookup': ('{}.lookups'.format(app_name), 'FeatureactionsLookup'),
+    'result_lookup': ('{}.lookups'.format(app_name), 'ResultsLookup'),
+    'profileresult_lookup': ('{}.lookups'.format(app_name), 'ProfileResultsLookup'),
+    'measurementresult_lookup': ('{}.lookups'.format(app_name), 'MeasurementResultsLookup'),
+    'cv_taxonomic_classifier_type': ('{}.lookups'.format(app_name), 'CvTaxonomicClassifierTypeLookup'),
+    'cv_method_type':('{}.lookups'.format(app_name),'CvMethodTypeLookup'),
+    'cv_action_type':('{}.lookups'.format(app_name),'CvActionTypeLookup'),
+    'cv_sampling_feature_type':('{}.lookups'.format(app_name),'CvSamplingFeatureTypeLookup'),
+    'cv_sampling_feature_geo_type': ('{}.lookups'.format(app_name), 'CvSamplingFeatureGeoTypeLookup'),
+    'cv_elevation_datum': ('{}.lookups'.format(app_name), 'CvElevationDatumLookup'),
     # define a custom lookup channel
 }
 
