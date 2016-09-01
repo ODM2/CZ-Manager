@@ -1,5 +1,4 @@
 __author__ = 'leonmi'
-__author__ = 'leonmi'
 from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.db.models import Sum, Avg
@@ -49,6 +48,9 @@ import sys as sys
 from django.core import management
 from django.shortcuts import render_to_response
 from django.contrib.gis.geos import GEOSGeometry
+from templatesAndSettings.settings import map_config
+from templatesAndSettings.base import ADMIN_SHORTCUTS
+from django.contrib import admin
 #
 # class FeatureactionsAutocomplete(autocomplete.Select2QuerySetView):
 #     def get_queryset(self):
@@ -243,24 +245,22 @@ def publications(request):
     return TemplateResponse(request,'publications.html',{'citationList': citationList,'authList':authList,
             'filterTags':filterTags,'citationCategories':citationCategories,'selectedCategory':selectedCategory,
             'selectedTag':selectedTag,'peopleList':peopleList,'selectedAuthor':selectedAuthor,'prefixpath': CUSTOM_TEMPLATE_PATH,})
-    #else:
-        #return HttpResponseRedirect('../')
 
-
-#def index(request):
-   # return render_to_response('admin/app_index.html', context_instance=RequestContext(request))
-
+################# SHORTCUTS ##################################################
 def AddSensor(request):
     if request.user.is_authenticated():
-        template = loader.get_template('AddSensor.html')
-        context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
-        return TemplateResponse(request, template, context)
+        context = {'prefixpath': CUSTOM_TEMPLATE_PATH, 'name':request.user,
+                   'authenticated':True, 'site_title': admin.site.site_title,
+                   'site_header':admin.site.site_header,'short_title':ADMIN_SHORTCUTS[0]['shortcuts'][1]['title']}
+        return TemplateResponse(request, 'AddSensor.html', context)
     else:
         return HttpResponseRedirect('../')
 
 def chartIndex(request):
     if request.user.is_authenticated():
-        context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
+        context = {'prefixpath': CUSTOM_TEMPLATE_PATH, 'name': request.user,
+                   'authenticated': True, 'site_title': admin.site.site_title,
+                   'site_header': admin.site.site_header, 'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][5]['title']}
         return TemplateResponse(request, 'chartIndex.html', context)
     else:
         return HttpResponseRedirect('../')
@@ -268,14 +268,18 @@ def chartIndex(request):
 #chartIndex
 def AddProfile(request):
     if request.user.is_authenticated():
-        context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
+        context = {'prefixpath': CUSTOM_TEMPLATE_PATH, 'name': request.user,
+                   'authenticated': True, 'site_title': admin.site.site_title,
+                   'site_header': admin.site.site_header, 'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][2]['title']}
         return TemplateResponse(request, 'AddProfile.html', context)
     else:
         return HttpResponseRedirect('../')
 
 def RecordAction(request):
     if request.user.is_authenticated():
-        context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
+        context = {'prefixpath': CUSTOM_TEMPLATE_PATH, 'name': request.user,
+                   'authenticated': True, 'site_title': admin.site.site_title,
+                   'site_header': admin.site.site_header, 'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][3]['title']}
         return TemplateResponse(request, 'RecordAction.html', context)
     else:
         return HttpResponseRedirect('../')
@@ -283,10 +287,14 @@ def RecordAction(request):
 
 def ManageCitations(request):
     if request.user.is_authenticated():
-        context = {'prefixpath': CUSTOM_TEMPLATE_PATH}
+        context = {'prefixpath': CUSTOM_TEMPLATE_PATH, 'name': request.user,
+                   'authenticated': True, 'site_title': admin.site.site_title,
+                   'site_header': admin.site.site_header, 'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][4]['title']}
         return TemplateResponse(request, 'ManageCitations.html', context)
     else:
         return HttpResponseRedirect('../')
+
+###################################################################
 # #
 # def dataloggerfilesView(request, id):
 #      #model = Dataloggerfiles
@@ -373,8 +381,9 @@ def web_map(request,dataset='NotSet'):
         authenticated=True
     else:
         authenticated=False
-
+    map_config = map_config
     datasets = Datasets.objects.all()
+
     ids = [ds.datasetid for ds in datasets]
 
     selections = request.POST.getlist('datasetselection')
@@ -395,9 +404,10 @@ def web_map(request,dataset='NotSet'):
         features1 = Samplingfeatures.objects.filter(samplingfeatureid__in=fa.values("samplingfeatureid"))
         relatedfeatures = Relatedfeatures.objects.filter(samplingfeatureid__in=features1.values("samplingfeatureid"))
         features2 = Samplingfeatures.objects.filter(samplingfeatureid__in=relatedfeatures.values("relatedfeatureid"))
-        features = features1| features2
+        features = features1 | features2
     else:
         selected = ids
+
         features = Samplingfeatures.objects.all()
         results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
 
@@ -424,7 +434,8 @@ def web_map(request,dataset='NotSet'):
 
     context = {
         'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,'results':results,
-        'datasets':datasets,'selecteddatasets':selected,'authenticated':authenticated}
+        'datasets':datasets,'selecteddatasets':selected,'authenticated':authenticated, 'map_config':map_config, 'name':request.user,'site_title': admin.site.site_title,
+                   'site_header': admin.site.site_header, 'short_title': 'Map Sample Locations'}
     return render(request, 'mapdata.html', context)
 
 
@@ -696,7 +707,8 @@ def TimeSeriesGraphing(request,feature_action='All'):
         return TemplateResponse(request,template,{ 'featureactionList': featureactionList,'prefixpath': CUSTOM_TEMPLATE_PATH, 'resultList': resultList,
             'startDate':entered_start_date,'endDate':entered_end_date, 'SelectedResults':int_selectedresultid_ids,'authenticated':authenticated,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'graphType':graphType, 'xAxis': xAxis, 'yAxis': yAxis,'name_of_units':name_of_units,
-            'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,},)
+            'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,'name':request.user,'site_title': admin.site.site_title,
+                   'site_header': admin.site.site_header, 'short_title': 'Time Series'},)
 
 
 def mappopuploader(request,feature_action='NotSet',samplingfeature='NotSet',dataset='NotSet',resultidu='NotSet',startdate='NotSet',enddate='NotSet',popup='NotSet'):
@@ -1077,7 +1089,6 @@ def scatter_plot(request):
     rvx=rvy=prvx=prvy=xlocs=ylocs=None
     if xVar and yVar:
         rvx=pr.filter(variableid=xVar).values('resultid')
-        print(rvx)
         prvx=Profileresultvalues.objects.filter(~Q(datavalue=-6999))\
         .filter(~Q(datavalue=-888.88)).filter(resultid__in=rvx).order_by("resultid__resultid__unitsid","resultid__resultid__featureactionid__samplingfeatureid","zlocation")
         rvy=pr.filter(variableid=yVar).values('resultid')
@@ -1142,7 +1153,9 @@ def scatter_plot(request):
         'xVariableSelection':xVariableSelection,'yVariableSelection':yVariableSelection,
         'fieldarea1':fieldarea1, 'fieldarea2':fieldarea2, 'fieldareas':fieldareas,
         'chartID': chartID, 'chart': chart,'title2': title2, 'graphType':graphType,
-        'yAxis': yAxis, 'xAxis': xAxis,'xdata':xdata,'ydata':ydata,'ylocation':ylocation,'xlocation':xlocation,},)
+        'yAxis': yAxis, 'xAxis': xAxis,'xdata':xdata,'ydata':ydata,'ylocation':ylocation,
+        'xlocation':xlocation,'name':request.user, 'site_title': admin.site.site_title,
+                   'site_header': admin.site.site_header, 'short_title': 'Soils Scatter Plot'},)
 
 def exportcitations(request,citations,csv):
     myfile = StringIO.StringIO()
@@ -1538,4 +1551,5 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         return TemplateResponse(request,template,{'prefixpath': CUSTOM_TEMPLATE_PATH,  'variableList': variableList,
              'SelectedVariables':int_selectedvariable_ids,'authenticated':authenticated,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'graphType':graphType, 'yAxis': yAxis,'name_of_units':name_of_units,
-            'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid,},)
+            'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid,'name':request.user,'site_title': admin.site.site_title,
+                   'site_header': admin.site.site_header, 'short_title': 'Soils Data'},)

@@ -47,5 +47,7 @@ nosetests.xml
 
 log
 *.log
-.idea
-
+.idea/
+*.pyc
+.gitignore
+templatesAndSettings/config.json

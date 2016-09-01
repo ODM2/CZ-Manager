@@ -1,0 +1,16 @@
+name: odm2adminenv
+channels:
+- conda-forge
+dependencies:
+- python=2.7
+- django=1.9
+- psycopg2
+- pip:
+  - django-uuidfield
+  - django-ajax-selects
+  - django-admin-shortcuts
+  - djangocms-admin-style==0.2.7
+  - django-apptemplates
+  - django-daterange-filter
+  - django-import-export
+  - django-jquery

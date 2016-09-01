@@ -1,10 +1,3 @@
-<!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/
-
-
-
-
--->
-
 {% extends "admin/base_site.html" %}
 {% load admin_extras %}
 {% load static %}
@@ -12,18 +5,13 @@
 
 {# django-admin-shortcuts changes these blocks #}
 
-{% block breadcrumbs %}
-	<div class="admin_shortcuts">
-		{% admin_shortcuts %}
-	</div>
-{% endblock %}
-
- {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
-{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+{% block extrastyle %}
+    <style type="text/css">{% admin_shortcuts_css %}</style>
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}"/>{% endblock %}
 
 
-{% block extrahead %}
-{{ block.super }}{% admin_shortcuts_js %}{% endblock %}
+{% block extrahead %}{{ block.super }}{% admin_shortcuts_js %}{% endblock %}
 
 {# end changes #}
 
@@ -31,36 +19,59 @@
 
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
 
+{% block title %}
+    {{ short_title }} | {{ site_title }}
+{% endblock %}
 
+{% block branding %}
+    <h1>{{ site_header }}</h1>
+{% endblock %}
 
+{% block nav-global %}
+    {% if authenticated %}
+        {% include 'user-tools.html' %}
+    {% endif %}
+{% endblock %}
+
+{% block breadcrumbs %}
+    {% if authenticated %}
+        <div class="admin_shortcuts">
+            {% admin_shortcuts %}
+        </div>
+    {% endif %}
+{% endblock %}
 
 {% block content %}
-<div id="content-main">
+    <div id="content-main">
 
 
-<div class="app-odm2testapp module">
-        <table>
-               
-				<tr ><td class="section"><h1>Record an Action</h1></td></tr>
-				<tr>
-				<th scope="row"><a href="{{prefixpath }}actions/">
-                    {% trans 'Add the action you preformed' %}</a></th>
-                <td><a href="{{prefixpath }}actions/add/" class="addlink">{% trans 'Add' %}</a></td>
-                <td><a href="{{prefixpath }}actions/" class="changelink">{% trans 'Change' %}</a></td>
-                </tr>
-				<tr>
-				<th scope="row"><a href="{{prefixpath }}actionby/">
-                    {% trans 'Record who preformed the action' %}</a></th>
-                <td><a href="{{prefixpath }}actionby/add/" class="addlink">{% trans 'Add' %}</a></td>
-                <td><a href="{{prefixpath }}actionby/" class="changelink">{% trans 'Change' %}</a></td>
-                </tr>
-				<th scope="row"><a href="{{prefixpath }}methods/">
-                    {% trans 'Add a new method' %}</a></th>
-                <td><a href="{{prefixpath }}methods/add/" class="addlink">{% trans 'Add' %}</a></td>
-                <td><a href="{{prefixpath }}methods/" class="changelink">{% trans 'Change' %}</a></td>
-                </tr>
-				
-        </table>
+        <div class="app-odm2testapp module">
+            <table>
 
+                <tr>
+                    <td class="section"><h1>Record an Action</h1></td>
+                </tr>
+                <tr>
+                    <th scope="row"><a href="{{ prefixpath }}actions/">
+                        {% trans 'Add the action you performed' %}</a></th>
+                    <td><a href="{{ prefixpath }}actions/add/" class="addlink">{% trans 'Add' %}</a></td>
+                    <td><a href="{{ prefixpath }}actions/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+                <tr>
+                    <th scope="row"><a href="{{ prefixpath }}actionby/">
+                        {% trans 'Record who performed the action' %}</a></th>
+                    <td><a href="{{ prefixpath }}actionby/add/" class="addlink">{% trans 'Add' %}</a></td>
+                    <td><a href="{{ prefixpath }}actionby/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+                <tr>
+                    <th scope="row"><a href="{{ prefixpath }}methods/">
+                        {% trans 'Add a new method' %}</a></th>
+                    <td><a href="{{ prefixpath }}methods/add/" class="addlink">{% trans 'Add' %}</a></td>
+                    <td><a href="{{ prefixpath }}methods/" class="changelink">{% trans 'Change' %}</a></td>
+                </tr>
+
+            </table>
+        </div>
+    </div>
 
 {% endblock %}
