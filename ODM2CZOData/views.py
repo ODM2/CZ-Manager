@@ -48,9 +48,10 @@ import sys as sys
 from django.core import management
 from django.shortcuts import render_to_response
 from django.contrib.gis.geos import GEOSGeometry
-from templatesAndSettings.settings import map_config
+from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
 from templatesAndSettings.base import ADMIN_SHORTCUTS
 from django.contrib import admin
+
 #
 # class FeatureactionsAutocomplete(autocomplete.Select2QuerySetView):
 #     def get_queryset(self):
@@ -381,7 +382,7 @@ def web_map(request,dataset='NotSet'):
         authenticated=True
     else:
         authenticated=False
-    map_config = map_config
+    map_config = MAP_CONFIG
     datasets = Datasets.objects.all()
 
     ids = [ds.datasetid for ds in datasets]
