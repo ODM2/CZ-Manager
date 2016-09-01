@@ -1110,6 +1110,7 @@ class ORCIDInLine(admin.StackedInline):
 
         }),
     )
+    max_num = 1
     extra = 0
     verbose_name = 'ORCID'
 
