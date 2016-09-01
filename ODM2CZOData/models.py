@@ -14,7 +14,8 @@ from django.db import models
 
 from templatesAndSettings.settings import MEDIA_ROOT
 
-#from django.contrib.gis.db import models
+from django.contrib.gis.db import models as gis_models
+from django.contrib.gis.geos import GEOSGeometry
 import time
 #from django.forms import ModelFormWithFileField
 #from .forms import DataloggerprogramfilesAdminForm
@@ -101,7 +102,7 @@ class Actionby(models.Model):
         if self.affiliationid:
             s += u"- %s" % (self.affiliationid)
         if self.roledescription:
-            s +=u"- %s," % (self.roledescription)
+            s +=u"- %s" % (self.roledescription)
         return s
     class Meta:
         managed = False
@@ -134,9 +135,9 @@ class Actionextensionpropertyvalues(models.Model):
 class Actions(models.Model):
     actionid = models.AutoField(primary_key=True)
     action_type = models.ForeignKey('CvActiontype',
-            help_text= "A vocabulary for describing the type of actions performed in making observations. Depending" +
-            " on the action type, the action may or may not produce an observation result. view action type "+
-            "details here http://vocabulary.odm2.org/actiontype/",db_column='actiontypecv')
+                                    help_text='A vocabulary for describing the type of actions performed in making observations. Depending' \
+                                              ' on the action type, the action may or may not produce an observation result. view action type ' \
+                                              'details here http://vocabulary.odm2.org/actiontype/', db_column='actiontypecv')
     method = models.ForeignKey('Methods', db_column='methodid')
     begindatetime = models.DateTimeField(verbose_name='begin date time')
     begindatetimeutcoffset = models.IntegerField(verbose_name='begin date time clock off set (from GMT)', default=4)
@@ -147,7 +148,7 @@ class Actions(models.Model):
     def __unicode__(self):
         s = u"%s" % (self.action_type)
         if self.method:
-            s += u"- %s" % (self.method)
+            s += u" | %s" % (self.method)
         return s
     class Meta:
         managed = False
@@ -169,7 +170,7 @@ class Affiliations(models.Model):
     def __unicode__(self):
         s = u"%s" % (self.personid)
         if self.organizationid:
-            s += u"- %s" % (self.organizationid)
+            s += u" | %s" % (self.organizationid)
         return s
     class Meta:
         managed = False
@@ -202,6 +203,9 @@ class Authorlists(models.Model):
     personid = models.ForeignKey('People', verbose_name='person', db_column='personid', blank=True, null=True)
     authororder = models.IntegerField(verbose_name='author order', blank=True, null=True)
 
+    def __unicode__(self):
+        s = u"{0} - {1}".format(self.personid,self.authororder)
+        return s
     class Meta:
         managed = False
         db_table = r'odm2"."authorlists'
@@ -356,19 +360,23 @@ class Citationexternalidentifiers(models.Model):
     citationid = models.ForeignKey('Citations', db_column='citationid')
     externalidentifiersystemid = models.ForeignKey('Externalidentifiersystems', db_column='externalidentifiersystemid') #externalidentifiersystemid
     citationexternalidentifier = models.CharField(max_length=255, db_column="citationexternalidentifier")
-    citationexternalidentiferuri = models.CharField(max_length=255, blank=True, db_column="citationexternalidentiferuri")
+    citationexternalidentifieruri = models.CharField(max_length=255, blank=True, db_column="citationexternalidentifieruri")
 
+    def __unicode__(self):
+        s = u"{0} - {1}".format(self.externalidentifiersystemid, self.citationexternalidentifier)
+        return s
     class Meta:
         managed = False
         db_table = r'odm2"."citationexternalidentifiers'
+        verbose_name = 'citationexternalidentifier'
 
 
 class Citations(models.Model):
     citationid = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
     publisher = models.CharField(max_length=255)
-    publicationyear = models.IntegerField(verbose_name='publication year')
-    citationlink = models.CharField(max_length=255, blank=True,verbose_name='DOI',)
+    publicationyear = models.IntegerField(verbose_name='year')
+    citationlink = models.CharField(max_length=255, blank=True,verbose_name='Citation Link',)
     def __unicode__(self):
         s = u"%s" % (self.title)
         if self.publisher:
@@ -418,9 +426,7 @@ class CvActiontype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_actiontype'
@@ -434,14 +440,11 @@ class CvAggregationstatistic(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_aggregationstatistic'
         ordering = ['term','name']
-
 
 
 class CvAnnotationtype(models.Model):
@@ -451,9 +454,7 @@ class CvAnnotationtype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_annotationtype'
@@ -467,14 +468,11 @@ class CvCensorcode(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_censorcode'
         ordering = ['term','name']
-
 
 
 class CvDataqualitytype(models.Model):
@@ -484,9 +482,7 @@ class CvDataqualitytype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_dataqualitytype'
@@ -500,9 +496,7 @@ class CvDatasettypecv(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_datasettypecv'
@@ -515,7 +509,8 @@ class CvDirectivetype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __unicode__(self):
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_directivetype'
@@ -529,9 +524,7 @@ class CvElevationdatum(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_elevationdatum'
@@ -545,7 +538,8 @@ class CvEquipmenttype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __unicode__(self):
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_equipmenttype'
@@ -559,9 +553,7 @@ class CvMethodtype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_methodtype'
@@ -575,9 +567,7 @@ class CvOrganizationtype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_organizationtype'
@@ -591,9 +581,7 @@ class CvPropertydatatype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_propertydatatype'
@@ -607,14 +595,11 @@ class CvQualitycode(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_qualitycode'
         ordering = ['term','name']
-
 
 
 class CvReferencematerialmedium(models.Model):
@@ -623,7 +608,8 @@ class CvReferencematerialmedium(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
-
+    def __unicode__(self):
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_referencematerialmedium'
@@ -637,9 +623,7 @@ class CvRelationshiptype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_relationshiptype'
@@ -653,9 +637,7 @@ class CvResulttype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_resulttype'
@@ -669,14 +651,11 @@ class CvMedium(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_medium'
         ordering = ['term','name']
-
 
 
 class CvSamplingfeaturegeotype(models.Model):
@@ -686,9 +665,7 @@ class CvSamplingfeaturegeotype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_samplingfeaturegeotype'
@@ -703,9 +680,7 @@ class CvSamplingfeaturetype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s" % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_samplingfeaturetype'
@@ -720,9 +695,7 @@ class CvSitetype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_sitetype'
@@ -736,9 +709,7 @@ class CvSpatialoffsettype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_spatialoffsettype'
@@ -752,9 +723,7 @@ class CvSpeciation(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_speciation'
@@ -768,9 +737,7 @@ class CvSpecimenmedium(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_specimenmedium'
@@ -784,9 +751,7 @@ class CvSpecimentype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_specimentype'
@@ -800,9 +765,7 @@ class CvStatus(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_status'
@@ -816,9 +779,7 @@ class CvTaxonomicclassifiertype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_taxonomicclassifiertype'
@@ -833,9 +794,7 @@ class CvUnitstype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_unitstype'
@@ -848,15 +807,14 @@ class CvVariablename(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"{}".format(self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_variablename'
         ordering = ['term','name']
-
 
 
 class CvVariabletype(models.Model):
@@ -866,9 +824,7 @@ class CvVariabletype(models.Model):
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
     def __unicode__(self):
-        s = u"%s" % (self.term)
-        s += u"- %s," % (self.name)
-        return s
+        return u"%s" % (self.name)
     class Meta:
         managed = False
         db_table = r'odm2"."cv_variabletype'
@@ -1381,12 +1337,12 @@ class Methodexternalidentifiers(models.Model):
 
 class Methods(models.Model):
     methodid = models.AutoField(primary_key=True)
-    methodtypecv = models.ForeignKey(CvMethodtype,verbose_name='method type',
-            help_text="A vocabulary for describing types of Methods associated with creating observations. " +
-                      "MethodTypes correspond with ActionTypes in ODM2. An Action must be performed using an " +
-                      "appropriate MethodType - e.g., a specimen collection Action should be associated with a "+
-                      "specimen collection method. details for individual values " +
-                      "here: http://vocabulary.odm2.org/methodtype/", db_column='methodtypecv')
+    methodtypecv = models.ForeignKey(CvMethodtype, verbose_name='method type',
+                                     help_text='A vocabulary for describing types of Methods associated with creating observations. ' \
+                                               'MethodTypes correspond with ActionTypes in ODM2. An Action must be performed using an ' \
+                                               'appropriate MethodType - e.g., a specimen collection Action should be associated with a ' \
+                                               'specimen collection method. details for individual values ' \
+                                               'here: http://vocabulary.odm2.org/methodtype/', db_column='methodtypecv')
     methodcode = models.CharField(verbose_name='method code',max_length=50)
     methodname = models.CharField(verbose_name='method name',max_length=255)
     methoddescription = models.CharField(verbose_name='method description', max_length=5000, blank=True)
@@ -1438,7 +1394,7 @@ class Organizations(models.Model):
     organizationlink = models.CharField(verbose_name="organization web link", max_length=255, blank=True)
     parentorganizationid = models.ForeignKey('self',verbose_name="parent organization", db_column='parentorganizationid',blank=True, null=True, default=1)
     def __unicode__(self):
-        s = u"%s " % (self.organizationcode)
+        s = u"%s" % (self.organizationcode)
         if self.organizationname:
             s += u", %s" % (self.organizationname)
         return s
@@ -1454,7 +1410,7 @@ class People(models.Model):
     personmiddlename = models.CharField(max_length=255, verbose_name="middle name",blank=True)
     personlastname = models.CharField(max_length=255, verbose_name="last name")
     def __unicode__(self):
-        s = u"%s " % (self.personlastname)
+        s = u"%s" % (self.personlastname)
         if self.personfirstname:
             s += u", %s" % (self.personfirstname)
         return s
@@ -1473,9 +1429,16 @@ class Personexternalidentifiers(models.Model):
     personexternalidentifier = models.CharField(max_length=255)
     personexternalidentifieruri = models.CharField(max_length=255, blank=True)
 
+    def __unicode__(self):
+        s = u"%s - %s - %s - %s" % (
+        self.personid, self.externalidentifiersystemid, self.personexternalidentifier,
+        self.personexternalidentifieruri)
+        return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."personexternalidentifiers'
+        verbose_name_plural = 'ORCID (Person Unique Identifier)'
 
 
 class Pointcoverageresults(models.Model):
@@ -1949,12 +1912,17 @@ class Samplingfeatures(models.Model):
     elevation_m = models.FloatField(verbose_name='elevation',blank=True, null=True)
     elevation_datum = models.ForeignKey(CvElevationdatum, db_column='elevationdatumcv', blank=True, null=True)
 
+    objects = gis_models.GeoManager()
+
+    def featuregeometrywkt(self):
+        return GEOSGeometry(self.featuregeometry)
+
     def __unicode__(self):
         s = u"%s - %s" % (self.samplingfeatureid,  self.sampling_feature_type)
         if self.samplingfeaturecode:
             s += u" - %s" % (self.samplingfeaturecode)
         if self.samplingfeaturename:
-            s += u" - %s," % (self.samplingfeaturename)
+            s += u" - %s" % (self.samplingfeaturename)
         return s
     class Meta:
         managed = False
@@ -2191,9 +2159,9 @@ class Taxonomicclassifierexternalidentifiers(models.Model):
 class Taxonomicclassifiers(models.Model):
     taxonomicclassifierid = models.AutoField(primary_key=True)
     taxonomic_classifier_type = models.ForeignKey(CvTaxonomicclassifiertype, db_column='taxonomicclassifiertypecv',
-                    help_text="A vocabulary for describing types of taxonomies from which descriptive terms used "+
-                              "in an ODM2 database have been drawn. Taxonomic classifiers provide a way to classify"+
-                              " Results and Specimens according to terms from a formal taxonomy.. Check "+
+                    help_text="A vocabulary for describing types of taxonomies from which descriptive terms used "\
+                              "in an ODM2 database have been drawn. Taxonomic classifiers provide a way to classify"\
+                              " Results and Specimens according to terms from a formal taxonomy.. Check "\
                               "http://vocabulary.odm2.org/taxonomicclassifiertype/  for more info")
     taxonomicclassifiername = models.CharField(verbose_name='taxonomic classifier name', max_length=255)
     taxonomicclassifiercommonname = models.CharField(verbose_name='taxonomic classifier common name',max_length=255, blank=True)
@@ -2356,7 +2324,7 @@ class Transectresultvalues(models.Model):
 class Units(models.Model):
     unitsid = models.AutoField(primary_key=True)
     unit_type = models.ForeignKey(CvUnitstype,
-            help_text="A vocabulary for describing the type of the Unit or the more general quantity that the Unit " +
+            help_text="A vocabulary for describing the type of the Unit or the more general quantity that the Unit "
                       "represents. View unit type details here http://vocabulary.odm2.org/unitstype/"
             ,db_column='unitstypecv')
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
@@ -2392,7 +2360,7 @@ class Variableexternalidentifiers(models.Model):
     bridgeid = models.AutoField(primary_key=True)
     variableid = models.ForeignKey('Variables', db_column='variableid')
     externalidentifiersystemid = models.ForeignKey(Externalidentifiersystems, db_column='externalidentifiersystemid')
-    variableexternalidentifer = models.CharField(max_length=255)
+    variableexternalidentifier = models.CharField(max_length=255)
     variableexternalidentifieruri = models.CharField(max_length=255, blank=True)
 
     class Meta:
@@ -2416,7 +2384,7 @@ class Variables(models.Model):
     def __unicode__(self):
         s = "%s" % (self.variablecode)
         if self.variabledefinition:
-            s += "- %s" % (self.variabledefinition)[:20]
+            s += " - %s" % (self.variabledefinition)[:20]
         return s
     class Meta:
         managed = False

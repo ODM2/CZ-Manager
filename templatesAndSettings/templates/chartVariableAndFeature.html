@@ -23,11 +23,22 @@
  {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
 {{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
 
+{% block title %}
+    Soils Data | {{ "site_title"|get_title:6 }}
+{% endblock %}
+
+{% block branding%}
+    <h1>{{ "site_header"|get_title:6 }}</h1>
+{% endblock %}
+
+{% block nav-global %}
+    {% if authenticated %}
+        {% include 'user-tools.html' %}
+    {% endif %}
+{% endblock %}
 
 {% block extrahead %}
-{{ block.super }}<title>
-	{% block title %}{% endblock %}
-  </title>
+{{ block.super }}
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     
 	 <script src="https://code.highcharts.com/4.1.10/highcharts.js"></script>
