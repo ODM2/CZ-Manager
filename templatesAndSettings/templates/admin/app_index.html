@@ -1,4 +1,4 @@
-{% extends "admin:admin/app_index.html" %}
+{% extends "admin/app_index.html" %}
 
 {% load admin_extras %}
 {% load static %}
@@ -66,12 +66,12 @@
                         <td><a href="{{ prefixpath }}people/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}people/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
-                    {% comment %}<tr>
+                    <tr>
                         <th scope="row"><a href="{{ prefixpath }}affiliations/">
                             {% trans 'Affiliation (relate people and organizations)' %}</a></th>
                         <td><a href="{{ prefixpath }}affiliations/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}affiliations/" class="changelink">{% trans 'Change' %}</a></td>
-                    </tr>{% endcomment %}
+                    </tr>
                 </table>
             </div>
             <div class="app-ODM2CZOData module">

@@ -12,6 +12,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from import_export import resources
 from import_export.admin import ImportExportActionModelAdmin
+from import_export.admin import ExportMixin
 from django.contrib.admin import SimpleListFilter, RelatedFieldListFilter
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.contrib.gis import forms, admin
@@ -1135,6 +1136,36 @@ class AffiliationInLine(admin.StackedInline):
     )
     extra = 0
 
+
+class AffiliationsResource(resources.ModelResource):
+    class Meta:
+        model = Affiliations
+        #import_id_fields = ('valueid',)
+        fields = ('organizationid__organizationname', 'personid__personfirstname', 'personid__personlastname', 'isprimaryorganizationcontact',
+                  'primaryemail')
+        export_order = ['organizationid__organizationname', 'personid__personfirstname', 'personid__personlastname', 'isprimaryorganizationcontact','primaryemail']
+
+
+class AffiliationsAdminForm(ModelForm):
+
+    class Meta:
+        model= Affiliations
+        fields = '__all__'
+        export_order = ['organizationname', 'personfirstname', 'personlastname', 'isprimaryorganizationcontact','primaryemail']
+        #ordering = ['-primaryemail']
+
+class AffiliationsAdmin(ExportMixin, admin.ModelAdmin):
+    form=AffiliationsAdminForm
+    resource_class = AffiliationsResource
+    search_fields = ['organizationid__organizationname','organizationid__organizationtypecv__name','organizationid__organizationcode',
+                     'personid__personfirstname', 'personid__personlastname']
+    list_display = ('organizationname', 'personfirstname', 'personlastname', 'isprimaryorganizationcontact','primaryemail')
+    def organizationname(self,obj):
+        return obj.organizationid.organizationname
+    def personfirstname(self,obj):
+        return obj.personid.personfirstname
+    def personlastname(self,obj):
+        return obj.personid.personlastname
 
 class PeopleAdmin(admin.ModelAdmin):
     form = PeopleAdminForm

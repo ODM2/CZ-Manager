@@ -177,6 +177,7 @@ class Affiliations(models.Model):
         db_table = r'odm2"."affiliations'
         verbose_name='affiliation (relate people and organizations)'
         verbose_name_plural='affiliation (relate people and organizations)'
+        ordering = ['-primaryemail']
 
 
 class Annotations(models.Model):

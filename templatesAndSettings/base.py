@@ -42,6 +42,7 @@ CUSTOM_TEMPLATE_PATH = custom_template_path
 # ADMIN_SHORTCUTS_PATH=admin_shortcuts_path
 URL_PATH = url_path
 STATIC_ROOT = static_root
+MAP_CONFIG = map_config
 # https://github.com/mishbahr/django-modeladmin-reorder
 # {'app': 'auth', 'models': ('auth.User', 'auth.Group')},
 # ADMIN_REORDER = ('odm2testsite',
