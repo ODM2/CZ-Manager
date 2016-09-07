@@ -13,7 +13,12 @@ map_config = {
       "zoom":2
     }
 
+data_disclaimer = {
+    "text": "Add a link discribing where your data come from ",
+    "linktext": "The name of my site",
+    "link":"http://mysiteswegpage.page/",
 
+    }
 # SECURITY WARNING: keep the secret key used in production secret!
 secret_key = 'random_secret_key_like_so_7472873649836'
 _root = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin'

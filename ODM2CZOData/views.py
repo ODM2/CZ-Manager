@@ -49,6 +49,7 @@ from django.core import management
 from django.shortcuts import render_to_response
 from django.contrib.gis.geos import GEOSGeometry
 from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
+from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DSICLAIMER
 from templatesAndSettings.base import ADMIN_SHORTCUTS
 from django.contrib import admin
 
@@ -383,6 +384,7 @@ def web_map(request,dataset='NotSet'):
     else:
         authenticated=False
     map_config = MAP_CONFIG
+    data_disclaimer = DATA_DSICLAIMER
     datasets = Datasets.objects.all()
 
     ids = [ds.datasetid for ds in datasets]
@@ -435,7 +437,7 @@ def web_map(request,dataset='NotSet'):
 
     context = {
         'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,'results':results,
-        'datasets':datasets,'selecteddatasets':selected,'authenticated':authenticated, 'map_config':map_config, 'name':request.user,'site_title': admin.site.site_title,
+        'datasets':datasets,'selecteddatasets':selected,'authenticated':authenticated, 'map_config':map_config,'data_disclaimer':data_disclaimer, 'name':request.user,'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header, 'short_title': 'Map Sample Locations'}
     return render(request, 'mapdata.html', context)
 
@@ -705,7 +707,7 @@ def TimeSeriesGraphing(request,feature_action='All'):
         return response
     else:
         #raise ValidationError(relatedFeatureList)
-        return TemplateResponse(request,template,{ 'featureactionList': featureactionList,'prefixpath': CUSTOM_TEMPLATE_PATH, 'resultList': resultList,
+        return TemplateResponse(request,template,{ 'featureactionList': featureactionList,'prefixpath': CUSTOM_TEMPLATE_PATH,'data_disclaimer':DATA_DSICLAIMER, 'resultList': resultList,
             'startDate':entered_start_date,'endDate':entered_end_date, 'SelectedResults':int_selectedresultid_ids,'authenticated':authenticated,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'graphType':graphType, 'xAxis': xAxis, 'yAxis': yAxis,'name_of_units':name_of_units,
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid, 'SelectedFeatureAction':selected_featureactionid,'name':request.user,'site_title': admin.site.site_title,
@@ -717,10 +719,13 @@ def mappopuploader(request,feature_action='NotSet',samplingfeature='NotSet',data
     if not request.user.is_authenticated():
         #return HttpResponseRedirect('../')
         authenticated=False
+    else:
+        authenticated=True
     if popup=='NotSet':
         template = loader.get_template('chart2.html')
     else:
         template = loader.get_template('chartpopup.html')
+    data_disclaimer= DATA_DSICLAIMER
     useDataset = False
     useSamplingFeature=False
     if dataset=='NotSet':
@@ -780,7 +785,7 @@ def mappopuploader(request,feature_action='NotSet',samplingfeature='NotSet',data
 
     return TemplateResponse(request,template,{ 'prefixpath': CUSTOM_TEMPLATE_PATH,
             'useSamplingFeature':useSamplingFeature,
-            'featureActionMethod':featureActionMethod,'featureActionLocation':featureActionLocation,
+            'featureActionMethod':featureActionMethod,'featureActionLocation':featureActionLocation,'data_disclaimer':data_disclaimer,
             'datasetTitle':datasetTitle,'datasetAbstract':datasetAbstract,'useDataset':useDataset,'startDate':startdate,'endDate':enddate,
              'authenticated':authenticated,'methods':methods,'resultList':resultList,},)
 
@@ -793,6 +798,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
         template = loader.get_template('chart2.html')
     else:
         template = loader.get_template('chartpopup.html')
+    data_disclaimer= DATA_DSICLAIMER
     useDataset = False
     useSamplingFeature=False
     if dataset=='NotSet':
@@ -1022,7 +1028,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
         #raise ValidationError(relatedFeatureList)
         return TemplateResponse(request,template,{ 'prefixpath': CUSTOM_TEMPLATE_PATH,
             'startDate':entered_start_date,'endDate':entered_end_date,'useSamplingFeature':useSamplingFeature,
-            'featureActionMethod':featureActionMethod,'featureActionLocation':featureActionLocation,
+            'featureActionMethod':featureActionMethod,'featureActionLocation':featureActionLocation,'data_disclaimer':data_disclaimer,
             'datasetTitle':datasetTitle,'datasetAbstract':datasetAbstract,'useDataset':useDataset,'startdate':startdate,'enddate':enddate,
              'SelectedResults':int_selectedresultid_ids,'authenticated':authenticated,'methods':methods,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2,'resultList': resultList,
@@ -1334,7 +1340,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         template = loader.get_template('profileresultgraphpopup.html')
     selected_resultid = 9365
     selected_relatedfeatid = 15
-
+    data_disclaimer =DATA_DSICLAIMER
     #relatedfeatureList
     #update_result_on_related_feature
     done=False
@@ -1550,7 +1556,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         name_of_units = removeDupsFromListOfStrings(name_of_units)
         #raise ValidationError(relatedFeatureList)
         return TemplateResponse(request,template,{'prefixpath': CUSTOM_TEMPLATE_PATH,  'variableList': variableList,
-             'SelectedVariables':int_selectedvariable_ids,'authenticated':authenticated,
+             'SelectedVariables':int_selectedvariable_ids,'authenticated':authenticated,'data_disclaimer':data_disclaimer,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'graphType':graphType, 'yAxis': yAxis,'name_of_units':name_of_units,
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid,'name':request.user,'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header, 'short_title': 'Soils Data'},)
