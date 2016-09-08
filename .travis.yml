@@ -15,11 +15,12 @@ before_install:
     - travis_retry pip install -r requirements.txt
 
 # Test the tarball creation.
-install:
-    - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2djangoadmin-${version}.tar.gz && popd
+# TODO: Will be available in the next PR
+#install:
+    #- python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2djangoadmin-${version}.tar.gz && popd
 
 script:
-    # Un-comment once we have proper testing.
+    # TODO: Will be available once we can package and run the tests.
     #- if [[ $TEST_TARGET == 'default' ]]; then
         #python setup.py test -a '--verbose --cov=pyugrid';
       #fi
