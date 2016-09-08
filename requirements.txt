@@ -6,5 +6,5 @@ djangocms_admin_style
 django-apptemplates
 django-daterange-filter
 django-import-export
-django-jquery 
+django-jquery
 psycopg2
