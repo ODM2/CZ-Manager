@@ -20,8 +20,9 @@
 	{% block title %}{% endblock %}
   </title>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    
-	 <script src="https://code.highcharts.com/4.1.10/highcharts.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="http://code.highcharts.com/modules/exporting.js"></script>
+	 
 	 <script>
     var chart_id = 'chartid'
     var chart = {{ chart|safe }}
