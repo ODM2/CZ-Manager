@@ -3,22 +3,23 @@ Keep this file untracked
 """
 
 # Custom App settings
-app_name = "ODM2CZOData" # This has to match the name of the folder that the app is saved
+# This has to match the name of the folder that the app is saved.
+app_name = "ODM2CZOData"
 verbose_name = "ODM2CZOData"
 site_title = "ODM2 Admin"
 site_header = "ODM2 Admin"
 map_config = {
-      "lat":0,
-      "lon":0,
-      "zoom":2
-    }
+    "lat": 0,
+    "lon": 0,
+    "zoom": 2
+}
 
 data_disclaimer = {
     "text": "Add a link discribing where your data come from ",
     "linktext": "The name of my site",
-    "link":"http://mysiteswegpage.page/",
+    "link": "http://mysiteswegpage.page/",
+}
 
-    }
 # SECURITY WARNING: keep the secret key used in production secret!
 secret_key = 'random_secret_key_like_so_7472873649836'
 _root = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin'
@@ -36,7 +37,7 @@ template_debug = True
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 ODM2_configs = {
 
-    'ENGINE': 'django.contrib.gis.db.backends.postgis',  # 'django.db.backends.postgresql_psycopg2',
+    'ENGINE': 'django.contrib.gis.db.backends.postgis',  # 'django.db.backends.postgresql_psycopg2'  # noqa
     'NAME': 'name',
     'USER': 'postgres',
     'PASSWORD': 'password',
@@ -52,8 +53,9 @@ ODM2_configs = {
 static_url = '/static/'
 
 admins = [{
-    "name":"first last",
-    "email":"email@example.com"
-  }]
+    "name": "first last",
+    "email": "email@example.com"
+}]
 
-from templatesAndSettings.base import *
+# FIXME: Do not import *
+# from templatesAndSettings.base import *
