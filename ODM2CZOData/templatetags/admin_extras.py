@@ -1,5 +1,5 @@
-#this came from https://djangosnippets.org/snippets/2196/
-#adds a collect tag for templates so you can build lists
+# This came from https://djangosnippets.org/snippets/2196/
+# adds a collect tag for templates so you can build lists
 
 from django import template
 from django.contrib.gis.geos import GEOSGeometry
@@ -7,10 +7,9 @@ from django.contrib import admin
 from templatesAndSettings.base import ADMIN_SHORTCUTS
 
 register = template.Library()
+
+
 @register.tag
-
-
-
 def collect(parser, token):
     bits = list(token.split_contents())
     if len(bits) > 3 and bits[-2] == 'as':
@@ -18,7 +17,8 @@ def collect(parser, token):
         items = bits[1:-2]
         return CollectNode(items, varname)
     else:
-        raise template.TemplateSyntaxError('%r expected format is "item [item ...] as varname"' % bits[0])
+        raise template.TemplateSyntaxError('%r expected format is "item [item ...] as varname"' % bits[0])  # noqa
+
 
 class CollectNode(template.Node):
     def __init__(self, items, varname):
@@ -39,6 +39,7 @@ class AssignNode(template.Node):
         context[self.name] = self.value.resolve(context, True)
         return ''
 
+
 def do_assign(parser, token):
     """
     Assign an expression to a variable in the current context.
@@ -51,14 +52,15 @@ def do_assign(parser, token):
     """
     bits = token.contents.split()
     if len(bits) != 3:
-        raise template.TemplateSyntaxError("'%s' tag takes two arguments" % bits[0])
+        raise template.TemplateSyntaxError("'%s' tag takes two arguments" % bits[0])  # noqa
     value = parser.compile_filter(bits[2])
     return AssignNode(bits[1], value)
 
 register = template.Library()
 register.tag('assign', do_assign)
 
-# Extra template tags for map
+
+# Extra template tags for map.
 @register.filter()
 def get_lat_lng(value, gc):
     lat = GEOSGeometry(value).coords[1]
@@ -81,6 +83,7 @@ def filter_coords(value):
 
     return sites
 
+
 @register.filter()
 def get_title(value, short):
     if value == 'site_title':
@@ -89,6 +92,7 @@ def get_title(value, short):
         return admin.site.site_header
     elif value == 'shortcut_title':
         return ADMIN_SHORTCUTS[0]['shortcuts'][short]['title']
+
 
 @register.filter()
 def in_field(value):

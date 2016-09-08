@@ -1,6 +1,6 @@
 from django.contrib import admin
-from django.db import models
-from templatesAndSettings.settings import URL_PATH
+# from django.db import models  # imported but unused
+# from templatesAndSettings.settings import URL_PATH  # imported but unused
 
 from .models import Samplingfeatures
 from .forms import SamplingfeaturesAdmin
@@ -38,7 +38,6 @@ from .models import Dataloggerprogramfiles
 from .forms import DataloggerprogramfilesAdmin
 from .models import Dataloggerfiles
 from .forms import DataloggerfilesAdmin
-from .models import Units
 from .models import Measurementresultvalues
 from .forms import MeasurementresultvaluesAdmin
 from .models import Measurementresults
@@ -77,46 +76,46 @@ from .models import Externalidentifiersystems
 from .forms import ExternalidentifiersystemAdmin
 
 admin.site.register(Dataquality, DataqualityAdmin)
-admin.site.register(Resultsdataquality,ResultsdataqualityAdmin)
+admin.site.register(Resultsdataquality, ResultsdataqualityAdmin)
 
 admin.site.register(Datasetcitations, DatasetcitationsAdmin)
 admin.site.register(Citations, CitationsAdmin)
 admin.site.register(Authorlists, AuthorlistsAdmin)
 admin.site.register(Methodcitations, MethodcitationsAdmin)
 admin.site.register(Extensionproperties, ExtensionpropertiesAdmin)
-admin.site.register(Citationextensionpropertyvalues, CitationextensionpropertyvaluesAdmin)
+admin.site.register(Citationextensionpropertyvalues, CitationextensionpropertyvaluesAdmin)  # noqa
 
 admin.site.register(Profileresults, ProfileresultsAdmin)
 admin.site.register(Profileresultvalues, ProfileresultsvaluesAdmin)
-admin.site.register(Equipmentmodels,EquipmentmodelsAdmin)
+admin.site.register(Equipmentmodels, EquipmentmodelsAdmin)
 admin.site.register(Instrumentoutputvariables, InstrumentoutputvariablesAdmin)
 admin.site.register(Dataloggerfilecolumns, DataloggerfilecolumnsAdmin)
-admin.site.register(Dataloggerprogramfiles,DataloggerprogramfilesAdmin)
+admin.site.register(Dataloggerprogramfiles, DataloggerprogramfilesAdmin)
 admin.site.register(Dataloggerfiles, DataloggerfilesAdmin)
-admin.site.register(Samplingfeatures,SamplingfeaturesAdmin)
-admin.site.register(Samplingfeatureexternalidentifiers,SamplingfeatureexternalidentifiersAdmin)
-admin.site.register(Affiliations,AffiliationsAdmin)
-admin.site.register(People,PeopleAdmin)
+admin.site.register(Samplingfeatures, SamplingfeaturesAdmin)
+admin.site.register(Samplingfeatureexternalidentifiers, SamplingfeatureexternalidentifiersAdmin)  # noqa
+admin.site.register(Affiliations, AffiliationsAdmin)
+admin.site.register(People, PeopleAdmin)
 admin.site.register(Personexternalidentifiers)
-admin.site.register(Methods,MethodsAdmin)
-admin.site.register(Units,UnitsAdmin)
+admin.site.register(Methods, MethodsAdmin)
+admin.site.register(Units, UnitsAdmin)
 admin.site.register(Actionby, ActionByAdmin)
-admin.site.register(Organizations,OrganizationsAdmin)
-admin.site.register(Featureactions,FeatureactionsAdmin)
-admin.site.register(Actions,ActionsAdmin)
-admin.site.register(Results,ResultsAdmin)
-admin.site.register(Relatedactions,RelatedactionsAdmin)
+admin.site.register(Organizations, OrganizationsAdmin)
+admin.site.register(Featureactions, FeatureactionsAdmin)
+admin.site.register(Actions, ActionsAdmin)
+admin.site.register(Results, ResultsAdmin)
+admin.site.register(Relatedactions, RelatedactionsAdmin)
 admin.site.register(Variables, VariablesAdmin)
 admin.site.register(ProcessDataloggerfile)
-admin.site.register(Externalidentifiersystems,ExternalidentifiersystemAdmin)
+admin.site.register(Externalidentifiersystems, ExternalidentifiersystemAdmin)
 
-admin.site.register(Taxonomicclassifiers,TaxonomicclassifiersAdmin)
-admin.site.register(Datasets,DatasetsAdmin)
+admin.site.register(Taxonomicclassifiers, TaxonomicclassifiersAdmin)
+admin.site.register(Datasets, DatasetsAdmin)
 admin.site.register(Datasetsresults)
 admin.site.register(Processinglevels)
 admin.site.register(Relatedfeatures)
 admin.site.register(Measurementresults, MeasurementresultsAdmin)
-admin.site.register(Measurementresultvalues,MeasurementresultvaluesAdmin)
+admin.site.register(Measurementresultvalues, MeasurementresultvaluesAdmin)
 admin.site.register(MeasurementresultvalueFile)
-#admin.site.index_template = URL_PATH + "/my_index.html"
+# admin.site.index_template = URL_PATH + "/my_index.html"
 admin.site.index_template = "admin/my_index.html"

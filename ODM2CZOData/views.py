@@ -1,51 +1,50 @@
 __author__ = 'leonmi'
 from django.http import HttpResponse
 from django.template.response import TemplateResponse
-from django.db.models import Sum, Avg
+# from django.db.models import Sum, Avg  # imported but unused
 from django.shortcuts import render_to_response
-#from odm2testapp.forms import VariablesForm
+# from odm2testapp.forms import VariablesForm
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from .models import *
 from datetime import datetime
-import csv
-import time
-import datetime
-from datetime import timedelta
+# import csv  # imported but unused
+# import time  # imported but unused
+# import datetime  # imported but unused
+# from datetime import timedelta  # imported but unused
 from django.db.models import Q
-from django.views.generic import ListView
-import csv
-import io
-import binascii
+# from django.views.generic import ListView  # imported but unused
+# import csv  # imported but unused
+# import io  # imported but unused
+# import binascii  # imported but unused
 import math
-import unicodedata
-from io import TextIOWrapper
+# import unicodedata  # imported but unused
+# from io import TextIOWrapper  # imported but unused
 import cStringIO as StringIO
-from templatesAndSettings.settings import MEDIA_ROOT
-import itertools
-from django.core.exceptions import ValidationError
-from daterange_filter.filter import DateRangeFilter
+# from templatesAndSettings.settings import MEDIA_ROOT  # imported but unused
+# import itertools  # imported but unused
+# from django.core.exceptions import ValidationError  # imported but unused
+# from daterange_filter.filter import DateRangeFilter  # imported but unused
 from django import template
-from django.core.serializers.json import DjangoJSONEncoder
-import json
-from django.views.generic import View
-from django.template import RequestContext
-from .forms import DataloggerfilesAdmin
-from .forms import DataloggerfilesAdminForm
-import json
+# from django.core.serializers.json import DjangoJSONEncoder  # imported but unused  # noqa
+# from django.views.generic import View  # imported but unused
+# from django.template import RequestContext  # imported but unused
+# from .forms import DataloggerfilesAdmin  # imported but unused
+# from .forms import DataloggerfilesAdminForm  # imported but unused
+# import json  # imported but unused
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
-import re
+# import re  # imported but unused
 register = template.Library()
 from django.db.models import Min, Max
 from django.template import loader
 from .forms import CitationsAdminForm
-from .forms import CitationextensionpropertyvaluesAdminForm
-from .forms import AuthorlistsAdminForm
+# from .forms import CitationextensionpropertyvaluesAdminForm  # imported but unused  # noqa
+# from .forms import AuthorlistsAdminForm  # imported but unused
 from django.http import StreamingHttpResponse
-from django.core import mail
-from subprocess import *
-import sys as sys
-from django.core import management
+# from django.core import mail  # imported but unused
+# from subprocess import *
+# from .models import *
+# import sys  # imported but unused
+# from django.core import management  # imported but unused
 from django.shortcuts import render_to_response
 from django.contrib.gis.geos import GEOSGeometry
 from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
