@@ -10,7 +10,8 @@ site_header = "ODM2 Admin"
 map_config = {
       "lat":0,
       "lon":0,
-      "zoom":2
+      "zoom":2,
+      "cluster_sites":False
     }
 
 data_disclaimer = {
