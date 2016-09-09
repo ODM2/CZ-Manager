@@ -158,21 +158,21 @@
         // var myMap = L.map('map',{worldCopyJump:true}).setView([ 18.28263, -65.77458], 14);
         // var myMap = L.map('map',{worldCopyJump:true}).setView([40.000,-95.000], 5); // For Crossczo
         var m = null;
-
         var osm = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
             maxZoom: 20,
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
             '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
             'Imagery &copy; <a href="http://mapbox.com">Mapbox</a>', id: 'mapbox.run-bike-hike'
         }).addTo(myMap);
-        var markerClusters = L.markerClusterGroup(singleMarkerMode=true);
+        var markerClusters = L.markerClusterGroup(singleMarkerMode=true); //,maxClusterRadius=1
+		
         {% for site in features|filter_coords %}
             var feat_obj = feature_list.filter(
                     function( obj ){
                         return obj.name == '{{ site.sampling_feature_type.name }}'
                     });
             var popup = '';
-            {% if  site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" or site.sampling_feature_type.name == "Stream gage" %}
+            {% if  site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" or site.sampling_feature_type.name == "Stream gage" or site.sampling_feature_type.name == "Transect"  %}
                 popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
                         + '<hr />'
                         + '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
@@ -180,7 +180,7 @@
                         + '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
                         + '<br> {{ site.sampling_feature_type.name}}'
                         + '<br> <a  target="_blank" href="{{prefixpath}}../graphfa/samplingfeature&#61;{{site.samplingfeatureid}}">view times series data in new page</a></p><iframe  width=600, height=600, src="{{prefixpath}}../mappopup/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
-            {% elif  site.sampling_feature_type.name == "Excavation" %}
+			{% elif  site.sampling_feature_type.name == "Excavation" %}
                 popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
                         + '<hr />'
                         + '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
@@ -207,16 +207,20 @@
                 className: feat_obj[0].styleclass + ' awesome-marker leaflet-zoom-animated leaflet-interactive',
                 html: '<i class="fa '+  feat_obj[0].icon +' icon-white" aria-hidden="true"></i><p style="margin-top:20px;font-weight:bold;">{{ site.samplingfeaturecode }}</p>'
             });
-			{% if  site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" or site.sampling_feature_type.name == "Field area" or site.sampling_feature_type.name == "Stream gage" %}
+			{% if  site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" or site.sampling_feature_type.name == "Field area" or site.sampling_feature_type.name == "Stream gage" or site.sampling_feature_type.name == "Transect"  %}
                 m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
                     icon: iconDiv, title: '{{ site.samplingfeaturename }}'
-                }).addTo(myMap).bindPopup( popup,{minWidth: 600, minHeight: 500,autoPanPadding: [10, 50],  autoPan: true, closeButton: true,offset: [0, 5]} );
-				
+                }).bindPopup( popup,{minWidth: 600, minHeight: 500,autoPanPadding: [10, 50],  autoPan: true, closeButton: true,offset: [0, 5]} );
+			    {% if map_config.cluster_sites and  site.sampling_feature_type.name == "Site" %}
+					markerClusters.addLayer(m);
+				{% else %} 
+				    m.addTo(myMap);
+				{% endif %}
 			{% else %}
                 m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
                     icon: iconDiv, title: '{{ site.samplingfeaturename }}'
                 }).bindPopup( popup,{minWidth: 600, minHeight: 500, autoPanPadding: [10, 50], autoPan: true, closeButton: true,offset: [0, 5]} );
-			markerClusters.addLayer(m);
+				markerClusters.addLayer(m);
 			{% endif %}
         {% endfor %}
         var legend = L.control({position: 'bottomright'});

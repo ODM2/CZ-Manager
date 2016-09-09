@@ -385,6 +385,8 @@ def web_map(request,dataset='NotSet'):
         authenticated=False
     map_config = MAP_CONFIG
     data_disclaimer = DATA_DSICLAIMER
+
+
     datasets = Datasets.objects.all()
 
     ids = [ds.datasetid for ds in datasets]
@@ -1265,12 +1267,12 @@ def exportspreadsheet(request,resultValuesSeries,profileResult=True):
         #elif not lastUnit==unit:
              #myfile.write(myresults.csvheaderShortUnitOnly())
     if profileResult:
-        resultValuesSeries = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
+        resultValuesSeries = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Ecological land classification")).\
             filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area")).\
             order_by("resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
                 "resultid__intendedzspacing","resultid__resultid__variableid","resultid__resultid__unitsid")
     else:
-         resultValuesSeries = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Landscape classification")).\
+         resultValuesSeries = resultValuesSeries.filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Ecological land classification")).\
             filter(~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area")).\
             order_by("valuedatetime","resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
                 "resultid__resultid__variableid","resultid__resultid__unitsid","resultid__resultid__processing_level")
