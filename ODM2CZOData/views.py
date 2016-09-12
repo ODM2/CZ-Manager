@@ -426,6 +426,8 @@ def web_map(request,dataset='NotSet'):
              style_class="awesome-marker-icon-darkred"),
         dict(feature_type="Field area", icon="fa-map-o", color="darkblue",
              style_class="awesome-marker-icon-darkblue"),
+        dict(feature_type="Weather station", icon="fa-cloud", color="darkblue",
+             style_class="awesome-marker-icon-darkblue"),
         dict(feature_type="Ecological land classification", icon="fa-bar-chart", color="darkpurple",
              style_class="awesome-marker-icon-darkpurple"),
         dict(feature_type="Observation well", icon="fa-eye", color="orange",
@@ -440,7 +442,7 @@ def web_map(request,dataset='NotSet'):
     context = {
         'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,'results':results,
         'datasets':datasets,'selecteddatasets':selected,'authenticated':authenticated, 'map_config':map_config,'data_disclaimer':data_disclaimer, 'name':request.user,'site_title': admin.site.site_title,
-                   'site_header': admin.site.site_header, 'short_title': 'Map Sample Locations'}
+                   'site_header': admin.site.site_header, 'short_title': 'Map Locations'}
     return render(request, 'mapdata.html', context)
 
 
