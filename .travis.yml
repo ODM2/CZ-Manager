@@ -1,7 +1,29 @@
 language: python
+
+sudo: false
+
 python:
-  - "2.7"
-# command to install dependencies
-install: 
- - "pip install -r requirements.txt"
- #- "pip install git+https://github.com/nwcell/psycopg2-windows.git@win64-py27#egg=psycopg2" #for windows, travis is building on ubuntu
+    - 2.7
+    - 3.4
+    - 3.5
+
+env:
+    - TEST_TARGET=default
+    - TEST_TARGET=coding
+
+before_install:
+    - travis_retry pip install -r requirements.txt
+
+# Test the tarball creation.
+# TODO: Will be available in the next PR
+#install:
+    #- python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2djangoadmin-${version}.tar.gz && popd
+
+script:
+    # TODO: Will be available once we can package and run the tests.
+    # - if [[ $TEST_TARGET == 'default' ]]; then
+    #     python setup.py test';
+    #   fi
+    - if [[ $TEST_TARGET == 'coding' ]]; then
+        find . -type f -name "*.py" ! -name "base.py" ! -name "tests.py" | xargs flake8 --max-line-length=100;
+      fi
