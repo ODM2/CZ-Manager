@@ -70,6 +70,7 @@ from .models import Samplingfeatureexternalidentifiers
 from .models import Externalidentifiersystems
 from .models import Citationexternalidentifiers
 from .models import Relatedfeatures
+from .models import Variables
 
 from templatesAndSettings.settings import STATIC_URL
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
@@ -108,6 +109,27 @@ def link_list_display_DOI(link):
     else:
         return u'<a href="%s" target="_blank">%s</a>' % (link, link)
 
+
+class variablesInLine(admin.StackedInline):
+    model = Variables
+
+class unitsInLine(admin.StackedInline):
+    model = Units
+    # fieldsets = (
+    #     ('Details', {
+    #         'classes': ('collapse',),
+    #         'fields': ('unitsid',
+    #                    'unit_type',
+    #                    'unitsabbreviation',
+    #                    'unitsname',
+    #                    'unitslink',
+    #                    )
+    #
+    #     }),
+    # )
+    extra = 0
+class resultsInLine(admin.StackedInline):
+    model = Results
 
 class ResultsdataqualityAdminForm(ModelForm):
     class Meta:
@@ -178,6 +200,10 @@ class DatasetcitationsAdmin(admin.ModelAdmin):
     list_display = ('datasetid', 'relationshiptypecv', 'citationid')
     form = DatasetcitationsAdminForm
 
+
+class InstrumentoutputvariablesInline(admin.StackedInline):
+    model = Instrumentoutputvariables
+    extra = 0
 
 class authorlistInline(admin.StackedInline):
     model = Authorlists
@@ -488,6 +514,52 @@ duplicate_results_event.short_description = "Duplicate selected result"
 #         self.data['featureactionid'] = featureaction
 #         return featureaction
 
+
+class MeasurementResultsInline(admin.StackedInline):
+    model = Measurementresults
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('resultid',
+                       'xlocation',
+                       'xlocationunitsid',
+                       'ylocation',
+                       'ylocationunitsid',
+                       'zlocation',
+                       'zlocationunitsid',
+                       'spatialreferenceid',
+                       'censorcodecv',
+                       'qualitycodecv',
+                       'aggregationstatisticcv',
+                       'timeaggregationinterval',
+                       'timeaggregationintervalunitsid',
+
+            )
+        }),
+    )
+    extra = 0
+
+class ProfileResultsInline(admin.StackedInline):
+    model = Profileresults
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('resultid',
+                       'xlocation',
+                       'xlocationunitsid',
+                       'ylocation',
+                       'ylocationunitsid',
+                       'spatialreferenceid',
+                       'intendedzspacing',
+                       'intendedzspacingunitsid',
+                       'intendedtimespacing',
+                       'intendedtimespacingunitsid',
+                       'aggregationstatisticcv',
+
+            )
+        }),
+    )
+    extra = 0
 class ResultsAdminForm(ModelForm):
     # featureactionid = make_ajax_field(Featureactions,'featureactionid','featureaction_lookup',max_length=500)
     featureactionid = AutoCompleteSelectField('featureaction_lookup', required=True, help_text='',
@@ -518,6 +590,7 @@ class ResultsAdminForm(ModelForm):
 # http://django-ajax-selects.readthedocs.org/en/latest/Admin-add-popup.html
 class ResultsAdmin(AjaxSelectAdmin):  # admin.ModelAdmin
     form = ResultsAdminForm
+    inlines=[MeasurementResultsInline,ProfileResultsInline]
     list_display = ['resultid', 'featureactionid', 'variableid', 'processing_level']
     search_fields = ['variableid__variable_name__name', 'variableid__variablecode', 'variableid__variabledefinition',
                      'featureactionid__samplingfeatureid__samplingfeaturename',
@@ -572,6 +645,56 @@ class OrganizationsAdmin(admin.ModelAdmin):
 
     organization_link.allow_tags = True
 
+
+class SamplingFeaturesInline(admin.StackedInline):
+    model = Samplingfeatures
+    extra = 0
+class FeatureactionsInline(admin.StackedInline):
+    model = Featureactions
+    extra = 0
+
+class DataLoggerFileColumnsInline(admin.StackedInline):
+    model=Dataloggerfilecolumns
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('dataloggerfilecolumnid',
+                       'resultid',
+                       'dataloggerfileid',
+                       'instrumentoutputvariableid',
+                       'columnlabel',
+                       'columndescription',
+                       'measurementequation',
+                       'scaninterval',
+                       'scanintervalunitsid',
+                       'recordinginterval',
+                       'recordingintervalunitsid',
+                       'aggregationstatisticcv',
+                       )
+
+        }),
+    )
+    extra=0
+
+class ActionsInline(admin.StackedInline):
+    model = Actions
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('actionid',
+                       'action_type',
+                       'method',
+                       'begindatetime',
+                       'begindatetimeutcoffset',
+                       'enddatetime',
+                       'enddatetimeutcoffset',
+                       'actiondescription',
+                       'actionfilelink',
+                       )
+
+        }),
+    )
+    extra = 0
 
 class FeatureactionsAdminForm(ModelForm):
     class Meta:
@@ -646,6 +769,7 @@ class ActionsAdminForm(ModelForm):
 
 class ActionsAdmin(admin.ModelAdmin):
     list_display = ('action_type', 'method', 'begindatetime', 'enddatetime')
+    inlines=[FeatureactionsInline]
     list_display_links = ('action_type',)
     search_fields = ['action_type__name', 'method__methodname']  # ,
     form = ActionsAdminForm
@@ -683,6 +807,7 @@ class MethodsAdminForm(ModelForm):
 
 class MethodsAdmin(admin.ModelAdmin):
     list_display = ('methodname', 'method_type_linked', 'method_link')
+    inlines=[ActionsInline]
     list_display_links = ['methodname']
     form = MethodsAdminForm
 
@@ -719,6 +844,7 @@ def duplicate_Dataloggerfiles_event(ModelAdmin, request, queryset):
 duplicate_Dataloggerfiles_event.short_description = "Duplicate selected datalogger file along with columns"
 
 
+
 class DataloggerfilesAdminForm(ModelForm):
     class Meta:
         model = Dataloggerfiles
@@ -729,7 +855,7 @@ class DataloggerfilesAdmin(admin.ModelAdmin):
     form = DataloggerfilesAdminForm
     change_form_template = './admin/ODM2CZOData/dataloggerfiles/change_form.html'
     actions = [duplicate_Dataloggerfiles_event]
-
+    #inlines= [DataLoggerFileColumnsInline]
     # get the data columns related to this data loggerfile and return them to the change view.
     def get_dataloggerfilecolumns(self, object_id):
         DataloggerfilecolumnsList = Dataloggerfilecolumns.objects.filter(dataloggerfileid=object_id)
@@ -1089,6 +1215,7 @@ class EquipmentmodelsAdminForm(ModelForm):
 
 class EquipmentmodelsAdmin(admin.ModelAdmin):
     form = EquipmentmodelsAdminForm
+    inlines=[InstrumentoutputvariablesInline]
 
 
 class PeopleAdminForm(ModelForm):
