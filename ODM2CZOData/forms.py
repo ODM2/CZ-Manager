@@ -128,6 +128,21 @@ class unitsInLine(admin.StackedInline):
     #     }),
     # )
     extra = 0
+
+
+class FeatureActionsInline(admin.StackedInline):
+    model = Featureactions
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('featureactionid',
+                       'samplingfeatureid',
+                       'action',
+                       )
+
+        }),
+    )
+    extra = 0
 class resultsInLine(admin.StackedInline):
     model = Results
 
@@ -453,7 +468,7 @@ class IGSNInline(admin.StackedInline):
 
 class SamplingfeaturesAdmin(admin.OSMGeoAdmin):
     form = SamplingfeaturesAdminForm
-    inlines = [IGSNInline]
+    inlines = [FeatureActionsInline, IGSNInline]
     search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name', 'samplingfeaturename',
                      'samplingfeaturecode', 'samplingfeatureid',
                      'samplingfeatureexternalidentifiers__samplingfeatureexternalidentifier']
@@ -649,9 +664,6 @@ class OrganizationsAdmin(admin.ModelAdmin):
 class SamplingFeaturesInline(admin.StackedInline):
     model = Samplingfeatures
     extra = 0
-class FeatureactionsInline(admin.StackedInline):
-    model = Featureactions
-    extra = 0
 
 class DataLoggerFileColumnsInline(admin.StackedInline):
     model=Dataloggerfilecolumns
@@ -695,6 +707,9 @@ class ActionsInline(admin.StackedInline):
         }),
     )
     extra = 0
+
+
+
 
 class FeatureactionsAdminForm(ModelForm):
     class Meta:
@@ -769,7 +784,7 @@ class ActionsAdminForm(ModelForm):
 
 class ActionsAdmin(admin.ModelAdmin):
     list_display = ('action_type', 'method', 'begindatetime', 'enddatetime')
-    inlines=[FeatureactionsInline]
+    inlines=[FeatureActionsInline]
     list_display_links = ('action_type',)
     search_fields = ['action_type__name', 'method__methodname']  # ,
     form = ActionsAdminForm

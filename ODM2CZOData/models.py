@@ -1919,15 +1919,14 @@ class Samplingfeatures(models.Model):
         return GEOSGeometry(self.featuregeometry)
 
     def __unicode__(self):
-        s = u"%s - %s" % (self.samplingfeatureid,  self.sampling_feature_type)
-        if self.samplingfeaturecode:
-            s += u" - %s" % (self.samplingfeaturecode)
+        s = u"%s - %s- %s" % (self.samplingfeaturecode, self.samplingfeatureid,  self.sampling_feature_type)
         if self.samplingfeaturename:
             s += u" - %s" % (self.samplingfeaturename)
         return s
     class Meta:
         managed = False
         db_table = r'odm2"."samplingfeatures'
+        ordering = ('sampling_feature_type','samplingfeaturename',)
         verbose_name='sampling feature'
 
 
