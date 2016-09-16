@@ -153,7 +153,7 @@ $(document).ready(function() {
 <td><input id="maxy2"   name="new Maximum of left y-axis" type="number">new maximum of right y-axis</input></td>
 <td><button id="extremesButton" class="autocompare">Set extremes y-axis</button></td></tr>
 {% include 'resultList.html' %}
-
+<p>{{data_disclaimer.text}} <a href={{data_disclaimer.link}} target="_blank"> {{data_disclaimer.linktext}}</a></p>
 {% endblock %}
 
 

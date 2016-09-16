@@ -1159,7 +1159,7 @@ def scatter_plot(request):
         resultValuesSeries=prvx |prvy
         response=exportspreadsheet(request,resultValuesSeries)
         return response
-    return TemplateResponse(request,'soilsscatterplot.html',{'prefixpath': CUSTOM_TEMPLATE_PATH,
+    return TemplateResponse(request,'soilsscatterplot.html',{'prefixpath': CUSTOM_TEMPLATE_PATH, 'data_disclaimer': DATA_DSICLAIMER,
         'xVariables':variables, 'yVariables':variables,'authenticated':authenticated,
         'xVariableSelection':xVariableSelection,'yVariableSelection':yVariableSelection,
         'fieldarea1':fieldarea1, 'fieldarea2':fieldarea2, 'fieldareas':fieldareas,
@@ -1559,7 +1559,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         #this removes duplicates from a list of strings
         name_of_units = removeDupsFromListOfStrings(name_of_units)
         #raise ValidationError(relatedFeatureList)
-        return TemplateResponse(request,template,{'prefixpath': CUSTOM_TEMPLATE_PATH,  'variableList': variableList,
+        return TemplateResponse(request,template,{'prefixpath': CUSTOM_TEMPLATE_PATH, 'variableList': variableList,
              'SelectedVariables':int_selectedvariable_ids,'authenticated':authenticated,'data_disclaimer':data_disclaimer,
              'chartID': chartID, 'chart': chart,'series': series, 'title2': title2, 'graphType':graphType, 'yAxis': yAxis,'name_of_units':name_of_units,
             'relatedFeatureList': relatedFeatureList,'SelectedRelatedFeature':selected_relatedfeatid,'name':request.user,'site_title': admin.site.site_title,

@@ -164,7 +164,7 @@ Method- {{featureActionMethod}}
 <td><button id="extremesButton" class="autocompare">Set extremes y-axis</button></td></tr>
 {% include 'StartEndDate.html' %}
 <br><br>
-<p>Data from this site are a product the <a href="http://criticalzone.org/luquillo/">Luquillo Critical Zone Observatory</a></p>
+<p>{{data_disclaimer.text}} <a href={{data_disclaimer.link}} target="_blank"> {{data_disclaimer.linktext}}</a></p>
 {% endblock %}
 
 
