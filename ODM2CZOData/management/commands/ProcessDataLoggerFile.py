@@ -22,6 +22,7 @@ import io
 from django.core.management.base import BaseCommand, CommandError
 from django.db.models import Min, Max, Count
 from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist
 import itertools
 from django.utils.translation import ugettext as _
 #using atomic transaction should improve the speed of loading the data.
@@ -41,14 +42,22 @@ def updateStartDateEndDate(results,startdate,enddate):
     StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
     EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
     result = Results.objects.get(resultid=results.resultid.resultid)
-    repvstart = Resultextensionpropertyvalues.objects.filter(resultid=result).filter(propertyid=StartDateProperty).get()
-    repvstart.propertyvalue =startdate
-    #print(repvstart.propertyvalue)
-    repvstart.save()
-    repvend = Resultextensionpropertyvalues.objects.filter(resultid=result).filter(propertyid=EndDateProperty).get()
-    repvstart.propertyvalue = enddate
-    #print(repvend.propertyvalue)
-    repvend.save()
+    try:
+        repvstart = Resultextensionpropertyvalues.objects.filter(resultid=result).filter(propertyid=StartDateProperty).get()
+        repvstart.propertyvalue =startdate
+        #print(repvstart.propertyvalue)
+        repvstart.save()
+        repvend = Resultextensionpropertyvalues.objects.filter(resultid=result).filter(propertyid=EndDateProperty).get()
+        repvstart.propertyvalue = enddate
+        #print(repvend.propertyvalue)
+        repvend.save()
+    except ObjectDoesNotExist:
+        repvstart = Resultextensionpropertyvalues(resultid=result,propertyid=StartDateProperty,propertyvalue=startdate)
+        #print(repvstart.propertyvalue)
+        repvstart.save()
+        repvend = Resultextensionpropertyvalues(resultid=result,propertyid=EndDateProperty,propertyvalue=enddate)
+		#print(repvend.propertyvalue)
+        repvend.save()
 
 class Command(BaseCommand):
 
@@ -166,13 +175,15 @@ class Command(BaseCommand):
                                         #Measurementresultvalues.delete()
                                     #row[0] is this column object
                     i+=1
-            Measurementresults.objects.raw("SELECT odm2.\"MeasurementResultValsToResultsCountvalue\"()")
-            for results in Measurementresults:
-                startdate= Measurementresultvalues.objects.filter(resultid=results.resultid).annotate(Min('valuedatetime')).\
-                order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
-                enddate= Measurementresultvalues.objects.filter(resultid=results.resultid).annotate(Max('valuedatetime')).\
-                order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-                updateStartDateEndDate(results,startdate,enddate)
+            #Measurementresults.objects.raw("SELECT odm2.\"MeasurementResultValsToResultsCountvalue\"()")
+            for colnum in rowColumnMap:
+                measurementresult = Measurementresults.objects.filter(resultid= colnum.resultid)
+                for results in measurementresult:
+					startdate= Measurementresultvalues.objects.filter(resultid=results.resultid).annotate(Min('valuedatetime')).\
+                    order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
+					enddate= Measurementresultvalues.objects.filter(resultid=results.resultid).annotate(Max('valuedatetime')).\
+                    order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+                    updateStartDateEndDate(results,startdate,enddate)
         except IndexError:
             raise ValidationError('encountered a problem with row '+row)
 
