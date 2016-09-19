@@ -21,6 +21,7 @@ import math
 import unicodedata
 from io import TextIOWrapper
 import cStringIO as StringIO
+from datetime import datetime
 from templatesAndSettings.settings import MEDIA_ROOT
 import itertools
 from django.core.exceptions import ValidationError
@@ -776,12 +777,27 @@ def mappopuploader(request,feature_action='NotSet',samplingfeature='NotSet',data
         datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
 
     try:
-        startdate= Measurementresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Min('valuedatetime')).\
-        order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
+        #resultList= Resultextensionpropertyvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(start_date=Min('propertyvalue'))
+        StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
+        EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
+        startdates = Resultextensionpropertyvalues.objects.filter(resultid__in=resultList.values("resultid")).filter(propertyid=StartDateProperty)
+        enddates = Resultextensionpropertyvalues.objects.filter(resultid__in=resultList.values("resultid")).filter(propertyid=EndDateProperty)
+        realstartdates = []
+        realenddates=[]
+        for startdate in startdates:
+            realstartdates.append(datetime.strptime(startdate.propertyvalue,"%Y-%m-%d %H:%M"))
+        for enddate in enddates:
+            realenddates.append(datetime.strptime(enddate.propertyvalue,"%Y-%m-%d %H:%M"))
+        startdate= min(realstartdates).strftime('%Y-%m-%d %H:%M')
+        enddate = max(realenddates).strftime('%Y-%m-%d %H:%M')
+        #resultList= resultList.annotate(start_date=Resultextensionpropertyvalues.objects.filter(resultid__in=resultList.values("resultid")).filter(propertyid=StartDateProperty))
+        #resultList= resultList.annotate(end_date=Resultextensionpropertyvalues.objects.filter(resultid__in=resultList.values("resultid")).filter(propertyid=EndDateProperty))
+        #startdate= Measurementresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Min('valuedatetime')).\
+        #order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
 
-        enddate= Measurementresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Max('valuedatetime')).\
-        order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-    except IndexError:
+        #enddate= Measurementresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Max('valuedatetime')).\
+        #order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+    except ValueError:
             html = "<html><body>No Data Available Yet.</body></html>"
             return HttpResponse(html)
 
@@ -803,6 +819,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
     else:
         template = loader.get_template('chartpopup.html')
     data_disclaimer= DATA_DSICLAIMER
+    map_config = MAP_CONFIG
     useDataset = False
     useSamplingFeature=False
     if dataset=='NotSet':
@@ -882,20 +899,25 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
         else:
             selectedMResultSeries.append(int(resultidu))
 
-
-    if 'startDate' in request.POST:
-            entered_start_date = request.POST['startDate']
-    else:
-        entered_start_date= Measurementresultvalues.objects.filter(resultid__in=selectedMResultSeries).annotate(Min('valuedatetime')).\
-        order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
-
+    entered_end_date=None
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
+    elif not enddate == 'NotSet':
+        entered_end_date= enddate
     else:
         entered_end_date= Measurementresultvalues.objects.filter(resultid__in=selectedMResultSeries).annotate(Max('valuedatetime')).\
         order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
 
-
+    if 'startDate' in request.POST:
+            entered_start_date = request.POST['startDate']
+    elif not startdate == 'NotSet':
+        entered_start_date= startdate
+    else:
+        #entered_start_date= Measurementresultvalues.objects.filter(resultid__in=selectedMResultSeries).annotate(Min('valuedatetime')).\
+        #order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
+        datetime_entered_end_date = datetime.strptime(entered_end_date, '%Y-%m-%d %H:%M')
+        entered_start_date = datetime_entered_end_date - timedelta(map_config['time_series_months']*365/12)#.strftime('%Y-%m-%d %H:%M')
+        entered_start_date = entered_start_date.strftime('%Y-%m-%d %H:%M')
     for selectedMResult in selectedMResultSeries:
         i +=1
         selected_result = Results.objects.filter(resultid=selectedMResult)
@@ -950,7 +972,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
     for myresults in myresultSeries:
         i+=1
         for result in myresults:
-            start = datetime.datetime(1970,1,1)
+            start = datetime(1970,1,1)
             delta = result.valuedatetime-start
             mills = delta.total_seconds()*1000
             dataval = None

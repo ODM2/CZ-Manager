@@ -40,7 +40,6 @@ option {
 				<th scope="col"  class="sortable column-resultid">Units</th>
 				<th scope="col"  class="sortable column-resultid">Location</th>
 				<th scope="col"  class="sortable column-resultid">Processing Level</th>
-				<th scope="col"  class="sortable column-resultid">Number of Records Available</th></tr>
 					{% endif %}
 					{% assign done 1 %}
 					<tr class="row1">
@@ -50,7 +49,6 @@ option {
 								<td >{{Result.unitsid}}</td>
 								<td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}"> View Time Series </a></td>
 								<td > {{Result.processing_level}}</td>
-								<td > {{Result.valuecount}}</td>
 								</tr>
 				{% endif %} 
 			{% endfor %}
