@@ -11,7 +11,8 @@ map_config = {
       "lat":0,
       "lon":0,
       "zoom":2,
-      "cluster_sites":False
+      "cluster_sites":False, #should sampling features of type site be added to marker clusters or not
+      "time_series_months":3, #how many months by default should time series generated from the map display
     }
 
 data_disclaimer = {
