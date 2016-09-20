@@ -53,8 +53,7 @@ from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
 from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DSICLAIMER
 from templatesAndSettings.base import ADMIN_SHORTCUTS
 from django.contrib import admin
-
-#
+from django.core.exceptions import ObjectDoesNotExist
 # class FeatureactionsAutocomplete(autocomplete.Select2QuerySetView):
 #     def get_queryset(self):
 #         # Don't forget to filter out results depending on the visitor !
@@ -797,6 +796,15 @@ def mappopuploader(request,feature_action='NotSet',samplingfeature='NotSet',data
 
         #enddate= Measurementresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Max('valuedatetime')).\
         #order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+    except (ObjectDoesNotExist) as e:
+        try:
+            startdate= Measurementresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Min('valuedatetime')).\
+            order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
+            enddate= Measurementresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Max('valuedatetime')).\
+            order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+        except IndexError:
+            html = "<html><body>No Data Available Yet.</body></html>"
+            return HttpResponse(html)
     except ValueError:
             html = "<html><body>No Data Available Yet.</body></html>"
             return HttpResponse(html)
