@@ -921,7 +921,7 @@ class DataloggerfilecolumnsAdminForm(ModelForm):
 class DataloggerfilecolumnsAdmin(admin.ModelAdmin):
     form = DataloggerfilecolumnsAdminForm
     list_display = ['columnlabel', 'resultid', 'dataloggerfileid']
-    # actions = [duplicate_Dataloggerfilecolumns_event]
+    actions = [duplicate_Dataloggerfilecolumns_event]
     search_fields = ['columnlabel', 'dataloggerfileid__dataloggerfilename',
                      'resultid__variableid__variable_name__name', ]
     save_as = True
