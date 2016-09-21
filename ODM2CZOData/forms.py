@@ -91,6 +91,7 @@ from daterange_filter.filter import DateRangeFilter
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 import re
+from readonlyadmin import ReadOnlyAdmin
 
 from django.forms.widgets import Textarea
 # from .admin import MeasurementresultvaluesResource
@@ -1304,9 +1305,31 @@ class AffiliationsAdmin(ExportMixin, admin.ModelAdmin):
     def personlastname(self,obj):
         return obj.personid.personlastname
 
-class PeopleAdmin(admin.ModelAdmin):
+
+class ReadOnlyAffiliationInline(AffiliationInLine):
+     readonly_fields = AffiliationInLine.fieldsets[0][1]['fields']
+     can_delete = False
+
+     def has_add_permission(self, request):
+         return False
+
+
+class ReadOnlyORCIDInline(ORCIDInLine):
+    readonly_fields = ORCIDInLine.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+class PeopleAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in People._meta.get_fields() if not p.is_relation]
+    user_readonly_inlines = [ReadOnlyAffiliationInline, ReadOnlyORCIDInline]
+
+    # For admin users
     form = PeopleAdminForm
-    inlines = [AffiliationInLine, ORCIDInLine]
+    inlines_list = [AffiliationInLine, ORCIDInLine]
+
     search_fields = ['personfirstname', 'personlastname', 'personexternalidentifiers__personexternalidentifier',
                      'affiliations__organizationid__organizationname']
     list_display = ('personlastname', 'personfirstname', 'orcid', 'affiliation')
