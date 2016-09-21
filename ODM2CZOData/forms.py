@@ -665,29 +665,6 @@ class SamplingFeaturesInline(admin.StackedInline):
     model = Samplingfeatures
     extra = 0
 
-class DataLoggerFileColumnsInline(admin.StackedInline):
-    model=Dataloggerfilecolumns
-    fieldsets = (
-        ('Details', {
-            'classes': ('collapse',),
-            'fields': ('dataloggerfilecolumnid',
-                       'resultid',
-                       'dataloggerfileid',
-                       'instrumentoutputvariableid',
-                       'columnlabel',
-                       'columndescription',
-                       'measurementequation',
-                       'scaninterval',
-                       'scanintervalunitsid',
-                       'recordinginterval',
-                       'recordingintervalunitsid',
-                       'aggregationstatisticcv',
-                       )
-
-        }),
-    )
-    extra=0
-
 class ActionsInline(admin.StackedInline):
     model = Actions
     fieldsets = (
@@ -859,6 +836,36 @@ def duplicate_Dataloggerfiles_event(ModelAdmin, request, queryset):
 duplicate_Dataloggerfiles_event.short_description = "Duplicate selected datalogger file along with columns"
 
 
+class DataLoggerFileColumnsInlineAdminForm(ModelForm):
+    resultid = AutoCompleteSelectField('result_lookup', required=True,
+                                       help_text='result to extend as a soil profile result', label='Result')
+    class Meta:
+        model = Dataloggerfilecolumns
+        fields = '__all__'
+
+class DataLoggerFileColumnsInline(admin.StackedInline):
+    model = Dataloggerfilecolumns
+    form = DataLoggerFileColumnsInlineAdminForm
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('dataloggerfilecolumnid',
+                       'resultid',
+                       'dataloggerfileid',
+                       'instrumentoutputvariableid',
+                       'columnlabel',
+                       'columndescription',
+                       'measurementequation',
+                       'scaninterval',
+                       'scanintervalunitsid',
+                       'recordinginterval',
+                       'recordingintervalunitsid',
+                       'aggregationstatisticcv',
+                       )
+
+        }),
+    )
+    extra = 0
 
 class DataloggerfilesAdminForm(ModelForm):
     class Meta:
@@ -868,9 +875,8 @@ class DataloggerfilesAdminForm(ModelForm):
 
 class DataloggerfilesAdmin(admin.ModelAdmin):
     form = DataloggerfilesAdminForm
-    change_form_template = './admin/ODM2CZOData/dataloggerfiles/change_form.html'
     actions = [duplicate_Dataloggerfiles_event]
-    #inlines= [DataLoggerFileColumnsInline]
+    inlines= [DataLoggerFileColumnsInline]
     # get the data columns related to this data loggerfile and return them to the change view.
     def get_dataloggerfilecolumns(self, object_id):
         DataloggerfilecolumnsList = Dataloggerfilecolumns.objects.filter(dataloggerfileid=object_id)
@@ -878,7 +884,7 @@ class DataloggerfilesAdmin(admin.ModelAdmin):
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
-        extra_context['DataloggerfilecolumnsList'] = self.get_dataloggerfilecolumns(object_id)
+        # extra_context['DataloggerfilecolumnsList'] = self.get_dataloggerfilecolumns(object_id)
         extra_context['prefixpath'] = CUSTOM_TEMPLATE_PATH
         # extra_context['dataloggerfileschange_view'] = DataloggerfilecolumnsAdmin.get_changelist(DataloggerfilecolumnsAdmin)
         return super(DataloggerfilesAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)

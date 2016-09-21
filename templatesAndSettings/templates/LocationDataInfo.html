@@ -20,7 +20,7 @@ option {
 	<form action="" method="post">
 	{% csrf_token %} 
 	<table >
-	<p>Data available from: {{startDate}} to: {{endDate}} </p>
+	<p>Data available from: {{startDate}} to {{endDate}} </p>
 	<p>Collection methods include:</p>
 	
 	{% for method in methods %}
