@@ -12,7 +12,8 @@ env:
     - TEST_TARGET=coding
 
 before_install:
-    - travis_retry pip install -r requirements.txt
+    - pip install -r requirements.txt
+    - pip install -r requirements-dev.txt
 
 # Test the tarball creation.
 # TODO: Will be available in the next PR
