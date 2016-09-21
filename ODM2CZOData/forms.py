@@ -877,17 +877,6 @@ class DataloggerfilesAdmin(admin.ModelAdmin):
     form = DataloggerfilesAdminForm
     actions = [duplicate_Dataloggerfiles_event]
     inlines= [DataLoggerFileColumnsInline]
-    # get the data columns related to this data loggerfile and return them to the change view.
-    def get_dataloggerfilecolumns(self, object_id):
-        DataloggerfilecolumnsList = Dataloggerfilecolumns.objects.filter(dataloggerfileid=object_id)
-        return DataloggerfilecolumnsList
-
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        extra_context = extra_context or {}
-        # extra_context['DataloggerfilecolumnsList'] = self.get_dataloggerfilecolumns(object_id)
-        extra_context['prefixpath'] = CUSTOM_TEMPLATE_PATH
-        # extra_context['dataloggerfileschange_view'] = DataloggerfilecolumnsAdmin.get_changelist(DataloggerfilecolumnsAdmin)
-        return super(DataloggerfilesAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
 
 
 def duplicate_Dataloggerfilecolumns_event(ModelAdmin, request, queryset):

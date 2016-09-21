@@ -850,15 +850,10 @@ class Dataloggerfilecolumns(models.Model):
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, verbose_name="aggregation statistic",
                                                db_column='aggregationstatisticcv', blank=True, null=True)
     def __unicode__(self):
-        s = u"%s" % (self.dataloggerfileid)
-        if self.dataloggerfileid:
-            s += u"- %s" % (self.dataloggerfileid)
-        return s
-    def __unicode__(self):
-        s = u"%s" % (self.dataloggerfileid)
-        s += u"- %s," % (self.columnlabel)
-        s += u"- %s," % (self.columndescription)
-        s += u"- %s" % (self.resultid)
+       # s = u"%s" % (self.dataloggerfileid)
+        s = u"Label: %s," % (self.columnlabel)
+        #s += u" Description: %s," % (self.columndescription)
+        s += u" Result: %s" % (self.resultid)
         return s
     class Meta:
         managed = False

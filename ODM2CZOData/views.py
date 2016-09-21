@@ -625,7 +625,7 @@ def TimeSeriesGraphing(request,feature_action='All'):
     for myresults in myresultSeries:
         i+=1
         for result in myresults:
-            start = datetime.datetime(1970,1,1)
+            start = datetime(1970,1,1)
             delta = result.valuedatetime-start
             mills = delta.total_seconds()*1000
             if math.isnan(result.datavalue):
@@ -684,7 +684,7 @@ def TimeSeriesGraphing(request,feature_action='All'):
     actionList = Actions.objects.filter(action_type="Observation") #where the action is not of type estimation
     #assuming an estimate is a single value.
     featureactionList = Featureactions.objects.filter(action__in=actionList)
-    relatedFeatureList = Relatedfeatures.objects.order_by('relatedfeatureid').distinct('relatedfeatureid')
+    relatedFeatureList = Relatedfeatures.objects.distinct('relatedfeatureid') #.order_by('relatedfeatureid')
     int_selectedresultid_ids = []
     for int_selectedresultid in selectedMResultSeries:
         int_selectedresultid_ids.append(int(int_selectedresultid))
@@ -1388,7 +1388,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
             selected_relatedfeatid = int(request.POST['SelectedRelatedFeature'])
             #relatedFeature = Samplingfeatures.objects.filter(samplingfeatureid=selected_relatedfeatid)
 
-    if selectedrelatedfeature != 'NotSet':
+    elif selectedrelatedfeature != 'NotSet':
         selected_relatedfeatid = int(selectedrelatedfeature)
     else:
         selected_relatedfeatid = 15
@@ -1573,7 +1573,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
     results = Results.objects.filter(resultid__in=withProfileResults)
     featureAction = Featureactions.objects.filter(featureactionid__in=results.values("featureactionid"))
     samplefeatid = Featureactions.objects.filter(featureactionid__in=results).values('samplingfeatureid')
-    relatedFeatureList = Relatedfeatures.objects.filter(samplingfeatureid__in=samplefeatid).order_by('relatedfeatureid').distinct('relatedfeatureid') #
+    relatedFeatureList = Relatedfeatures.objects.filter(samplingfeatureid__in=samplefeatid).distinct('relatedfeatureid') #.order_by('relatedfeatureid')
     #relatedFeatureList = sorted(relatedFeatureList, key=operator.attrgetter('relatedfeatureid__samplingfeaturecode')) #relatedFeatureList.order_by('relatedfeatureid__samplingfeaturecode')
     int_selectedvariable_ids = []
     for int_selectedvariableid in selectedMVariableSeries:
