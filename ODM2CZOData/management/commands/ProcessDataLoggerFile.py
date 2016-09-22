@@ -41,22 +41,24 @@ parser = argparse.ArgumentParser(description='process datalogger file.')
 def updateStartDateEndDate(results,startdate,enddate):
     StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
     EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
-    result = Results.objects.get(resultid=results.resultid.resultid)
+    #result = results#.objects.get(resultid=results.resultid.resultid)
     try:
-        repvstart = Resultextensionpropertyvalues.objects.filter(resultid=result).filter(propertyid=StartDateProperty).get()
-        repvstart.propertyvalue =startdate
+        #raise CommandError(" start date "str(startdate)))
+        #
+        Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(propertyid=StartDateProperty).update(propertyvalue=startdate)
+        #repvstart = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(propertyid=StartDateProperty).get()
         #print(repvstart.propertyvalue)
-        repvstart.save()
-        repvend = Resultextensionpropertyvalues.objects.filter(resultid=result).filter(propertyid=EndDateProperty).get()
-        repvstart.propertyvalue = enddate
+        Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(propertyid=EndDateProperty).update(propertyvalue=enddate)
+        #repvend = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(propertyid=EndDateProperty).get()
+        #repvend, new = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(propertyid=EndDateProperty).get()
         #print(repvend.propertyvalue)
-        repvend.save()
     except ObjectDoesNotExist:
-        repvstart = Resultextensionpropertyvalues(resultid=result,propertyid=StartDateProperty,propertyvalue=startdate)
+        #raise CommandError("couldn't find extension property values " +str(repvstart) + "for " + str(StartDateProperty + "for" + str(results))
+        repvstart = Resultextensionpropertyvalues(resultid=results,propertyid=StartDateProperty,propertyvalue=startdate)
         #print(repvstart.propertyvalue)
         repvstart.save()
-        repvend = Resultextensionpropertyvalues(resultid=result,propertyid=EndDateProperty,propertyvalue=enddate)
-		#print(repvend.propertyvalue)
+        repvend = Resultextensionpropertyvalues(resultid=results,propertyid=EndDateProperty,propertyvalue=enddate)
+        #print(repvend.propertyvalue)
         repvend.save()
 
 class Command(BaseCommand):
@@ -85,6 +87,7 @@ class Command(BaseCommand):
         databeginson = int(args[2]) #int(databeginson[0])
         print(databeginson)
         columnheaderson= int(args[3]) #int(columnheaderson[0])
+        rowColumnMap = list()
         try:
             with io.open(file, 'rt', encoding='ascii') as f:
                 #reader = csv.reader(f)
@@ -92,7 +95,6 @@ class Command(BaseCommand):
                 reader, reader2 = itertools.tee(csv.reader(f))
                 for i in range(0,databeginson):
                     columnsinCSV = len(next(reader2))
-                rowColumnMap = list()
                 dateTimeColumnNum = -1
                 DataloggerfilecolumnSet = Dataloggerfilecolumns.objects.filter(dataloggerfileid=fileid.dataloggerfileid)
                 i=0
@@ -176,15 +178,17 @@ class Command(BaseCommand):
                                     #row[0] is this column object
                     i+=1
             #Measurementresults.objects.raw("SELECT odm2.\"MeasurementResultValsToResultsCountvalue\"()")
-            for colnum in rowColumnMap:
-                measurementresult = Measurementresults.objects.filter(resultid= colnum.resultid)
-                for results in measurementresult:
-					startdate= Measurementresultvalues.objects.filter(resultid=results.resultid).annotate(Min('valuedatetime')).\
-                    order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
-					enddate= Measurementresultvalues.objects.filter(resultid=results.resultid).annotate(Max('valuedatetime')).\
-                    order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-                    updateStartDateEndDate(results,startdate,enddate)
+
         except IndexError:
-            raise ValidationError('encountered a problem with row '+row)
+            raise ValidationError('encountered a problem with row '+str(i) for i in row)
 
-
+        for colnum in rowColumnMap:
+            results = Measurementresults.objects.filter(resultid= colnum.resultid)
+            for result in results:
+                mrvs_count = len(Measurementresultvalues.objects.filter(resultid=result))
+                if mrvs_count >0:
+                    startdate= Measurementresultvalues.objects.filter(resultid=result).annotate(Min('valuedatetime')).\
+                    order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
+                    enddate= Measurementresultvalues.objects.filter(resultid=result).annotate(Max('valuedatetime')).\
+                    order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+                    updateStartDateEndDate(result,startdate,enddate)
