@@ -56,7 +56,7 @@ def updateStartDateEndDate(results,startdate,enddate):
         #print(repvstart.propertyvalue)
         repvstart.save()
         repvend = Resultextensionpropertyvalues(resultid=result,propertyid=EndDateProperty,propertyvalue=enddate)
-		#print(repvend.propertyvalue)
+        #print(repvend.propertyvalue)
         repvend.save()
 
 class Command(BaseCommand):
@@ -179,12 +179,11 @@ class Command(BaseCommand):
             for colnum in rowColumnMap:
                 measurementresult = Measurementresults.objects.filter(resultid= colnum.resultid)
                 for results in measurementresult:
-					startdate= Measurementresultvalues.objects.filter(resultid=results.resultid).annotate(Min('valuedatetime')).\
+                    startdate= Measurementresultvalues.objects.filter(resultid=results.resultid).annotate(Min('valuedatetime')).\
                     order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
-					enddate= Measurementresultvalues.objects.filter(resultid=results.resultid).annotate(Max('valuedatetime')).\
+                    enddate= Measurementresultvalues.objects.filter(resultid=results.resultid).annotate(Max('valuedatetime')).\
                     order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
                     updateStartDateEndDate(results,startdate,enddate)
         except IndexError:
             raise ValidationError('encountered a problem with row '+row)
-
 
