@@ -43,11 +43,15 @@ def updateStartDateEndDate(results,startdate,enddate):
     EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
     #result = results#.objects.get(resultid=results.resultid.resultid)
     try:
-        repvstart, new = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(propertyid=StartDateProperty).update(propertyvalue=startdate)
+        #raise CommandError(" start date "str(startdate)))
+        #
+        Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(propertyid=StartDateProperty).update(propertyvalue=startdate)
         #repvstart = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(propertyid=StartDateProperty).get()
-        repvend, new =Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(propertyid=EndDateProperty).update(propertyvalue=enddate)
+        #print(repvstart.propertyvalue)
+        Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(propertyid=EndDateProperty).update(propertyvalue=enddate)
+        #repvend = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(propertyid=EndDateProperty).get()
         #repvend, new = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(propertyid=EndDateProperty).get()
-
+        #print(repvend.propertyvalue)
     except ObjectDoesNotExist:
         #raise CommandError("couldn't find extension property values " +str(repvstart) + "for " + str(StartDateProperty + "for" + str(results))
         repvstart = Resultextensionpropertyvalues(resultid=results,propertyid=StartDateProperty,propertyvalue=startdate)
