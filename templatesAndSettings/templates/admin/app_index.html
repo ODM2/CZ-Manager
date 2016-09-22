@@ -1,14 +1,23 @@
 {% extends "admin/app_index.html" %}
 
 {% load admin_extras %}
+{% load admin_shortcuts_mod %}
 {% load static %}
 {% load i18n admin_static admin_shortcuts_tags %}
 {# django-admin-shortcuts changes these blocks #}
 
 {% block breadcrumbs %}
-    <div class="admin_shortcuts">
-        {% admin_shortcuts %}
-    </div>
+    {% for group in user.groups.all %}
+        {% if group.name != 'readonly' %}
+            <div class="admin_shortcuts">
+                {% admin_shortcuts %}
+            </div>
+        {% else %}
+            <div class="admin_shortcuts">
+                {% admin_shortcuts_filter %}
+            </div>
+        {% endif %}
+    {% endfor %}
 {% endblock %}
 
 {% block extrastyle %}
@@ -27,7 +36,9 @@
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
 
 {% block content %}
-    <div id="content-main" style="max-width: 100%;">
+    {% for group in user.groups.all %}
+        {% if group.name != 'readonly' %}
+            <div id="content-main" style="max-width: 100%;">
         {% if app_list %}
             {% for app in app_list|slice:":1" %}
                 <div class="app-{{ app.app_label }} module">
@@ -232,10 +243,10 @@
                         <td><a href="{{ prefixpath }}profileresults/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
                     <tr>
-                        <th scope="row"><a href="{{ prefixpath }}profileresults/">
+                        <th scope="row"><a href="{{ prefixpath }}profileresultvalues/">
                             {% trans 'Profile result values- soils data values' %}</a></th>
-                        <td><a href="{{ prefixpath }}profileresults/add/" class="addlink">{% trans 'Add' %}</a></td>
-                        <td><a href="{{ prefixpath }}profileresults/" class="changelink">{% trans 'Change' %}</a></td>
+                        <td><a href="{{ prefixpath }}profileresultvalues/add/" class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}profileresultvalues/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
                 </table>
             </div>
@@ -377,4 +388,249 @@
         </div>
     <h2><a href="#">Back to Top</a></h2>
     </div>
+        {% else %}
+            <div id="content-main" style="max-width: 100%;">
+        <div>
+            <div class="app-ODM2CZOData module">
+                <table>
+                    <caption>
+                        <h1>People and Organizations</h1>
+                    </caption>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}organizations/">
+                            {% trans 'Organizations' %}</a></th>
+                    </tr>
+                    {% comment %}<tr>
+                        <th scope="row"><a href="{{ prefixpath }}personexternalidentifiers/">
+                            {% trans 'ORCIDs' %}</a></th>
+                        <td><a href="{{ prefixpath }}personexternalidentifiers/add/"
+                               class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}personexternalidentifiers/"
+                               class="changelink">{% trans 'Change' %}</a></td>
+                    </tr>{% endcomment %}
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}people/">
+                            {% trans 'People' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}affiliations/">
+                            {% trans 'Affiliation (relate people and organizations)' %}</a></th>
+                    </tr>
+                </table>
+            </div>
+            <div class="app-ODM2CZOData module">
+                <table>
+                    <caption>
+                        <h1>Variables and Units</h1>
+                    </caption>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}variables/">
+                            {% trans 'Variables' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}units/">
+                            {% trans 'Units' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}taxonomicclassifiers/">
+                            {% trans 'Taxonomic classifiers- to describe Results and Specimens' %}</a></th>
+                    </tr>
+                </table>
+            </div>
+            <div class="app-ODM2CZOData module">
+                <table>
+                    <caption>
+                        <h1>Methods and Actions</h1>
+                    </caption>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}methods/">
+                            {% trans 'Methods' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}actions/">
+                            {% trans 'Actions' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}relatedactions/">
+                            {% trans 'Related action (associates one action with another)' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}actionby/">
+                            {% trans 'Action by' %}</a></th>
+                    </tr>
+                </table>
+            </div>
+            <div class="app-ODM2CZOData module">
+                <table>
+                    <caption>
+                        <h1>Locations and Actions at Locations</h1>
+                    </caption>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}samplingfeatures/">
+                            {% trans 'Sampling features' %}</a></th>
+                    </tr>
+                    {% comment %}<tr>
+                        <th scope="row"><a href="{{ prefixpath }}samplingfeatureexternalidentifiers/">
+                            {% trans 'IGSNs' %}</a></th>
+                        <td><a href="{{ prefixpath }}samplingfeatureexternalidentifiers/add/"
+                               class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}samplingfeatureexternalidentifiers/"
+                               class="changelink">{% trans 'Change' %}</a></td>
+                    </tr>{% endcomment %}
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}relatedfeatures/">
+                            {% trans 'Relate two features' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}featureactions/">
+                            {% trans 'Sampling feature action (link sampling features and actions)' %}</a></th>
+                    </tr>
+                </table>
+            </div>
+            <div class="app-ODM2CZOData module">
+                <table>
+                    <caption>
+                        <h1>Result Definitions</h1>
+                    </caption>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}results/">
+                            {% trans 'Results' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}datasets/">
+                            {% trans 'Datasets- a description (title, abstract) of some set of results ' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}datasetsresults/">
+                            {% trans 'Dataset results- link results to datasets' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}processinglevels/">
+                            {% trans 'Processing Levels' %}</a></th>
+                    </tr>
+                </table>
+            </div>
+            <div class="app-ODM2CZOData module">
+                <table>
+                    <caption>
+                        <h1>Result Values</h1>
+                    </caption>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}measurementresults/">
+                            {% trans 'Measurement Results - Define Time Series' %}</a></th>
+                    </tr>
+
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}measurementresultvalues/">
+                            {% trans 'Measurement Result Values - Time Series Values' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}measurementresultvaluefile/">
+                            {% trans 'Measurement result value files' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}profileresults/">
+                            {% trans 'Profile results- define soils data' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}profileresultvalues/">
+                            {% trans 'Profile result values- soils data values' %}</a></th>
+                    </tr>
+                </table>
+            </div>
+            <div class="app-ODM2CZOData module">
+                <table>
+                    <caption>
+                        <h1>Citations</h1>
+                    </caption>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}citations/">
+                            {% trans 'Citations' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}authorlists/">
+                            {% trans 'Author list' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}datasetcitations/">
+                            {% trans 'Dataset citations-link a dataset to a citation' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}methodcitations/">
+                            {% trans 'Method citations-link a method to a citation' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}extensionproperties/">
+                            {% trans 'Extension properties - define extra metrics about citations, can be applied to other objects' %}</a>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}citationextensionpropertyvalues/">
+                            {% trans 'Citation extension properties values - track extra metrics about citations' %}</a>
+                        </th>
+                    </tr>
+                </table>
+            </div>
+            <div class="app-ODM2CZOData module">
+                <table>
+                    <caption>
+                        <h1>Data Logger Files</h1>
+                    </caption>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}dataloggerprogramfiles/">
+                            {% trans 'Data logger program files' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}dataloggerfiles/">
+                            {% trans 'Data logger files' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}dataloggerfilecolumns/">
+                            {% trans 'Data logger file columns' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}processdataloggerfile/">
+                            {% trans 'Process data logger files' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}instrumentoutputvariables/">
+                            {% trans 'Instrument output variables' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}equipmentmodels/">
+                            {% trans 'Equipment models' %}</a></th>
+                    </tr>
+                </table>
+            </div>
+            <div class="app-ODM2CZOData module">
+                <table>
+                    <caption>
+                        <h1>Data Quality</h1>
+                    </caption>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}dataquality/">
+                            {% trans 'Data quality' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}resultsdataquality/">
+                            {% trans 'Specify Data quality for results' %}</a></th>
+                    </tr>
+                </table>
+            </div>
+            <div class="app-ODM2CZOData module">
+                <table>
+                    <caption>
+                        <h1>External Identifier Systems</h1>
+                    </caption>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}externalidentifiersystems/">
+                            {% trans 'External identifier systems' %}</a></th>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    <h2><a href="#">Back to Top</a></h2>
+    </div>
+        {% endif %}
+    {% endfor %}
 {% endblock %}{% block sidebar %}{% endblock %}

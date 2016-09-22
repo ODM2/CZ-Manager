@@ -33,7 +33,9 @@ from .forms import DatasetsAdmin
 from .forms import ActionsAdmin
 from .forms import ActionByAdmin
 from .models import Datasetsresults
+from .forms import DatasetsresultsAdmin
 from .models import Processinglevels
+from .forms import ProcessingLevelsAdmin
 from .models import Dataloggerprogramfiles
 from .forms import DataloggerprogramfilesAdmin
 from .models import Dataloggerfiles
@@ -45,6 +47,7 @@ from .models import Measurementresults
 from .forms import MeasurementresultsAdmin
 from .forms import UnitsAdmin
 from .models import MeasurementresultvalueFile
+from .forms import MeasurementresultvalueFileAdmin
 from .models import Dataloggerfilecolumns
 from .forms import DataloggerfilecolumnsAdmin
 from .models import Instrumentoutputvariables
@@ -52,11 +55,13 @@ from .forms import InstrumentoutputvariablesAdmin
 from .models import Equipmentmodels
 from .forms import EquipmentmodelsAdmin
 from .models import Relatedfeatures
+from .forms import RelatedfeaturesAdmin
 from .models import ProcessDataloggerfile
+from .forms import ProcessDataloggerfileAdmin
 from .models import Profileresults
-from .models import Profileresultvalues
 from .forms import ProfileresultsAdmin
-from .forms import ProfileresultsvaluesAdmin
+from .models import Profileresultvalues
+from .forms import ProfileresultvaluesAdmin
 from .models import Datasetcitations
 from .models import Citations
 from .models import Authorlists
@@ -87,7 +92,7 @@ admin.site.register(Extensionproperties, ExtensionpropertiesAdmin)
 admin.site.register(Citationextensionpropertyvalues, CitationextensionpropertyvaluesAdmin)
 
 admin.site.register(Profileresults, ProfileresultsAdmin)
-admin.site.register(Profileresultvalues, ProfileresultsvaluesAdmin)
+admin.site.register(Profileresultvalues, ProfileresultvaluesAdmin)
 admin.site.register(Equipmentmodels,EquipmentmodelsAdmin)
 admin.site.register(Instrumentoutputvariables, InstrumentoutputvariablesAdmin)
 admin.site.register(Dataloggerfilecolumns, DataloggerfilecolumnsAdmin)
@@ -107,16 +112,16 @@ admin.site.register(Actions,ActionsAdmin)
 admin.site.register(Results,ResultsAdmin)
 admin.site.register(Relatedactions,RelatedactionsAdmin)
 admin.site.register(Variables, VariablesAdmin)
-admin.site.register(ProcessDataloggerfile)
+admin.site.register(ProcessDataloggerfile, ProcessDataloggerfileAdmin)
 admin.site.register(Externalidentifiersystems,ExternalidentifiersystemAdmin)
 
 admin.site.register(Taxonomicclassifiers,TaxonomicclassifiersAdmin)
 admin.site.register(Datasets,DatasetsAdmin)
-admin.site.register(Datasetsresults)
-admin.site.register(Processinglevels)
-admin.site.register(Relatedfeatures)
+admin.site.register(Datasetsresults, DatasetsresultsAdmin)
+admin.site.register(Processinglevels, ProcessingLevelsAdmin)
+admin.site.register(Relatedfeatures, RelatedfeaturesAdmin)
 admin.site.register(Measurementresults, MeasurementresultsAdmin)
-admin.site.register(Measurementresultvalues,MeasurementresultvaluesAdmin)
-admin.site.register(MeasurementresultvalueFile)
+admin.site.register(Measurementresultvalues, MeasurementresultvaluesAdmin)
+admin.site.register(MeasurementresultvalueFile, MeasurementresultvalueFileAdmin)
 #admin.site.index_template = URL_PATH + "/my_index.html"
 admin.site.index_template = "admin/my_index.html"

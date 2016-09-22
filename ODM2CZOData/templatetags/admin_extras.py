@@ -58,6 +58,7 @@ def do_assign(parser, token):
 register = template.Library()
 register.tag('assign', do_assign)
 
+
 # Extra template tags for map
 @register.filter()
 def get_lat_lng(value, gc):
@@ -81,6 +82,7 @@ def filter_coords(value):
 
     return sites
 
+
 @register.filter()
 def get_title(value, short):
     if value == 'site_title':
@@ -90,7 +92,9 @@ def get_title(value, short):
     elif value == 'shortcut_title':
         return ADMIN_SHORTCUTS[0]['shortcuts'][short]['title']
 
+
 @register.filter()
 def in_field(value):
     val = value.split(" ")
     return val[0]
+
