@@ -185,5 +185,5 @@ class Command(BaseCommand):
                     order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
                     updateStartDateEndDate(results,startdate,enddate)
         except IndexError:
-            raise ValidationError('encountered a problem with row '+row)
+            raise ValidationError('encountered a problem with row '+str(i) for i in row)
 
