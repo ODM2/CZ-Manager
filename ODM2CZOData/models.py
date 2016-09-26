@@ -10,13 +10,13 @@
 # into your database.
 from __future__ import unicode_literals
 
+import time
+
 from django.db import models
-
-from templatesAndSettings.settings import MEDIA_ROOT
-
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import GEOSGeometry
-import time
+
+from templatesAndSettings.settings import MEDIA_ROOT
 #from django.forms import ModelFormWithFileField
 #from .forms import DataloggerprogramfilesAdminForm
 #from odm2testapp.forms import VariablesForm
@@ -2174,7 +2174,7 @@ class Taxonomicclassifiers(models.Model):
 
 
 class Timeseriesresults(models.Model):
-    resultid = models.OneToOneField(Results, db_column='resultid', primary_key=True)
+    resultid = models.OneToOneField(Results,  verbose_name="Result Series", db_column='resultid', primary_key=True)
     xlocation = models.FloatField(blank=True, null=True)
     xlocationunitsid = models.ForeignKey('Units', related_name='+', db_column='xlocationunitsid', blank=True, null=True)
     ylocation = models.FloatField(blank=True, null=True)
@@ -2183,12 +2183,18 @@ class Timeseriesresults(models.Model):
     zlocationunitsid = models.ForeignKey('Units', related_name='+', db_column='zlocationunitsid', blank=True, null=True)
     spatialreferenceid = models.ForeignKey(Spatialreferences, db_column='spatialreferenceid', blank=True, null=True)
     intendedtimespacing = models.FloatField(blank=True, null=True)
-    intendedtimespacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedtimespacingunitsid', blank=True, null=True)
+    intendedtimespacingunitsid = models.ForeignKey('Units', related_name='+', verbose_name="Time Units", db_column='intendedtimespacingunitsid', blank=True, null=True)
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, db_column='aggregationstatisticcv')
-
+    def __unicode__(self):
+        s = u"%s " % (self.resultid)
+        s += u", %s" % (self.intendedtimespacing)
+        s += u", %s" % (self.intendedtimespacingunitsid)
+        return s
     class Meta:
         managed = False
         db_table = r'odm2"."timeseriesresults'
+        ordering = ['resultid']
+        verbose_name = 'time series result'
 
 
 class Timeseriesresultvalueannotations(models.Model):
@@ -2209,12 +2215,58 @@ class Timeseriesresultvalues(models.Model):
     valuedatetimeutcoffset = models.IntegerField()
     censorcodecv = models.ForeignKey(CvCensorcode, db_column='censorcodecv')
     qualitycodecv = models.ForeignKey(CvQualitycode, db_column='qualitycodecv')
-    timeaggregationinterval = models.FloatField()
-    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+', db_column='timeaggregationintervalunitsid')
+    timeaggregationinterval = models.FloatField(verbose_name="Time Interval")
+    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+',verbose_name="Time Units",  db_column='timeaggregationintervalunitsid')
+    def __unicode__(self):
+        s = u"%s " % (self.resultid)
+        s += u"- %s" % (self.datavalue)
+        s += u"- %s" % (self.valuedatetime)
+        return s
+    def csvheader(self):
+        s='databaseid,'
+        #s+='Value,'
+        s += 'Date and Time,'
+        #s += 'Variable Name,'
+        #s += 'Unit Name,'
+        #s += 'processing level,'
+        s += 'sampling feature/location,'
+        s += 'time aggregation interval,'
+        s += 'time aggregation unit,'
+        s +='citation,'
 
+        return s
+    def csvoutput(self):
+        s = str(self.valueid)
+        #s += ', {0}'.format(self.datavalue)
+        s += ', {0}'.format(self.valuedatetime)
+        #s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
+        #s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
+        #s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
+        s += ',\" {0}\"'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)
+        s += ', {0}'.format(self.timeaggregationinterval)
+        s += ', {0},'.format(self.timeaggregationintervalunitsid)
+        s = buildCitation(s,self)
+
+            #s += ' {0}\"'.format(citation.citationlink)
+        return s
+    def csvheaderShort(self):
+        s = '\" {0} -unit-{1}-processing level-{2}\",annotation,'.format(self.resultid.resultid.variableid.variablecode,self.resultid.resultid.unitsid.unitsname,self.resultid.resultid.processing_level)
+        return s
+    def csvoutputShort(self):
+        s = '{0}'.format(self.datavalue)
+        mrvannotation = Measurementresultvalueannotations.objects.filter(valueid=self.valueid)
+        id = self.valueid
+        annotations = Annotations.objects.filter(annotationid__in=mrvannotation)
+        s += ',\"'
+        for anno in annotations:
+            s += '{0} '.format(anno)
+        s += '\"'
+        s += ','
+        return s
     class Meta:
         managed = False
         db_table = r'odm2"."timeseriesresultvalues'
+        verbose_name='time series result value'
 
 
 class Trajectoryresults(models.Model):

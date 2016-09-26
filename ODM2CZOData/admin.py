@@ -1,6 +1,4 @@
 from django.contrib import admin
-from django.db import models
-from templatesAndSettings.settings import URL_PATH
 
 from .models import Samplingfeatures
 from .forms import SamplingfeaturesAdmin
@@ -25,7 +23,6 @@ from .models import Methods
 from .forms import MethodsAdmin
 from .models import Variables
 from .forms import VariablesAdmin
-from .models import Units
 from .models import Taxonomicclassifiers
 from .forms import TaxonomicclassifiersAdmin
 from .models import Datasets
@@ -75,7 +72,10 @@ from .models import Citationextensionpropertyvalues
 from .forms import CitationextensionpropertyvaluesAdmin
 from .models import Externalidentifiersystems
 from .forms import ExternalidentifiersystemAdmin
-
+from .models import Timeseriesresults
+from .forms import TimeseriesresultsAdmin
+from .models import Timeseriesresultvalues
+from .forms import TimeseriesresultvaluesAdmin
 admin.site.register(Dataquality, DataqualityAdmin)
 admin.site.register(Resultsdataquality,ResultsdataqualityAdmin)
 
@@ -115,8 +115,9 @@ admin.site.register(Datasets,DatasetsAdmin)
 admin.site.register(Datasetsresults)
 admin.site.register(Processinglevels)
 admin.site.register(Relatedfeatures)
+admin.site.register(Timeseriesresults, TimeseriesresultsAdmin)
+admin.site.register(Timeseriesresultvalues, TimeseriesresultvaluesAdmin)
 admin.site.register(Measurementresults, MeasurementresultsAdmin)
 admin.site.register(Measurementresultvalues,MeasurementresultvaluesAdmin)
 admin.site.register(MeasurementresultvalueFile)
-#admin.site.index_template = URL_PATH + "/my_index.html"
 admin.site.index_template = "admin/my_index.html"

@@ -1,59 +1,32 @@
 __author__ = 'leonmi'
+from datetime import timedelta
+import math
+from datetime import datetime
+
 from django.http import HttpResponse
 from django.template.response import TemplateResponse
-from django.db.models import Sum, Avg
-from django.shortcuts import render_to_response
-#from odm2testapp.forms import VariablesForm
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from .models import *
-from datetime import datetime
-import csv
-import time
-import datetime
-from datetime import timedelta
 from django.db.models import Q
-from django.views.generic import ListView
-import csv
-import io
-import binascii
-import math
-import unicodedata
-from io import TextIOWrapper
-import cStringIO as StringIO
-from datetime import datetime
-from templatesAndSettings.settings import MEDIA_ROOT
-import itertools
-from django.core.exceptions import ValidationError
-from daterange_filter.filter import DateRangeFilter
 from django import template
-from django.core.serializers.json import DjangoJSONEncoder
-import json
-from django.views.generic import View
-from django.template import RequestContext
-from .forms import DataloggerfilesAdmin
-from .forms import DataloggerfilesAdminForm
-import json
+
+from .models import *
+import cStringIO as StringIO
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
-import re
+
 register = template.Library()
 from django.db.models import Min, Max
 from django.template import loader
 from .forms import CitationsAdminForm
-from .forms import CitationextensionpropertyvaluesAdminForm
-from .forms import AuthorlistsAdminForm
 from django.http import StreamingHttpResponse
-from django.core import mail
-from subprocess import *
-import sys as sys
-from django.core import management
-from django.shortcuts import render_to_response
-from django.contrib.gis.geos import GEOSGeometry
 from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
 from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DSICLAIMER
 from templatesAndSettings.base import ADMIN_SHORTCUTS
 from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
+from django.forms.models import inlineformset_factory
+from django.db import IntegrityError
+
 # class FeatureactionsAutocomplete(autocomplete.Select2QuerySetView):
 #     def get_queryset(self):
 #         # Don't forget to filter out results depending on the visitor !
@@ -68,99 +41,95 @@ from django.core.exceptions import ObjectDoesNotExist
 #             #qs = qs.filter(__istartswith=self.q)
 #
 #         return self.q
-from django.views.generic.edit import FormView
 
 #class CreatePubView(FormView):
 #    template_name = "publications2.html"
 #    model = Citations
-from django.forms.models import inlineformset_factory
-from django.db import IntegrityError
-from django.forms import widgets
-from django.db import models
-
-def add_pub(request,citationid='NotSet'):
-    if request.user.is_authenticated():
-        #if 'citationidnew' in request.POST:
-            #if not request.POST['citationidnew'] == '':
-                #citationid = int(request.POST['citationidnew'])
-                #citationidnew = citationid
-        AuthorInlineFormSet = inlineformset_factory(Citations,Authorlists,extra=6)
-
-        CitationpropertyInlineFormSet = inlineformset_factory(Citations,Citationextensionpropertyvalues)
-        #citation_form=CitationsAdminForm(request.POST,instance=citation)
-        if request.method=="POST":
-            if 'delete_citation' in request.POST:
-                citation= Citations.objects.filter(citationid=citationid).get()
-                citation.delete()
-                return HttpResponseRedirect('../../publications.html')
-            if citationid == 'NotSet':
-                citation= Citations(title=request.POST['title'],publisher=request.POST['publisher'],publicationyear=int(request.POST['publicationyear']),citationlink=request.POST['citationlink'])
-                #if citation.is_valid():
-                citation.save()
-                citationid=citation.citationid
-                citation_form=CitationsAdminForm(request.POST,instance=citation)
-            else:
-                citation= Citations.objects.filter(citationid=citationid).get()
-                citation_form=CitationsAdminForm(request.POST,instance=citation)
-            #citation= Citations.objects.filter(citationid=citationid).get()
-            Authorformset=AuthorInlineFormSet(request.POST,instance=citation)
-
-            Citationpropertyformset = CitationpropertyInlineFormSet(request.POST,instance=citation)
-
-            if Authorformset.is_valid():
-                try:
-                    Authorformset.save()
-                except IntegrityError:
-                    pass
-            if Citationpropertyformset.is_valid():
-                Citationpropertyformset.save()
-            #for form in CitationPorpertyformset:
-                #if form.changed_data.__len__() > 0:
-                    #form.save()
-            if citation_form.is_valid():
-                citation_form.save()
-            return HttpResponseRedirect('../../pubview/citationid=' + str(citationid) +'/')
-        elif not citationid=='NotSet':
-            citation= Citations.objects.filter(citationid=citationid).get()
-            Authorformset = AuthorInlineFormSet(instance=citation)
-
-            #Authorformset.empty_permitted=False
-            Citationpropertyformset = CitationpropertyInlineFormSet(instance=citation)
-            #CitationPorpertyformset.empty_permitted=True
-            citation_form=CitationsAdminForm(instance=citation)
-        else:
-            AuthorInlineFormSet = inlineformset_factory(Citations,Authorlists,extra=6)
-            CitationpropertyInlineFormSet = inlineformset_factory(Citations,Citationextensionpropertyvalues,extra=8)
-            Authorformset=AuthorInlineFormSet(instance=Authorlists())
-            # i=1
-            # for form in Authorformset:
-            #     form.fields['authororder'].initial = i
-            #     i+=1
-            Citationpropertyformset = CitationpropertyInlineFormSet(instance=Citationextensionpropertyvalues())
-            citation_form=CitationsAdminForm(instance=Citations())
-            citationidnew=''
-        i=1
-        for form in Authorformset:
-            if form.fields['authororder'].initial == None:
-                form.fields['authororder'].initial = i
-            i+=1
-        #for form in Citationpropertyformset:
-
-            #if  'propertyid' in form.initial: #not propertyid==None
-                #propertyid = form.initial['propertyid'] #.initial #type number
-                #extensionprop = Extensionproperties.objects.filter(propertyid=propertyid).get()
-                #name = extensionprop.propertydatatypecv
-                #typecv = CvPropertydatatype.objects.filter(name=name.name).get()
-                #if typecv.name == "Boolean":
-                    #form.fields['propertyvalue'].widget = widgets.CheckboxInput
-                    #form.fields['propertyvalue']= models.BooleanField()
-            #elif citationid=='NotSet':
-
-            #if form.fields['authororder'].initial == None:
-
-        return render(request, 'publications3.html', {'Authorformset':Authorformset, 'Citationpropertyformset':Citationpropertyformset,'citation_form':citation_form,})
-    else:
-        return HttpResponseRedirect('../../')
+#
+#
+# def add_pub(request,citationid='NotSet'):
+#     if request.user.is_authenticated():
+#         #if 'citationidnew' in request.POST:
+#             #if not request.POST['citationidnew'] == '':
+#                 #citationid = int(request.POST['citationidnew'])
+#                 #citationidnew = citationid
+#         AuthorInlineFormSet = inlineformset_factory(Citations,Authorlists,extra=6)
+#
+#         CitationpropertyInlineFormSet = inlineformset_factory(Citations,Citationextensionpropertyvalues)
+#         #citation_form=CitationsAdminForm(request.POST,instance=citation)
+#         if request.method=="POST":
+#             if 'delete_citation' in request.POST:
+#                 citation= Citations.objects.filter(citationid=citationid).get()
+#                 citation.delete()
+#                 return HttpResponseRedirect('../../publications.html')
+#             if citationid == 'NotSet':
+#                 citation= Citations(title=request.POST['title'],publisher=request.POST['publisher'],publicationyear=int(request.POST['publicationyear']),citationlink=request.POST['citationlink'])
+#                 #if citation.is_valid():
+#                 citation.save()
+#                 citationid=citation.citationid
+#                 citation_form=CitationsAdminForm(request.POST,instance=citation)
+#             else:
+#                 citation= Citations.objects.filter(citationid=citationid).get()
+#                 citation_form=CitationsAdminForm(request.POST,instance=citation)
+#             #citation= Citations.objects.filter(citationid=citationid).get()
+#             Authorformset=AuthorInlineFormSet(request.POST,instance=citation)
+#
+#             Citationpropertyformset = CitationpropertyInlineFormSet(request.POST,instance=citation)
+#
+#             if Authorformset.is_valid():
+#                 try:
+#                     Authorformset.save()
+#                 except IntegrityError:
+#                     pass
+#             if Citationpropertyformset.is_valid():
+#                 Citationpropertyformset.save()
+#             #for form in CitationPorpertyformset:
+#                 #if form.changed_data.__len__() > 0:
+#                     #form.save()
+#             if citation_form.is_valid():
+#                 citation_form.save()
+#             return HttpResponseRedirect('../../pubview/citationid=' + str(citationid) +'/')
+#         elif not citationid=='NotSet':
+#             citation= Citations.objects.filter(citationid=citationid).get()
+#             Authorformset = AuthorInlineFormSet(instance=citation)
+#
+#             #Authorformset.empty_permitted=False
+#             Citationpropertyformset = CitationpropertyInlineFormSet(instance=citation)
+#             #CitationPorpertyformset.empty_permitted=True
+#             citation_form=CitationsAdminForm(instance=citation)
+#         else:
+#             AuthorInlineFormSet = inlineformset_factory(Citations,Authorlists,extra=6)
+#             CitationpropertyInlineFormSet = inlineformset_factory(Citations,Citationextensionpropertyvalues,extra=8)
+#             Authorformset=AuthorInlineFormSet(instance=Authorlists())
+#             # i=1
+#             # for form in Authorformset:
+#             #     form.fields['authororder'].initial = i
+#             #     i+=1
+#             Citationpropertyformset = CitationpropertyInlineFormSet(instance=Citationextensionpropertyvalues())
+#             citation_form=CitationsAdminForm(instance=Citations())
+#             citationidnew=''
+#         i=1
+#         for form in Authorformset:
+#             if form.fields['authororder'].initial == None:
+#                 form.fields['authororder'].initial = i
+#             i+=1
+#         #for form in Citationpropertyformset:
+#
+#             #if  'propertyid' in form.initial: #not propertyid==None
+#                 #propertyid = form.initial['propertyid'] #.initial #type number
+#                 #extensionprop = Extensionproperties.objects.filter(propertyid=propertyid).get()
+#                 #name = extensionprop.propertydatatypecv
+#                 #typecv = CvPropertydatatype.objects.filter(name=name.name).get()
+#                 #if typecv.name == "Boolean":
+#                     #form.fields['propertyvalue'].widget = widgets.CheckboxInput
+#                     #form.fields['propertyvalue']= models.BooleanField()
+#             #elif citationid=='NotSet':
+#
+#             #if form.fields['authororder'].initial == None:
+#
+#         return render(request, 'publications3.html', {'Authorformset':Authorformset, 'Citationpropertyformset':Citationpropertyformset,'citation_form':citation_form,})
+#     else:
+#         return HttpResponseRedirect('../../')
 # def add_pub(request,citation='NotSet'):
 #     #citation_form
 #     #author_form
@@ -608,7 +577,7 @@ def TimeSeriesGraphing(request,feature_action='All'):
              name_of_units.append(tmpname)
 
 
-        myresultSeries.append(Measurementresultvalues.objects.all().filter(~Q(datavalue__lte=-6999))\
+        myresultSeries.append(Timeseriesresultvalues.objects.all().filter(~Q(datavalue__lte=-6999))\
         .filter(valuedatetime__gt= entered_start_date)\
         .filter(valuedatetime__lt = entered_end_date)\
                     .filter(resultid=selectedMResult).order_by('-valuedatetime'))
@@ -616,7 +585,7 @@ def TimeSeriesGraphing(request,feature_action='All'):
         data.update({'datavalue' + str(i): []})
 
 
-    myresultSeriesExport = Measurementresultvalues.objects.all()\
+    myresultSeriesExport = Timeseriesresultvalues.objects.all()\
                 .filter(valuedatetime__gt= entered_start_date)\
                 .filter(valuedatetime__lt = entered_end_date)\
                     .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
@@ -798,9 +767,9 @@ def mappopuploader(request,feature_action='NotSet',samplingfeature='NotSet',data
         #order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
     except (ObjectDoesNotExist) as e:
         try:
-            startdate= Measurementresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Min('valuedatetime')).\
+            startdate= Timeseriesresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Min('valuedatetime')).\
             order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
-            enddate= Measurementresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Max('valuedatetime')).\
+            enddate= Timeseriesresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Max('valuedatetime')).\
             order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
         except IndexError:
             html = "<html><body>No Data Available Yet.</body></html>"
@@ -913,7 +882,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
     elif not enddate == 'NotSet':
         entered_end_date= enddate
     else:
-        entered_end_date= Measurementresultvalues.objects.filter(resultid__in=selectedMResultSeries).annotate(Max('valuedatetime')).\
+        entered_end_date= Timeseriesresultvalues.objects.filter(resultid__in=selectedMResultSeries).annotate(Max('valuedatetime')).\
         order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
 
     if 'startDate' in request.POST:
@@ -962,7 +931,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
         else:
              name_of_units.append(tmpname)
 
-        myresultSeries.append(Measurementresultvalues.objects.all().filter(~Q(datavalue__lte=-6999))\
+        myresultSeries.append(Timeseriesresultvalues.objects.all().filter(~Q(datavalue__lte=-6999))\
         .filter(valuedatetime__gt= entered_start_date)\
         .filter(valuedatetime__lt = entered_end_date)\
                     .filter(resultid=selectedMResult).order_by('-valuedatetime'))
@@ -970,7 +939,7 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
         data.update({'datavalue' + str(i): []})
 
 
-    myresultSeriesExport = Measurementresultvalues.objects.all()\
+    myresultSeriesExport = Timeseriesresultvalues.objects.all()\
                 .filter(valuedatetime__gt= entered_start_date)\
                 .filter(valuedatetime__lt = entered_end_date)\
                     .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')

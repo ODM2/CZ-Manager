@@ -142,7 +142,7 @@ class Command(BaseCommand):
                         #raise ValidationError("".join(str(rowColumnMap)))
                         if check_dates:
                             mrs = Results.objects.filter(resultid__in = DataloggerfilecolumnSet.values("resultid"))
-                            mrvs = Measurementresultvalues.objects.filter(resultid__in=mrs)
+                            mrvs = Timeseriesresultvalues.objects.filter(resultid__in=mrs)
                         for colnum in rowColumnMap:
                             #x[0] for x in my_tuples
                             #colnum[0] = column number, colnum[1] = dataloggerfilecolumn object
@@ -151,13 +151,15 @@ class Command(BaseCommand):
                                                       #str(row[colnum.columnnum])+ " dateTime " + datestr)
                                 #thisresultid = colnum.resultid #result.values('resultid')
 
-                                measurementresult = Measurementresults.objects.filter(resultid= colnum.resultid)
-                                if  measurementresult.count() == 0:
+                                Timeseriesresult = Timeseriesresults.objects.filter(resultid= colnum.resultid)
+                                if  Timeseriesresult.count() == 0:
                                     raise CommandError('No Measurement results for column ' + colnum.columnlabel + ' Add measurement results for'+
                                                       'each column. Both results and measurement results are needed.' )
                                 #only one measurement result is allowed per result
                                 value = row[colnum.columnnum]
-                                for mresults in measurementresult:
+                                censorcode = CvCensorcode.objects.filter(name="Not censored").get()
+                                qualitycode = CvQualitycode.objects.filter(name="Good").get()
+                                for mresults in Timeseriesresult:
                                     try:
                                         if(value==''):
                                             raise IntegrityError
@@ -165,30 +167,36 @@ class Command(BaseCommand):
                                             try:
                                                 mrv = mrvs.filter(valuedatetime=datestr).filter(resultid=mresults.resultid).get()
                                             except ObjectDoesNotExist:
-                                                Measurementresultvalues(resultid=mresults
+                                                Timeseriesresultvalues(resultid=mresults
                                                             ,datavalue=row[colnum.columnnum],
-                                                            valuedatetime=datestr,valuedatetimeutcoffset=4).save()
+                                                            valuedatetime=datestr,valuedatetimeutcoffset=4,
+                                                            censorcodecv=censorcode,qualitycodecv=qualitycode,
+                                                            timeaggregationinterval=mresults.intendedtimespacing,
+                                                            timeaggregationintervalunitsid=mresults.intendedtimespacingunitsid).save()
                                         else:
-                                             Measurementresultvalues(resultid=mresults
+                                             Timeseriesresultvalues(resultid=mresults
                                                             ,datavalue=row[colnum.columnnum],
-                                                            valuedatetime=datestr,valuedatetimeutcoffset=4).save()
+                                                            valuedatetime=datestr,valuedatetimeutcoffset=4,
+                                                            censorcodecv=censorcode,qualitycodecv=qualitycode,
+                                                            timeaggregationinterval=mresults.intendedtimespacing,
+                                                            timeaggregationintervalunitsid=mresults.intendedtimespacingunitsid).save()
                                     except IntegrityError:
                                         pass
-                                        #Measurementresultvalues.delete()
+                                        #Timeseriesresultvalues.delete()
                                     #row[0] is this column object
                     i+=1
-            #Measurementresults.objects.raw("SELECT odm2.\"MeasurementResultValsToResultsCountvalue\"()")
+            #Timeseriesresults.objects.raw("SELECT odm2.\"TimeseriesresultValsToResultsCountvalue\"()")
 
         except IndexError:
             raise ValidationError('encountered a problem with row '+str(i) for i in row)
 
         for colnum in rowColumnMap:
-            results = Measurementresults.objects.filter(resultid= colnum.resultid)
+            results = Timeseriesresults.objects.filter(resultid= colnum.resultid)
             for result in results:
-                mrvs_count = len(Measurementresultvalues.objects.filter(resultid=result))
+                mrvs_count = len(Timeseriesresultvalues.objects.filter(resultid=result))
                 if mrvs_count >0:
-                    startdate= Measurementresultvalues.objects.filter(resultid=result).annotate(Min('valuedatetime')).\
+                    startdate= Timeseriesresultvalues.objects.filter(resultid=result).annotate(Min('valuedatetime')).\
                     order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M') #.annotate(Min('price')).order_by('price')[0]
-                    enddate= Measurementresultvalues.objects.filter(resultid=result).annotate(Max('valuedatetime')).\
+                    enddate= Timeseriesresultvalues.objects.filter(resultid=result).annotate(Max('valuedatetime')).\
                     order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
                     updateStartDateEndDate(result,startdate,enddate)

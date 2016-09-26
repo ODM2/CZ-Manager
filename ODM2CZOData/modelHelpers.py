@@ -1,14 +1,13 @@
 __author__ = 'leonmi'
 
-from ODM2CZOData.models import *
 import os
 import csv
-from django.db.models import Avg, Max, Min
-from django.db.models import F
 from datetime import datetime
-import warnings
-import time
+
 from django.db import transaction
+
+from ODM2CZOData.models import *
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
 from django.db.models import Q
 from  django.core.exceptions import MultipleObjectsReturned

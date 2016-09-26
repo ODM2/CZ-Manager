@@ -140,6 +140,7 @@ AJAX_LOOKUP_CHANNELS = {
     'result_lookup': ('{}.lookups'.format(app_name), 'ResultsLookup'),
     'profileresult_lookup': ('{}.lookups'.format(app_name), 'ProfileResultsLookup'),
     'measurementresult_lookup': ('{}.lookups'.format(app_name), 'MeasurementResultsLookup'),
+    'timeseriesresult_lookup': ('{}.lookups'.format(app_name), 'TimeseriesResultsLookup'),
     'cv_taxonomic_classifier_type': ('{}.lookups'.format(app_name), 'CvTaxonomicClassifierTypeLookup'),
     'cv_method_type':('{}.lookups'.format(app_name),'CvMethodTypeLookup'),
     'cv_action_type':('{}.lookups'.format(app_name),'CvActionTypeLookup'),

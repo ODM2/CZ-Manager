@@ -1,10 +1,4 @@
 # from __future__ import unicode_literals
-from django.forms import HiddenInput
-from django.contrib import admin
-from django.db import models
-from django.forms import ModelChoiceField
-from django.forms import FileField
-from django import forms
 from django.forms import CharField
 from django.forms import TypedChoiceField
 from django.forms import ModelForm
@@ -13,36 +7,16 @@ from django.shortcuts import render
 from import_export import resources
 from import_export.admin import ImportExportActionModelAdmin
 from import_export.admin import ExportMixin
-from django.contrib.admin import SimpleListFilter, RelatedFieldListFilter
-from django.contrib.gis.geos import GEOSGeometry, Point
+from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis import forms, admin
-from django.contrib.gis.db import models
 
-from django.shortcuts import render_to_response
-from .models import Variables
-from .models import CvVariabletype
-from .models import CvVariablename
-from .models import CvSpeciation
 from .models import Taxonomicclassifiers
-from .models import CvTaxonomicclassifiertype
-from .models import CvMethodtype
-from .models import Samplingfeatures
-from .models import CvSamplingfeaturetype
-from .models import CvSamplingfeaturegeotype
-from .models import CvElevationdatum
 from .models import Results
-from .models import CvResulttype
-from .models import Variables
 from .models import Relatedactions
-from .models import CvActiontype
-from .models import Actions
 from .models import Datasets
 from .models import Featureactions
 from .models import Samplingfeatures
 from .models import Organizations
-from .models import CvOrganizationtype
-from .models import CvRelationshiptype
-from .models import CvDatasettypecv
 from .models import Affiliations
 from .models import People
 from .models import Personexternalidentifiers
@@ -60,7 +34,6 @@ from .models import Extensionproperties
 from .models import Authorlists
 from .models import Methodcitations
 from .models import MeasurementresultvalueFile
-from .models import CvUnitstype
 from .models import Instrumentoutputvariables
 from .models import Equipmentmodels
 from .models import Datasetsresults
@@ -69,30 +42,24 @@ from .models import Resultsdataquality
 from .models import Samplingfeatureexternalidentifiers
 from .models import Externalidentifiersystems
 from .models import Citationexternalidentifiers
-from .models import Relatedfeatures
+from .models import Timeseriesresults
+from .models import Timeseriesresultvalues
 from .models import Variables
-
-from templatesAndSettings.settings import STATIC_URL
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
-from templatesAndSettings.settings import MEDIA_URL
 from .models import Profileresults
-import cStringIO as StringIO
+
+
 # from io import StringIO
 from ajax_select import make_ajax_field
-from ajax_select.fields import autoselect_fields_check_can_add
 from ajax_select.admin import AjaxSelectAdmin
-from ajax_select.fields import AutoCompleteSelectField, AutoCompleteSelectMultipleField
-from dal import autocomplete
+from ajax_select.fields import AutoCompleteSelectField
 from .models import Measurementresults
 from .models import Measurementresultvalues
 from .models import Profileresultvalues
 # from .views import dataloggercolumnView
 from daterange_filter.filter import DateRangeFilter
-from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import ValidationError
 import re
 
-from django.forms.widgets import Textarea
 # from .admin import MeasurementresultvaluesResource
 # AffiliationsChoiceField(People.objects.all().order_by('personlastname'),Organizations.objects.all().order_by('organizationname'))
 
@@ -530,6 +497,29 @@ duplicate_results_event.short_description = "Duplicate selected result"
 #         return featureaction
 
 
+
+
+class TimeseriesresultsInline(admin.StackedInline):
+    model = Timeseriesresults
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('resultid',
+                       'xlocation',
+                       'xlocationunitsid',
+                       'ylocation',
+                       'ylocationunitsid',
+                       'zlocation',
+                       'zlocationunitsid',
+                       'spatialreferenceid',
+                       'intendedtimespacing',
+                       'intendedtimespacingunitsid',
+                       'aggregationstatisticcv',
+            )
+        }),
+    )
+    extra = 0
+
 class MeasurementResultsInline(admin.StackedInline):
     model = Measurementresults
     fieldsets = (
@@ -605,7 +595,7 @@ class ResultsAdminForm(ModelForm):
 # http://django-ajax-selects.readthedocs.org/en/latest/Admin-add-popup.html
 class ResultsAdmin(AjaxSelectAdmin):  # admin.ModelAdmin
     form = ResultsAdminForm
-    inlines=[MeasurementResultsInline,ProfileResultsInline]
+    inlines=[TimeseriesresultsInline,MeasurementResultsInline,ProfileResultsInline]
     list_display = ['resultid', 'featureactionid', 'variableid', 'processing_level']
     search_fields = ['variableid__variable_name__name', 'variableid__variablecode', 'variableid__variabledefinition',
                      'featureactionid__samplingfeatureid__samplingfeaturename',
@@ -916,49 +906,49 @@ class DataloggerfilecolumnsAdmin(admin.ModelAdmin):
     save_as = True
 
 
-class MeasurementResultFilter(SimpleListFilter):
-    title = _('data values loaded')
-    parameter_name = 'resultValuesPresent'
-
-    def lookups(self, request, model_admin):
-        mrs = Measurementresults.objects.values('resultid',
-                                                'resultid__featureactionid__samplingfeatureid__samplingfeaturename',
-                                                'resultid__variableid__variable_name__name')
-        # need to make a custom list with feature name and variable name.
-        resultidlist = [(p['resultid'], '{0} {1}'.format(
-            p['resultid__featureactionid__samplingfeatureid__samplingfeaturename'],
-            p['resultid__variableid__variable_name__name']),) for p in mrs]
-
-        return resultidlist
-
-    def queryset(self, request, queryset):
-        if not self.value():
-            return queryset
-        valuesPresent = Measurementresults.objects.filter(resultid=self.value())
-        # values = Measurementresultvalues.objects.filter(resultid=self.value()).distinct()
-        resultsWCount = Results.objects.raw(
-            "SELECT results.*, count(measurementresultvalues.resultid) as valuecount2 " +
-            "from odm2.results " +
-            "left join odm2.measurementresultvalues " +
-            "on (results.resultid = measurementresultvalues.resultid) " +
-            "group by " +
-            "results.resultid")
-        ids = []
-        for mresults in valuesPresent:
-            resultid = str(mresults.resultid)  # mresults.value_list('resultid')
-            resultid = resultid.split(':')[1]
-            resultid = resultid.strip()
-            resultid = long(resultid)
-            # raise ValidationError(resultid)
-            for resultwCount in resultsWCount:
-                valuecount2 = resultwCount.valuecount2
-                # raise ValidationError(resultwCount.resultid)
-                if resultid == resultwCount.resultid and valuecount2 > 0:
-                    ids += [resultwCount.resultid]
-                    # raise ValidationError(ids)
-
-        # valuesPresent = [p.resultid for p in resultsWCount]
-        return queryset.filter(resultid__in=ids)
+# class MeasurementResultFilter(SimpleListFilter):
+#     title = ugettext_lazy('data values loaded')
+#     parameter_name = 'resultValuesPresent'
+#
+#     def lookups(self, request, model_admin):
+#         mrs = Measurementresults.objects.values('resultid',
+#                                                 'resultid__featureactionid__samplingfeatureid__samplingfeaturename',
+#                                                 'resultid__variableid__variable_name__name')
+#         # need to make a custom list with feature name and variable name.
+#         resultidlist = [(p['resultid'], '{0} {1}'.format(
+#             p['resultid__featureactionid__samplingfeatureid__samplingfeaturename'],
+#             p['resultid__variableid__variable_name__name']),) for p in mrs]
+#
+#         return resultidlist
+#
+#     def queryset(self, request, queryset):
+#         if not self.value():
+#             return queryset
+#         valuesPresent = Measurementresults.objects.filter(resultid=self.value())
+#         # values = Measurementresultvalues.objects.filter(resultid=self.value()).distinct()
+#         resultsWCount = Results.objects.raw(
+#             "SELECT results.*, count(measurementresultvalues.resultid) as valuecount2 " +
+#             "from odm2.results " +
+#             "left join odm2.measurementresultvalues " +
+#             "on (results.resultid = measurementresultvalues.resultid) " +
+#             "group by " +
+#             "results.resultid")
+#         ids = []
+#         for mresults in valuesPresent:
+#             resultid = str(mresults.resultid)  # mresults.value_list('resultid')
+#             resultid = resultid.split(':')[1]
+#             resultid = resultid.strip()
+#             resultid = int(resultid)
+#             # raise ValidationError(resultid)
+#             for resultwCount in resultsWCount:
+#                 valuecount2 = resultwCount.valuecount2
+#                 # raise ValidationError(resultwCount.resultid)
+#                 if resultid == resultwCount.resultid and valuecount2 > 0:
+#                     ids += [resultwCount.resultid]
+#                     # raise ValidationError(ids)
+#
+#         # valuesPresent = [p.resultid for p in resultsWCount]
+#         return queryset.filter(resultid__in=ids)
 
 
 # for soil sampling profiles with depths
@@ -1065,7 +1055,7 @@ class MeasurementresultsAdmin(AjaxSelectAdmin):
     #    mrv = Measurementresultvalues.objects.filter(resultid= obj.resultid)
     #    return mrv.values('valuedatetime')
     # gl = OrderDetail.objects.filter(order__order_date__range=('2015-02-02','2015-03-10'))
-    list_filter = [MeasurementResultFilter, ]  # ('resultid__valuedatetime', DateRangeFilter),
+    # list_filter = [MeasurementResultFilter, ]  # ('resultid__valuedatetime', DateRangeFilter),
     save_as = True
     search_fields = ['resultid__featureactionid__samplingfeatureid__samplingfeaturename',
                      'resultid__variableid__variable_name__name',
@@ -1077,7 +1067,6 @@ class MeasurementresultsAdmin(AjaxSelectAdmin):
 
     data_link.short_description = 'sampling feature action'
     data_link.allow_tags = True
-
     # resultValues = Measurementresultvalues.objects.filter(resultid=)
 
 
@@ -1093,6 +1082,88 @@ class MeasurementresultvaluesResource(resources.ModelResource):
                         'resultid__resultid__unitsid__unitsname',
                         'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',)
 
+class TimeseriesresultsAdminForm(ModelForm):
+    # resultid = make_ajax_field(Results,'resultid','result_lookup')
+    resultid = AutoCompleteSelectField('result_lookup', required=True, help_text='', label='Result')
+
+    # this processes the user input into the form.
+    def clean_resultid(self):
+        resultiduni = self.data['resultid']
+        resultid = None
+        for riduni in resultiduni.split("-"):
+            if riduni.isdigit():
+                resultid = riduni
+                continue
+        result = Results.objects.filter(resultid=resultid).get()
+        return result
+
+    class Meta:
+        model = Timeseriesresults
+        fields = '__all__'
+
+class TimeseriesresultsAdmin(AjaxSelectAdmin):
+    form = TimeseriesresultsAdminForm
+    list_display = ('resultid', 'intendedtimespacing','intendedtimespacingunitsid', 'data_link')
+    list_display_links = ('resultid', 'data_link')
+    # def resultvalues_valuedatetime(self,obj):
+    #    mrv = Measurementresultvalues.objects.filter(resultid= obj.resultid)
+    #    return mrv.values('valuedatetime')
+    # gl = OrderDetail.objects.filter(order__order_date__range=('2015-02-02','2015-03-10'))
+    # list_filter = [MeasurementResultFilter, ]  # ('resultid__valuedatetime', DateRangeFilter),
+    save_as = True
+    search_fields = ['resultid__featureactionid__samplingfeatureid__samplingfeaturename',
+                     'resultid__variableid__variable_name__name',
+                     'resultid__variableid__variable_type__name']
+
+    def data_link(self, obj):
+        return u'<a href="%sfeatureactions/%s/">%s</a>' % (
+            CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid, obj.resultid.featureactionid)
+
+    data_link.short_description = 'sampling feature action'
+    data_link.allow_tags = True
+
+
+class TimeseriesresultvaluesAdminForm(ModelForm):
+    # resultid = make_ajax_field(Measurementresults,'resultid','measurementresult_lookup') #
+    resultid = AutoCompleteSelectField('timeseriesresult_lookup', required=True, help_text='', label='Result')
+
+    def clean_resultid(self):
+        resultiduni = self.data['resultid']
+        resultid = None
+        for riduni in resultiduni.split("-"):
+            if riduni.isdigit():
+                resultid = riduni
+                continue
+        result = Timeseriesresults.objects.filter(resultid=resultid).get()
+        return result
+
+    class Meta:
+        model = Timeseriesresultvalues
+        fields = '__all__'
+
+
+class TimeseriesresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin):
+    form = TimeseriesresultvaluesAdminForm
+    # date time filter and list of results you can filter on
+    list_filter = (
+        ('valuedatetime', DateRangeFilter),
+        #MeasurementResultFilter,
+
+    )
+    list_display = ['datavalue', 'valuedatetime',
+                    'resultid']  # 'resultid','featureactionid_link','resultid__featureactionid__name', 'resultid__variable__name'
+    list_display_links = ['resultid', ]  # 'featureactionid_link'
+    search_fields = ['resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',
+                     'resultid__resultid__variableid__variable_name__name',
+                     'resultid__resultid__variableid__variable_type__name']
+
+    def feature_action_link(self, obj):
+        return u'<a href="/admin/ODM2CZOData/featureactions/%s/">%s</a>' % (
+            obj.resultid.resultid.featureactionid.featureactionid, obj.resultid.resultid.featureactionid)
+
+    feature_action_link.short_description = 'feature action'
+    feature_action_link.allow_tags = True
+    feature_action_link.admin_order_field = 'resultid__resultid__featureactionid__samplingfeatureid'
 
 class MeasurementresultvaluesAdminForm(ModelForm):
     # resultid = make_ajax_field(Measurementresults,'resultid','measurementresult_lookup') #
@@ -1115,13 +1186,11 @@ class MeasurementresultvaluesAdminForm(ModelForm):
 
 class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin):
     form = MeasurementresultvaluesAdminForm
-    # MeasurementresultvaluesResource is for exporting values to different file types.
-    # resource_class uses django-import-export
-    resource_class = MeasurementresultvaluesResource
+    #resource_class = MeasurementresultvaluesResource
     # date time filter and list of results you can filter on
     list_filter = (
         ('valuedatetime', DateRangeFilter),
-        MeasurementResultFilter,
+        #MeasurementResultFilter,
 
     )
     list_display = ['datavalue', 'valuedatetime',

@@ -201,9 +201,25 @@
                     <caption>
                         <h1>Result Values</h1>
                     </caption>
+                     <tr>
+                        <th scope="row"><a href="{{ prefixpath }}timeseriesresults/">
+                            {% trans 'Time Series Results' %}</a></th>
+                        <td><a href="{{ prefixpath }}timeseriesresults/add/" class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}timeseriesresults/" class="changelink">{% trans 'Change' %}</a>
+                        </td>
+                    </tr>
+
                     <tr>
+                        <th scope="row"><a href="{{ prefixpath }}timeseriesresultvalues/">
+                            {% trans 'Time Series Result Values' %}</a></th>
+                        <td><a href="{{ prefixpath }}timeseriesresultvalues/add/" class="addlink">{% trans 'Add' %}</a>
+                        </td>
+                        <td><a href="{{ prefixpath }}timeseriesresultvalues/"
+                               class="changelink">{% trans 'Change' %}</a></td>
+                    </tr>
+					<tr>
                         <th scope="row"><a href="{{ prefixpath }}measurementresults/">
-                            {% trans 'Measurement Results - Define Time Series' %}</a></th>
+                            {% trans 'Measurement Results' %}</a></th>
                         <td><a href="{{ prefixpath }}measurementresults/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}measurementresults/" class="changelink">{% trans 'Change' %}</a>
                         </td>
@@ -211,7 +227,7 @@
 
                     <tr>
                         <th scope="row"><a href="{{ prefixpath }}measurementresultvalues/">
-                            {% trans 'Measurement Result Values - Time Series Values' %}</a></th>
+                            {% trans 'Measurement Result Values' %}</a></th>
                         <td><a href="{{ prefixpath }}measurementresultvalues/add/" class="addlink">{% trans 'Add' %}</a>
                         </td>
                         <td><a href="{{ prefixpath }}measurementresultvalues/"

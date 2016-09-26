@@ -2,30 +2,11 @@ from ajax_select import LookupChannel
 
 ######## Import all Controlled Vocabulary Module #########
 from .models import CvActiontype
-from .models import CvAggregationstatistic
-from .models import CvAnnotationtype
-from .models import CvCensorcode
-from .models import CvDataqualitytype
-from .models import CvDatasettypecv
-from .models import CvDirectivetype
 from .models import CvElevationdatum
-from .models import CvEquipmenttype
 from .models import CvMethodtype
-from .models import CvMedium
-from .models import CvOrganizationtype
-from .models import CvPropertydatatype
-from .models import CvQualitycode
-from .models import CvReferencematerialmedium
-from .models import CvRelationshiptype
-from .models import CvResulttype
 from .models import CvSamplingfeaturetype
 from .models import CvSamplingfeaturegeotype
-from .models import CvSitetype
-from .models import CvSpatialoffsettype
 from .models import CvSpeciation
-from .models import CvSpecimenmedium
-from .models import CvSpecimentype
-from .models import CvStatus
 from .models import CvTaxonomicclassifiertype
 from .models import CvUnitstype
 from .models import CvVariablename
@@ -35,11 +16,49 @@ from .models import Featureactions
 from .models import Results
 from .models import Profileresults
 from .models import Measurementresults
-from .models import FeatureactionsNames
+from .models import Timeseriesresults
 from django.utils.html import escape
-from django.core.exceptions import ValidationError
 from django.db.models import Q
 
+
+class TimeseriesResultsLookup(LookupChannel):
+    model = Timeseriesresults
+
+    def get_query(self, q, request):
+        qset = None
+        for part in q.split():
+            if not qset:
+                qset = Timeseriesresults.objects.filter(Q(resultid__resultid__icontains=part) \
+                                                         | Q(
+                    resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) \
+                                                         | Q(
+                    resultid__featureactionid__action__method__methodname__icontains=part) \
+                                                         | Q(resultid__variableid__variablecode__icontains=part) \
+                                                         | Q(resultid__variableid__variable_name__name__icontains=part))
+
+            else:
+                qset = qset & Timeseriesresults.objects.filter(Q(resultid__resultid__icontains=part) \
+                                                                | Q(
+                    resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) \
+                                                                | Q(
+                    resultid__featureactionid__action__method__methodname__icontains=part) \
+                                                                | Q(resultid__variableid__variablecode__icontains=part) \
+                                                                | Q(
+                    resultid__variableid__variable_name__name__icontains=part))
+        return qset
+
+    def get_result(self, obj):
+        return "%s" % (obj.resultid)
+
+    def format_match(self, obj):
+        return "%s" % (obj.resultid)
+
+    def format_item_display(self, obj):
+        return "%s" % (obj.resultid)  # ,
+
+    def get_objects(self, ids):
+        obj = Timeseriesresults.objects.filter(resultid__in=ids)
+        return obj
 
 class MeasurementResultsLookup(LookupChannel):
     model = Measurementresults
