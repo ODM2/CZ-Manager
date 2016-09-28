@@ -70,14 +70,14 @@
 			</table>
 <table >
                
-				<tr ><th scope="col" class="section">title, CZO Author</td>
+				<tr ><th scope="col" class="section">Title, CZO Author</td>
 				<th scope="col"  class="section">publisher</th>
 				<th scope="col"  class="section">year</th>
 				<th scope="col"  class="section">DOI</th></tr>
 					<tr>
 							
 				{% for citation in citationList %}
-					<td ><a href="{{prefixpath }}../pubview/citationid={{citation.citationid}}/" class="changelink"><b>{{citation.title}}</b></a> </td>
+					<td ><a href="{{prefixpath }}citations/{{citation.citationid}}/change/" class="changelink"><b>{{citation.title}}</b></a> </td>
 					<td >{{citation.publisher}}</td>
 					<td >{{citation.publicationyear}}</td>
 					<td ><a href="http://dx.doi.org/{{citation.citationlink}}">{{citation.citationlink}}</a></td>
