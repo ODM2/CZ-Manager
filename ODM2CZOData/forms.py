@@ -77,6 +77,7 @@ def link_list_display_DOI(link):
         return u'<a href="%s" target="_blank">%s</a>' % (link, link)
 
 
+
 class variablesInLine(admin.StackedInline):
     model = Variables
 
@@ -110,6 +111,21 @@ class FeatureActionsInline(admin.StackedInline):
         }),
     )
     extra = 0
+
+
+class CitationextensionpropertyvalueInline(admin.StackedInline):
+    model= Citationextensionpropertyvalues
+    fieldsets = (('Details', {
+            'classes': ('collapse',),
+            'fields': ('citationid',
+                       'propertyid',
+                       'propertyvalue',
+
+            )
+        }),
+    )
+    extra = 6
+
 class resultsInLine(admin.StackedInline):
     model = Results
 
@@ -225,7 +241,7 @@ class DOIInline(admin.StackedInline):
 class CitationsAdmin(admin.ModelAdmin):
     list_display = ('primary_author', 'publicationyear', 'title', 'other_author', 'publisher', 'doi', 'citation_link')
     list_display_links = ['title']
-    inlines = [authorlistInline, DOIInline]
+    inlines = [authorlistInline, DOIInline, CitationextensionpropertyvalueInline]
     form = CitationsAdminForm
     search_fields = ['title', 'publisher', 'publicationyear', 'authorlists__personid__personfirstname',
                      'authorlists__personid__personlastname']
@@ -565,6 +581,8 @@ class ProfileResultsInline(admin.StackedInline):
         }),
     )
     extra = 0
+
+
 class ResultsAdminForm(ModelForm):
     # featureactionid = make_ajax_field(Featureactions,'featureactionid','featureaction_lookup',max_length=500)
     featureactionid = AutoCompleteSelectField('featureaction_lookup', required=True, help_text='',
