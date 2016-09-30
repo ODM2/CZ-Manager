@@ -1,7 +1,7 @@
 ODM2 Admin
 ==========
 
-.. |Build Status| image:: https://travis-ci.org/miguelcleon/ODM2-Admin.svg?branch=master
+.. image:: https://travis-ci.org/miguelcleon/ODM2-Admin.svg?branch=master
    :target: https://travis-ci.org/miguelcleon/ODM2-Admin
 
 This is a Django admin app for Observation Data Model 2 (ODM2). ODM2
@@ -29,10 +29,9 @@ To install psycopg2 for windows follow the instructions here:
 https://github.com/nwcell/psycopg2-windows
 
 You may need to copy a folder from from
-C:\\Users\\\\AppData\\Local\\Temp\\2\\pip\_build\_Administrator\\psycopg\\
+``C:\Users\<user name>\AppData\Local\Temp\2\pip_build_Administrator\psycopg\``
 into your python library for instance
-C:\\Python27\\Lib\\site-packages\\psycopg2\\
-
+``C:\Python27\Lib\site-packages\psycopg2\``
 support tested for django 1.6.5 and 1.9.x
 
 python 2.7
