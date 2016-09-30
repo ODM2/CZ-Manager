@@ -10,7 +10,12 @@
 {# django-admin-shortcuts changes these blocks #}
 
 {% block breadcrumbs %}
-    {% for group in user.groups.all %}
+    {% if not user.groups.all.0 %}
+        <div class="admin_shortcuts">
+            {% admin_shortcuts %}
+        </div>
+    {% else %}
+        {% for group in user.groups.all %}
         {% if group.name != 'readonly' %}
             <div class="admin_shortcuts">
                 {% admin_shortcuts %}
@@ -21,6 +26,7 @@
             </div>
         {% endif %}
     {% endfor %}
+    {% endif %}
 {% endblock %}
 
 {% block extrastyle %}
@@ -46,7 +52,90 @@
 
 {% block content %}
     {% assign prefixpath '/admin/ODM2CZOData/' %}
-    {% for group in user.groups.all %}
+    {% if not user.groups.all.0 %}
+        <div id="content-main" style="margin-right: 50px;">
+            {% if app_list %}
+                {% for app in app_list|slice:"1:" %}
+                    <div class="app-{{ app.app_label }} module">
+                        <table>
+                            <caption>
+                                <h1><a href="{{ app.app_url }}" class="section"
+                                   title="{% blocktrans with name=app.name %}Models in the {{ name }} application{% endblocktrans %}">{% blocktrans with name=app.name %}{{ name }} administration{% endblocktrans %}</a></h1>
+                            </caption>
+                        </table>
+                    </div>
+
+                    {% if app_list %}
+                        {% for app in app_list|slice:":1" %}
+                            <div class="app-{{ app.app_label }} module">
+                                <table>
+                                    <caption>
+                                        <h1>{{ app.name }}</h1>
+                                    </caption>
+                                    {% for model in app.models %}
+                                        <tr class="model-{{ model.object_name|lower }}">
+                                            {% if model.admin_url %}
+                                                <th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+                                            {% else %}
+                                                <th scope="row">{{ model.name }}</th>
+                                            {% endif %}
+
+                                            {% if model.add_url %}
+                                                <td><a href="{{ model.add_url }}" class="addlink">{% trans 'Add' %}</a></td>
+                                            {% else %}
+                                                <td>&nbsp;</td>
+                                            {% endif %}
+
+                                            {% if model.admin_url %}
+                                                <td><a href="{{ model.admin_url }}"
+                                                       class="changelink">{% trans 'Change' %}</a></td>
+                                            {% else %}
+                                                <td>&nbsp;</td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>{% trans "You don't have permission to edit anything." %}</p>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            </div>
+        <div id="content-related">
+                <div class="module" id="recent-actions-module">
+                    <h2>{% trans 'Recent actions' %}</h2>
+                    <h3>{% trans 'My actions' %}</h3>
+                    {% load log %}
+                    {% get_admin_log 10 as admin_log for_user user %}
+                    {% if not admin_log %}
+                        <p>{% trans 'None available' %}</p>
+                    {% else %}
+                        <div style="max-height:300px;overflow: auto;">
+                        <ul class="actionlist">
+                            {% for entry in admin_log %}
+                                <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
+                                    {% if entry.is_deletion or not entry.get_admin_url %}
+                                        {{ entry.object_repr }}
+                                    {% else %}
+                                        <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+                                    {% endif %}
+                                    <br/>
+                                    {% if entry.content_type %}
+                                        <span class="mini quiet">{% filter capfirst %}
+                                            {{ entry.content_type }}{% endfilter %}</span>
+                                    {% else %}
+                                        <span class="mini quiet">{% trans 'Unknown content' %}</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul></div>
+                    {% endif %}
+                </div>
+            </div>
+    {% else %}
+        {% for group in user.groups.all %}
         {% if group.name != 'readonly' %}
             <div id="content-main" style="margin-right: 50px;">
             {% if app_list %}
@@ -175,4 +264,5 @@
             </div>
         {% endif %}
     {% endfor %}
+    {% endif %}
 {% endblock %}

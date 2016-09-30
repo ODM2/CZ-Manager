@@ -35,7 +35,12 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-    {% for group in user.groups.all %}
+    {% if not user.groups.all.0 %}
+        <div class="admin_shortcuts">
+            {% admin_shortcuts %}
+        </div>
+    {% else %}
+        {% for group in user.groups.all %}
         {% if group.name != 'readonly' %}
             <div class="admin_shortcuts">
                 {% admin_shortcuts %}
@@ -46,6 +51,7 @@
             </div>
         {% endif %}
     {% endfor %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
