@@ -149,6 +149,8 @@ class Actions(models.Model):
         s = u"%s" % (self.action_type)
         if self.method:
             s += u" | %s" % (self.method)
+        if self.method:
+            s += u" | %s" % (self.actiondescription[:25])
         return s
     class Meta:
         managed = False

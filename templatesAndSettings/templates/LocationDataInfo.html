@@ -14,46 +14,63 @@ option {
 .loadinggif {
     background:url('http://www.hsi.com.hk/HSI-Net/pages/images/en/share/ajax-loader.gif') no-repeat right center;
 </style>
-<br>
-<br>
+
     
 	<form action="" method="post">
 	{% csrf_token %} 
 	<table >
-	<p>Data available from: {{startDate}} to {{endDate}} </p>
+	{% ifequal methodsOnly "False" %}
+		<p>Data available from: {{startDate}} to: {{endDate}} </p>
+	{% endifequal %}
 	<p>Collection methods include:</p>
-	
-	{% for method in methods %}
-	<tr><td>
-	{% if not useDataset %}
+	{% assign done 0 %}
+	{% for featureAction in featureActions %}
+		{% if not useDataset %}
 			<table >
-			{% assign done 0 %}
-			{% for Result in resultList %}
-				{% if method.methodname == Result.featureactionid.action.method.methodname  %}
-					{% if not done == 1 %}
-						<p><a target="_blank", href="{{prefixpath}}../graphfa/featureaction&#61;{{Result.featureactionid.featureactionid}} ">{{method.methodname}}</a></p>
+			{% ifequal methodsOnly "True" %}
+			
+				{% if not done == 1 %}
+					<th scope="col"  class="sortable column-resultid">method name</th>
+					<th scope="col"  class="sortable column-resultid">link</th>
+					<th scope="col"  class="sortable column-resultid">description</th></tr>
+				{% endif %}
+				{% assign done 1 %}
+				<tr class="row1">
+				<td>{{ featureAction.action.method.methodname }} </td>
+				<td ><a target="_blank", href='{{featureAction.action.actionfilelink}}'> link </a></td>
+				<td >{{featureAction.action.actiondescription}}</td></tr>
+			
+			{% else %}
+				{% assign done 0 %}
+				{% for Result in resultList %}
+					{% if featureAction.action.method.methodname == Result.featureactionid.action.method.methodname  %}
+						{% if not done == 1 %}
+							<p><a target="_blank", href="{{prefixpath}}../graphfa/featureaction&#61;{{Result.featureactionid.featureactionid}} ">{{featureAction.action.method.methodname}}</a></p>
 
-				
-				<tr ><th scope="col" class="section">Result Series</td>
-				<th scope="col"  class="sortable column-resultid">id</th>
-				<th scope="col"  class="sortable column-resultid">Variable</th>
-				<th scope="col"  class="sortable column-resultid">Units</th>
-				<th scope="col"  class="sortable column-resultid">Location</th>
-				<th scope="col"  class="sortable column-resultid">Processing Level</th>
-					{% endif %}
-					{% assign done 1 %}
-					<tr class="row1">
-							<td>{{ Result.feature_action }} </td>
-								<td >{{Result.resultid}}</td>
-								<td >{{Result.variableid.variablecode}}</td>
-								<td >{{Result.unitsid}}</td>
-								<td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}"> View Time Series </a></td>
-								<td > {{Result.processing_level}}</td>
-								</tr>
-				{% endif %} 
-			{% endfor %}
+					
+					<tr ><th scope="col" class="section">Result Series</td>
+					<th scope="col"  class="sortable column-resultid">id</th>
+					<th scope="col"  class="sortable column-resultid">Variable</th>
+					<th scope="col"  class="sortable column-resultid">Units</th>
+					<th scope="col"  class="sortable column-resultid">Location</th>
+					<th scope="col"  class="sortable column-resultid">Processing Level</th>
+					<th scope="col"  class="sortable column-resultid">Number of Records Available</th></tr>
+						{% endif %}
+						{% assign done 1 %}
+						<tr class="row1">
+								<td>{{ Result.feature_action }} </td>
+									<td >{{Result.resultid}}</td>
+									<td >{{Result.variableid.variablecode}}</td>
+									<td >{{Result.unitsid}}</td>
+									<td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}"> View Time Series </a></td>
+									<td > {{Result.processing_level}}</td>
+									<td > {{Result.valuecount}}</td>
+									</tr>
+					{% endif %} 
+				{% endfor %}
 			 </table>	
-		{% endif %}
+		{% endifequal %}
+	{% endif %}
 </td></tr>
 {% endfor %}
 </table>

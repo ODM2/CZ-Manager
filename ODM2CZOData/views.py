@@ -384,13 +384,14 @@ def web_map(request,dataset='NotSet'):
 
         features = Samplingfeatures.objects.all()
         results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
-
+        externalidentifiers = Samplingfeatureexternalidentifiers.objects.all()
     # start_date= Measurementresultvalues.objects.filter(resultid__in=results.values("resultid")).annotate(Min('valuedatetime'))\
     #             .order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
     # end_date= Measurementresultvalues.objects.filter(resultid__in=results.values("resultid")).annotate(Max('valuedatetime'))\
     #             .order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
 
     legend_ref = [
+        dict(feature_type="CZO", icon="fa fa-flag-o", color="purple", style_class="awesome-marker-icon-purple"),
         dict(feature_type="Excavation", icon="fa-spoon", color="darkred",
              style_class="awesome-marker-icon-darkred"),
         dict(feature_type="Field area", icon="fa-map-o", color="darkblue",
@@ -409,7 +410,7 @@ def web_map(request,dataset='NotSet'):
 
 
     context = {
-        'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,'results':results,
+        'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,'results':results,'externalidentifiers':externalidentifiers,
         'datasets':datasets,'selecteddatasets':selected,'authenticated':authenticated, 'map_config':map_config,'data_disclaimer':data_disclaimer, 'name':request.user,'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header, 'short_title': 'Map Locations'}
     return render(request, 'mapdata.html', context)
@@ -721,22 +722,24 @@ def mappopuploader(request,feature_action='NotSet',samplingfeature='NotSet',data
     datasetTitle=None
     datasetAbstract=None
     methods=None
+    actions=None
     samplefeature=None
+    methodsOnly='False'
     if not useDataset:
         if useSamplingFeature:
             samplefeature = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
-            feature_actions = Featureactions.objects.filter(samplingfeatureid=samplefeature)
-            resultList = Results.objects.filter(featureactionid__in=feature_actions).filter(~Q(processing_level=4)).order_by("featureactionid__action__method")
-            actions = Actions.objects.filter(actionid__in=feature_actions.values("action"))
+            featureActions = Featureactions.objects.filter(samplingfeatureid=samplefeature)
+            resultList = Results.objects.filter(featureactionid__in=featureActions).filter(~Q(processing_level=4)).order_by("featureactionid__action__method")
+            actions = Actions.objects.filter(actionid__in=featureActions.values("action"))
             methods = Methods.objects.filter(methodid__in=actions.values("method"))
             featureActionLocation= samplefeature.samplingfeaturename
         else:
             resultList = Results.objects.filter(featureactionid=feature_action).filter(~Q(processing_level=4)).order_by("featureactionid__action__method")
-            featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
-            featureActionLocation= featureAction.samplingfeatureid.samplingfeaturename
-            featureActionMethod= featureAction.action.method.methodname
-            action = Actions.objects.filter(actionid=featureAction.action.actionid).get()
-            methods = Methods.objects.filter(methodid=action.method.methodid)
+            featureActions = Featureactions.objects.filter(featureactionid=feature_action).get()
+            featureActionLocation= featureActions.samplingfeatureid.samplingfeaturename
+            featureActionMethod= featureActions.action.method.methodname
+            actions = Actions.objects.filter(actionid=featureActions.action.actionid).get()
+            methods = Methods.objects.filter(methodid=actions.method.methodid)
 
     else:
         datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
@@ -772,16 +775,17 @@ def mappopuploader(request,feature_action='NotSet',samplingfeature='NotSet',data
             enddate= Timeseriesresultvalues.objects.filter(resultid__in=resultList.values("resultid")).annotate(Max('valuedatetime')).\
             order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
         except IndexError:
-            html = "<html><body>No Data Available Yet.</body></html>"
-            return HttpResponse(html)
+            #html = "<html><body>No Data Available Yet.</body></html>"
+            #return HttpResponse(html)
+            methodsOnly='True'
     except ValueError:
-            html = "<html><body>No Data Available Yet.</body></html>"
-            return HttpResponse(html)
-
+            #html = "<html><body>No Data Available Yet.</body></html>"
+            #return HttpResponse(html)
+            methodsOnly='True'
 
 
     return TemplateResponse(request,template,{ 'prefixpath': CUSTOM_TEMPLATE_PATH,
-            'useSamplingFeature':useSamplingFeature,
+            'useSamplingFeature':useSamplingFeature,'methodsOnly':methodsOnly,'featureActions':featureActions,
             'featureActionMethod':featureActionMethod,'featureActionLocation':featureActionLocation,'data_disclaimer':data_disclaimer,
             'datasetTitle':datasetTitle,'datasetAbstract':datasetAbstract,'useDataset':useDataset,'startDate':startdate,'endDate':enddate,
              'authenticated':authenticated,'methods':methods,'resultList':resultList,},)
@@ -799,6 +803,9 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
     map_config = MAP_CONFIG
     useDataset = False
     useSamplingFeature=False
+    if 'annotation' in request.POST:
+        #pass
+        raise ValidationError(request.POST['annotation'])
     if dataset=='NotSet':
         if samplingfeature=='NotSet':
             feature_action=int(feature_action)

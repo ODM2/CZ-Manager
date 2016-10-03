@@ -157,7 +157,7 @@
         var myMap = L.map('map',{worldCopyJump:true}).setView([ {{ map_config.lat }}, {{ map_config.lon }}], {{ map_config.zoom }});
         // var myMap = L.map('map',{worldCopyJump:true}).setView([ 18.28263, -65.77458], 14);
         // var myMap = L.map('map',{worldCopyJump:true}).setView([40.000,-95.000], 5); // For Crossczo
-        var m = null;
+		var m = null;
         var Esri_NatGeoWorldMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
 			attribution: 'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC',
 			maxZoom: 16
@@ -175,48 +175,66 @@
             'Imagery &copy; <a href="http://mapbox.com">Mapbox</a>', id: 'mapbox.run-bike-hike'
         }).addTo(myMap);
         var markerClusters = L.markerClusterGroup(singleMarkerMode=true); //,maxClusterRadius=1
-		
+		var done = false;
         {% for site in features|filter_coords %}
             var feat_obj = feature_list.filter(
                     function( obj ){
                         return obj.name == '{{ site.sampling_feature_type.name }}'
                     });
             var popup = '';
-            {% if  site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" or site.sampling_feature_type.name == "Stream gage" or site.sampling_feature_type.name == "Transect" or site.sampling_feature_type.name == "Weather station" %}
-                popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
+			done = false;
+			{% for externalidentifier in externalidentifiers %}
+				{% if  site.sampling_feature_type.name == "Site" and site.samplingfeatureid == externalidentifier.samplingfeatureid.samplingfeatureid and externalidentifier.externalidentifiersystemid.externalidentifiersystemname == "NSF" %}
+				 popup = '<br><h2>CZO: <a href="{{ externalidentifier.samplingfeatureexternalidentifieruri }}">{{ site.samplingfeaturename }}</a></h2>'
                         + '<hr />'
-                        + '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
-                        + '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
-                        + '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
-                        + '<br> {{ site.sampling_feature_type.name}}'
-                        + '<br> <a  target="_blank" href="{{prefixpath}}../graphfa/samplingfeature&#61;{{site.samplingfeatureid}}">view times series data in new page</a></p><iframe  width=600, height=600, src="{{prefixpath}}../mappopup/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
-			{% elif  site.sampling_feature_type.name == "Excavation" %}
-                popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
-                        + '<hr />'
-                        + '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
-                        + '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
-                        + '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
-                        + '<br> {{ site.sampling_feature_type.name}}'
-                        + '<br><a  target="_blank" href="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true"> View soil profile data in new page</a></p><iframe  width=600, height=500, src="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
-			{% elif  site.sampling_feature_type.name == "Field area" %}
-                popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
-                        + '<hr />'
-                        + '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
-                        + '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
-                        + '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
-                        + '<br> {{ site.sampling_feature_type.name}}'
-                        + '<br><a  target="_blank" href="{{prefixpath}}../profilegraph/selectedrelatedfeature&#61;{{site.samplingfeatureid}}/popup=true"> View data for this field area in new page</a></p><iframe  width=600, height=500, src="{{prefixpath}}../profilegraph/selectedrelatedfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
-            {% else %}
-                popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
-                        + '<hr />'
-                        + '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
-                        + '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
-                        + '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]</p>';
-            {% endif %}
+                        + '<br> <iframe  width=600, height=600, src="{{prefixpath}}../mappopup/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
+						done= true;
+						{% endif %}
+			{% endfor %}
+			if (done ==false){
+				{% if not done == 1 and site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" or site.sampling_feature_type.name == "Stream gage" or site.sampling_feature_type.name == "Transect" or site.sampling_feature_type.name == "Weather station" %}
+					popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
+							+ '<hr />'
+							+ '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
+							+ '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
+							+ '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
+							+ '<br> {{ site.sampling_feature_type.name}}'
+							+ '<br> <a  target="_blank" href="{{prefixpath}}../graphfa/samplingfeature&#61;{{site.samplingfeatureid}}">view times series data in new page</a></p><iframe  width=600, height=600, src="{{prefixpath}}../mappopup/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
+				{% elif  site.sampling_feature_type.name == "Excavation" %}
+					popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
+							+ '<hr />'
+							+ '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
+							+ '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
+							+ '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
+							+ '<br> {{ site.sampling_feature_type.name}}'
+							+ '<br><a  target="_blank" href="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true"> View soil profile data in new page</a></p><iframe  width=600, height=500, src="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
+				{% elif  site.sampling_feature_type.name == "Field area" %}
+					popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
+							+ '<hr />'
+							+ '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
+							+ '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
+							+ '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
+							+ '<br> {{ site.sampling_feature_type.name}}'
+							+ '<br><a  target="_blank" href="{{prefixpath}}../profilegraph/selectedrelatedfeature&#61;{{site.samplingfeatureid}}/popup=true"> View data for this field area in new page</a></p><iframe  width=600, height=500, src="{{prefixpath}}../profilegraph/selectedrelatedfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
+				{% else %}
+					popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
+							+ '<hr />'
+							+ '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
+							+ '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
+							+ '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]</p>';
+				{% endif %}
+			}
+			if (done ==true){
             var iconDiv = new L.DivIcon({
+                className: 'awesome-marker-icon-purple awesome-marker leaflet-zoom-animated leaflet-interactive',
+                html: '<i class="fa fa fa-flag-o icon-white" aria-hidden="true"></i><p style="margin-top:20px;font-weight:bold;">{{ site.samplingfeaturecode }}</p>'
+            });
+			}else{
+			 var iconDiv = new L.DivIcon({
                 className: feat_obj[0].styleclass + ' awesome-marker leaflet-zoom-animated leaflet-interactive',
                 html: '<i class="fa '+  feat_obj[0].icon +' icon-white" aria-hidden="true"></i><p style="margin-top:20px;font-weight:bold;">{{ site.samplingfeaturecode }}</p>'
             });
+			}
 			{% if  site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" or site.sampling_feature_type.name == "Field area" or site.sampling_feature_type.name == "Stream gage" or site.sampling_feature_type.name == "Transect" or site.sampling_feature_type.name == "Weather station"  %}
                 m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
                     icon: iconDiv, title: '{{ site.samplingfeaturename }}'
