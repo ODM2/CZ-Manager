@@ -803,9 +803,9 @@ def TimeSeriesGraphingShort(request,feature_action='NotSet',samplingfeature='Not
     map_config = MAP_CONFIG
     useDataset = False
     useSamplingFeature=False
-    if 'annotation' in request.POST:
-        #pass
-        raise ValidationError(request.POST['annotation'])
+    #if 'annotation' in request.POST:
+    #pass
+    #raise ValidationError(request.POST['annotation'])
     if dataset=='NotSet':
         if samplingfeature=='NotSet':
             feature_action=int(feature_action)
