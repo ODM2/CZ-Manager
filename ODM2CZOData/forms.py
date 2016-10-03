@@ -546,14 +546,9 @@ class SamplingfeaturesAdminForm(ModelForm):
             feat = instance.featuregeometrywkt()
             initial = kwargs.get('initial', {})
             initial['featuregeometrywkt'] = '{}'.format(feat)
+            initial['map'] = '{}'.format(feat)
             kwargs['initial'] = initial
         super(SamplingfeaturesAdminForm, self).__init__(*args, **kwargs)
-
-    featuregeometrywkt = forms.CharField(help_text="feature geometry (to add a point format is POINT(lat, lon)" +
-                                                   " where long and lat are in decimal degrees. If you don't want to add a location" +
-                                                   " leave default value of POINT(0 0).", label='Featuregeometrywkt',
-                                         widget=forms.Textarea, required=False)
-    featuregeometrywkt.initial = GEOSGeometry("POINT(0 0)")
 
     sampling_feature_type = make_ajax_field(Samplingfeatures, 'sampling_feature_type', 'cv_sampling_feature_type')
     sampling_feature_type.help_text = u'A vocabulary for describing the type of SamplingFeature. ' \
@@ -589,6 +584,13 @@ class SamplingfeaturesAdminForm(ModelForm):
                                 u'here: <a href="http://vocabulary.odm2.org/elevationdatum/" ' \
                                 u'target="_blank">http://vocabulary.odm2.org/elevationdatum/</a>'
     elevation_datum.allow_tags = True
+    featuregeometrywkt = forms.CharField(help_text="feature geometry (to add a point format is POINT(lat, lon)" +
+                                                   " where long and lat are in decimal degrees. If you don't want to add a location" +
+                                                   " leave default value of POINT(0 0).", label='Featuregeometrywkt',
+                                         widget=forms.Textarea(attrs={'readonly': False}), required=False)
+
+
+    featuregeometrywkt.initial = GEOSGeometry("POINT(0 0)")
     featuregeometry = forms.PointField(label='Featuregeometry',
                                        widget=forms.OpenLayersWidget(), required=False)
 
@@ -625,7 +627,6 @@ class SamplingfeaturesAdmin(ReadOnlyAdmin):
     user_readonly = [p.name for p in Samplingfeatures._meta.get_fields() if not p.one_to_many]
     user_readonly_inlines = [ReadOnlyFeatureActionsInline, ReadOnlyIGSNInline]
 
-    # For admin users
     form = SamplingfeaturesAdminForm
     inlines_list = [FeatureActionsInline, IGSNInline]
 
@@ -670,6 +671,10 @@ class SamplingfeaturesAdmin(ReadOnlyAdmin):
     sampling_feature_type_linked.short_description = 'Sampling Feature Type'
     sampling_feature_type_linked.allow_tags = True
 
+    @staticmethod
+    def __user_is_readonly(request):
+        groups = [x.name for x in request.user.groups.all()]
+        return "readonly" in groups
 
 # Relatedfeatures AdminForm
 class RelatedfeaturesAdminForm(ModelForm):
