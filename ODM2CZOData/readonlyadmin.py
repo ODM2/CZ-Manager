@@ -10,9 +10,10 @@ class ReadOnlyAdmin(admin.OSMGeoAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(ReadOnlyAdmin, self).get_form(request, obj, **kwargs)
+        if 'featuregeometrywkt' in form.declared_fields and self.__user_is_readonly(request):
+            form.declared_fields['featuregeometrywkt'].widget.attrs['readonly'] = True
 
         autoselect_fields_check_can_add(form, self.model, request.user)
-
 
         return form
 
@@ -48,8 +49,14 @@ class ReadOnlyAdmin(admin.OSMGeoAdmin):
 
     def change_view(self, request, object_id, form_url = '', extra_context=None):
         if self.__user_is_readonly(request):
+            self.save_as = False
             self.readonly_fields = self.user_readonly
             self.inlines = self.user_readonly_inlines
+
+            extra_context = extra_context or {}
+            extra_context['show_save'] = False
+            extra_context['show_save_as_new'] = False
+            extra_context['show_save_and_continue'] = False
 
             try:
                 return super(ReadOnlyAdmin, self).change_view(
