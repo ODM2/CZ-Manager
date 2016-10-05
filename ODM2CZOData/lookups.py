@@ -1,6 +1,6 @@
 from ajax_select import LookupChannel
 
-######## Import all Controlled Vocabulary Module #########
+# ========= Import all Controlled Vocabulary Module =========#
 from .models import CvActiontype
 from .models import CvElevationdatum
 from .models import CvMethodtype
@@ -29,21 +29,21 @@ class TimeseriesResultsLookup(LookupChannel):
         for part in q.split():
             if not qset:
                 qset = Timeseriesresults.objects.filter(Q(resultid__resultid__icontains=part) \
-                                                         | Q(
+                                                        | Q(
                     resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) \
-                                                         | Q(
+                                                        | Q(
                     resultid__featureactionid__action__method__methodname__icontains=part) \
-                                                         | Q(resultid__variableid__variablecode__icontains=part) \
-                                                         | Q(resultid__variableid__variable_name__name__icontains=part))
+                                                        | Q(resultid__variableid__variablecode__icontains=part) \
+                                                        | Q(resultid__variableid__variable_name__name__icontains=part))
 
             else:
                 qset = qset & Timeseriesresults.objects.filter(Q(resultid__resultid__icontains=part) \
-                                                                | Q(
+                                                               | Q(
                     resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) \
-                                                                | Q(
+                                                               | Q(
                     resultid__featureactionid__action__method__methodname__icontains=part) \
-                                                                | Q(resultid__variableid__variablecode__icontains=part) \
-                                                                | Q(
+                                                               | Q(resultid__variableid__variablecode__icontains=part) \
+                                                               | Q(
                     resultid__variableid__variable_name__name__icontains=part))
         return qset
 
@@ -59,6 +59,7 @@ class TimeseriesResultsLookup(LookupChannel):
     def get_objects(self, ids):
         obj = Timeseriesresults.objects.filter(resultid__in=ids)
         return obj
+
 
 class MeasurementResultsLookup(LookupChannel):
     model = Measurementresults
@@ -216,7 +217,7 @@ class FeatureactionsLookup(LookupChannel):
     def format_item_display(self, obj):
         # return u"<span class='tag'>%s</span>" % obj.name
         return "%s- %s - %s" % (
-        obj.featureactionid, obj.samplingfeatureid.samplingfeaturename, obj.action.method.methodname)
+            obj.featureactionid, obj.samplingfeatureid.samplingfeaturename, obj.action.method.methodname)
 
     def get_objects(self, ids):
         obj = Featureactions.objects.filter(featureactionid__in=ids)
