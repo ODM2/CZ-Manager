@@ -102,7 +102,7 @@ def QAProcessLevelCreation(SeriesToProcess, result, timeRangesToRemove, printval
             flagdatavalue = mrv.datavalue
             for range in timeRangesToRemove:
                 # if printvals: print(range[0] + ' to ' + range[1])
-                if valuedatetime > range[0] and valuedatetime < range[1]:
+                if range[0] < valuedatetime < range[1]:
                     QAFlagOutofWater = True
                     datavalue = -6999
                     if printvals: print("bad " + str(mrv))
@@ -224,13 +224,7 @@ def importValues(file, variableFileIndex, variableDBID, variableUnitID, actionID
         oldfc = None
         for fc, xy, z in zip(featureCode, xylist, zlist):
             if fc != oldfc:
-                newSF = Samplingfeatures(sampling_feature_type=featuretype, samplingfeaturecode=fc,
-                                         samplingfeaturename=fc,
-                                         samplingfeaturedescription="Stone M.M. et al. site, "
-                                                                    "see http://dx.doi.org/"
-                                                                    "10.1016/j.soilbio.2014.10.019",
-                                         sampling_feature_geo_type=featuregeotype,
-                                         featuregeometry=xy, elevation_m=z)
+                pass
                 # print(newSF)
             oldfc = fc
 

@@ -265,12 +265,11 @@ class CitationsAdmin(admin.ModelAdmin):
             external_id.citationexternalidentifier)
 
     def primary_author(self, obj):
-        self.author_list = Authorlists.objects.filter(citationid=obj.citationid)
         first_author = self.author_list.get(authororder=1)
         return "{0}, {1}".format(first_author.personid.personlastname,
                                  first_author.personid.personfirstname)
 
-    def other_author(self, obj):
+    def other_author(self):
         list_et_al = list()
         for author in self.author_list:
             if author.authororder != 1:
@@ -527,7 +526,8 @@ class SamplingfeaturesAdmin(admin.OSMGeoAdmin):
 
     igsn.allow_tags = True
 
-    def dataset_code(self, obj):
+    @staticmethod
+    def dataset_code(obj):
         fid = Featureactions.objects.filter(samplingfeatureid=obj.samplingfeatureid)
         ds = Datasets.objects.filter(datasetsresults__resultid__featureactionid__in=fid).distinct()
         ds_list = list()
@@ -545,10 +545,10 @@ class SamplingfeaturesAdmin(admin.OSMGeoAdmin):
     sampling_feature_type_linked.allow_tags = True
 
 
-def duplicate_results_event(ModelAdmin, request, queryset):
-    for object in queryset:
-        object.resultid = None
-        object.save()
+def duplicate_results_event(queryset):
+    for obj in queryset:
+        obj.resultid = None
+        obj.save()
 
 
 duplicate_results_event.short_description = "Duplicate selected result"
@@ -778,12 +778,14 @@ class DatasetsAdmin(admin.ModelAdmin):
     form = DatasetsAdminForm
     list_display = ['datasetcode', 'datasettitle', 'datasettypecv']
 
-    def get_datasetsresults(self, object_id):
+    @staticmethod
+    def get_datasetsresults(object_id):
         datasetResults = Datasetsresults.objects.filter(datasetid=object_id)
         # raise ValidationError(datasetResults)
         return datasetResults
 
-    def get_results(self, object_id):
+    @staticmethod
+    def get_results(object_id):
         ids = []
         datasetResults = Datasetsresults.objects.filter(datasetid=object_id)
         for result in datasetResults:
@@ -896,14 +898,13 @@ class MethodsAdmin(admin.ModelAdmin):
     method_type_linked.allow_tags = True
 
 
-def duplicate_Dataloggerfiles_event(ModelAdmin, request, queryset):
+def duplicate_Dataloggerfiles_event(queryset):
     for dataloggerfile in queryset:
         fileid = dataloggerfile.dataloggerfileid
         filecolumns = Dataloggerfilecolumns.objects.filter(dataloggerfileid=fileid)
         dataloggerfile.dataloggerfileid = None
         dataloggerfile.save()
         # save will assign new dataloggerfileid
-        fileid = dataloggerfile.dataloggerfileid
         for columns in filecolumns:
             columns.dataloggerfilecolumnid = None
             columns.dataloggerfileid = dataloggerfile
@@ -961,7 +962,7 @@ class DataloggerfilesAdmin(admin.ModelAdmin):
     inlines = [DataLoggerFileColumnsInline]
 
 
-def duplicate_Dataloggerfilecolumns_event(ModelAdmin, request, queryset):
+def duplicate_Dataloggerfilecolumns_event(queryset):
     for object in queryset:
         object.dataloggerfilecolumnid = None
         object.save()
@@ -1375,6 +1376,7 @@ class UnitsAdmin(admin.ModelAdmin):
 
 
 class DataloggerprogramfilesAdminForm(ModelForm):
+    @staticmethod
     def upload_file(request):
         if request.method == 'POST':
             form = DataloggerprogramfilesAdminForm(request.POST, request.FILES)
@@ -1504,13 +1506,16 @@ class AffiliationsAdmin(ExportMixin, admin.ModelAdmin):
         'organizationname', 'personfirstname', 'personlastname', 'isprimaryorganizationcontact',
         'primaryemail')
 
-    def organizationname(self, obj):
+    @staticmethod
+    def organizationname(obj):
         return obj.organizationid.organizationname
 
-    def personfirstname(self, obj):
+    @staticmethod
+    def personfirstname(obj):
         return obj.personid.personfirstname
 
-    def personlastname(self, obj):
+    @staticmethod
+    def personlastname(obj):
         return obj.personid.personlastname
 
 

@@ -103,11 +103,11 @@ class Actionby(models.Model):
                                        blank=True)
 
     def __unicode__(self):
-        s = u"%s" % (self.actionid)
+        s = u"%s" % self.actionid
         if self.affiliationid:
-            s += u"- %s" % (self.affiliationid)
+            s += u"- %s" % self.affiliationid
         if self.roledescription:
-            s += u"- %s" % (self.roledescription)
+            s += u"- %s" % self.roledescription
         return s
 
     class Meta:
@@ -159,9 +159,9 @@ class Actions(models.Model):
     actionfilelink = models.CharField(verbose_name='action file link', max_length=255, blank=True)
 
     def __unicode__(self):
-        s = u"%s" % (self.action_type)
+        s = u"%s" % self.action_type
         if self.method:
-            s += u" | %s" % (self.method)
+            s += u" | %s" % self.method
         if self.method:
             s += u" | %s" % (self.actiondescription[:25])
         return s
@@ -189,9 +189,9 @@ class Affiliations(models.Model):
     personlink = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        s = u"%s" % (self.personid)
+        s = u"%s" % self.personid
         if self.organizationid:
-            s += u" | %s" % (self.organizationid)
+            s += u" | %s" % self.organizationid
         return s
 
     class Meta:
@@ -214,7 +214,7 @@ class Annotations(models.Model):
     citationid = models.ForeignKey('Citations', db_column='citationid', blank=True, null=True)
 
     def __unicode__(self):
-        s = u" %s" % (self.annotationtext)
+        s = u" %s" % self.annotationtext
         return s
 
     class Meta:
@@ -360,7 +360,7 @@ class Citationextensionpropertyvalues(models.Model):
 
     def pubType(self):
         type = None
-        if (str(self.propertyvalue).__len__() > 0):
+        if str(self.propertyvalue).__len__() > 0:
             if str(
                     self.propertyid) == 'Citation Category - Paper, Book, Talk, Poster, ' \
                                         'Dissertation, Thesis, Undergrad Thesis, Report':
@@ -382,7 +382,7 @@ class Citationextensionpropertyvalues(models.Model):
 
     def endnoteexport(self):
         s = ''
-        if (str(self.propertyvalue).__len__() > 0):
+        if str(self.propertyvalue).__len__() > 0:
             if str(
                     self.propertyid) == 'Citation Category - Paper, Book, Talk, Poster, ' \
                                         'Dissertation, Thesis, Undergrad Thesis, Report':
@@ -436,11 +436,11 @@ class Citations(models.Model):
     citationlink = models.CharField(max_length=255, blank=True, verbose_name='Citation Link', )
 
     def __unicode__(self):
-        s = u"%s" % (self.title)
+        s = u"%s" % self.title
         if self.publisher:
-            s += u"- %s," % (self.publisher)
+            s += u"- %s," % self.publisher
         if self.publicationyear:
-            s += u", %s," % (self.publicationyear)
+            s += u", %s," % self.publicationyear
         return s
 
     class Meta:
@@ -449,7 +449,8 @@ class Citations(models.Model):
         ordering = ['title']
         verbose_name = 'citation'
 
-    def csvheader(self):
+    @staticmethod
+    def csvheader():
         s = 'citationid,title,publisher,year,citationlink,'
         return s
 
@@ -461,7 +462,8 @@ class Citations(models.Model):
         s += ', {0},'.format(self.citationlink)
         return s
 
-    def endnoteexportheader(self):
+    @staticmethod
+    def endnoteexportheader():
         s = 'TI\tPB\tPY\tcitationlink\t'
         return s
 
@@ -491,7 +493,7 @@ class CvActiontype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -507,7 +509,7 @@ class CvAggregationstatistic(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -523,7 +525,7 @@ class CvAnnotationtype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -539,7 +541,7 @@ class CvCensorcode(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -555,7 +557,7 @@ class CvDataqualitytype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -571,7 +573,7 @@ class CvDatasettypecv(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -587,7 +589,7 @@ class CvDirectivetype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -603,7 +605,7 @@ class CvElevationdatum(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -620,7 +622,7 @@ class CvEquipmenttype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -636,7 +638,7 @@ class CvMethodtype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -652,7 +654,7 @@ class CvOrganizationtype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -668,7 +670,7 @@ class CvPropertydatatype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -684,7 +686,7 @@ class CvQualitycode(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -700,7 +702,7 @@ class CvReferencematerialmedium(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -716,7 +718,7 @@ class CvRelationshiptype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -732,7 +734,7 @@ class CvResulttype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -748,7 +750,7 @@ class CvMedium(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -764,7 +766,7 @@ class CvSamplingfeaturegeotype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -781,7 +783,7 @@ class CvSamplingfeaturetype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -798,7 +800,7 @@ class CvSitetype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -814,7 +816,7 @@ class CvSpatialoffsettype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -830,7 +832,7 @@ class CvSpeciation(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -846,7 +848,7 @@ class CvSpecimenmedium(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -862,7 +864,7 @@ class CvSpecimentype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -878,7 +880,7 @@ class CvStatus(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -894,7 +896,7 @@ class CvTaxonomicclassifiertype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -911,7 +913,7 @@ class CvUnitstype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -943,7 +945,7 @@ class CvVariabletype(models.Model):
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.name)
+        return u"%s" % self.name
 
     class Meta:
         managed = False
@@ -982,9 +984,9 @@ class Dataloggerfilecolumns(models.Model):
 
     def __unicode__(self):
         # s = u"%s" % (self.dataloggerfileid)
-        s = u"Label: %s," % (self.columnlabel)
+        s = u"Label: %s," % self.columnlabel
         # s += u" Description: %s," % (self.columndescription)
-        s += u" Result: %s" % (self.resultid)
+        s += u" Result: %s" % self.resultid
         return s
 
     class Meta:
@@ -1002,7 +1004,7 @@ class Dataloggerfiles(models.Model):
     dataloggerfilelink = models.FileField(upload_to='dataloggerfiles')  # upload_to='.'
 
     def __unicode__(self):
-        s = u"%s" % (self.dataloggerfilename)
+        s = u"%s" % self.dataloggerfilename
         return s
 
     class Meta:
@@ -1029,8 +1031,8 @@ class ProcessDataloggerfile(models.Model):
     date_processed = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        s = u"%s" % (self.dataloggerfileid)
-        s += u"- Processed on %s" % (self.date_processed)
+        s = u"%s" % self.dataloggerfileid
+        s += u"- Processed on %s" % self.date_processed
         return s
 
     class Meta:
@@ -1067,8 +1069,8 @@ class Dataloggerprogramfiles(models.Model):
     # + '/' + programname.__str__() settings.MEDIA_ROOT upload_to='/upfiles/'
 
     def __unicode__(self):
-        s = u"%s" % (self.programname)
-        s += u"- Version %s" % (self.programversion)
+        s = u"%s" % self.programname
+        s += u"- Version %s" % self.programversion
         return s
 
     class Meta:
@@ -1125,9 +1127,9 @@ class Datasets(models.Model):
     datasetabstract = models.CharField(verbose_name="dataset abstract", max_length=5000)
 
     def __unicode__(self):
-        s = u"%s" % (self.datasetcode)
+        s = u"%s" % self.datasetcode
         if self.datasettitle:
-            s += u"- %s" % (self.datasettitle)
+            s += u"- %s" % self.datasettitle
         return s
 
     class Meta:
@@ -1143,9 +1145,9 @@ class Datasetsresults(models.Model):
                                  db_column='resultid')
 
     def __unicode__(self):
-        s = u"%s" % (self.datasetid)
+        s = u"%s" % self.datasetid
         if self.resultid:
-            s += u"- %s" % (self.resultid)
+            s += u"- %s" % self.resultid
         return s
 
     class Meta:
@@ -1218,9 +1220,9 @@ class Equipmentmodels(models.Model):
                                  blank=True)
 
     def __unicode__(self):
-        s = u"%s" % (self.modelname)
+        s = u"%s" % self.modelname
         if self.modelpartnumber:
-            s += u"- %s" % (self.modelpartnumber)
+            s += u"- %s" % self.modelpartnumber
         return s
 
     class Meta:
@@ -1268,7 +1270,7 @@ class Externalidentifiersystems(models.Model):
     externalidentifiersystemurl = models.CharField(max_length=255, blank=True)
 
     def __unicode__(self):
-        return u"%s" % (self.externalidentifiersystemname)
+        return u"%s" % self.externalidentifiersystemname
 
     class Meta:
         managed = False
@@ -1337,8 +1339,8 @@ class Instrumentoutputvariables(models.Model):
                                                    db_column='instrumentrawoutputunitsid')
 
     def __unicode__(self):
-        s = u"%s " % (self.modelid)
-        s += u"- %s" % (self.variableid)
+        s = u"%s " % self.modelid
+        s += u"- %s" % self.variableid
         return s
 
     class Meta:
@@ -1390,8 +1392,8 @@ class Measurementresults(models.Model):
                                                        db_column='timeaggregationintervalunitsid')
 
     def __unicode__(self):
-        s = u"%s " % (self.resultid)
-        s += u", %s" % (self.qualitycodecv)
+        s = u"%s " % self.resultid
+        s += u", %s" % self.qualitycodecv
         return s
 
     class Meta:
@@ -1421,12 +1423,13 @@ class Measurementresultvalues(models.Model):
                                                  default=4)
 
     def __unicode__(self):
-        s = u"%s " % (self.resultid)
-        s += u"- %s" % (self.datavalue)
-        s += u"- %s" % (self.valuedatetime)
+        s = u"%s " % self.resultid
+        s += u"- %s" % self.datavalue
+        s += u"- %s" % self.valuedatetime
         return s
 
-    def csvheader(self):
+    @staticmethod
+    def csvheader():
         s = 'databaseid,'
         # s+='Value,'
         s += 'Date and Time,'
@@ -1466,7 +1469,6 @@ class Measurementresultvalues(models.Model):
     def csvoutputShort(self):
         s = '{0}'.format(self.datavalue)
         mrvannotation = Measurementresultvalueannotations.objects.filter(valueid=self.valueid)
-        id = self.valueid
         annotations = Annotations.objects.filter(annotationid__in=mrvannotation)
         s += ',\"'
         for anno in annotations:
@@ -1491,7 +1493,7 @@ class MeasurementresultvalueFile(models.Model):
     valueFile = models.FileField(upload_to='resultvalues', verbose_name="value file ")
 
     def __unicode__(self):
-        s = u"%s" % (self.resultid)
+        s = u"%s" % self.resultid
         return s
 
     class Meta:
@@ -1522,8 +1524,8 @@ class Methodcitations(models.Model):
     citationid = models.ForeignKey(Citations, db_column='citationid', verbose_name='citation')
 
     def __unicode__(self):
-        s = u"%s " % (self.methodid)
-        s += u"-, %s" % (self.citationid)
+        s = u"%s " % self.methodid
+        s += u"-, %s" % self.citationid
         return s
 
     class Meta:
@@ -1579,9 +1581,9 @@ class Methods(models.Model):
                                        blank=True, null=True)
 
     def __unicode__(self):
-        s = u"%s " % (self.methodcode)
+        s = u"%s " % self.methodcode
         if self.methodtypecv:
-            s += u", %s" % (self.methodtypecv)
+            s += u", %s" % self.methodtypecv
         return s
 
     class Meta:
@@ -1631,9 +1633,9 @@ class Organizations(models.Model):
                                              null=True, default=1)
 
     def __unicode__(self):
-        s = u"%s" % (self.organizationcode)
+        s = u"%s" % self.organizationcode
         if self.organizationname:
-            s += u", %s" % (self.organizationname)
+            s += u", %s" % self.organizationname
         return s
 
     class Meta:
@@ -1649,9 +1651,9 @@ class People(models.Model):
     personlastname = models.CharField(max_length=255, verbose_name="last name")
 
     def __unicode__(self):
-        s = u"%s" % (self.personlastname)
+        s = u"%s" % self.personlastname
         if self.personfirstname:
-            s += u", %s" % (self.personfirstname)
+            s += u", %s" % self.personfirstname
         return s
 
     class Meta:
@@ -1742,9 +1744,9 @@ class Processinglevels(models.Model):
     explanation = models.CharField(max_length=5000, blank=True)
 
     def __unicode__(self):
-        s = u"%s " % (self.processinglevelcode)
+        s = u"%s " % self.processinglevelcode
         if self.definition:
-            s += u", %s" % (self.definition)
+            s += u", %s" % self.definition
         return s
 
     class Meta:
@@ -1783,17 +1785,17 @@ class Profileresults(models.Model):
     def __unicode__(self):
         s = u"%s" % self.resultid
         if self.xlocation:
-            s += u"- %s" % (self.xlocation)
+            s += u"- %s" % self.xlocation
         if self.xlocationunitsid:
-            s += u", %s" % (self.xlocationunitsid)
+            s += u", %s" % self.xlocationunitsid
         if self.ylocation:
-            s += u"- %s" % (self.ylocation)
+            s += u"- %s" % self.ylocation
         if self.ylocationunitsid:
-            s += u", %s" % (self.ylocationunitsid)
+            s += u", %s" % self.ylocationunitsid
         if self.intendedzspacing:
-            s += u"- %s" % (self.intendedzspacing)
+            s += u"- %s" % self.intendedzspacing
         if self.intendedzspacingunitsid:
-            s += u", %s" % (self.intendedzspacingunitsid)
+            s += u", %s" % self.intendedzspacingunitsid
         return s
 
     class Meta:
@@ -1838,14 +1840,15 @@ class Profileresultvalues(models.Model):
                                                        blank=True, null=True)
 
     def __unicode__(self):
-        s = u"%s " % (self.resultid)
-        s += u", %s" % (self.datavalue)
-        s += u", %s" % (self.zlocation)
+        s = u"%s " % self.resultid
+        s += u", %s" % self.datavalue
+        s += u", %s" % self.zlocation
         # s += u", %s" % (self.zaggregationinterval)
-        s += u", %s" % (self.zlocationunitsid)
+        s += u", %s" % self.zlocationunitsid
         return s
 
-    def csvheader(self):
+    @staticmethod
+    def csvheader():
         s = 'databaseid,'
         # s+='Value,'
         # s += 'Date and Time,'
@@ -1967,11 +1970,11 @@ class Relatedactions(models.Model):
                                         db_column='relatedactionid')
 
     def __unicode__(self):
-        s = u"%s" % (self.actionid)
+        s = u"%s" % self.actionid
         if self.relationshiptypecv:
-            s += u", %s" % (self.relationshiptypecv)
+            s += u", %s" % self.relationshiptypecv
         if self.relatedactionid:
-            s += u", %s" % (self.relatedactionid)
+            s += u", %s" % self.relatedactionid
         return s
 
     class Meta:
@@ -2195,9 +2198,9 @@ class Samplingfeatureannotations(models.Model):
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
 
     def __unicode__(self):
-        s = u"%s" % (self.samplingfeatureid)
+        s = u"%s" % self.samplingfeatureid
         if self.annotationid:
-            s += u"- %s" % (self.annotationid)
+            s += u"- %s" % self.annotationid
         return s
 
     class Meta:
@@ -2212,9 +2215,9 @@ class Samplingfeatureextensionpropertyvalues(models.Model):
     propertyvalue = models.CharField(max_length=255)
 
     def __unicode__(self):
-        s = u"%s" % (self.samplingfeatureid)
+        s = u"%s" % self.samplingfeatureid
         if self.propertyvalue:
-            s += u"- %s" % (self.propertyvalue)
+            s += u"- %s" % self.propertyvalue
         return s
 
     class Meta:
@@ -2271,7 +2274,7 @@ class Samplingfeatures(models.Model):
         s = u"%s - %s- %s" % (
             self.samplingfeaturecode, self.samplingfeatureid, self.sampling_feature_type)
         if self.samplingfeaturename:
-            s += u" - %s" % (self.samplingfeaturename)
+            s += u" - %s" % self.samplingfeaturename
         return s
 
     class Meta:
@@ -2569,9 +2572,9 @@ class Taxonomicclassifiers(models.Model):
                                                     null=True)
 
     def __unicode__(self):
-        s = u"%s" % (self.taxonomicclassifiername)
+        s = u"%s" % self.taxonomicclassifiername
         if self.taxonomicclassifiercommonname:
-            s += u"- %s" % (self.taxonomicclassifiercommonname)
+            s += u"- %s" % self.taxonomicclassifiercommonname
         return s
 
     class Meta:
@@ -2603,9 +2606,9 @@ class Timeseriesresults(models.Model):
                                                db_column='aggregationstatisticcv')
 
     def __unicode__(self):
-        s = u"%s " % (self.resultid)
-        s += u", %s" % (self.intendedtimespacing)
-        s += u", %s" % (self.intendedtimespacingunitsid)
+        s = u"%s " % self.resultid
+        s += u", %s" % self.intendedtimespacing
+        s += u", %s" % self.intendedtimespacingunitsid
         return s
 
     class Meta:
@@ -2639,12 +2642,13 @@ class Timeseriesresultvalues(models.Model):
                                                        db_column='timeaggregationintervalunitsid')
 
     def __unicode__(self):
-        s = u"%s " % (self.resultid)
-        s += u"- %s" % (self.datavalue)
-        s += u"- %s" % (self.valuedatetime)
+        s = u"%s " % self.resultid
+        s += u"- %s" % self.datavalue
+        s += u"- %s" % self.valuedatetime
         return s
 
-    def csvheader(self):
+    @staticmethod
+    def csvheader():
         s = 'databaseid,'
         # s+='Value,'
         s += 'Date and Time,'
@@ -2684,7 +2688,6 @@ class Timeseriesresultvalues(models.Model):
     def csvoutputShort(self):
         s = '{0}'.format(self.datavalue)
         mrvannotation = Measurementresultvalueannotations.objects.filter(valueid=self.valueid)
-        id = self.valueid
         annotations = Annotations.objects.filter(annotationid__in=mrvannotation)
         s += ',\"'
         for anno in annotations:
@@ -2833,11 +2836,11 @@ class Units(models.Model):
                                  blank=True)
 
     def __unicode__(self):
-        s = u"%s" % (self.unitsabbreviation)
+        s = u"%s" % self.unitsabbreviation
         # if self.unit_type:
         #    s = u"- %s" % (self.unit_type)
         if self.unitsname:
-            s += u"- %s" % (self.unitsname)
+            s += u"- %s" % self.unitsname
         return s
 
     class Meta:
@@ -2890,9 +2893,9 @@ class Variables(models.Model):
     nodatavalue = models.FloatField(verbose_name='no data value')
 
     def __unicode__(self):
-        s = "%s" % (self.variablecode)
+        s = "%s" % self.variablecode
         if self.variabledefinition:
-            s += " - %s" % (self.variabledefinition)[:20]
+            s += " - %s" % self.variabledefinition[:20]
         return s
 
     class Meta:

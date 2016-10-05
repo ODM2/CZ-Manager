@@ -49,13 +49,13 @@ class TimeseriesResultsLookup(LookupChannel):
         return qset
 
     def get_result(self, obj):
-        return "%s" % (obj.resultid)
+        return "%s" % obj.resultid
 
     def format_match(self, obj):
-        return "%s" % (obj.resultid)
+        return "%s" % obj.resultid
 
     def format_item_display(self, obj):
-        return "%s" % (obj.resultid)  # ,
+        return "%s" % obj.resultid  # ,
 
     def get_objects(self, ids):
         obj = Timeseriesresults.objects.filter(resultid__in=ids)
@@ -88,13 +88,13 @@ class MeasurementResultsLookup(LookupChannel):
         return qset
 
     def get_result(self, obj):
-        return "%s" % (obj.resultid)
+        return "%s" % obj.resultid
 
     def format_match(self, obj):
-        return "%s" % (obj.resultid)
+        return "%s" % obj.resultid
 
     def format_item_display(self, obj):
-        return "%s" % (obj.resultid)  # ,
+        return "%s" % obj.resultid  # ,
 
     def get_objects(self, ids):
         obj = Measurementresults.objects.filter(resultid__in=ids)

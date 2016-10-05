@@ -110,7 +110,6 @@ class Command(BaseCommand):
                 reader, reader2 = itertools.tee(csv.reader(f))
                 for i in range(0, databeginson):
                     columnsinCSV = len(next(reader2))
-                dateTimeColumnNum = -1
                 DataloggerfilecolumnSet = Dataloggerfilecolumns.objects.filter(
                     dataloggerfileid=fileid.dataloggerfileid)
                 i = 0
@@ -194,14 +193,13 @@ class Command(BaseCommand):
                                 qualitycode = CvQualitycode.objects.filter(name="Good").get()
                                 for mresults in Timeseriesresult:
                                     try:
-                                        if (value == ''):
+                                        if value == '':
                                             raise IntegrityError
                                         if check_dates:
                                             # this check is really slowing down
                                             # ingestion so I added a flag to turn it off
                                             try:
-                                                mrv = mrvs.filter(valuedatetime=datestr).filter(
-                                                    resultid=mresults.resultid).get()
+                                                pass
                                             except ObjectDoesNotExist:
                                                 Timeseriesresultvalues(
                                                     resultid=mresults,

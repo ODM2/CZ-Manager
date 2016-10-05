@@ -5,8 +5,7 @@ from datetime import timedelta
 
 from django import template
 from django.contrib import admin
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Min, Max
+from django.db.models import Max
 from django.db.models import Q
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -349,7 +348,7 @@ def get_name_of_units(selected_result):
     return name_of_units
 
 
-def relatedFeaturesFilter(request, done, selected_relatedfeatid, selected_resultid, featureaction,
+def relatedFeaturesFilter(request, done, selected_resultid, featureaction,
                           resultType='Time series coverage', ):
     # selected_relatedfeatid = 18
     if 'SelectedRelatedFeature' in request.POST and 'update_result_list' not in request.POST:
@@ -523,7 +522,6 @@ def TimeSeriesGraphing(request, feature_action='All'):
     authenticated = True
     if not request.user.is_authenticated():
         return HttpResponseRedirect('../')
-        authenticated = False
 
     template = loader.get_template('chart.html')
     selected_relatedfeatid = None
@@ -551,7 +549,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
             selected_featureactionid = int(request.POST['SelectedFeatureAction'])
             resultList = Results.objects.filter(featureactionid=selected_featureactionid)
             if 'update_result_list' in request.POST:
-                selected_resultid = resultList[0].resultid
+                pass
         else:
             selected_featureactionid = request.POST['SelectedFeatureAction']
             resultList = Results.objects.filter(result_type="Time series coverage")
@@ -561,7 +559,6 @@ def TimeSeriesGraphing(request, feature_action='All'):
     # find the measurement results series that where selected.
     numresults = resultList.count()
     selectedMResultSeries = []
-    selectionStr = ''
     for i in range(0, numresults):
         selectionStr = str('selection' + str(i))
         if selectionStr in request.POST:
@@ -598,10 +595,8 @@ def TimeSeriesGraphing(request, feature_action='All'):
     name_of_sampling_features = []
     name_of_variables = []
     name_of_units = []
-    ProcessingLevel = []
 
     myresultSeries = []
-    myresultSeriesExport = None
     i = 0
     data = {}
 
@@ -698,8 +693,6 @@ def TimeSeriesGraphing(request, feature_action='All'):
              "data": data['datavalue' + str(i)]})
     i = 0
     name_of_sampling_features = set(name_of_sampling_features)
-    sfname = None
-    oldsfname = None
 
     for name_of_sampling_feature in name_of_sampling_features:
         i += 1
@@ -714,7 +707,6 @@ def TimeSeriesGraphing(request, feature_action='All'):
     xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
     yAxis = {"title": {"text": seriesStr}}
     graphType = 'line'
-    opposite = False
 
     actionList = Actions.objects.filter(
         action_type="Observation")  # where the action is not of type estimation
@@ -769,9 +761,6 @@ def TimeSeriesGraphing(request, feature_action='All'):
                                  'site_title': admin.site.site_title,
                                  'site_header': admin.site.site_header,
                                  'short_title': 'Time Series'}, )
-    authenticated = True
-    if not request.user.is_authenticated():
-        return HttpResponseRedirect('../')
 
     template = loader.get_template('chart.html')
     selected_relatedfeatid = None
@@ -798,7 +787,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
             selected_featureactionid = int(request.POST['SelectedFeatureAction'])
             resultList = Results.objects.filter(featureactionid=selected_featureactionid)
             if 'update_result_list' in request.POST:
-                selected_resultid = resultList[0].resultid
+                pass
         else:
             selected_featureactionid = request.POST['SelectedFeatureAction']
             resultList = Results.objects.filter(result_type="Time series coverage")
@@ -808,7 +797,6 @@ def TimeSeriesGraphing(request, feature_action='All'):
     # find the measurement results series that where selected.
     numresults = resultList.count()
     selectedMResultSeries = []
-    selectionStr = ''
     for i in range(0, numresults):
         selectionStr = str('selection' + str(i))
         if selectionStr in request.POST:
@@ -845,10 +833,8 @@ def TimeSeriesGraphing(request, feature_action='All'):
     name_of_sampling_features = []
     name_of_variables = []
     name_of_units = []
-    ProcessingLevel = []
 
     myresultSeries = []
-    myresultSeriesExport = None
     i = 0
     data = {}
 
@@ -945,8 +931,6 @@ def TimeSeriesGraphing(request, feature_action='All'):
              "data": data['datavalue' + str(i)]})
     i = 0
     name_of_sampling_features = set(name_of_sampling_features)
-    sfname = None
-    oldsfname = None
 
     for name_of_sampling_feature in name_of_sampling_features:
         i += 1
@@ -961,7 +945,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
     xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
     yAxis = {"title": {"text": seriesStr}}
     graphType = 'line'
-    opposite = False
+
 
     actionList = Actions.objects.filter(
         action_type="Observation")  # where the action is not of type estimation
@@ -1018,7 +1002,6 @@ def TimeSeriesGraphing(request, feature_action='All'):
 def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', dataset='NotSet',
                    resultidu='NotSet',
                    startdate='NotSet', enddate='NotSet', popup='NotSet'):
-    authenticated = True
     if not request.user.is_authenticated():
         # return HttpResponseRedirect('../')
         authenticated = False
@@ -1040,19 +1023,15 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
     else:
         useDataset = True
         dataset = int(dataset)
-    useResultid = False
-    if resultidu != 'NotSet':
-        useResultid = True
-        resultidu = int(resultidu)
 
-    i = 0
+    if resultidu != 'NotSet':
+        pass
+
     featureActionLocation = None
     featureActionMethod = None
     datasetTitle = None
     datasetAbstract = None
     methods = None
-    actions = None
-    samplefeature = None
     methodsOnly = 'False'
     if not useDataset:
         if useSamplingFeature:
@@ -1079,57 +1058,6 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
             ~Q(processing_level=4)).order_by("featureactionid__action__method")
         datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
         datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
-
-    try:
-        # resultList= Resultextensionpropertyvalues.objects.filter(
-        # esultid__in=resultList.values("resultid")).annotate(start_date=Min('propertyvalue'))
-        StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
-        EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
-        startdates = Resultextensionpropertyvalues.objects.filter(
-            resultid__in=resultList.values("resultid")).filter(
-            propertyid=StartDateProperty)
-        enddates = Resultextensionpropertyvalues.objects.filter(
-            resultid__in=resultList.values("resultid")).filter(
-            propertyid=EndDateProperty)
-        realstartdates = []
-        realenddates = []
-        for startdate in startdates:
-            realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M"))
-        for enddate in enddates:
-            realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M"))
-        startdate = min(realstartdates).strftime('%Y-%m-%d %H:%M')
-        enddate = max(realenddates).strftime('%Y-%m-%d %H:%M')
-        # resultList= resultList.annotate(start_date=Resultextensionpropertyvalues.
-        # objects.filter(resultid__in=resultList.values("resultid")).filter(propertyid=StartDateProperty))
-        # resultList= resultList.annotate(end_date=Resultextensionpropertyvalues.
-        # objects.filter(resultid__in=resultList.values("resultid")).filter(propertyid=EndDateProperty))
-        # startdate= Measurementresultvalues.objects.filter(resultid__in=resultList.
-        # values("resultid")).annotate(Min('valuedatetime')).\
-        # order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-        # #.annotate(Min('price')).order_by('price')[0]
-
-        # enddate= Measurementresultvalues.objects.filter(resultid__in=resultList.
-        # values("resultid")).annotate(Max('valuedatetime')).\
-        # order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-    except (ObjectDoesNotExist) as e:
-        try:
-            startdate = Timeseriesresultvalues.objects.filter(
-                resultid__in=resultList.values("resultid")).annotate(
-                Min('valuedatetime')). \
-                order_by('valuedatetime')[0].valuedatetime.strftime(
-                '%Y-%m-%d %H:%M')  # .annotate(Min('price')).order_by('price')[0]
-            enddate = Timeseriesresultvalues.objects.filter(
-                resultid__in=resultList.values("resultid")).annotate(
-                Max('valuedatetime')). \
-                order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-        except IndexError:
-            # html = "<html><body>No Data Available Yet.</body></html>"
-            # return HttpResponse(html)
-            methodsOnly = 'True'
-    except ValueError:
-        # html = "<html><body>No Data Available Yet.</body></html>"
-        # return HttpResponse(html)
-        methodsOnly = 'True'
 
     return TemplateResponse(request, template, {'prefixpath': CUSTOM_TEMPLATE_PATH,
                                                 'useSamplingFeature': useSamplingFeature,
@@ -1174,27 +1102,24 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     else:
         useDataset = True
         dataset = int(dataset)
-    useResultid = False
+
     if resultidu != 'NotSet':
-        useResultid = True
+
         resultidu = int(resultidu)
 
     selected_results = []
     name_of_sampling_features = []
     name_of_variables = []
     name_of_units = []
-    ProcessingLevel = []
 
     myresultSeries = []
-    myresultSeriesExport = None
-    i = 0
+
     data = {}
     featureActionLocation = None
     featureActionMethod = None
     datasetTitle = None
     datasetAbstract = None
     methods = None
-    samplefeature = None
     if not useDataset:
         if useSamplingFeature:
             samplefeature = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
@@ -1221,7 +1146,6 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
     numresults = resultList.count()
     selectedMResultSeries = []
-    selectionStr = ''
     for i in range(0, numresults):
         selectionStr = str('selection' + str(i))
         if selectionStr in request.POST:
@@ -1242,7 +1166,6 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         else:
             selectedMResultSeries.append(int(resultidu))
 
-    entered_end_date = None
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
     elif not enddate == 'NotSet':
@@ -1322,7 +1245,6 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             start = datetime(1970, 1, 1)
             delta = result.valuedatetime - start
             mills = delta.total_seconds() * 1000
-            dataval = None
             if math.isnan(result.datavalue):
                 dataval = 'null'
             else:
@@ -1360,8 +1282,6 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
              "data": data['datavalue' + str(i)]})
     i = 0
     name_of_sampling_features = set(name_of_sampling_features)
-    sfname = None
-    oldsfname = None
 
     for name_of_sampling_feature in name_of_sampling_features:
         i += 1
@@ -1376,7 +1296,6 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
     yAxis = {"title": {"text": seriesStr}}
     graphType = 'line'
-    opposite = False
 
     int_selectedresultid_ids = []
     for int_selectedresultid in selectedMResultSeries:
@@ -1493,7 +1412,7 @@ def scatter_plot(request):
     ylocation = []
     xdata = []
     ydata = []
-    rvx = rvy = prvx = prvy = xlocs = ylocs = None
+    prvx = prvy = xlocs = ylocs = None
     if xVar and yVar:
         rvx = pr.filter(variableid=xVar).values('resultid')
         prvx = Profileresultvalues.objects.filter(~Q(datavalue=-6999)) \
@@ -1517,7 +1436,7 @@ def scatter_plot(request):
         else:
             xlocs = Samplingfeatures.objects.filter(
                 samplingfeatureid__in=xfa.values("samplingfeatureid"))
-        xloc = xlocs.values_list("samplingfeaturename", flat=True)
+
         # xlocation = re.sub('[^A-Za-z0-9]+', '', xlocation)
         yr = Results.objects.filter(resultid__in=prvy.values("resultid"))
         yfa = Featureactions.objects.filter(featureactionid__in=yr.values("featureactionid"))
@@ -1528,7 +1447,6 @@ def scatter_plot(request):
         else:
             ylocs = Samplingfeatures.objects.filter(
                 samplingfeatureid__in=yfa.values("samplingfeatureid"))
-        yloc = ylocs.values_list("samplingfeaturename", flat=True)
     if prvx and prvx:
         prvx = prvx.filter(resultid__resultid__featureactionid__samplingfeatureid__in=xlocs)
         prvy = prvy.filter(resultid__resultid__featureactionid__samplingfeatureid__in=ylocs)
@@ -1692,7 +1610,7 @@ def exportcitations(request, citations, csv):
 
 def exportspreadsheet(request, resultValuesSeries, profileResult=True):
     # if the user hit the export csv button export the measurement results to csv
-    csvexport = True
+
 
     myfile = StringIO.StringIO()
     # raise ValidationError(resultValues)
@@ -1702,7 +1620,6 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
     unit = ''
     firstheader = True
     processingCode = None
-    lastProcessingCode = None
     resultValuesHeaders = resultValuesSeries.filter(
         ~Q(
             resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type
@@ -1770,25 +1687,21 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
         )
     # myfile.write(lastResult.csvheaderShort())
     myfile.write('\n')
-    lastSamplingFeatureCode = ''
+
     samplingFeatureCode = ''
-    lastDepth = 0
+
     depth = 0
     position = 0
     time = None
-    lastTime = None
-    nextRow = False
+
     # resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode
     for myresults in resultValuesSeries:
-        lastVariable = variable
         variable = myresults.resultid.resultid.variableid.variablecode
-        lastUnit = unit
         unit = myresults.resultid.resultid.unitsid
         lastSamplingFeatureCode = samplingFeatureCode
         samplingFeatureCode = myresults.resultid.resultid.featureactionid.samplingfeatureid \
             .samplingfeaturecode
         lastDepth = depth
-        lastProcessingCode = processingCode
         processingCode = myresults.resultid.resultid.processing_level
         if profileResult:
             depth = myresults.resultid.intendedzspacing
@@ -1824,7 +1737,6 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
         ):
             myfile.write(",")
             position += 1
-        temp = myresults.csvoutputShort()
         myfile.write(myresults.csvoutputShort())
         position += 1
         k += 1
@@ -1841,12 +1753,10 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         template = loader.get_template('chartVariableAndFeature.html')
     else:
         template = loader.get_template('profileresultgraphpopup.html')
-    selected_resultid = 9365
     selected_relatedfeatid = 15
     data_disclaimer = DATA_DSICLAIMER
     # relatedfeatureList
     # update_result_on_related_feature
-    done = False
 
     # need a variables list instead of a results list
     # find the variables for the selected related feature
@@ -1871,7 +1781,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         useSamplingFeature = True
     # find variables found at the sampling feature
     # need to go through featureaction to get to results
-    variableList = None
+
     # need the feature actions for all of the sampling features related to this sampling feature
     if not useSamplingFeature:
         sampling_features = Relatedfeatures.objects.filter(
@@ -1900,7 +1810,6 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
     numvariables = variableList.__len__()
     # raise ValidationError(numvariables)
     selectedMVariableSeries = []
-    selectionStr = ''
     for i in range(0, numvariables):
         selectionStr = str('selection' + str(i))
         if selectionStr in request.POST:
@@ -1929,7 +1838,6 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
     unitAndVariable = ''
     i = 0
     data = {}
-    data2 = []
     resultValuesSeries = None
     # if 'update_result_on_related_feature' in request.POST:
     # raise ValidationError(selectedMResultsSeries)
@@ -2015,7 +1923,6 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
     titleStr = ''
     tmpUnit = ''
     tmpVariableName = ''
-    update = False
     numberofLocations = len(name_of_sampling_features)
 
     for name_of_unit, name_of_variable in zip(name_of_units, name_of_variables):
@@ -2061,7 +1968,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
                 # titleStr += tmpVariableName
                 # series.append(data['datavalue'+str(i)])
 
-    i = 0
+
     chartID = 'chart_id'
     chart = {"renderTo": chartID, "type": 'column', "zoomType": 'xy'}
     title2 = {"text": titleStr}
@@ -2069,12 +1976,10 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
     # 'category',"title": {"text": xAxisCategories},
     yAxis = {"title": {"text": seriesStr}}
     graphType = 'column'
-    opposite = False
+
 
     withProfileResults = Profileresults.objects.all()
     results = Results.objects.filter(resultid__in=withProfileResults)
-    featureAction = Featureactions.objects.filter(
-        featureactionid__in=results.values("featureactionid"))
     samplefeatid = Featureactions.objects.filter(featureactionid__in=results).values(
         'samplingfeatureid')
     relatedFeatureList = Relatedfeatures.objects.filter(
@@ -2086,7 +1991,6 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
     int_selectedvariable_ids = []
     for int_selectedvariableid in selectedMVariableSeries:
         int_selectedvariable_ids.append(int(int_selectedvariableid))
-    csvexport = False
     # if the user hit the export csv button export the measurement results to csv
     if 'export_data' in request.POST:
         resultValuesSeries = resultValuesSeries.order_by(

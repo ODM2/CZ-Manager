@@ -3,7 +3,7 @@ from django.core.wsgi import get_wsgi_application
 
 import ODM2CZOData.modelHelpers as modelHelpers
 
-from ODM2CZOData.models import Actions, Units
+from ODM2CZOData.models import Actions, Units, Variables
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")  # noqa
 application = get_wsgi_application()
@@ -96,4 +96,4 @@ act = Actions.objects.filter(actionid=actionID).get()
 print(act)
 # zspacing = 20
 # zinterval = 20
-modelHelpers.importValues(fname, variableFileIndex, variableDBID, variableUnitID, actionID, False, samplingfeaturedescription)  # noqa
+modelHelpers.importValues(fname, variableFileIndex, variableDBID, variableUnitID, actionID, False,)  # noqa

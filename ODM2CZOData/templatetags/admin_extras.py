@@ -11,7 +11,7 @@ register = template.Library()
 
 
 @register.tag
-def collect(parser, token):
+def collect(token):
     bits = list(token.split_contents())
     if len(bits) > 3 and bits[-2] == 'as':
         varname = bits[-1]
