@@ -1,12 +1,12 @@
+from ajax_select import urls as ajax_select_urls
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
-from ajax_select import urls as ajax_select_urls
 from django.http.response import HttpResponseRedirect
 
 from templatesAndSettings.settings import MEDIA_ROOT
-from templatesAndSettings.settings import MEDIA_URL
 from templatesAndSettings.settings import URL_PATH
 from templatesAndSettings.settings import app_name, site_header, site_title
+
 # from ODM2CZOData import views # How can I use config file for this??
 import importlib
 
@@ -109,9 +109,9 @@ urlpatterns = patterns('',
                        url(r'^' + URL_PATH + 'chartVariableAndFeature.html', views.graph_data, name="graph_data"),
                        url(r'^' + URL_PATH + 'soilsscatterplot.html', views.scatter_plot, name="scatter_plot"),
                        url(r'^' + URL_PATH + 'publications.html', views.publications, name="publications"),
-                       #url(r'^' + URL_PATH + 'pubview/citationid=(?P<citationid>(\d+))/$', views.add_pub,
+                       # url(r'^' + URL_PATH + 'pubview/citationid=(?P<citationid>(\d+))/$', views.add_pub,
                        #    name="add_pub"),
-                       #url(r'^' + URL_PATH + 'pubview', views.add_pub),
+                       # url(r'^' + URL_PATH + 'pubview', views.add_pub),
                        # for uploaded files like dataloggerfiles
                        # url(r'^' + MEDIA_URL +'(?P<path>.*)$', 'django.views.static.serve', {
                        #        'document_root': MEDIA_ROOT,

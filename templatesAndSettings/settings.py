@@ -3,24 +3,24 @@ Keep this file untracked
 """
 
 # Custom App settings
-app_name = "ODM2CZOData" # This has to match the name of the folder that the app is saved
+app_name = "ODM2CZOData"  # This has to match the name of the folder that the app is saved
 verbose_name = "ODM2CZOData"
 site_title = "ODM2 Admin"
 site_header = "ODM2 Admin"
 map_config = {
-      "lat":0,
-      "lon":0,
-      "zoom":2,
-      "cluster_sites":False, #should sampling features of type site be added to marker clusters or not
-      "time_series_months":3, #how many months by default should time series generated from the map display
-    }
+    "lat": 0,
+    "lon": 0,
+    "zoom": 2,
+    "cluster_sites": False,  # should sampling features of type site be added to marker clusters or not
+    "time_series_months": 3,  # how many months by default should time series generated from the map display
+}
 
 data_disclaimer = {
     "text": "Add a link discribing where your data come from ",
     "linktext": "The name of my site",
-    "link":"http://mysiteswegpage.page/",
+    "link": "http://mysiteswegpage.page/",
 
-    }
+}
 # SECURITY WARNING: keep the secret key used in production secret!
 secret_key = 'random_secret_key_like_so_7472873649836'
 _root = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin'
@@ -54,8 +54,8 @@ ODM2_configs = {
 static_url = '/static/'
 
 admins = [{
-    "name":"first last",
-    "email":"email@example.com"
-  }]
+    "name": "first last",
+    "email": "email@example.com"
+}]
 
 from templatesAndSettings.base import *

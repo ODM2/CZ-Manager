@@ -1,53 +1,52 @@
 # from __future__ import unicode_literals
+from django.contrib.gis import forms, admin
+from django.contrib.gis.geos import GEOSGeometry
 from django.forms import CharField
-from django.forms import TypedChoiceField
 from django.forms import ModelForm
+from django.forms import TypedChoiceField
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from import_export import resources
-from import_export.admin import ImportExportActionModelAdmin
 from import_export.admin import ExportMixin
-from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis import forms, admin
+from import_export.admin import ImportExportActionModelAdmin
 
-from .models import Taxonomicclassifiers
-from .models import Results
-from .models import Relatedactions
-from .models import Datasets
-from .models import Featureactions
-from .models import Samplingfeatures
-from .models import Organizations
-from .models import Affiliations
-from .models import People
-from .models import Personexternalidentifiers
+from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
 from .models import Actionby
 from .models import Actions
-from .models import Dataloggerprogramfiles
-from .models import Dataloggerfiles
-from .models import Dataloggerfilecolumns
-from .models import Methods
-from .models import Units
-from .models import Datasetcitations
-from .models import Citations
-from .models import Citationextensionpropertyvalues
-from .models import Extensionproperties
+from .models import Affiliations
 from .models import Authorlists
-from .models import Methodcitations
-from .models import MeasurementresultvalueFile
-from .models import Instrumentoutputvariables
-from .models import Equipmentmodels
-from .models import Datasetsresults
+from .models import Citationextensionpropertyvalues
+from .models import Citationexternalidentifiers
+from .models import Citations
+from .models import Dataloggerfilecolumns
+from .models import Dataloggerfiles
+from .models import Dataloggerprogramfiles
 from .models import Dataquality
+from .models import Datasetcitations
+from .models import Datasets
+from .models import Datasetsresults
+from .models import Equipmentmodels
+from .models import Extensionproperties
+from .models import Externalidentifiersystems
+from .models import Featureactions
+from .models import Instrumentoutputvariables
+from .models import MeasurementresultvalueFile
+from .models import Methodcitations
+from .models import Methods
+from .models import Organizations
+from .models import People
+from .models import Personexternalidentifiers
+from .models import Profileresults
+from .models import Relatedactions
+from .models import Results
 from .models import Resultsdataquality
 from .models import Samplingfeatureexternalidentifiers
-from .models import Externalidentifiersystems
-from .models import Citationexternalidentifiers
+from .models import Samplingfeatures
+from .models import Taxonomicclassifiers
 from .models import Timeseriesresults
 from .models import Timeseriesresultvalues
+from .models import Units
 from .models import Variables
-from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
-from .models import Profileresults
-
 
 # from io import StringIO
 from ajax_select import make_ajax_field
@@ -59,6 +58,7 @@ from .models import Profileresultvalues
 # from .views import dataloggercolumnView
 from daterange_filter.filter import DateRangeFilter
 import re
+
 
 # from .admin import MeasurementresultvaluesResource
 # AffiliationsChoiceField(People.objects.all().order_by('personlastname'),Organizations.objects.all().order_by('organizationname'))
@@ -77,9 +77,9 @@ def link_list_display_DOI(link):
         return u'<a href="%s" target="_blank">%s</a>' % (link, link)
 
 
-
 class variablesInLine(admin.StackedInline):
     model = Variables
+
 
 class unitsInLine(admin.StackedInline):
     model = Units
@@ -114,20 +114,22 @@ class FeatureActionsInline(admin.StackedInline):
 
 
 class CitationextensionpropertyvalueInline(admin.StackedInline):
-    model= Citationextensionpropertyvalues
+    model = Citationextensionpropertyvalues
     fieldsets = (('Details', {
-            'classes': ('collapse',),
-            'fields': ('citationid',
-                       'propertyid',
-                       'propertyvalue',
+        'classes': ('collapse',),
+        'fields': ('citationid',
+                   'propertyid',
+                   'propertyvalue',
 
-            )
-        }),
-    )
+                   )
+    }),
+                 )
     extra = 6
+
 
 class resultsInLine(admin.StackedInline):
     model = Results
+
 
 class ResultsdataqualityAdminForm(ModelForm):
     class Meta:
@@ -202,6 +204,7 @@ class DatasetcitationsAdmin(admin.ModelAdmin):
 class InstrumentoutputvariablesInline(admin.StackedInline):
     model = Instrumentoutputvariables
     extra = 0
+
 
 class authorlistInline(admin.StackedInline):
     model = Authorlists
@@ -323,13 +326,14 @@ class VariablesAdminForm(ModelForm):
 
 class VariablesAdmin(admin.ModelAdmin):
     form = VariablesAdminForm
-    list_display = ('variablecode','variable_name_linked','variable_type_linked', 'speciation_linked')
+    list_display = ('variablecode', 'variable_name_linked', 'variable_type_linked', 'speciation_linked')
     search_fields = ['variable_type__name', 'variable_name__name', 'variablecode', 'speciation__name']
 
-    def variable_name_linked(self,obj):
+    def variable_name_linked(self, obj):
         if obj.variable_name:
             return u'<a href="http://vocabulary.odm2.org/variablename/{0}" target="_blank">{1}</a>'.format(
                 obj.variable_name.term, obj.variable_name.name)
+
     variable_name_linked.short_description = 'Variable Name'
     variable_name_linked.allow_tags = True
 
@@ -383,6 +387,7 @@ class SamplingfeatureexternalidentifiersAdmin(admin.ModelAdmin):
     list_display = ('samplingfeatureexternalidentifier', 'samplingfeatureexternalidentifieruri')
     save_as = True
 
+
 class SamplingfeaturesAdminForm(ModelForm):
     class Meta:
         model = Samplingfeatures
@@ -400,8 +405,8 @@ class SamplingfeaturesAdminForm(ModelForm):
         super(SamplingfeaturesAdminForm, self).__init__(*args, **kwargs)
 
     featuregeometrywkt = forms.CharField(help_text="feature geometry (to add a point format is POINT(lat, lon)" +
-                                                " where long and lat are in decimal degrees. If you don't want to add a location" +
-                                                " leave default value of POINT(0 0).",label='Featuregeometrywkt',
+                                                   " where long and lat are in decimal degrees. If you don't want to add a location" +
+                                                   " leave default value of POINT(0 0).", label='Featuregeometrywkt',
                                          widget=forms.Textarea, required=False)
     featuregeometrywkt.initial = GEOSGeometry("POINT(0 0)")
 
@@ -411,7 +416,7 @@ class SamplingfeaturesAdminForm(ModelForm):
                                       u'SamplingFeatures of type Site and Specimen will be the most common, ' \
                                       u'but many different types of varying levels of complexity can be used. ' \
                                       u'details for individual values ' \
-                             u'here: <a href="http://vocabulary.odm2.org/samplingfeaturetype/" target="_blank">http://vocabulary.odm2.org/samplingfeaturetype/</a>'
+                                      u'here: <a href="http://vocabulary.odm2.org/samplingfeaturetype/" target="_blank">http://vocabulary.odm2.org/samplingfeaturetype/</a>'
     sampling_feature_type.allow_tags = True
 
     samplingfeaturedescription = CharField(max_length=5000, label="feature description", widget=forms.Textarea,
@@ -424,25 +429,26 @@ class SamplingfeaturesAdminForm(ModelForm):
                                           u'In ODM2, each SamplingFeature may have only one geospatial type, ' \
                                           u'but a geospatial types may range from simple points to a complex polygons ' \
                                           u'or even three dimensional volumes. ' \
-                                      u'details for individual values ' \
-                                      u'here: <a href="http://vocabulary.odm2.org/samplingfeaturegeotype/" ' \
+                                          u'details for individual values ' \
+                                          u'here: <a href="http://vocabulary.odm2.org/samplingfeaturegeotype/" ' \
                                           u'target="_blank">http://vocabulary.odm2.org/samplingfeaturegeotype/</a>'
     sampling_feature_geo_type.allow_tags = True
     sampling_feature_geo_type.required = False
 
     elevation_datum = make_ajax_field(Samplingfeatures, 'elevation_datum',
-                                                'cv_elevation_datum')
+                                      'cv_elevation_datum')
     elevation_datum.help_text = u'A vocabulary for describing vertical datums. ' \
-                               u'Vertical datums are used in ODM2 to specify the origin for elevations ' \
-                               u'assocated with SamplingFeatures.' \
-                                          u'details for individual values ' \
-                                          u'here: <a href="http://vocabulary.odm2.org/elevationdatum/" ' \
-                                          u'target="_blank">http://vocabulary.odm2.org/elevationdatum/</a>'
+                                u'Vertical datums are used in ODM2 to specify the origin for elevations ' \
+                                u'assocated with SamplingFeatures.' \
+                                u'details for individual values ' \
+                                u'here: <a href="http://vocabulary.odm2.org/elevationdatum/" ' \
+                                u'target="_blank">http://vocabulary.odm2.org/elevationdatum/</a>'
     elevation_datum.allow_tags = True
     featuregeometry = forms.PointField(label='Featuregeometry',
-                                          widget = forms.OpenLayersWidget(), required=False)
+                                       widget=forms.OpenLayersWidget(), required=False)
 
     featuregeometry.initial = GEOSGeometry("POINT(0 0)")
+
 
 class IGSNInline(admin.StackedInline):
     model = Samplingfeatureexternalidentifiers
@@ -456,7 +462,10 @@ class SamplingfeaturesAdmin(admin.OSMGeoAdmin):
                      'samplingfeaturecode', 'samplingfeatureid',
                      'samplingfeatureexternalidentifiers__samplingfeatureexternalidentifier']
 
-    list_display = ('samplingfeaturecode', 'samplingfeaturename', 'sampling_feature_type_linked', 'samplingfeaturedescription', 'igsn', 'dataset_code')
+    list_display = (
+        'samplingfeaturecode', 'samplingfeaturename', 'sampling_feature_type_linked', 'samplingfeaturedescription',
+        'igsn',
+        'dataset_code')
     readonly_fields = ('samplingfeatureuuid',)
 
     # your own processing
@@ -513,8 +522,6 @@ duplicate_results_event.short_description = "Duplicate selected result"
 #         return featureaction
 
 
-
-
 class TimeseriesresultsInline(admin.StackedInline):
     model = Timeseriesresults
     fieldsets = (
@@ -531,10 +538,11 @@ class TimeseriesresultsInline(admin.StackedInline):
                        'intendedtimespacing',
                        'intendedtimespacingunitsid',
                        'aggregationstatisticcv',
-            )
+                       )
         }),
     )
     extra = 0
+
 
 class MeasurementResultsInline(admin.StackedInline):
     model = Measurementresults
@@ -555,10 +563,11 @@ class MeasurementResultsInline(admin.StackedInline):
                        'timeaggregationinterval',
                        'timeaggregationintervalunitsid',
 
-            )
+                       )
         }),
     )
     extra = 0
+
 
 class ProfileResultsInline(admin.StackedInline):
     model = Profileresults
@@ -577,7 +586,7 @@ class ProfileResultsInline(admin.StackedInline):
                        'intendedtimespacingunitsid',
                        'aggregationstatisticcv',
 
-            )
+                       )
         }),
     )
     extra = 0
@@ -613,7 +622,7 @@ class ResultsAdminForm(ModelForm):
 # http://django-ajax-selects.readthedocs.org/en/latest/Admin-add-popup.html
 class ResultsAdmin(AjaxSelectAdmin):  # admin.ModelAdmin
     form = ResultsAdminForm
-    inlines=[TimeseriesresultsInline,MeasurementResultsInline,ProfileResultsInline]
+    inlines = [TimeseriesresultsInline, MeasurementResultsInline, ProfileResultsInline]
     list_display = ['resultid', 'featureactionid', 'variableid', 'processing_level']
     search_fields = ['variableid__variable_name__name', 'variableid__variablecode', 'variableid__variabledefinition',
                      'featureactionid__samplingfeatureid__samplingfeaturename',
@@ -673,6 +682,7 @@ class SamplingFeaturesInline(admin.StackedInline):
     model = Samplingfeatures
     extra = 0
 
+
 class ActionsInline(admin.StackedInline):
     model = Actions
     fieldsets = (
@@ -692,8 +702,6 @@ class ActionsInline(admin.StackedInline):
         }),
     )
     extra = 0
-
-
 
 
 class FeatureactionsAdminForm(ModelForm):
@@ -769,7 +777,7 @@ class ActionsAdminForm(ModelForm):
 
 class ActionsAdmin(admin.ModelAdmin):
     list_display = ('action_type', 'method', 'begindatetime', 'enddatetime')
-    inlines=[FeatureActionsInline]
+    inlines = [FeatureActionsInline]
     list_display_links = ('action_type',)
     search_fields = ['action_type__name', 'method__methodname']  # ,
     form = ActionsAdminForm
@@ -807,7 +815,7 @@ class MethodsAdminForm(ModelForm):
 
 class MethodsAdmin(admin.ModelAdmin):
     list_display = ('methodname', 'method_type_linked', 'method_link')
-    inlines=[ActionsInline]
+    inlines = [ActionsInline]
     list_display_links = ['methodname']
     form = MethodsAdminForm
 
@@ -847,9 +855,11 @@ duplicate_Dataloggerfiles_event.short_description = "Duplicate selected datalogg
 class DataLoggerFileColumnsInlineAdminForm(ModelForm):
     resultid = AutoCompleteSelectField('result_lookup', required=True,
                                        help_text='result to extend as a soil profile result', label='Result')
+
     class Meta:
         model = Dataloggerfilecolumns
         fields = '__all__'
+
 
 class DataLoggerFileColumnsInline(admin.StackedInline):
     model = Dataloggerfilecolumns
@@ -875,6 +885,7 @@ class DataLoggerFileColumnsInline(admin.StackedInline):
     )
     extra = 0
 
+
 class DataloggerfilesAdminForm(ModelForm):
     class Meta:
         model = Dataloggerfiles
@@ -884,7 +895,7 @@ class DataloggerfilesAdminForm(ModelForm):
 class DataloggerfilesAdmin(admin.ModelAdmin):
     form = DataloggerfilesAdminForm
     actions = [duplicate_Dataloggerfiles_event]
-    inlines= [DataLoggerFileColumnsInline]
+    inlines = [DataLoggerFileColumnsInline]
 
 
 def duplicate_Dataloggerfilecolumns_event(ModelAdmin, request, queryset):
@@ -1100,6 +1111,7 @@ class MeasurementresultvaluesResource(resources.ModelResource):
                         'resultid__resultid__unitsid__unitsname',
                         'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',)
 
+
 class TimeseriesresultsAdminForm(ModelForm):
     # resultid = make_ajax_field(Results,'resultid','result_lookup')
     resultid = AutoCompleteSelectField('result_lookup', required=True, help_text='', label='Result')
@@ -1119,9 +1131,10 @@ class TimeseriesresultsAdminForm(ModelForm):
         model = Timeseriesresults
         fields = '__all__'
 
+
 class TimeseriesresultsAdmin(AjaxSelectAdmin):
     form = TimeseriesresultsAdminForm
-    list_display = ('resultid', 'intendedtimespacing','intendedtimespacingunitsid', 'data_link')
+    list_display = ('resultid', 'intendedtimespacing', 'intendedtimespacingunitsid', 'data_link')
     list_display_links = ('resultid', 'data_link')
     # def resultvalues_valuedatetime(self,obj):
     #    mrv = Measurementresultvalues.objects.filter(resultid= obj.resultid)
@@ -1165,7 +1178,7 @@ class TimeseriesresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin)
     # date time filter and list of results you can filter on
     list_filter = (
         ('valuedatetime', DateRangeFilter),
-        #MeasurementResultFilter,
+        # MeasurementResultFilter,
 
     )
     list_display = ['datavalue', 'valuedatetime',
@@ -1182,6 +1195,7 @@ class TimeseriesresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin)
     feature_action_link.short_description = 'feature action'
     feature_action_link.allow_tags = True
     feature_action_link.admin_order_field = 'resultid__resultid__featureactionid__samplingfeatureid'
+
 
 class MeasurementresultvaluesAdminForm(ModelForm):
     # resultid = make_ajax_field(Measurementresults,'resultid','measurementresult_lookup') #
@@ -1204,11 +1218,11 @@ class MeasurementresultvaluesAdminForm(ModelForm):
 
 class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin):
     form = MeasurementresultvaluesAdminForm
-    #resource_class = MeasurementresultvaluesResource
+    # resource_class = MeasurementresultvaluesResource
     # date time filter and list of results you can filter on
     list_filter = (
         ('valuedatetime', DateRangeFilter),
-        #MeasurementResultFilter,
+        # MeasurementResultFilter,
 
     )
     list_display = ['datavalue', 'valuedatetime',
@@ -1312,7 +1326,7 @@ class EquipmentmodelsAdminForm(ModelForm):
 
 class EquipmentmodelsAdmin(admin.ModelAdmin):
     form = EquipmentmodelsAdminForm
-    inlines=[InstrumentoutputvariablesInline]
+    inlines = [InstrumentoutputvariablesInline]
 
 
 class PeopleAdminForm(ModelForm):
@@ -1364,32 +1378,41 @@ class AffiliationInLine(admin.StackedInline):
 class AffiliationsResource(resources.ModelResource):
     class Meta:
         model = Affiliations
-        #import_id_fields = ('valueid',)
-        fields = ('organizationid__organizationname', 'personid__personfirstname', 'personid__personlastname', 'isprimaryorganizationcontact',
+        # import_id_fields = ('valueid',)
+        fields = ('organizationid__organizationname', 'personid__personfirstname', 'personid__personlastname',
+                  'isprimaryorganizationcontact',
                   'primaryemail')
-        export_order = ['organizationid__organizationname', 'personid__personfirstname', 'personid__personlastname', 'isprimaryorganizationcontact','primaryemail']
+        export_order = ['organizationid__organizationname', 'personid__personfirstname', 'personid__personlastname',
+                        'isprimaryorganizationcontact', 'primaryemail']
 
 
 class AffiliationsAdminForm(ModelForm):
-
     class Meta:
-        model= Affiliations
+        model = Affiliations
         fields = '__all__'
-        export_order = ['organizationname', 'personfirstname', 'personlastname', 'isprimaryorganizationcontact','primaryemail']
-        #ordering = ['-primaryemail']
+        export_order = ['organizationname', 'personfirstname', 'personlastname', 'isprimaryorganizationcontact',
+                        'primaryemail']
+        # ordering = ['-primaryemail']
+
 
 class AffiliationsAdmin(ExportMixin, admin.ModelAdmin):
-    form=AffiliationsAdminForm
+    form = AffiliationsAdminForm
     resource_class = AffiliationsResource
-    search_fields = ['organizationid__organizationname','organizationid__organizationtypecv__name','organizationid__organizationcode',
+    search_fields = ['organizationid__organizationname', 'organizationid__organizationtypecv__name',
+                     'organizationid__organizationcode',
                      'personid__personfirstname', 'personid__personlastname']
-    list_display = ('organizationname', 'personfirstname', 'personlastname', 'isprimaryorganizationcontact','primaryemail')
-    def organizationname(self,obj):
+    list_display = (
+        'organizationname', 'personfirstname', 'personlastname', 'isprimaryorganizationcontact', 'primaryemail')
+
+    def organizationname(self, obj):
         return obj.organizationid.organizationname
-    def personfirstname(self,obj):
+
+    def personfirstname(self, obj):
         return obj.personid.personfirstname
-    def personlastname(self,obj):
+
+    def personlastname(self, obj):
         return obj.personid.personlastname
+
 
 class PeopleAdmin(admin.ModelAdmin):
     form = PeopleAdminForm
@@ -1409,28 +1432,28 @@ class PeopleAdmin(admin.ModelAdmin):
         for org_name in org:
             if org_name.organizationlink:
                 name_list.append(
-                            u'<a href="{0}" target="_blank">{1}</a>'.format(org_name.organizationlink, org_name.organizationname))
+                    u'<a href="{0}" target="_blank">{1}</a>'.format(org_name.organizationlink,
+                                                                    org_name.organizationname))
             else:
                 name_list.append(
                     u'{0}'.format(org_name.organizationname))
-            # if org_name.parentorganizationid:
-            #     if org_name.organizationlink:
-            #         name_list.append(u'<a href="{0}" target="_blank">{1}, {2}</a>'.format(org_name.organizationlink,
-            #                                                                               org_name.organizationname,
-            #                                                                               org_name.parentorganizationid.organizationname))
-            #     else:
-            #         name_list.append(u'{0}, {1}'.format(org_name.organizationname,
-            #                                               org_name.parentorganizationid.organizationname))
-            # else:
-            #     if org_name.organizationlink:
-            #         name_list.append(
-            #             u'<a href="{0}" target="_blank">{1}</a>'.format(org_name.organizationlink, org_name.organizationname))
-            #     else:
-            #         name_list.append(
-            #             u'{0}'.format(org_name.organizationname))
+                # if org_name.parentorganizationid:
+                #     if org_name.organizationlink:
+                #         name_list.append(u'<a href="{0}" target="_blank">{1}, {2}</a>'.format(org_name.organizationlink,
+                #                                                                               org_name.organizationname,
+                #                                                                               org_name.parentorganizationid.organizationname))
+                #     else:
+                #         name_list.append(u'{0}, {1}'.format(org_name.organizationname,
+                #                                               org_name.parentorganizationid.organizationname))
+                # else:
+                #     if org_name.organizationlink:
+                #         name_list.append(
+                #             u'<a href="{0}" target="_blank">{1}</a>'.format(org_name.organizationlink, org_name.organizationname))
+                #     else:
+                #         name_list.append(
+                #             u'{0}'.format(org_name.organizationname))
 
         return u'; '.join(name_list)
-
 
     orcid.allow_tags = True
     affiliation.allow_tags = True

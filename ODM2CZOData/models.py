@@ -1,4 +1,4 @@
-﻿#C:\ODM2\odm2testsite\odm2testsite\templates
+﻿# C:\ODM2\odm2testsite\odm2testsite\templates
 # This is an auto-generated Django model module.
 # You'll have to do the following manually to clean this up:
 #   * Rearrange models' order
@@ -12,15 +12,15 @@ from __future__ import unicode_literals
 
 import time
 
-from django.db import models
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import GEOSGeometry
+from django.db import models
 
 from templatesAndSettings.settings import MEDIA_ROOT
-#from django.forms import ModelFormWithFileField
-#from .forms import DataloggerprogramfilesAdminForm
-#from odm2testapp.forms import VariablesForm
-#from django.contrib.gis.db import models
+# from django.forms import ModelFormWithFileField
+# from .forms import DataloggerprogramfilesAdminForm
+# from odm2testapp.forms import VariablesForm
+# from django.contrib.gis.db import models
 import csv
 import io
 from uuidfield import UUIDField
@@ -28,49 +28,48 @@ from django.core import management
 from django.core.exceptions import ValidationError
 
 
-def handle_uploaded_file(f,id):
-    destination = io.open(MEDIA_ROOT + '/resultvalues/' + f.name +'.csv', 'wb+')
+def handle_uploaded_file(f, id):
+    destination = io.open(MEDIA_ROOT + '/resultvalues/' + f.name + '.csv', 'wb+')
     # data = open(f)
     for chunk in f.chunks():
-
         destination.write(chunk)
-        #Measurementresultvalues
+        # Measurementresultvalues
 
     destination.close()
     try:
-        with io.open(MEDIA_ROOT + '/resultvalues/' + f.name +'.csv', 'rt', encoding='ascii') as f:
+        with io.open(MEDIA_ROOT + '/resultvalues/' + f.name + '.csv', 'rt', encoding='ascii') as f:
             reader = csv.reader(f)
             for row in reader:
-                #raise ValidationError(row) #print the current row
-                dateT = time.strptime(row[0],"%m/%d/%Y %H:%M")#'1/1/2013 0:10
-                datestr = time.strftime("%Y-%m-%d %H:%M",dateT)
-                Measurementresultvalues(resultid=id,datavalue=row[1],valuedatetime=datestr,valuedatetimeutcoffset=4).save()
+                # raise ValidationError(row) #print the current row
+                dateT = time.strptime(row[0], "%m/%d/%Y %H:%M")  # '1/1/2013 0:10
+                datestr = time.strftime("%Y-%m-%d %H:%M", dateT)
+                Measurementresultvalues(resultid=id, datavalue=row[1], valuedatetime=datestr,
+                                        valuedatetimeutcoffset=4).save()
     except IndexError:
-        raise ValidationError('encountered a problem with row '+row)
-
+        raise ValidationError('encountered a problem with row ' + row)
 
 
 def buildCitation(s, self):
     datasetresults = Datasetsresults.objects.filter(resultid=self.resultid.resultid)
-    dsCitations = Datasetcitations.objects.filter(datasetid__in= datasetresults.values("datasetid"))
+    dsCitations = Datasetcitations.objects.filter(datasetid__in=datasetresults.values("datasetid"))
     citations = Citations.objects.filter(citationid__in=dsCitations.values("citationid"))
 
-    authcount=0
-    if citations.count()==0:
-        s +=','
-        return  s
+    authcount = 0
+    if citations.count() == 0:
+        s += ','
+        return s
     for citation in citations:
         citedauthors = Authorlists.objects.filter(citationid=citation.citationid).order_by("authororder")
         citedpersons = People.objects.filter(personid__in=citedauthors.values("personid"))
         for citedauthor in citedauthors:
             for author in citedpersons:
                 if citedauthor.personid.personid == author.personid:
-                    if authcount ==0:
+                    if authcount == 0:
                         s += ',\" {0}'.format(author.personlastname)
                     else:
                         s += ' {0}'.format(author.personlastname)
 
-                    authcount +=1
+                    authcount += 1
                     if authcount == citedpersons.count():
                         s += ' {0}.'.format(author.personfirstname)
                     else:
@@ -78,8 +77,9 @@ def buildCitation(s, self):
         s += ' {0}'.format(citation.title)
         s += '. {0}'.format(citation.publisher)
         s += ', {0}'.format(citation.publicationyear)
-        s += ' DOI: {0}\"'.format(citation.citationlink) #doesn't work not sure why
+        s += ' DOI: {0}\"'.format(citation.citationlink)  # doesn't work not sure why
     return s
+
 
 class Actionannotations(models.Model):
     bridgeid = models.AutoField(primary_key=True)
@@ -93,22 +93,24 @@ class Actionannotations(models.Model):
 
 class Actionby(models.Model):
     bridgeid = models.AutoField(primary_key=True)
-    actionid = models.ForeignKey('Actions',verbose_name="action", db_column='actionid')
-    affiliationid = models.ForeignKey('Affiliations',verbose_name="person by affiliation", db_column='affiliationid')
+    actionid = models.ForeignKey('Actions', verbose_name="action", db_column='actionid')
+    affiliationid = models.ForeignKey('Affiliations', verbose_name="person by affiliation", db_column='affiliationid')
     isactionlead = models.BooleanField(verbose_name="is lead person on action")
-    roledescription = models.CharField(max_length=5000,verbose_name="person's role on this action", blank=True)
+    roledescription = models.CharField(max_length=5000, verbose_name="person's role on this action", blank=True)
+
     def __unicode__(self):
         s = u"%s" % (self.actionid)
         if self.affiliationid:
             s += u"- %s" % (self.affiliationid)
         if self.roledescription:
-            s +=u"- %s" % (self.roledescription)
+            s += u"- %s" % (self.roledescription)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."actionby'
-        verbose_name='action by'
-        verbose_name_plural='action by'
+        verbose_name = 'action by'
+        verbose_name_plural = 'action by'
 
 
 class Actiondirectives(models.Model):
@@ -137,14 +139,16 @@ class Actions(models.Model):
     action_type = models.ForeignKey('CvActiontype',
                                     help_text='A vocabulary for describing the type of actions performed in making observations. Depending' \
                                               ' on the action type, the action may or may not produce an observation result. view action type ' \
-                                              'details here http://vocabulary.odm2.org/actiontype/', db_column='actiontypecv')
+                                              'details here http://vocabulary.odm2.org/actiontype/',
+                                    db_column='actiontypecv')
     method = models.ForeignKey('Methods', db_column='methodid')
     begindatetime = models.DateTimeField(verbose_name='begin date time')
     begindatetimeutcoffset = models.IntegerField(verbose_name='begin date time clock off set (from GMT)', default=4)
-    enddatetime = models.DateTimeField(verbose_name='end date time',blank=True, null=True)
+    enddatetime = models.DateTimeField(verbose_name='end date time', blank=True, null=True)
     enddatetimeutcoffset = models.IntegerField(verbose_name='end date time clock off set (from GMT)', default=4)
-    actiondescription = models.CharField(verbose_name='action description',max_length=5000, blank=True)
-    actionfilelink = models.CharField(verbose_name='action file link',max_length=255, blank=True)
+    actiondescription = models.CharField(verbose_name='action description', max_length=5000, blank=True)
+    actionfilelink = models.CharField(verbose_name='action file link', max_length=255, blank=True)
+
     def __unicode__(self):
         s = u"%s" % (self.action_type)
         if self.method:
@@ -152,33 +156,37 @@ class Actions(models.Model):
         if self.method:
             s += u" | %s" % (self.actiondescription[:25])
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."actions'
-        verbose_name='action'
+        verbose_name = 'action'
 
 
 class Affiliations(models.Model):
     affiliationid = models.AutoField(primary_key=True)
     personid = models.ForeignKey('People', verbose_name='person', db_column='personid')
-    organizationid = models.ForeignKey('Organizations', verbose_name='organization', db_column='organizationid', blank=True, null=True)
+    organizationid = models.ForeignKey('Organizations', verbose_name='organization', db_column='organizationid',
+                                       blank=True, null=True)
     isprimaryorganizationcontact = models.NullBooleanField(verbose_name='primary organization contact? ')
     affiliationstartdate = models.DateField(verbose_name="When affiliation began ")
-    affiliationenddate = models.DateField(verbose_name="When affiliation ended",blank=True, null=True)
-    primaryphone = models.CharField(verbose_name="primary phone",max_length=50, blank=True)
-    primaryemail = models.CharField(verbose_name="primary email",max_length=255)
+    affiliationenddate = models.DateField(verbose_name="When affiliation ended", blank=True, null=True)
+    primaryphone = models.CharField(verbose_name="primary phone", max_length=50, blank=True)
+    primaryemail = models.CharField(verbose_name="primary email", max_length=255)
     primaryaddress = models.CharField(verbose_name="primary address", max_length=255, blank=True)
     personlink = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         s = u"%s" % (self.personid)
         if self.organizationid:
             s += u" | %s" % (self.organizationid)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."affiliations'
-        verbose_name='affiliation (relate people and organizations)'
-        verbose_name_plural='affiliation (relate people and organizations)'
+        verbose_name = 'affiliation (relate people and organizations)'
+        verbose_name_plural = 'affiliation (relate people and organizations)'
         ordering = ['-primaryemail']
 
 
@@ -192,9 +200,11 @@ class Annotations(models.Model):
     annotationlink = models.CharField(max_length=255, blank=True)
     annotatorid = models.ForeignKey('People', db_column='annotatorid', blank=True, null=True)
     citationid = models.ForeignKey('Citations', db_column='citationid', blank=True, null=True)
+
     def __unicode__(self):
         s = u" %s" % (self.annotationtext)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."annotations'
@@ -207,24 +217,30 @@ class Authorlists(models.Model):
     authororder = models.IntegerField(verbose_name='author order', blank=True, null=True)
 
     def __unicode__(self):
-        s = u"{0} - {1}".format(self.personid,self.authororder)
+        s = u"{0} - {1}".format(self.personid, self.authororder)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."authorlists'
-        verbose_name='author list'
-        verbose_name_plural= 'author list'
+        verbose_name = 'author list'
+        verbose_name_plural = 'author list'
+
     def csvheader(self):
-        s = 'Author '+  str(self.authororder) +','
+        s = 'Author ' + str(self.authororder) + ','
         return s
+
     def csvoutput(self):
-        s = '"'+ str(self.personid.personlastname)+', '+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'",'
+        s = '"' + str(self.personid.personlastname) + ', ' + str(self.personid.personfirstname) + ', ' + str(
+            self.personid.personmiddlename) + '",'
         return s
+
     def endnoteexport(self):
-        #if self.authororder ==1:
-            #s = 'FAU - '+ str(self.personid.personlastname)+","+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'\n'
-        #else:
-        s = 'AU  - '+ str(self.personid.personlastname)+","+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'\r\n'
+        # if self.authororder ==1:
+        # s = 'FAU - '+ str(self.personid.personlastname)+","+ str(self.personid.personfirstname) + ', '+str(self.personid.personmiddlename) +'\n'
+        # else:
+        s = 'AU  - ' + str(self.personid.personlastname) + "," + str(self.personid.personfirstname) + ', ' + str(
+            self.personid.personmiddlename) + '\r\n'
         return s
 
 
@@ -302,72 +318,86 @@ class Citationextensionpropertyvalues(models.Model):
     citationid = models.ForeignKey('Citations', db_column='citationid')
     propertyid = models.ForeignKey('Extensionproperties', db_column='propertyid')
     propertyvalue = models.CharField(max_length=255, blank=True, null=True)
+
     def __unicode__(self):
         s = u"%s - %s - %s" % (self.citationid, self.propertyid, self.propertyvalue)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."citationextensionpropertyvalues'
-        verbose_name='citation extension property'
-        verbose_name_plural='citation extension properties'
+        verbose_name = 'citation extension property'
+        verbose_name_plural = 'citation extension properties'
+
     def csvheader(self):
-        s ='"'+ str(self.propertyid)+'",'
+        s = '"' + str(self.propertyid) + '",'
         return s
+
     def csvoutput(self):
-        s = '"'+str(self.propertyvalue) +'",'
+        s = '"' + str(self.propertyvalue) + '",'
         return s
-    #def endnoteheader(self):
-        #s ='"'+ str(self.propertyid)+'"\t'
-        #return s
+        # def endnoteheader(self):
+        # s ='"'+ str(self.propertyid)+'"\t'
+        # return s
+
     def pubType(self):
         type = None
-        if (str(self.propertyvalue).__len__()>0):
-            if str(self.propertyid)=='Citation Category - Paper, Book, Talk, Poster, Dissertation, Thesis, Undergrad Thesis, Report':
-                if str(self.propertyvalue)=='Paper':
-                    type="Paper"
-                if str(self.propertyvalue)=='Book':
-                    type= "Book"
-                if str(self.propertyvalue)=='Talk':
-                    type= "Conference"
-                if str(self.propertyvalue)=='Poster':
-                    type= "Poster"
-                if str(self.propertyvalue)=='Dissertation' or  str(self.propertyvalue)=='Thesis' or  str(self.propertyvalue)=='Undergrad Thesis':
+        if (str(self.propertyvalue).__len__() > 0):
+            if str(
+                    self.propertyid) == 'Citation Category - Paper, Book, Talk, Poster, Dissertation, Thesis, Undergrad Thesis, Report':
+                if str(self.propertyvalue) == 'Paper':
+                    type = "Paper"
+                if str(self.propertyvalue) == 'Book':
+                    type = "Book"
+                if str(self.propertyvalue) == 'Talk':
+                    type = "Conference"
+                if str(self.propertyvalue) == 'Poster':
+                    type = "Poster"
+                if str(self.propertyvalue) == 'Dissertation' or str(self.propertyvalue) == 'Thesis' or str(
+                        self.propertyvalue) == 'Undergrad Thesis':
                     type = "Thesis"
-                if str(self.propertyvalue)=='Report':
-                    type="Report"
+                if str(self.propertyvalue) == 'Report':
+                    type = "Report"
         return type
+
     def endnoteexport(self):
-        s=''
-        if (str(self.propertyvalue).__len__()>0):
-            if str(self.propertyid)=='Citation Category - Paper, Book, Talk, Poster, Dissertation, Thesis, Undergrad Thesis, Report':
-                s+= 'TY  - '
-                if str(self.propertyvalue)=='Paper':
-                    s+= 'JOUR' +'\r\n'
-                if str(self.propertyvalue)=='Book':
-                    s+= 'BOOK' +'\r\n'
-                if str(self.propertyvalue)=='Talk':
-                    s+= 'CONF' +'\r\n'
-                if str(self.propertyvalue)=='Poster':
-                    s+= 'ABST' +'\r\n'
-                if str(self.propertyvalue)=='Dissertation' or  str(self.propertyvalue)=='Thesis' or  str(self.propertyvalue)=='Undergrad Thesis':
-                    s+= 'THES' +'\r\n'
-                if str(self.propertyvalue)=='Report':
-                    s+= 'RPRT' +'\r\n'
-            s += 'N1  - '+ str(self.propertyid) + ': '+str(self.propertyvalue) +'\r\n'
+        s = ''
+        if (str(self.propertyvalue).__len__() > 0):
+            if str(
+                    self.propertyid) == 'Citation Category - Paper, Book, Talk, Poster, Dissertation, Thesis, Undergrad Thesis, Report':
+                s += 'TY  - '
+                if str(self.propertyvalue) == 'Paper':
+                    s += 'JOUR' + '\r\n'
+                if str(self.propertyvalue) == 'Book':
+                    s += 'BOOK' + '\r\n'
+                if str(self.propertyvalue) == 'Talk':
+                    s += 'CONF' + '\r\n'
+                if str(self.propertyvalue) == 'Poster':
+                    s += 'ABST' + '\r\n'
+                if str(self.propertyvalue) == 'Dissertation' or str(self.propertyvalue) == 'Thesis' or str(
+                        self.propertyvalue) == 'Undergrad Thesis':
+                    s += 'THES' + '\r\n'
+                if str(self.propertyvalue) == 'Report':
+                    s += 'RPRT' + '\r\n'
+            s += 'N1  - ' + str(self.propertyid) + ': ' + str(self.propertyvalue) + '\r\n'
         else:
-            s=''
+            s = ''
         return s
+
 
 class Citationexternalidentifiers(models.Model):
     bridgeid = models.AutoField(primary_key=True)
     citationid = models.ForeignKey('Citations', db_column='citationid')
-    externalidentifiersystemid = models.ForeignKey('Externalidentifiersystems', db_column='externalidentifiersystemid') #externalidentifiersystemid
+    externalidentifiersystemid = models.ForeignKey('Externalidentifiersystems',
+                                                   db_column='externalidentifiersystemid')  # externalidentifiersystemid
     citationexternalidentifier = models.CharField(max_length=255, db_column="citationexternalidentifier")
-    citationexternalidentifieruri = models.CharField(max_length=255, blank=True, db_column="citationexternalidentifieruri")
+    citationexternalidentifieruri = models.CharField(max_length=255, blank=True,
+                                                     db_column="citationexternalidentifieruri")
 
     def __unicode__(self):
         s = u"{0} - {1}".format(self.externalidentifiersystemid, self.citationexternalidentifier)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."citationexternalidentifiers'
@@ -379,7 +409,8 @@ class Citations(models.Model):
     title = models.CharField(max_length=255)
     publisher = models.CharField(max_length=255)
     publicationyear = models.IntegerField(verbose_name='year')
-    citationlink = models.CharField(max_length=255, blank=True,verbose_name='Citation Link',)
+    citationlink = models.CharField(max_length=255, blank=True, verbose_name='Citation Link', )
+
     def __unicode__(self):
         s = u"%s" % (self.title)
         if self.publisher:
@@ -387,14 +418,17 @@ class Citations(models.Model):
         if self.publicationyear:
             s += u", %s," % (self.publicationyear)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."citations'
         ordering = ['title']
         verbose_name = 'citation'
+
     def csvheader(self):
         s = 'citationid,title,publisher,year,citationlink,'
         return s
+
     def csvoutput(self):
         s = str(self.citationid)
         s += ',"{0}"'.format(self.title)
@@ -402,19 +436,21 @@ class Citations(models.Model):
         s += ', {0}'.format(self.publicationyear)
         s += ', {0},'.format(self.citationlink)
         return s
+
     def endnoteexportheader(self):
         s = 'TI\tPB\tPY\tcitationlink\t'
         return s
+
     def endnoteexport(self):
         propertyvalues = Citationextensionpropertyvalues.objects.filter(citationid=self.citationid)
-        pubType=None
+        pubType = None
         for propertyvalue in propertyvalues:
             if propertyvalue.pubType():
-                pubType=propertyvalue.pubType()
-        if not pubType: ##"Conference""Poster""Thesis""Report"
+                pubType = propertyvalue.pubType()
+        if not pubType:  # "Conference""Poster""Thesis""Report"
             pubType = "Unknown"
         s = 'TI  - {0}\r\n'.format(self.title)
-        if pubType=="Paper":
+        if pubType == "Paper":
             s += 'JO  - {0}\r\n'.format(self.publisher)
         else:
             s += 'PB  - {0}\r\n'.format(self.publisher)
@@ -422,18 +458,21 @@ class Citations(models.Model):
         s += 'DI  - {0}\r\n'.format(self.citationlink)
         return s
 
+
 class CvActiontype(models.Model):
     term = models.CharField(max_length=255)
     name = models.CharField(primary_key=True, max_length=255)
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_actiontype'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvAggregationstatistic(models.Model):
@@ -442,12 +481,14 @@ class CvAggregationstatistic(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_aggregationstatistic'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvAnnotationtype(models.Model):
@@ -456,12 +497,14 @@ class CvAnnotationtype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_annotationtype'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvCensorcode(models.Model):
@@ -470,12 +513,14 @@ class CvCensorcode(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_censorcode'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvDataqualitytype(models.Model):
@@ -484,12 +529,14 @@ class CvDataqualitytype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_dataqualitytype'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvDatasettypecv(models.Model):
@@ -498,12 +545,14 @@ class CvDatasettypecv(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_datasettypecv'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvDirectivetype(models.Model):
@@ -512,12 +561,14 @@ class CvDirectivetype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_directivetype'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvElevationdatum(models.Model):
@@ -526,13 +577,15 @@ class CvElevationdatum(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_elevationdatum'
-        verbose_name='elevation datum'
-        ordering = ['term','name']
+        verbose_name = 'elevation datum'
+        ordering = ['term', 'name']
 
 
 class CvEquipmenttype(models.Model):
@@ -541,12 +594,14 @@ class CvEquipmenttype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_equipmenttype'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvMethodtype(models.Model):
@@ -555,12 +610,14 @@ class CvMethodtype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_methodtype'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvOrganizationtype(models.Model):
@@ -569,12 +626,14 @@ class CvOrganizationtype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_organizationtype'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvPropertydatatype(models.Model):
@@ -583,12 +642,14 @@ class CvPropertydatatype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_propertydatatype'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvQualitycode(models.Model):
@@ -597,12 +658,14 @@ class CvQualitycode(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_qualitycode'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvReferencematerialmedium(models.Model):
@@ -611,12 +674,14 @@ class CvReferencematerialmedium(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_referencematerialmedium'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvRelationshiptype(models.Model):
@@ -625,12 +690,14 @@ class CvRelationshiptype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_relationshiptype'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvResulttype(models.Model):
@@ -639,12 +706,14 @@ class CvResulttype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_resulttype'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvMedium(models.Model):
@@ -653,12 +722,14 @@ class CvMedium(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_medium'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvSamplingfeaturegeotype(models.Model):
@@ -667,13 +738,15 @@ class CvSamplingfeaturegeotype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_samplingfeaturegeotype'
-        verbose_name='sampling feature geo type'
-        ordering = ['term','name']
+        verbose_name = 'sampling feature geo type'
+        ordering = ['term', 'name']
 
 
 class CvSamplingfeaturetype(models.Model):
@@ -682,13 +755,15 @@ class CvSamplingfeaturetype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_samplingfeaturetype'
-        verbose_name='sampling feature type'
-        ordering = ['term','name']
+        verbose_name = 'sampling feature type'
+        ordering = ['term', 'name']
 
 
 class CvSitetype(models.Model):
@@ -697,12 +772,14 @@ class CvSitetype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_sitetype'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvSpatialoffsettype(models.Model):
@@ -711,12 +788,14 @@ class CvSpatialoffsettype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_spatialoffsettype'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvSpeciation(models.Model):
@@ -725,12 +804,14 @@ class CvSpeciation(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_speciation'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvSpecimenmedium(models.Model):
@@ -739,12 +820,14 @@ class CvSpecimenmedium(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_specimenmedium'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvSpecimentype(models.Model):
@@ -753,12 +836,14 @@ class CvSpecimentype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_specimentype'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvStatus(models.Model):
@@ -767,12 +852,14 @@ class CvStatus(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_status'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvTaxonomicclassifiertype(models.Model):
@@ -781,13 +868,15 @@ class CvTaxonomicclassifiertype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_taxonomicclassifiertype'
-        ordering = ['term','name']
-        verbose_name="taxonomic classifier"
+        ordering = ['term', 'name']
+        verbose_name = "taxonomic classifier"
 
 
 class CvUnitstype(models.Model):
@@ -796,12 +885,14 @@ class CvUnitstype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_unitstype'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvVariablename(models.Model):
@@ -817,7 +908,7 @@ class CvVariablename(models.Model):
     class Meta:
         managed = False
         db_table = r'odm2"."cv_variablename'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class CvVariabletype(models.Model):
@@ -826,41 +917,49 @@ class CvVariabletype(models.Model):
     definition = models.CharField(max_length=1000, blank=True)
     category = models.CharField(max_length=255, blank=True)
     sourcevocabularyuri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.name)
+
     class Meta:
         managed = False
         db_table = r'odm2"."cv_variabletype'
-        ordering = ['term','name']
+        ordering = ['term', 'name']
 
 
 class Dataloggerfilecolumns(models.Model):
     dataloggerfilecolumnid = models.AutoField(primary_key=True)
-    resultid = models.ForeignKey('Results',verbose_name="result", db_column='resultid', blank=True, null=True)
-    dataloggerfileid = models.ForeignKey('Dataloggerfiles', verbose_name="data logger file", db_column='dataloggerfileid')
+    resultid = models.ForeignKey('Results', verbose_name="result", db_column='resultid', blank=True, null=True)
+    dataloggerfileid = models.ForeignKey('Dataloggerfiles', verbose_name="data logger file",
+                                         db_column='dataloggerfileid')
     instrumentoutputvariableid = models.ForeignKey('Instrumentoutputvariables',
-                                verbose_name="instrument output variable", db_column='instrumentoutputvariableid')
+                                                   verbose_name="instrument output variable",
+                                                   db_column='instrumentoutputvariableid')
     columnlabel = models.CharField(verbose_name="column label", max_length=50)
-    columndescription = models.CharField(verbose_name = "column description", max_length=5000, blank=True)
+    columndescription = models.CharField(verbose_name="column description", max_length=5000, blank=True)
     measurementequation = models.CharField(verbose_name="measurement equation", max_length=255, blank=True)
     scaninterval = models.FloatField(verbose_name="scan interval (time)", blank=True, null=True)
     scanintervalunitsid = models.ForeignKey('Units', verbose_name="scan interval units",
-                    related_name='relatedScanIntervalUnitsid', db_column='scanintervalunitsid', blank=True, null=True)
-    recordinginterval = models.FloatField(verbose_name="recording interval",blank=True, null=True)
-    recordingintervalunitsid = models.ForeignKey('Units',verbose_name="recording interval units",
-    related_name='relatedRecordingintervalunitsid', db_column='recordingintervalunitsid', blank=True, null=True)
+                                            related_name='relatedScanIntervalUnitsid', db_column='scanintervalunitsid',
+                                            blank=True, null=True)
+    recordinginterval = models.FloatField(verbose_name="recording interval", blank=True, null=True)
+    recordingintervalunitsid = models.ForeignKey('Units', verbose_name="recording interval units",
+                                                 related_name='relatedRecordingintervalunitsid',
+                                                 db_column='recordingintervalunitsid', blank=True, null=True)
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, verbose_name="aggregation statistic",
                                                db_column='aggregationstatisticcv', blank=True, null=True)
+
     def __unicode__(self):
-       # s = u"%s" % (self.dataloggerfileid)
+        # s = u"%s" % (self.dataloggerfileid)
         s = u"Label: %s," % (self.columnlabel)
-        #s += u" Description: %s," % (self.columndescription)
+        # s += u" Description: %s," % (self.columndescription)
         s += u" Result: %s" % (self.resultid)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."dataloggerfilecolumns'
-        verbose_name='data logger file column'
+        verbose_name = 'data logger file column'
 
 
 class Dataloggerfiles(models.Model):
@@ -868,48 +967,55 @@ class Dataloggerfiles(models.Model):
     programid = models.ForeignKey('Dataloggerprogramfiles', db_column='programid')
     dataloggerfilename = models.CharField(max_length=255)
     dataloggerfiledescription = models.CharField(max_length=5000, blank=True)
-    #dataloggerfilelink = models.CharField(max_length=255, blank=True)
-    dataloggerfilelink = models.FileField(upload_to='dataloggerfiles') #upload_to='.'
+    # dataloggerfilelink = models.CharField(max_length=255, blank=True)
+    dataloggerfilelink = models.FileField(upload_to='dataloggerfiles')  # upload_to='.'
+
     def __unicode__(self):
         s = u"%s" % (self.dataloggerfilename)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."dataloggerfiles'
-        verbose_name='data logger file'
-
+        verbose_name = 'data logger file'
 
 
 class ProcessDataloggerfile(models.Model):
     processdataloggerfileid = models.AutoField(primary_key=True)
-    dataloggerfileid = models.ForeignKey('dataloggerfiles', related_name='+', help_text="CAUTION dataloggerfilecolumns must be setup" +
-                                         ", the date and time stamp is expected to be the first column, "+
-                                         " column names must match "+
-                                         "the column name in associated dataloggerfilecolumns.",
+    dataloggerfileid = models.ForeignKey('dataloggerfiles', related_name='+',
+                                         help_text="CAUTION dataloggerfilecolumns must be setup" +
+                                                   ", the date and time stamp is expected to be the first column, " +
+                                                   " column names must match " +
+                                                   "the column name in associated dataloggerfilecolumns.",
                                          verbose_name='data logger file', db_column='dataloggerfileid')
     processingCode = models.CharField(max_length=255, verbose_name='processing code', default="0")
     databeginson = models.IntegerField(verbose_name="Data begins on this row number", default=2)
-    columnheaderson = models.IntegerField(verbose_name="Column headers matching column labels from data logger columns on row")
+    columnheaderson = models.IntegerField(
+        verbose_name="Column headers matching column labels from data logger columns on row")
     date_processed = models.DateTimeField(auto_now=True)
+
     def __unicode__(self):
         s = u"%s" % (self.dataloggerfileid)
         s += u"- Processed on %s" % (self.date_processed)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2extra"."processdataloggerfile'
-        verbose_name= 'process data logger file'
+        verbose_name = 'process data logger file'
+
     def save(self, *args, **kwargs):
-        #ProcessDataLoggerFile(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid, self.databeginson, self.columnheaderson, False)
-        management.call_command('ProcessDataLoggerFile',self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid, self.databeginson, self.columnheaderson, False, False)
+        # ProcessDataLoggerFile(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid, self.databeginson, self.columnheaderson, False)
+        management.call_command('ProcessDataLoggerFile', self.dataloggerfileid.dataloggerfilelink,
+                                self.dataloggerfileid, self.databeginson, self.columnheaderson, False, False)
         super(ProcessDataloggerfile, self).save(*args, **kwargs)
-    # def get_actions(self, request):
-    #     #Disable delete
-    #     actions = super(ProcessDataloggerfile, self).get_actions(request)
-    #     del actions['delete_selected']
-    #     return actions
-    # def has_delete_permission(self, request, obj=None):
-    #     return False
+        # def get_actions(self, request):
+        #     #Disable delete
+        #     actions = super(ProcessDataloggerfile, self).get_actions(request)
+        #     del actions['delete_selected']
+        #     return actions
+        # def has_delete_permission(self, request, obj=None):
+        #     return False
 
 
 class Dataloggerprogramfiles(models.Model):
@@ -918,47 +1024,53 @@ class Dataloggerprogramfiles(models.Model):
     programname = models.CharField(max_length=255)
     programdescription = models.CharField(max_length=5000, blank=True)
     programversion = models.CharField(max_length=50, blank=True)
-    #programfilelink = models.CharField(max_length=255, blank=True)
-    programfilelink = models.FileField(upload_to='dataloggerprogramfiles') #+ '/' + programname.__str__() settings.MEDIA_ROOT upload_to='/upfiles/'
+    # programfilelink = models.CharField(max_length=255, blank=True)
+    programfilelink = models.FileField(
+        upload_to='dataloggerprogramfiles')  # + '/' + programname.__str__() settings.MEDIA_ROOT upload_to='/upfiles/'
+
     def __unicode__(self):
         s = u"%s" % (self.programname)
         s += u"- Version %s" % (self.programversion)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."dataloggerprogramfiles'
-        verbose_name= 'data logger program file'
-
+        verbose_name = 'data logger program file'
 
 
 class Dataquality(models.Model):
     dataqualityid = models.AutoField(primary_key=True)
-    dataqualitytypecv = models.ForeignKey(CvDataqualitytype, db_column='dataqualitytypecv', verbose_name="data quality type")
-    dataqualitycode = models.CharField(max_length=255,verbose_name="data quality code")
-    dataqualityvalue = models.FloatField(blank=True, null=True,verbose_name="data quality value")
+    dataqualitytypecv = models.ForeignKey(CvDataqualitytype, db_column='dataqualitytypecv',
+                                          verbose_name="data quality type")
+    dataqualitycode = models.CharField(max_length=255, verbose_name="data quality code")
+    dataqualityvalue = models.FloatField(blank=True, null=True, verbose_name="data quality value")
     dataqualityvalueunitsid = models.ForeignKey('Units', related_name='+', db_column='dataqualityvalueunitsid',
                                                 verbose_name="data quality value units", blank=True, null=True)
     dataqualitydescription = models.CharField(max_length=5000, blank=True, verbose_name="data quality description")
     dataqualitylink = models.CharField(max_length=255, blank=True, verbose_name="data quality link")
+
     def __unicode__(self):
         return u"%s - %s - %s" % (self.dataqualitycode, self.dataqualityvalue, self.dataqualityvalueunitsid)
+
     class Meta:
         managed = False
         db_table = r'odm2"."dataquality'
-        verbose_name='data quality'
+        verbose_name = 'data quality'
         verbose_name_plural = 'data quality'
 
 
 class Datasetcitations(models.Model):
     bridgeid = models.AutoField(primary_key=True)
     datasetid = models.ForeignKey('Datasets', verbose_name='dataset', db_column='datasetid')
-    relationshiptypecv = models.ForeignKey(CvRelationshiptype, verbose_name='relationship type', db_column='relationshiptypecv')
+    relationshiptypecv = models.ForeignKey(CvRelationshiptype, verbose_name='relationship type',
+                                           db_column='relationshiptypecv')
     citationid = models.ForeignKey(Citations, db_column='citationid', verbose_name='citation')
 
     class Meta:
         managed = False
         db_table = r'odm2"."datasetcitations'
-        verbose_name='dataset citation'
+        verbose_name = 'dataset citation'
 
 
 class Datasets(models.Model):
@@ -967,31 +1079,35 @@ class Datasets(models.Model):
     datasettypecv = models.ForeignKey(CvDatasettypecv, verbose_name="dataset type", db_column='datasettypecv')
     datasetcode = models.CharField(verbose_name="dataset code", max_length=50)
     datasettitle = models.CharField(verbose_name="dataset title", max_length=255)
-    datasetabstract = models.CharField(verbose_name = "dataset abstract", max_length=5000)
+    datasetabstract = models.CharField(verbose_name="dataset abstract", max_length=5000)
+
     def __unicode__(self):
         s = u"%s" % (self.datasetcode)
         if self.datasettitle:
             s += u"- %s" % (self.datasettitle)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."datasets'
-        verbose_name= 'dataset'
+        verbose_name = 'dataset'
 
 
 class Datasetsresults(models.Model):
     bridgeid = models.AutoField(primary_key=True)
-    datasetid = models.ForeignKey(Datasets, verbose_name="dataset",db_column='datasetid')
-    resultid = models.ForeignKey('Results',verbose_name="add the dataset to the result", db_column='resultid')
+    datasetid = models.ForeignKey(Datasets, verbose_name="dataset", db_column='datasetid')
+    resultid = models.ForeignKey('Results', verbose_name="add the dataset to the result", db_column='resultid')
+
     def __unicode__(self):
         s = u"%s" % (self.datasetid)
         if self.resultid:
             s += u"- %s" % (self.resultid)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."datasetsresults'
-        verbose_name='dataset result'
+        verbose_name = 'dataset result'
 
 
 class Derivationequations(models.Model):
@@ -1048,20 +1164,22 @@ class Equipmentmodels(models.Model):
                                             db_column='modelmanufacturerid')
     modelpartnumber = models.CharField(max_length=50, blank=True, verbose_name="model part number")
     modelname = models.CharField(max_length=255, verbose_name="model name")
-    modeldescription = models.CharField(max_length=5000, blank=True,null=True, verbose_name="model description")
+    modeldescription = models.CharField(max_length=5000, blank=True, null=True, verbose_name="model description")
     isinstrument = models.BooleanField(verbose_name="Is this an instrument?")
     modelspecificationsfilelink = models.CharField(max_length=255,
-                                verbose_name="link to manual for equipment", blank=True)
+                                                   verbose_name="link to manual for equipment", blank=True)
     modellink = models.CharField(max_length=255, verbose_name="link to website for model", blank=True)
+
     def __unicode__(self):
         s = u"%s" % (self.modelname)
         if self.modelpartnumber:
             s += u"- %s" % (self.modelpartnumber)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."equipmentmodels'
-        verbose_name="equipment model"
+        verbose_name = "equipment model"
 
 
 class Equipmentused(models.Model):
@@ -1078,15 +1196,19 @@ class Extensionproperties(models.Model):
     propertyid = models.AutoField(primary_key=True)
     propertyname = models.CharField(max_length=255, verbose_name="property name")
     propertydescription = models.CharField(max_length=5000, blank=True, verbose_name="property description")
-    propertydatatypecv = models.ForeignKey(CvPropertydatatype, db_column='propertydatatypecv', verbose_name="property data type")
-    propertyunitsid = models.ForeignKey('Units',  db_column='propertyunitsid', blank=True, null=True, verbose_name="units for property")
+    propertydatatypecv = models.ForeignKey(CvPropertydatatype, db_column='propertydatatypecv',
+                                           verbose_name="property data type")
+    propertyunitsid = models.ForeignKey('Units', db_column='propertyunitsid', blank=True, null=True,
+                                        verbose_name="units for property")
+
     def __unicode__(self):
-        return u"%s - %s" % (self.propertyname,self.propertydescription)
+        return u"%s - %s" % (self.propertyname, self.propertydescription)
+
     class Meta:
         managed = False
         db_table = r'odm2"."extensionproperties'
-        verbose_name='extension property'
-        verbose_name_plural='extension properties'
+        verbose_name = 'extension property'
+        verbose_name_plural = 'extension properties'
 
 
 class Externalidentifiersystems(models.Model):
@@ -1095,8 +1217,10 @@ class Externalidentifiersystems(models.Model):
     identifiersystemorganizationid = models.ForeignKey('Organizations', db_column='identifiersystemorganizationid')
     externalidentifiersystemdescription = models.CharField(max_length=5000, blank=True)
     externalidentifiersystemurl = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
         return u"%s" % (self.externalidentifiersystemname)
+
     class Meta:
         managed = False
         db_table = r'odm2"."externalidentifiersystems'
@@ -1106,8 +1230,10 @@ class Featureactions(models.Model):
     featureactionid = models.AutoField(primary_key=True, verbose_name="sampling feature action")
     samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     action = models.ForeignKey(Actions, db_column='actionid')
+
     def __unicode__(self):
         return u"%s- %s - %s" % (self.featureactionid, self.samplingfeatureid, self.action)
+
     #     nameexists = FeatureactionsNames.objects.filter(featureactionid=self.featureactionid)
     #     if nameexists.__len__() >0:
     #         return u"%s" % nameexists[0]
@@ -1127,40 +1253,44 @@ class Featureactions(models.Model):
     class Meta:
         managed = False
         db_table = r'odm2"."featureactions'
-        verbose_name='action at sampling feature'
-        verbose_name_plural='action at sampling feature'
+        verbose_name = 'action at sampling feature'
+        verbose_name_plural = 'action at sampling feature'
 
-#this class just stores the unicode representation of a featureaction for faster lookup
+
+# this class just stores the unicode representation of a featureaction for faster lookup
 class FeatureactionsNames(models.Model):
     featureactionNamesid = models.AutoField(primary_key=True)
-    featureactionid = models.ForeignKey('Featureactions',db_column='featureactionid')
+    featureactionid = models.ForeignKey('Featureactions', db_column='featureactionid')
     name = models.CharField(max_length=500)
 
     def __unicode__(self):
         return u"%s" % self.name
+
     class Meta:
-        managed= False
+        managed = False
         db_table = r'odm2extra"."featureactionsNames'
-        verbose_name= 'feature action names'
+        verbose_name = 'feature action names'
 
 
 class Instrumentoutputvariables(models.Model):
     instrumentoutputvariableid = models.AutoField(primary_key=True)
-    modelid = models.ForeignKey(Equipmentmodels,verbose_name="equipment model", db_column='modelid')
-    variableid = models.ForeignKey('Variables',verbose_name="variable", db_column='variableid')
-    instrumentmethodid = models.ForeignKey('Methods',verbose_name="instrument method", db_column='instrumentmethodid')
+    modelid = models.ForeignKey(Equipmentmodels, verbose_name="equipment model", db_column='modelid')
+    variableid = models.ForeignKey('Variables', verbose_name="variable", db_column='variableid')
+    instrumentmethodid = models.ForeignKey('Methods', verbose_name="instrument method", db_column='instrumentmethodid')
     instrumentresolution = models.CharField(max_length=255, verbose_name="instrument resolution", blank=True)
     instrumentaccuracy = models.CharField(max_length=255, verbose_name="instrument accuracy", blank=True)
-    instrumentrawoutputunitsid = models.ForeignKey('Units', related_name='+',verbose_name="instrument raw output unit",
+    instrumentrawoutputunitsid = models.ForeignKey('Units', related_name='+', verbose_name="instrument raw output unit",
                                                    db_column='instrumentrawoutputunitsid')
+
     def __unicode__(self):
         s = u"%s " % (self.modelid)
         s += u"- %s" % (self.variableid)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."instrumentoutputvariables'
-        verbose_name="instrument output variable"
+        verbose_name = "instrument output variable"
 
 
 class Maintenanceactions(models.Model):
@@ -1175,28 +1305,36 @@ class Maintenanceactions(models.Model):
 
 
 class Measurementresults(models.Model):
-    resultid = models.OneToOneField('Results', verbose_name="Result Series",db_column='resultid', primary_key=True)
-    xlocation = models.FloatField(verbose_name="x location",blank=True, null=True)
-    xlocationunitsid = models.ForeignKey('Units',verbose_name="x location units", related_name='relatedXlocationUnits',  db_column='xlocationunitsid', blank=True, null=True)
-    ylocation = models.FloatField(blank=True,verbose_name="y location", null=True)
-    ylocationunitsid = models.ForeignKey('Units',verbose_name="y location units", related_name='relatedYlocationUnits',  db_column='ylocationunitsid', blank=True, null=True)
+    resultid = models.OneToOneField('Results', verbose_name="Result Series", db_column='resultid', primary_key=True)
+    xlocation = models.FloatField(verbose_name="x location", blank=True, null=True)
+    xlocationunitsid = models.ForeignKey('Units', verbose_name="x location units", related_name='relatedXlocationUnits',
+                                         db_column='xlocationunitsid', blank=True, null=True)
+    ylocation = models.FloatField(blank=True, verbose_name="y location", null=True)
+    ylocationunitsid = models.ForeignKey('Units', verbose_name="y location units", related_name='relatedYlocationUnits',
+                                         db_column='ylocationunitsid', blank=True, null=True)
     zlocation = models.FloatField(blank=True, verbose_name="z location", null=True)
-    zlocationunitsid = models.ForeignKey('Units', verbose_name="z location units",related_name='relatedZlocationUnits', db_column='zlocationunitsid', blank=True, null=True)
-    spatialreferenceid = models.ForeignKey('Spatialreferences', verbose_name="spatial reference", db_column='spatialreferenceid', blank=True, null=True)
+    zlocationunitsid = models.ForeignKey('Units', verbose_name="z location units", related_name='relatedZlocationUnits',
+                                         db_column='zlocationunitsid', blank=True, null=True)
+    spatialreferenceid = models.ForeignKey('Spatialreferences', verbose_name="spatial reference",
+                                           db_column='spatialreferenceid', blank=True, null=True)
     censorcodecv = models.ForeignKey(CvCensorcode, verbose_name="censor code", db_column='censorcodecv')
     qualitycodecv = models.ForeignKey(CvQualitycode, verbose_name="quality code", db_column='qualitycodecv')
-    aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, verbose_name="aggregation statistic", db_column='aggregationstatisticcv')
+    aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, verbose_name="aggregation statistic",
+                                               db_column='aggregationstatisticcv')
     timeaggregationinterval = models.FloatField(verbose_name="time aggregation interval")
-    timeaggregationintervalunitsid = models.ForeignKey('Units',verbose_name="time aggregation interval unit", related_name='+', db_column='timeaggregationintervalunitsid')
+    timeaggregationintervalunitsid = models.ForeignKey('Units', verbose_name="time aggregation interval unit",
+                                                       related_name='+', db_column='timeaggregationintervalunitsid')
+
     def __unicode__(self):
         s = u"%s " % (self.resultid)
         s += u", %s" % (self.qualitycodecv)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."measurementresults'
-        ordering = ['censorcodecv','resultid']
-        verbose_name='measurement result'
+        ordering = ['censorcodecv', 'resultid']
+        verbose_name = 'measurement result'
 
 
 class Measurementresultvalueannotations(models.Model):
@@ -1211,45 +1349,52 @@ class Measurementresultvalueannotations(models.Model):
 
 class Measurementresultvalues(models.Model):
     valueid = models.AutoField(primary_key=True)
-    resultid = models.ForeignKey(Measurementresults, verbose_name='Result Series',db_column='resultid')
+    resultid = models.ForeignKey(Measurementresults, verbose_name='Result Series', db_column='resultid')
     datavalue = models.FloatField(verbose_name='data value')
     valuedatetime = models.DateTimeField(verbose_name='value date time')
     valuedatetimeutcoffset = models.IntegerField(verbose_name='value date time UTC offset', default=4)
+
     def __unicode__(self):
         s = u"%s " % (self.resultid)
         s += u"- %s" % (self.datavalue)
         s += u"- %s" % (self.valuedatetime)
         return s
+
     def csvheader(self):
-        s='databaseid,'
-        #s+='Value,'
+        s = 'databaseid,'
+        # s+='Value,'
         s += 'Date and Time,'
-        #s += 'Variable Name,'
-        #s += 'Unit Name,'
-        #s += 'processing level,'
+        # s += 'Variable Name,'
+        # s += 'Unit Name,'
+        # s += 'processing level,'
         s += 'sampling feature/location,'
         s += 'time aggregation interval,'
         s += 'time aggregation unit,'
-        s +='citation,'
+        s += 'citation,'
 
         return s
+
     def csvoutput(self):
         s = str(self.valueid)
-        #s += ', {0}'.format(self.datavalue)
+        # s += ', {0}'.format(self.datavalue)
         s += ', {0}'.format(self.valuedatetime)
-        #s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
-        #s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
-        #s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
         s += ',\" {0}\"'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)
         s += ', {0}'.format(self.resultid.timeaggregationinterval)
         s += ', {0},'.format(self.resultid.timeaggregationintervalunitsid)
-        s = buildCitation(s,self)
+        s = buildCitation(s, self)
 
-            #s += ' {0}\"'.format(citation.citationlink)
+        # s += ' {0}\"'.format(citation.citationlink)
         return s
+
     def csvheaderShort(self):
-        s = '\" {0} -unit-{1}-processing level-{2}\",annotation,'.format(self.resultid.resultid.variableid.variablecode,self.resultid.resultid.unitsid.unitsname,self.resultid.resultid.processing_level)
+        s = '\" {0} -unit-{1}-processing level-{2}\",annotation,'.format(self.resultid.resultid.variableid.variablecode,
+                                                                         self.resultid.resultid.unitsid.unitsname,
+                                                                         self.resultid.resultid.processing_level)
         return s
+
     def csvoutputShort(self):
         s = '{0}'.format(self.datavalue)
         mrvannotation = Measurementresultvalueannotations.objects.filter(valueid=self.valueid)
@@ -1261,27 +1406,32 @@ class Measurementresultvalues(models.Model):
         s += '\"'
         s += ','
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."measurementresultvalues'
-        verbose_name='measurement result value'
-
+        verbose_name = 'measurement result value'
 
 
 class MeasurementresultvalueFile(models.Model):
     valueFileid = models.AutoField(primary_key=True)
-    resultid = models.ForeignKey(Measurementresults, help_text="CAUTION saving a measurement result value file will attempt to "+
-                            "load values into the database.",verbose_name='result',db_column='resultid')
+    resultid = models.ForeignKey(Measurementresults,
+                                 help_text="CAUTION saving a measurement result value file will attempt to " +
+                                           "load values into the database.", verbose_name='result',
+                                 db_column='resultid')
     valueFile = models.FileField(upload_to='resultvalues', verbose_name="value file ")
+
     def __unicode__(self):
         s = u"%s" % (self.resultid)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2extra"."Measurementresultvaluefile'
-        verbose_name='measurement result value file'
+        verbose_name = 'measurement result value file'
+
     def save(self, *args, **kwargs):
-        handle_uploaded_file(self.valueFile.file,self.resultid)
+        handle_uploaded_file(self.valueFile.file, self.resultid)
         super(MeasurementresultvalueFile, self).save(*args, **kwargs)
 
 
@@ -1298,16 +1448,19 @@ class Methodannotations(models.Model):
 class Methodcitations(models.Model):
     bridgeid = models.AutoField(primary_key=True)
     methodid = models.ForeignKey('Methods', db_column='methodid', verbose_name='method')
-    relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv', verbose_name='relationship type')
-    citationid = models.ForeignKey(Citations, db_column='citationid',verbose_name='citation')
+    relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv',
+                                           verbose_name='relationship type')
+    citationid = models.ForeignKey(Citations, db_column='citationid', verbose_name='citation')
+
     def __unicode__(self):
         s = u"%s " % (self.methodid)
         s += u"-, %s" % (self.citationid)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."methodcitations'
-        verbose_name='method citation'
+        verbose_name = 'method citation'
 
 
 class Methodextensionpropertyvalues(models.Model):
@@ -1341,20 +1494,23 @@ class Methods(models.Model):
                                                'appropriate MethodType - e.g., a specimen collection Action should be associated with a ' \
                                                'specimen collection method. details for individual values ' \
                                                'here: http://vocabulary.odm2.org/methodtype/', db_column='methodtypecv')
-    methodcode = models.CharField(verbose_name='method code',max_length=50)
-    methodname = models.CharField(verbose_name='method name',max_length=255)
+    methodcode = models.CharField(verbose_name='method code', max_length=50)
+    methodname = models.CharField(verbose_name='method name', max_length=255)
     methoddescription = models.CharField(verbose_name='method description', max_length=5000, blank=True)
     methodlink = models.CharField(verbose_name='web link for method', max_length=255, blank=True)
-    organizationid = models.ForeignKey('Organizations', verbose_name='organization', db_column='organizationid', blank=True, null=True)
+    organizationid = models.ForeignKey('Organizations', verbose_name='organization', db_column='organizationid',
+                                       blank=True, null=True)
+
     def __unicode__(self):
         s = u"%s " % (self.methodcode)
         if self.methodtypecv:
             s += u", %s" % (self.methodtypecv)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."methods'
-        verbose_name='method'
+        verbose_name = 'method'
         ordering = ["methodname"]
 
 
@@ -1385,38 +1541,44 @@ class Models(models.Model):
 
 class Organizations(models.Model):
     organizationid = models.AutoField(primary_key=True)
-    organizationtypecv = models.ForeignKey( CvOrganizationtype, verbose_name="organization type", db_column='organizationtypecv')
+    organizationtypecv = models.ForeignKey(CvOrganizationtype, verbose_name="organization type",
+                                           db_column='organizationtypecv')
     organizationcode = models.CharField(verbose_name="organization code", max_length=50)
     organizationname = models.CharField(verbose_name="organization name", max_length=255)
     organizationdescription = models.CharField(verbose_name="organization description", max_length=5000, blank=True)
     organizationlink = models.CharField(verbose_name="organization web link", max_length=255, blank=True)
-    parentorganizationid = models.ForeignKey('self',verbose_name="parent organization", db_column='parentorganizationid',blank=True, null=True, default=1)
+    parentorganizationid = models.ForeignKey('self', verbose_name="parent organization",
+                                             db_column='parentorganizationid', blank=True, null=True, default=1)
+
     def __unicode__(self):
         s = u"%s" % (self.organizationcode)
         if self.organizationname:
             s += u", %s" % (self.organizationname)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."organizations'
-        verbose_name='organization'
+        verbose_name = 'organization'
 
 
 class People(models.Model):
     personid = models.AutoField(primary_key=True)
     personfirstname = models.CharField(max_length=255, verbose_name="first name")
-    personmiddlename = models.CharField(max_length=255, verbose_name="middle name",blank=True)
+    personmiddlename = models.CharField(max_length=255, verbose_name="middle name", blank=True)
     personlastname = models.CharField(max_length=255, verbose_name="last name")
+
     def __unicode__(self):
         s = u"%s" % (self.personlastname)
         if self.personfirstname:
             s += u", %s" % (self.personfirstname)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."people'
-        verbose_name='people'
-        verbose_name_plural='people'
+        verbose_name = 'people'
+        verbose_name_plural = 'people'
         ordering = ["personlastname"]
 
 
@@ -1429,8 +1591,8 @@ class Personexternalidentifiers(models.Model):
 
     def __unicode__(self):
         s = u"%s - %s - %s - %s" % (
-        self.personid, self.externalidentifiersystemid, self.personexternalidentifier,
-        self.personexternalidentifieruri)
+            self.personid, self.externalidentifiersystemid, self.personexternalidentifier,
+            self.personexternalidentifieruri)
         return s
 
     class Meta:
@@ -1445,9 +1607,11 @@ class Pointcoverageresults(models.Model):
     zlocationunitsid = models.ForeignKey('Units', related_name='+', db_column='zlocationunitsid', blank=True, null=True)
     spatialreferenceid = models.ForeignKey('Spatialreferences', db_column='spatialreferenceid', blank=True, null=True)
     intendedxspacing = models.FloatField(blank=True, null=True)
-    intendedxspacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedxspacingunitsid', blank=True, null=True)
+    intendedxspacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedxspacingunitsid',
+                                                blank=True, null=True)
     intendedyspacing = models.FloatField(blank=True, null=True)
-    intendedyspacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedyspacingunitsid', blank=True, null=True)
+    intendedyspacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedyspacingunitsid',
+                                                blank=True, null=True)
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, db_column='aggregationstatisticcv')
     timeaggregationinterval = models.FloatField()
     timeaggregationintervalunitsid = models.IntegerField()
@@ -1487,38 +1651,41 @@ class Pointcoverageresultvalues(models.Model):
 
 class Processinglevels(models.Model):
     processinglevelid = models.AutoField(primary_key=True)
-    processinglevelcode = models.CharField(verbose_name='processing level code',max_length=50)
+    processinglevelcode = models.CharField(verbose_name='processing level code', max_length=50)
     definition = models.CharField(max_length=5000, blank=True)
     explanation = models.CharField(max_length=5000, blank=True)
+
     def __unicode__(self):
         s = u"%s " % (self.processinglevelcode)
         if self.definition:
             s += u", %s" % (self.definition)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."processinglevels'
-        verbose_name='processing level'
+        verbose_name = 'processing level'
 
 
 class Profileresults(models.Model):
     resultid = models.OneToOneField('Results', verbose_name='result', db_column='resultid', primary_key=True)
     xlocation = models.FloatField(blank=True, verbose_name='x location', null=True)
-    xlocationunitsid = models.ForeignKey('Units', verbose_name='x location units',related_name='+',
+    xlocationunitsid = models.ForeignKey('Units', verbose_name='x location units', related_name='+',
                                          db_column='xlocationunitsid', blank=True, null=True)
     ylocation = models.FloatField(blank=True, verbose_name='y location', null=True)
     ylocationunitsid = models.ForeignKey('Units', related_name='+', verbose_name='y location units',
                                          db_column='ylocationunitsid', blank=True, null=True)
     spatialreferenceid = models.ForeignKey('Spatialreferences', verbose_name='spatial reference',
-                                         db_column='spatialreferenceid', blank=True, null=True)
+                                           db_column='spatialreferenceid', blank=True, null=True)
     intendedzspacing = models.FloatField(blank=True, verbose_name='intended depth', null=True)
     intendedzspacingunitsid = models.ForeignKey('Units', verbose_name='intended depth units', related_name='+',
-                                         db_column='intendedzspacingunitsid', blank=True, null=True)
+                                                db_column='intendedzspacingunitsid', blank=True, null=True)
     intendedtimespacing = models.FloatField(blank=True, null=True, verbose_name='intended time spacing')
     intendedtimespacingunitsid = models.ForeignKey('Units', verbose_name='intended time spacing unit', related_name='+',
-                                         db_column='intendedtimespacingunitsid', blank=True, null=True)
-    aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, verbose_name= 'aggregation statistic',
-                                         db_column='aggregationstatisticcv')
+                                                   db_column='intendedtimespacingunitsid', blank=True, null=True)
+    aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, verbose_name='aggregation statistic',
+                                               db_column='aggregationstatisticcv')
+
     def __unicode__(self):
         s = u"%s" % self.resultid
         if self.xlocation:
@@ -1534,10 +1701,11 @@ class Profileresults(models.Model):
         if self.intendedzspacingunitsid:
             s += u", %s" % (self.intendedzspacingunitsid)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."profileresults'
-        verbose_name='profile result'
+        verbose_name = 'profile result'
 
 
 class Profileresultvalueannotations(models.Model):
@@ -1549,6 +1717,7 @@ class Profileresultvalueannotations(models.Model):
         managed = False
         db_table = r'odm2"."profileresultvalueannotations'
 
+
 class Profileresultvalues(models.Model):
     valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Profileresults, db_column='resultid')
@@ -1557,71 +1726,82 @@ class Profileresultvalues(models.Model):
     valuedatetimeutcoffset = models.IntegerField(verbose_name='value date and time UTC offset', blank=True, null=True)
     zlocation = models.FloatField(verbose_name='z location', blank=True, null=True)
     zaggregationinterval = models.FloatField(verbose_name='z aggregation interval', blank=True, null=True)
-    zlocationunitsid = models.ForeignKey('Units',verbose_name='z location unit', related_name='+',
-                                            db_column='zlocationunitsid', blank=True, null=True)
-    censorcodecv = models.ForeignKey(CvCensorcode, verbose_name='censor code',db_column='censorcodecv')
+    zlocationunitsid = models.ForeignKey('Units', verbose_name='z location unit', related_name='+',
+                                         db_column='zlocationunitsid', blank=True, null=True)
+    censorcodecv = models.ForeignKey(CvCensorcode, verbose_name='censor code', db_column='censorcodecv')
     qualitycodecv = models.ForeignKey(CvQualitycode, verbose_name='quality code', db_column='qualitycodecv')
     timeaggregationinterval = models.FloatField(verbose_name='time aggregation interval', blank=True, null=True)
     timeaggregationintervalunitsid = models.ForeignKey('Units', verbose_name='time aggregation interval unit',
-                        related_name='+', db_column='timeaggregationintervalunitsid', blank=True, null=True)
+                                                       related_name='+', db_column='timeaggregationintervalunitsid',
+                                                       blank=True, null=True)
+
     def __unicode__(self):
         s = u"%s " % (self.resultid)
         s += u", %s" % (self.datavalue)
         s += u", %s" % (self.zlocation)
-        #s += u", %s" % (self.zaggregationinterval)
+        # s += u", %s" % (self.zaggregationinterval)
         s += u", %s" % (self.zlocationunitsid)
         return s
+
     def csvheader(self):
-        s='databaseid,'
-        #s+='Value,'
-        #s += 'Date and Time,'
+        s = 'databaseid,'
+        # s+='Value,'
+        # s += 'Date and Time,'
         s += 'depth,'
-        #s += '\" {0}{1}\",'.format(self.resultid.resultid.variableid.variablecode,self.resultid.resultid.unitsid.unitsname)
+        # s += '\" {0}{1}\",'.format(self.resultid.resultid.variableid.variablecode,self.resultid.resultid.unitsid.unitsname)
         s += 'sampling feature/location,'
         s += 'sampling feature uri,'
         s += 'method,'
-        s +='citation'
-        #s = buildCitation(s,self)
+        s += 'citation'
+        # s = buildCitation(s,self)
         return s
 
     def cite(self):
-        s = buildCitation('',self)
+        s = buildCitation('', self)
         return s
+
     def csvheaderShort(self):
-        #s='databaseid,'
-        s = ',\" {0} -unit-{1}-processing level-{2}\"'.format(self.resultid.resultid.variableid.variablecode,self.resultid.resultid.unitsid.unitsname,self.resultid.resultid.processing_level)
-        #s += 'Date and Time,'
-        #s += 'Variable Name,'
-        #s += 'Unit Name,'
+        # s='databaseid,'
+        s = ',\" {0} -unit-{1}-processing level-{2}\"'.format(self.resultid.resultid.variableid.variablecode,
+                                                              self.resultid.resultid.unitsid.unitsname,
+                                                              self.resultid.resultid.processing_level)
+        # s += 'Date and Time,'
+        # s += 'Variable Name,'
+        # s += 'Unit Name,'
         return s
+
     def csvoutput(self):
-        s = '{0}'.format(self.resultid.resultid.resultid) #.samplingfeatureid.samplingfeatureid
-        #s += ', {0}'.format(self.datavalue)
-        s += ', {0}-{1} {2} '.format((self.zlocation -self.zaggregationinterval),self.zlocation,self.zlocationunitsid)
-        #s += ', {0}'.format(self.zaggregationinterval)
-        #s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
-        #s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
+        s = '{0}'.format(self.resultid.resultid.resultid)  # .samplingfeatureid.samplingfeatureid
+        # s += ', {0}'.format(self.datavalue)
+        s += ', {0}-{1} {2} '.format((self.zlocation - self.zaggregationinterval), self.zlocation,
+                                     self.zlocationunitsid)
+        # s += ', {0}'.format(self.zaggregationinterval)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
         s += ',\" {0}\"'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)
         try:
-            sfei=Samplingfeatureexternalidentifiers.objects.filter(samplingfeatureid=self.resultid.resultid.featureactionid.samplingfeatureid).get()
+            sfei = Samplingfeatureexternalidentifiers.objects.filter(
+                samplingfeatureid=self.resultid.resultid.featureactionid.samplingfeatureid).get()
             s += ', {0}'.format(sfei.samplingfeatureexternalidentifieruri)
         except Samplingfeatureexternalidentifiers.DoesNotExist:
             s += ','
         s += ',\" {0}\"'.format(self.resultid.resultid.featureactionid.action.method.methoddescription)
-        s = buildCitation(s,self)
+        s = buildCitation(s, self)
         s += ','
         return s
+
     def csvoutputShort(self):
-        #s = '{0}'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeatureid)
+        # s = '{0}'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeatureid)
         s = '{0}'.format(self.datavalue)
-        #s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
-        #s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
         s += ','
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."profileresultvalues'
-        verbose_name='profile result value'
+        verbose_name = 'profile result value'
 
 
 class Referencematerialexternalidentifiers(models.Model):
@@ -1668,9 +1848,12 @@ class Referencematerialvalues(models.Model):
 
 class Relatedactions(models.Model):
     relationid = models.AutoField(primary_key=True)
-    actionid = models.ForeignKey(Actions,verbose_name='action', db_column='actionid')
-    relationshiptypecv = models.ForeignKey(CvRelationshiptype, verbose_name='relationship type', db_column='relationshiptypecv')
-    relatedactionid = models.ForeignKey(Actions, verbose_name='related action',related_name='RelatedActions',db_column='relatedactionid')
+    actionid = models.ForeignKey(Actions, verbose_name='action', db_column='actionid')
+    relationshiptypecv = models.ForeignKey(CvRelationshiptype, verbose_name='relationship type',
+                                           db_column='relationshiptypecv')
+    relatedactionid = models.ForeignKey(Actions, verbose_name='related action', related_name='RelatedActions',
+                                        db_column='relatedactionid')
+
     def __unicode__(self):
         s = u"%s" % (self.actionid)
         if self.relationshiptypecv:
@@ -1678,18 +1861,20 @@ class Relatedactions(models.Model):
         if self.relatedactionid:
             s += u", %s" % (self.relatedactionid)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."relatedactions'
-        verbose_name='related action (associates one action with another)'
-        verbose_name_plural='related action (associates one action with another)'
+        verbose_name = 'related action (associates one action with another)'
+        verbose_name_plural = 'related action (associates one action with another)'
 
 
 class Relatedannotations(models.Model):
     relationid = models.AutoField(primary_key=True)
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
-    relatedannotationid = models.ForeignKey(Annotations,related_name='RelatedAnnotations', db_column='relatedannotationid')
+    relatedannotationid = models.ForeignKey(Annotations, related_name='RelatedAnnotations',
+                                            db_column='relatedannotationid')
 
     class Meta:
         managed = False
@@ -1700,7 +1885,7 @@ class Relatedcitations(models.Model):
     relationid = models.AutoField(primary_key=True)
     citationid = models.ForeignKey(Citations, db_column='citationid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
-    relatedcitationid = models.ForeignKey(Citations,related_name='RelatedCitations', db_column='relatedcitationid')
+    relatedcitationid = models.ForeignKey(Citations, related_name='RelatedCitations', db_column='relatedcitationid')
 
     class Meta:
         managed = False
@@ -1711,7 +1896,7 @@ class Relateddatasets(models.Model):
     relationid = models.AutoField(primary_key=True)
     datasetid = models.ForeignKey(Datasets, db_column='datasetid')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
-    relateddatasetid = models.ForeignKey(Datasets, related_name='relatedDataset',db_column='relateddatasetid')
+    relateddatasetid = models.ForeignKey(Datasets, related_name='relatedDataset', db_column='relateddatasetid')
     versioncode = models.CharField(max_length=50, blank=True)
 
     class Meta:
@@ -1736,16 +1921,22 @@ class Relatedequipment(models.Model):
 
 class Relatedfeatures(models.Model):
     relationid = models.AutoField(primary_key=True)
-    samplingfeatureid = models.ForeignKey('Samplingfeatures', verbose_name="first feature", db_column='samplingfeatureid')
-    relationshiptypecv = models.ForeignKey(CvRelationshiptype, verbose_name= "relationship type", db_column='relationshiptypecv')
-    relatedfeatureid = models.ForeignKey('Samplingfeatures', verbose_name="second feature", related_name='RelatedFeatures', db_column='relatedfeatureid')
-    spatialoffsetid = models.ForeignKey('Spatialoffsets',verbose_name="spatial offset", db_column='spatialoffsetid', blank=True, null=True)
+    samplingfeatureid = models.ForeignKey('Samplingfeatures', verbose_name="first feature",
+                                          db_column='samplingfeatureid')
+    relationshiptypecv = models.ForeignKey(CvRelationshiptype, verbose_name="relationship type",
+                                           db_column='relationshiptypecv')
+    relatedfeatureid = models.ForeignKey('Samplingfeatures', verbose_name="second feature",
+                                         related_name='RelatedFeatures', db_column='relatedfeatureid')
+    spatialoffsetid = models.ForeignKey('Spatialoffsets', verbose_name="spatial offset", db_column='spatialoffsetid',
+                                        blank=True, null=True)
+
     def __unicode__(self):
         return u"%s - %s - %s" % (self.samplingfeatureid, self.relationshiptypecv, self.relatedfeatureid)
+
     class Meta:
         managed = False
         db_table = r'odm2"."relatedfeatures'
-        verbose_name= 'relate two feature'
+        verbose_name = 'relate two feature'
 
 
 class Relatedmodels(models.Model):
@@ -1806,52 +1997,63 @@ class Resultextensionpropertyvalues(models.Model):
 
 class Resultnormalizationvalues(models.Model):
     resultid = models.OneToOneField('Results', db_column='resultid', primary_key=True)
-    normalizedbyreferencematerialvalueid = models.ForeignKey(Referencematerialvalues, db_column='normalizedbyreferencematerialvalueid')
+    normalizedbyreferencematerialvalueid = models.ForeignKey(Referencematerialvalues,
+                                                             db_column='normalizedbyreferencematerialvalueid')
 
     class Meta:
         managed = False
         db_table = r'odm2"."resultnormalizationvalues'
 
+
 class Results(models.Model):
     resultid = models.AutoField(primary_key=True, verbose_name="result")
     resultuuid = UUIDField(auto=True)
-    featureactionid = models.ForeignKey( Featureactions,related_name="feature_actions",verbose_name="sampling feature action", db_column='featureactionid')
-    result_type = models.ForeignKey(CvResulttype,verbose_name='result type', db_column='resulttypecv')
+    featureactionid = models.ForeignKey(Featureactions, related_name="feature_actions",
+                                        verbose_name="sampling feature action", db_column='featureactionid')
+    result_type = models.ForeignKey(CvResulttype, verbose_name='result type', db_column='resulttypecv')
     variableid = models.ForeignKey('Variables', verbose_name='variable', db_column='variableid')
     unitsid = models.ForeignKey('Units', verbose_name='units', related_name='+', db_column='unitsid')
-    taxonomicclassifierid = models.ForeignKey('Taxonomicclassifiers', verbose_name='taxonomic classifier', db_column='taxonomicclassifierid',blank=True, null=True)
+    taxonomicclassifierid = models.ForeignKey('Taxonomicclassifiers', verbose_name='taxonomic classifier',
+                                              db_column='taxonomicclassifierid', blank=True, null=True)
     processing_level = models.ForeignKey(Processinglevels, db_column='processinglevelid')
-    resultdatetime = models.DateTimeField(verbose_name='Start result date time',blank=True, null=True)
-    resultdatetimeutcoffset = models.BigIntegerField(verbose_name='Start result date time UTC offset', default=4, null=True)
-    #validdatetime>> Date and time for which the result is valid (e.g., for a forecast result).
+    resultdatetime = models.DateTimeField(verbose_name='Start result date time', blank=True, null=True)
+    resultdatetimeutcoffset = models.BigIntegerField(verbose_name='Start result date time UTC offset', default=4,
+                                                     null=True)
+    # validdatetime>> Date and time for which the result is valid (e.g., for a forecast result).
     # Should probably be expressed as a duration
-    validdatetime = models.DateTimeField(verbose_name= 'valid date time- Date and time for which the result is valid', blank=True, null=True)
+    validdatetime = models.DateTimeField(verbose_name='valid date time- Date and time for which the result is valid',
+                                         blank=True, null=True)
     validdatetimeutcoffset = models.BigIntegerField(verbose_name='valid date time UTC offset', default=4, null=True)
-    statuscv = models.ForeignKey(CvStatus, verbose_name='status',db_column='statuscv', blank=True, null=True)
-    sampledmediumcv = models.ForeignKey(CvMedium, verbose_name= 'sampled medium', db_column='sampledmediumcv', blank=True, null=True)
+    statuscv = models.ForeignKey(CvStatus, verbose_name='status', db_column='statuscv', blank=True, null=True)
+    sampledmediumcv = models.ForeignKey(CvMedium, verbose_name='sampled medium', db_column='sampledmediumcv',
+                                        blank=True, null=True)
     valuecount = models.IntegerField(verbose_name='number of recorded values')
-    #def __unicode__(self):
+
+    # def __unicode__(self):
     #    return u'%s - %s' % (self.resultid, self.feature_action)
 
     def __unicode__(self):
         return u"%s - %s - ID: %s" % (self.variableid, self.featureactionid, self.resultid)
+
     class Meta:
         managed = False
         db_table = r'odm2"."results'
-        verbose_name='result'
+        verbose_name = 'result'
         ordering = ["variableid"]
 
 
 class Resultsdataquality(models.Model):
     bridgeid = models.AutoField(primary_key=True)
-    resultid = models.ForeignKey(Results, db_column='resultid',verbose_name='result')
+    resultid = models.ForeignKey(Results, db_column='resultid', verbose_name='result')
     dataqualityid = models.ForeignKey(Dataquality, db_column='dataqualityid', verbose_name='data quality')
+
     def __unicode__(self):
         return u"%s - %s" % (self.resultid, self.dataqualityid)
+
     class Meta:
         managed = False
         db_table = r'odm2"."resultsdataquality'
-        verbose_name='results data quality'
+        verbose_name = 'results data quality'
         verbose_name_plural = 'results data quality'
 
 
@@ -1859,11 +2061,13 @@ class Samplingfeatureannotations(models.Model):
     bridgeid = models.AutoField(primary_key=True)
     samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     annotationid = models.ForeignKey(Annotations, db_column='annotationid')
+
     def __unicode__(self):
         s = u"%s" % (self.samplingfeatureid)
         if self.annotationid:
             s += u"- %s" % (self.annotationid)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."samplingfeatureannotations'
@@ -1874,11 +2078,13 @@ class Samplingfeatureextensionpropertyvalues(models.Model):
     samplingfeatureid = models.ForeignKey('Samplingfeatures', db_column='samplingfeatureid')
     propertyid = models.ForeignKey(Extensionproperties, db_column='propertyid')
     propertyvalue = models.CharField(max_length=255)
+
     def __unicode__(self):
         s = u"%s" % (self.samplingfeatureid)
         if self.propertyvalue:
             s += u"- %s" % (self.propertyvalue)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."samplingfeatureextensionpropertyvalues'
@@ -1890,9 +2096,13 @@ class Samplingfeatureexternalidentifiers(models.Model):
     externalidentifiersystemid = models.ForeignKey(Externalidentifiersystems, db_column='externalidentifiersystemid')
     samplingfeatureexternalidentifier = models.CharField(max_length=255)
     samplingfeatureexternalidentifieruri = models.CharField(max_length=255, blank=True)
+
     def __unicode__(self):
-        s = u"%s - %s - %s - %s" % (self.samplingfeatureid,  self.externalidentifiersystemid,self.samplingfeatureexternalidentifier,self.samplingfeatureexternalidentifieruri)
+        s = u"%s - %s - %s - %s" % (
+            self.samplingfeatureid, self.externalidentifiersystemid, self.samplingfeatureexternalidentifier,
+            self.samplingfeatureexternalidentifieruri)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."samplingfeatureexternalidentifiers'
@@ -1902,12 +2112,15 @@ class Samplingfeatures(models.Model):
     samplingfeatureid = models.AutoField(primary_key=True)
     samplingfeatureuuid = UUIDField(auto=True)
     sampling_feature_type = models.ForeignKey(CvSamplingfeaturetype, db_column='samplingfeaturetypecv')
-    samplingfeaturecode = models.CharField(verbose_name='sampling feature code',max_length=50)
-    samplingfeaturename = models.CharField(verbose_name='sampling feature name',max_length=255, blank=True, null=True)
-    samplingfeaturedescription = models.CharField(verbose_name='sampling feature description', max_length=5000, blank=True)
-    sampling_feature_geo_type = models.ForeignKey(CvSamplingfeaturegeotype,db_column='samplingfeaturegeotypecv', default= "Point", null=True)
-    featuregeometry = models.TextField(verbose_name='feature geometry',blank=True, null=True)  #GeometryField This field type is a guess.
-    elevation_m = models.FloatField(verbose_name='elevation',blank=True, null=True)
+    samplingfeaturecode = models.CharField(verbose_name='sampling feature code', max_length=50)
+    samplingfeaturename = models.CharField(verbose_name='sampling feature name', max_length=255, blank=True, null=True)
+    samplingfeaturedescription = models.CharField(verbose_name='sampling feature description', max_length=5000,
+                                                  blank=True)
+    sampling_feature_geo_type = models.ForeignKey(CvSamplingfeaturegeotype, db_column='samplingfeaturegeotypecv',
+                                                  default="Point", null=True)
+    featuregeometry = models.TextField(verbose_name='feature geometry', blank=True,
+                                       null=True)  # GeometryField This field type is a guess.
+    elevation_m = models.FloatField(verbose_name='elevation', blank=True, null=True)
     elevation_datum = models.ForeignKey(CvElevationdatum, db_column='elevationdatumcv', blank=True, null=True)
 
     objects = gis_models.GeoManager()
@@ -1916,15 +2129,16 @@ class Samplingfeatures(models.Model):
         return GEOSGeometry(self.featuregeometry)
 
     def __unicode__(self):
-        s = u"%s - %s- %s" % (self.samplingfeaturecode, self.samplingfeatureid,  self.sampling_feature_type)
+        s = u"%s - %s- %s" % (self.samplingfeaturecode, self.samplingfeatureid, self.sampling_feature_type)
         if self.samplingfeaturename:
             s += u" - %s" % (self.samplingfeaturename)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."samplingfeatures'
-        ordering = ('sampling_feature_type','samplingfeaturename',)
-        verbose_name='sampling feature'
+        ordering = ('sampling_feature_type', 'samplingfeaturename',)
+        verbose_name = 'sampling feature'
 
 
 class Sectionresults(models.Model):
@@ -1933,11 +2147,14 @@ class Sectionresults(models.Model):
     ylocationunitsid = models.ForeignKey('Units', related_name='+', db_column='ylocationunitsid', blank=True, null=True)
     spatialreferenceid = models.ForeignKey('Spatialreferences', db_column='spatialreferenceid', blank=True, null=True)
     intendedxspacing = models.FloatField(blank=True, null=True)
-    intendedxspacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedxspacingunitsid', blank=True, null=True)
+    intendedxspacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedxspacingunitsid',
+                                                blank=True, null=True)
     intendedzspacing = models.FloatField(blank=True, null=True)
-    intendedzspacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedzspacingunitsid', blank=True, null=True)
+    intendedzspacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedzspacingunitsid',
+                                                blank=True, null=True)
     intendedtimespacing = models.FloatField(blank=True, null=True)
-    intendedtimespacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedtimespacingunitsid', blank=True, null=True)
+    intendedtimespacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedtimespacingunitsid',
+                                                   blank=True, null=True)
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, db_column='aggregationstatisticcv')
 
     class Meta:
@@ -1971,7 +2188,8 @@ class Sectionresultvalues(models.Model):
     qualitycodecv = models.ForeignKey(CvQualitycode, db_column='qualitycodecv')
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, db_column='aggregationstatisticcv')
     timeaggregationinterval = models.FloatField()
-    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+', db_column='timeaggregationintervalunitsid')
+    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+',
+                                                       db_column='timeaggregationintervalunitsid')
 
     class Meta:
         managed = False
@@ -2090,7 +2308,9 @@ class Spectraresults(models.Model):
     zlocationunitsid = models.ForeignKey('Units', related_name='+', db_column='zlocationunitsid', blank=True, null=True)
     spatialreferenceid = models.ForeignKey(Spatialreferences, db_column='spatialreferenceid', blank=True, null=True)
     intendedwavelengthspacing = models.FloatField(blank=True, null=True)
-    intendedwavelengthspacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedwavelengthspacingunitsid', blank=True, null=True)
+    intendedwavelengthspacingunitsid = models.ForeignKey('Units', related_name='+',
+                                                         db_column='intendedwavelengthspacingunitsid', blank=True,
+                                                         null=True)
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, db_column='aggregationstatisticcv')
 
     class Meta:
@@ -2120,7 +2340,8 @@ class Spectraresultvalues(models.Model):
     censorcodecv = models.ForeignKey(CvCensorcode, db_column='censorcodecv')
     qualitycodecv = models.ForeignKey(CvQualitycode, db_column='qualitycodecv')
     timeaggregationinterval = models.FloatField()
-    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+', db_column='timeaggregationintervalunitsid')
+    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+',
+                                                       db_column='timeaggregationintervalunitsid')
 
     class Meta:
         managed = False
@@ -2138,45 +2359,51 @@ class Taxonomicclassifierexternalidentifiers(models.Model):
         managed = False
         db_table = r'odm2"."taxonomicclassifierexternalidentifiers'
 
-# I needed to add a sequence and set it as the default for the primary key to make the Taxonomic Classifiers class work
-# this is the SQL
+        # I needed to add a sequence and set it as the default for the primary key to make the Taxonomic Classifiers class work
+        # this is the SQL
 
-# CREATE SEQUENCE odm2.taxonomicclassifiers_taxonomicclassifiersid_seq
-#   INCREMENT 1
-#   MINVALUE 2
-#   MAXVALUE 9223372036854775807
-#   START 3
-#   CACHE 1;
-# ALTER TABLE odm2.taxonomicclassifiers_taxonomicclassifiersid_seq
-#   OWNER TO postgres;
+        # CREATE SEQUENCE odm2.taxonomicclassifiers_taxonomicclassifiersid_seq
+        #   INCREMENT 1
+        #   MINVALUE 2
+        #   MAXVALUE 9223372036854775807
+        #   START 3
+        #   CACHE 1;
+        # ALTER TABLE odm2.taxonomicclassifiers_taxonomicclassifiersid_seq
+        #   OWNER TO postgres;
 
-#ALTER TABLE odm2.taxonomicclassifiers
- #  ALTER COLUMN taxonomicclassifierid SET DEFAULT nextval('odm2.taxonomicclassifiers_taxonomicclassifiersid_seq'::regclass);
+        # ALTER TABLE odm2.taxonomicclassifiers
+        #  ALTER COLUMN taxonomicclassifierid SET DEFAULT nextval('odm2.taxonomicclassifiers_taxonomicclassifiersid_seq'::regclass);
+
 
 class Taxonomicclassifiers(models.Model):
     taxonomicclassifierid = models.AutoField(primary_key=True)
     taxonomic_classifier_type = models.ForeignKey(CvTaxonomicclassifiertype, db_column='taxonomicclassifiertypecv',
-                    help_text="A vocabulary for describing types of taxonomies from which descriptive terms used "\
-                              "in an ODM2 database have been drawn. Taxonomic classifiers provide a way to classify"\
-                              " Results and Specimens according to terms from a formal taxonomy.. Check "\
-                              "http://vocabulary.odm2.org/taxonomicclassifiertype/  for more info")
+                                                  help_text="A vocabulary for describing types of taxonomies from which descriptive terms used " \
+                                                            "in an ODM2 database have been drawn. Taxonomic classifiers provide a way to classify" \
+                                                            " Results and Specimens according to terms from a formal taxonomy.. Check " \
+                                                            "http://vocabulary.odm2.org/taxonomicclassifiertype/  for more info")
     taxonomicclassifiername = models.CharField(verbose_name='taxonomic classifier name', max_length=255)
-    taxonomicclassifiercommonname = models.CharField(verbose_name='taxonomic classifier common name',max_length=255, blank=True)
-    taxonomicclassifierdescription = models.CharField(verbose_name='taxonomic classifier description',max_length=5000, blank=True)
-    parent_taxonomic_classifier = models.ForeignKey('self', db_column='parenttaxonomicclassifierid', blank=True, null=True)
+    taxonomicclassifiercommonname = models.CharField(verbose_name='taxonomic classifier common name', max_length=255,
+                                                     blank=True)
+    taxonomicclassifierdescription = models.CharField(verbose_name='taxonomic classifier description', max_length=5000,
+                                                      blank=True)
+    parent_taxonomic_classifier = models.ForeignKey('self', db_column='parenttaxonomicclassifierid', blank=True,
+                                                    null=True)
+
     def __unicode__(self):
         s = u"%s" % (self.taxonomicclassifiername)
         if self.taxonomicclassifiercommonname:
             s += u"- %s" % (self.taxonomicclassifiercommonname)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."taxonomicclassifiers'
-        verbose_name='taxonomic classifier'
+        verbose_name = 'taxonomic classifier'
 
 
 class Timeseriesresults(models.Model):
-    resultid = models.OneToOneField(Results,  verbose_name="Result Series", db_column='resultid', primary_key=True)
+    resultid = models.OneToOneField(Results, verbose_name="Result Series", db_column='resultid', primary_key=True)
     xlocation = models.FloatField(blank=True, null=True)
     xlocationunitsid = models.ForeignKey('Units', related_name='+', db_column='xlocationunitsid', blank=True, null=True)
     ylocation = models.FloatField(blank=True, null=True)
@@ -2185,13 +2412,16 @@ class Timeseriesresults(models.Model):
     zlocationunitsid = models.ForeignKey('Units', related_name='+', db_column='zlocationunitsid', blank=True, null=True)
     spatialreferenceid = models.ForeignKey(Spatialreferences, db_column='spatialreferenceid', blank=True, null=True)
     intendedtimespacing = models.FloatField(blank=True, null=True)
-    intendedtimespacingunitsid = models.ForeignKey('Units', related_name='+', verbose_name="Time Units", db_column='intendedtimespacingunitsid', blank=True, null=True)
+    intendedtimespacingunitsid = models.ForeignKey('Units', related_name='+', verbose_name="Time Units",
+                                                   db_column='intendedtimespacingunitsid', blank=True, null=True)
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, db_column='aggregationstatisticcv')
+
     def __unicode__(self):
         s = u"%s " % (self.resultid)
         s += u", %s" % (self.intendedtimespacing)
         s += u", %s" % (self.intendedtimespacingunitsid)
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."timeseriesresults'
@@ -2218,42 +2448,50 @@ class Timeseriesresultvalues(models.Model):
     censorcodecv = models.ForeignKey(CvCensorcode, db_column='censorcodecv')
     qualitycodecv = models.ForeignKey(CvQualitycode, db_column='qualitycodecv')
     timeaggregationinterval = models.FloatField(verbose_name="Time Interval")
-    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+',verbose_name="Time Units",  db_column='timeaggregationintervalunitsid')
+    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+', verbose_name="Time Units",
+                                                       db_column='timeaggregationintervalunitsid')
+
     def __unicode__(self):
         s = u"%s " % (self.resultid)
         s += u"- %s" % (self.datavalue)
         s += u"- %s" % (self.valuedatetime)
         return s
+
     def csvheader(self):
-        s='databaseid,'
-        #s+='Value,'
+        s = 'databaseid,'
+        # s+='Value,'
         s += 'Date and Time,'
-        #s += 'Variable Name,'
-        #s += 'Unit Name,'
-        #s += 'processing level,'
+        # s += 'Variable Name,'
+        # s += 'Unit Name,'
+        # s += 'processing level,'
         s += 'sampling feature/location,'
         s += 'time aggregation interval,'
         s += 'time aggregation unit,'
-        s +='citation,'
+        s += 'citation,'
 
         return s
+
     def csvoutput(self):
         s = str(self.valueid)
-        #s += ', {0}'.format(self.datavalue)
+        # s += ', {0}'.format(self.datavalue)
         s += ', {0}'.format(self.valuedatetime)
-        #s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
-        #s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
-        #s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
         s += ',\" {0}\"'.format(self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)
         s += ', {0}'.format(self.timeaggregationinterval)
         s += ', {0},'.format(self.timeaggregationintervalunitsid)
-        s = buildCitation(s,self)
+        s = buildCitation(s, self)
 
-            #s += ' {0}\"'.format(citation.citationlink)
+        # s += ' {0}\"'.format(citation.citationlink)
         return s
+
     def csvheaderShort(self):
-        s = '\" {0} -unit-{1}-processing level-{2}\",annotation,'.format(self.resultid.resultid.variableid.variablecode,self.resultid.resultid.unitsid.unitsname,self.resultid.resultid.processing_level)
+        s = '\" {0} -unit-{1}-processing level-{2}\",annotation,'.format(self.resultid.resultid.variableid.variablecode,
+                                                                         self.resultid.resultid.unitsid.unitsname,
+                                                                         self.resultid.resultid.processing_level)
         return s
+
     def csvoutputShort(self):
         s = '{0}'.format(self.datavalue)
         mrvannotation = Measurementresultvalueannotations.objects.filter(valueid=self.valueid)
@@ -2265,19 +2503,23 @@ class Timeseriesresultvalues(models.Model):
         s += '\"'
         s += ','
         return s
+
     class Meta:
         managed = False
         db_table = r'odm2"."timeseriesresultvalues'
-        verbose_name='time series result value'
+        verbose_name = 'time series result value'
 
 
 class Trajectoryresults(models.Model):
     resultid = models.OneToOneField(Results, db_column='resultid', primary_key=True)
     spatialreferenceid = models.ForeignKey(Spatialreferences, db_column='spatialreferenceid', blank=True, null=True)
     intendedtrajectoryspacing = models.FloatField(blank=True, null=True)
-    intendedtrajectoryspacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedtrajectoryspacingunitsid', blank=True, null=True)
+    intendedtrajectoryspacingunitsid = models.ForeignKey('Units', related_name='+',
+                                                         db_column='intendedtrajectoryspacingunitsid', blank=True,
+                                                         null=True)
     intendedtimespacing = models.FloatField(blank=True, null=True)
-    intendedtimespacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedtimespacingunitsid', blank=True, null=True)
+    intendedtimespacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedtimespacingunitsid',
+                                                   blank=True, null=True)
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, db_column='aggregationstatisticcv')
 
     class Meta:
@@ -2313,7 +2555,8 @@ class Trajectoryresultvalues(models.Model):
     censorcodecv = models.ForeignKey(CvCensorcode, db_column='censorcodecv')
     qualitycodecv = models.ForeignKey(CvQualitycode, db_column='qualitycodecv')
     timeaggregationinterval = models.FloatField()
-    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+', db_column='timeaggregationintervalunitsid')
+    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+',
+                                                       db_column='timeaggregationintervalunitsid')
 
     class Meta:
         managed = False
@@ -2326,9 +2569,12 @@ class Transectresults(models.Model):
     zlocationunitsid = models.ForeignKey('Units', related_name='+', db_column='zlocationunitsid', blank=True, null=True)
     spatialreferenceid = models.ForeignKey(Spatialreferences, db_column='spatialreferenceid', blank=True, null=True)
     intendedtransectspacing = models.FloatField(blank=True, null=True)
-    intendedtransectspacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedtransectspacingunitsid', blank=True, null=True)
+    intendedtransectspacingunitsid = models.ForeignKey('Units', related_name='+',
+                                                       db_column='intendedtransectspacingunitsid', blank=True,
+                                                       null=True)
     intendedtimespacing = models.FloatField(blank=True, null=True)
-    intendedtimespacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedtimespacingunitsid', blank=True, null=True)
+    intendedtimespacingunitsid = models.ForeignKey('Units', related_name='+', db_column='intendedtimespacingunitsid',
+                                                   blank=True, null=True)
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, db_column='aggregationstatisticcv')
 
     class Meta:
@@ -2363,7 +2609,8 @@ class Transectresultvalues(models.Model):
     qualitycodecv = models.ForeignKey(CvQualitycode, db_column='qualitycodecv')
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic, db_column='aggregationstatisticcv')
     timeaggregationinterval = models.FloatField()
-    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+', db_column='timeaggregationintervalunitsid')
+    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+',
+                                                       db_column='timeaggregationintervalunitsid')
 
     class Meta:
         managed = False
@@ -2373,25 +2620,26 @@ class Transectresultvalues(models.Model):
 class Units(models.Model):
     unitsid = models.AutoField(primary_key=True)
     unit_type = models.ForeignKey(CvUnitstype,
-            help_text="A vocabulary for describing the type of the Unit or the more general quantity that the Unit "
-                      "represents. View unit type details here http://vocabulary.odm2.org/unitstype/"
-            ,db_column='unitstypecv')
+                                  help_text="A vocabulary for describing the type of the Unit or the more general quantity that the Unit "
+                                            "represents. View unit type details here http://vocabulary.odm2.org/unitstype/"
+                                  , db_column='unitstypecv')
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
-    unitsname = models.CharField(verbose_name='unit name',max_length=255)
-    unitslink = models.CharField(verbose_name='reference for the unit (web link)',max_length=255, blank=True)
-    def __unicode__(self):
+    unitsname = models.CharField(verbose_name='unit name', max_length=255)
+    unitslink = models.CharField(verbose_name='reference for the unit (web link)', max_length=255, blank=True)
 
+    def __unicode__(self):
         s = u"%s" % (self.unitsabbreviation)
-        #if self.unit_type:
+        # if self.unit_type:
         #    s = u"- %s" % (self.unit_type)
         if self.unitsname:
-            s+=u"- %s" % (self.unitsname)
+            s += u"- %s" % (self.unitsname)
         return s
+
     class Meta:
         managed = False
-        ordering = ('unitsabbreviation','unitsname',)
+        ordering = ('unitsabbreviation', 'unitsname',)
         db_table = r'odm2"."units'
-        verbose_name='unit'
+        verbose_name = 'unit'
 
 
 class Variableextensionpropertyvalues(models.Model):
@@ -2417,26 +2665,29 @@ class Variableexternalidentifiers(models.Model):
         db_table = r'odm2"."variableexternalidentifiers'
 
 
-
 class Variables(models.Model):
     variableid = models.AutoField(primary_key=True)
     variable_type = models.ForeignKey(CvVariabletype,
-        help_text="view variable types here http://vocabulary.odm2.org/variabletype/ ", db_column='variabletypecv')
-    #variabletypecv = models.ModelChoiceField(CvVariabletype, db_column='variabletypecv')
+                                      help_text="view variable types here http://vocabulary.odm2.org/variabletype/ ",
+                                      db_column='variabletypecv')
+    # variabletypecv = models.ModelChoiceField(CvVariabletype, db_column='variabletypecv')
     variablecode = models.CharField(verbose_name='variable code', max_length=50)
     variable_name = models.ForeignKey(CvVariablename,
-        help_text="view variable names here http://vocabulary.odm2.org/variablename/", db_column='variablenamecv')
+                                      help_text="view variable names here http://vocabulary.odm2.org/variablename/",
+                                      db_column='variablenamecv')
     variabledefinition = models.CharField(verbose_name='variable definition', max_length=500, blank=True)
-    #variabledefinition.name = 'variable_definition'
+    # variabledefinition.name = 'variable_definition'
     speciation = models.ForeignKey(CvSpeciation, db_column='speciationcv', blank=True, null=True)
     nodatavalue = models.FloatField(verbose_name='no data value')
+
     def __unicode__(self):
         s = "%s" % (self.variablecode)
         if self.variabledefinition:
             s += " - %s" % (self.variabledefinition)[:20]
         return s
+
     class Meta:
         managed = False
-        ordering = ('variablecode','variable_name',)
+        ordering = ('variablecode', 'variable_name',)
         db_table = r'odm2"."variables'
-        verbose_name='variable'
+        verbose_name = 'variable'
