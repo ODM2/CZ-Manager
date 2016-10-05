@@ -28,23 +28,24 @@ class TimeseriesResultsLookup(LookupChannel):
         qset = None
         for part in q.split():
             if not qset:
-                qset = Timeseriesresults.objects.filter(Q(resultid__resultid__icontains=part) \
-                                                        | Q(
-                    resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) \
-                                                        | Q(
-                    resultid__featureactionid__action__method__methodname__icontains=part) \
-                                                        | Q(resultid__variableid__variablecode__icontains=part) \
-                                                        | Q(resultid__variableid__variable_name__name__icontains=part))
+                qset = Timeseriesresults.objects.filter(
+                    Q(resultid__resultid__icontains=part) |
+                    Q(
+                        resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains
+                        =part) |
+                    Q(resultid__featureactionid__action__method__methodname__icontains=part) |
+                    Q(resultid__variableid__variablecode__icontains=part) |
+                    Q(resultid__variableid__variable_name__name__icontains=part))
 
             else:
-                qset = qset & Timeseriesresults.objects.filter(Q(resultid__resultid__icontains=part) \
-                                                               | Q(
-                    resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) \
-                                                               | Q(
-                    resultid__featureactionid__action__method__methodname__icontains=part) \
-                                                               | Q(resultid__variableid__variablecode__icontains=part) \
-                                                               | Q(
-                    resultid__variableid__variable_name__name__icontains=part))
+                qset = qset & Timeseriesresults.objects.filter(
+                    Q(resultid__resultid__icontains=part) |
+                    Q(
+                        resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains
+                        =part) |
+                    Q(resultid__featureactionid__action__method__methodname__icontains=part) |
+                    Q(resultid__variableid__variablecode__icontains=part) |
+                    Q(resultid__variableid__variable_name__name__icontains=part))
         return qset
 
     def get_result(self, obj):
@@ -68,23 +69,22 @@ class MeasurementResultsLookup(LookupChannel):
         qset = None
         for part in q.split():
             if not qset:
-                qset = Measurementresults.objects.filter(Q(resultid__resultid__icontains=part) \
-                                                         | Q(
-                    resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) \
-                                                         | Q(
-                    resultid__featureactionid__action__method__methodname__icontains=part) \
-                                                         | Q(resultid__variableid__variablecode__icontains=part) \
-                                                         | Q(resultid__variableid__variable_name__name__icontains=part))
+                qset = Measurementresults.objects.filter(
+                    Q(resultid__resultid__icontains=part) |
+                    Q(resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains
+                        =part) |
+                    Q(resultid__featureactionid__action__method__methodname__icontains=part) |
+                    Q(resultid__variableid__variablecode__icontains=part) |
+                    Q(resultid__variableid__variable_name__name__icontains=part))
 
             else:
-                qset = qset & Measurementresults.objects.filter(Q(resultid__resultid__icontains=part) \
-                                                                | Q(
-                    resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) \
-                                                                | Q(
-                    resultid__featureactionid__action__method__methodname__icontains=part) \
-                                                                | Q(resultid__variableid__variablecode__icontains=part) \
-                                                                | Q(
-                    resultid__variableid__variable_name__name__icontains=part))
+                qset = qset & Measurementresults.objects.filter(
+                    Q(resultid__resultid__icontains=part) |
+                    Q(resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains
+                        =part) |
+                    Q(resultid__featureactionid__action__method__methodname__icontains=part) |
+                    Q(resultid__variableid__variablecode__icontains=part) |
+                    Q(resultid__variableid__variable_name__name__icontains=part))
         return qset
 
     def get_result(self, obj):
@@ -108,23 +108,22 @@ class ProfileResultsLookup(LookupChannel):
         qset = None
         for part in q.split():
             if not qset:
-                qset = Profileresults.objects.filter(Q(resultid__resultid__icontains=part) \
-                                                     | Q(
-                    resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) \
-                                                     | Q(
-                    resultid__featureactionid__action__method__methodname__icontains=part) \
-                                                     | Q(resultid__variableid__variablecode__icontains=part) \
-                                                     | Q(resultid__variableid__variable_name__name__icontains=part))
+                qset = Profileresults.objects.filter(
+                    Q(resultid__resultid__icontains=part) |
+                    Q(resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains
+                        =part) |
+                    Q(resultid__featureactionid__action__method__methodname__icontains=part) |
+                    Q(resultid__variableid__variablecode__icontains=part) |
+                    Q(resultid__variableid__variable_name__name__icontains=part))
 
             else:
-                qset = qset & Profileresults.objects.filter(Q(resultid__resultid__icontains=part) \
-                                                            | Q(
-                    resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) \
-                                                            | Q(
-                    resultid__featureactionid__action__method__methodname__icontains=part) \
-                                                            | Q(resultid__variableid__variablecode__icontains=part) \
-                                                            | Q(
-                    resultid__variableid__variable_name__name__icontains=part))
+                qset = qset & Profileresults.objects.filter(
+                    Q(resultid__resultid__icontains=part) |
+                    Q(resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains
+                        =part) |
+                    Q(resultid__featureactionid__action__method__methodname__icontains=part) |
+                    Q(resultid__variableid__variablecode__icontains=part) |
+                    Q(resultid__variableid__variable_name__name__icontains=part))
         return qset
 
     def get_result(self, obj):
@@ -148,38 +147,41 @@ class ResultsLookup(LookupChannel):
         qset = None
         for part in q.split():
             if not qset:
-                qset = Results.objects.filter(Q(resultid__icontains=part) \
-                                              | Q(
-                    featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) \
-                                              | Q(featureactionid__action__method__methodname__icontains=part) \
-                                              | Q(variableid__variabledefinition__icontains=part) \
-                                              | Q(variableid__variablecode__icontains=part))
+                qset = Results.objects.filter(
+                    Q(resultid__icontains=part) |
+                    Q(featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) |
+                    Q(featureactionid__action__method__methodname__icontains=part) |
+                    Q(variableid__variabledefinition__icontains=part) |
+                    Q(variableid__variablecode__icontains=part))
 
             else:
-                qset = qset & Results.objects.filter(Q(resultid__icontains=part) \
-                                                     | Q(
-                    featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) \
-                                                     | Q(featureactionid__action__method__methodname__icontains=part) \
-                                                     | Q(variableid__variabledefinition__icontains=part) \
-                                                     | Q(variableid__variablecode__icontains=part))
+                qset = qset & Results.objects.filter(
+                    Q(resultid__icontains=part) |
+                    Q(featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) |
+                    Q(featureactionid__action__method__methodname__icontains=part) |
+                    Q(variableid__variabledefinition__icontains=part) |
+                    Q(variableid__variablecode__icontains=part))
                 # raise ValidationError(qset)
         return qset
 
     def get_result(self, obj):
-        return "%s- %s - %s - %s - %s" % (obj.resultid, obj.variableid.variable_name.name, obj.variableid.variablecode,
-                                          obj.featureactionid.samplingfeatureid.samplingfeaturename,
-                                          obj.featureactionid.action.method.methodname)
+        return "%s- %s - %s - %s - %s" % (
+            obj.resultid, obj.variableid.variable_name.name, obj.variableid.variablecode,
+            obj.featureactionid.samplingfeatureid.samplingfeaturename,
+            obj.featureactionid.action.method.methodname)
 
     def format_match(self, obj):
         # return self.format_item_display(obj)
-        return "%s- %s - %s - %s - %s" % (obj.resultid, obj.variableid.variable_name.name, obj.variableid.variablecode,
-                                          obj.featureactionid.samplingfeatureid.samplingfeaturename,
-                                          obj.featureactionid.action.method.methodname)
+        return "%s- %s - %s - %s - %s" % (
+            obj.resultid, obj.variableid.variable_name.name, obj.variableid.variablecode,
+            obj.featureactionid.samplingfeatureid.samplingfeaturename,
+            obj.featureactionid.action.method.methodname)
 
     def format_item_display(self, obj):
-        return "%s- %s - %s - %s - %s" % (obj.resultid, obj.variableid.variable_name.name, obj.variableid.variablecode,
-                                          obj.featureactionid.samplingfeatureid.samplingfeaturename,
-                                          obj.featureactionid.action.method.methodname)
+        return "%s- %s - %s - %s - %s" % (
+            obj.resultid, obj.variableid.variable_name.name, obj.variableid.variablecode,
+            obj.featureactionid.samplingfeatureid.samplingfeaturename,
+            obj.featureactionid.action.method.methodname)
 
     def get_objects(self, ids):
         obj = Results.objects.filter(resultid__in=ids)
@@ -193,22 +195,25 @@ class FeatureactionsLookup(LookupChannel):
         qset = None
         for part in q.split():
             if not qset:
-                qset = Featureactions.objects.filter(Q(samplingfeatureid__samplingfeaturename__icontains=part) \
-                                                     | Q(action__method__methoddescription__icontains=part) \
-                                                     | Q(action__method__methodname__icontains=part)).order_by(
+                qset = Featureactions.objects.filter(
+                    Q(samplingfeatureid__samplingfeaturename__icontains=part) |
+                    Q(action__method__methoddescription__icontains=part) |
+                    Q(action__method__methodname__icontains=part)).order_by(
                     'samplingfeatureid__samplingfeaturename')
             else:
-                qset = qset & Featureactions.objects.filter(Q(samplingfeatureid__samplingfeaturename__icontains=part) \
-                                                            | Q(action__method__methoddescription__icontains=part) \
-                                                            | Q(action__method__methodname__icontains=part)).order_by(
+                qset = qset & Featureactions.objects.filter(
+                    Q(samplingfeatureid__samplingfeaturename__icontains=part) |
+                    Q(action__method__methoddescription__icontains=part) |
+                    Q(action__method__methodname__icontains=part)).order_by(
                     'samplingfeatureid__samplingfeaturename')
-        return qset  #
+        return qset
         # return Featureactions.objects.filter(name__icontains=q)#.order_by('name')
 
     def get_result(self, obj):
         # return obj.featureactionid
         return "%s- %s - %s" % (obj.featureactionid, obj.samplingfeatureid.samplingfeaturename,
-                                obj.action.method.methodname)  # Featureactions.objects.filter(featureactionid__in=obj.featureactionid) #
+                                obj.action.method.methodname)
+        # Featureactions.objects.filter(featureactionid__in=obj.featureactionid) #
 
     def format_match(self, obj):
         return self.format_item_display(obj)
@@ -217,7 +222,8 @@ class FeatureactionsLookup(LookupChannel):
     def format_item_display(self, obj):
         # return u"<span class='tag'>%s</span>" % obj.name
         return "%s- %s - %s" % (
-            obj.featureactionid, obj.samplingfeatureid.samplingfeaturename, obj.action.method.methodname)
+            obj.featureactionid, obj.samplingfeatureid.samplingfeaturename,
+            obj.action.method.methodname)
 
     def get_objects(self, ids):
         obj = Featureactions.objects.filter(featureactionid__in=ids)
@@ -238,7 +244,8 @@ class CvVariableNameLookup(LookupChannel):
         # return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
 
     def format_item_display(self, obj):
-        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri),
+        # escape(obj.name))
         return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
@@ -258,7 +265,8 @@ class CvVariableSpeciationLookup(LookupChannel):
         # return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
 
     def format_item_display(self, obj):
-        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri),
+        # escape(obj.name))
         return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
@@ -278,7 +286,8 @@ class CvVariableTypeLookup(LookupChannel):
         # return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
 
     def format_item_display(self, obj):
-        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri),
+        # escape(obj.name))
         return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
@@ -298,7 +307,8 @@ class CvUnitTypeLookup(LookupChannel):
         # return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
 
     def format_item_display(self, obj):
-        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri),
+        # escape(obj.name))
         return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
@@ -318,7 +328,8 @@ class CvTaxonomicClassifierTypeLookup(LookupChannel):
         # return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
 
     def format_item_display(self, obj):
-        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri),
+        # escape(obj.name))
         return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
@@ -338,7 +349,8 @@ class CvMethodTypeLookup(LookupChannel):
         # return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
 
     def format_item_display(self, obj):
-        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri),
+        # escape(obj.name))
         return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
@@ -358,7 +370,8 @@ class CvActionTypeLookup(LookupChannel):
         # return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
 
     def format_item_display(self, obj):
-        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri),
+        # escape(obj.name))
         return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
@@ -378,7 +391,8 @@ class CvSamplingFeatureTypeLookup(LookupChannel):
         # return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
 
     def format_item_display(self, obj):
-        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri),
+        # escape(obj.name))
         return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
@@ -398,7 +412,8 @@ class CvSamplingFeatureGeoTypeLookup(LookupChannel):
         # return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
 
     def format_item_display(self, obj):
-        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri),
+        # escape(obj.name))
         return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
@@ -418,7 +433,8 @@ class CvElevationDatumLookup(LookupChannel):
         # return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
 
     def format_item_display(self, obj):
-        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri),
+        # escape(obj.name))
         return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')

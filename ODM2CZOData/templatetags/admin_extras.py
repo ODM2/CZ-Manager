@@ -18,7 +18,8 @@ def collect(parser, token):
         items = bits[1:-2]
         return CollectNode(items, varname)
     else:
-        raise template.TemplateSyntaxError('%r expected format is "item [item ...] as varname"' % bits[0])
+        raise template.TemplateSyntaxError('%r expected format is "item [item ...] as varname"'
+                                           % bits[0])
 
 
 class CollectNode(template.Node):

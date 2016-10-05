@@ -61,11 +61,13 @@ import re
 
 
 # from .admin import MeasurementresultvaluesResource
-# AffiliationsChoiceField(People.objects.all().order_by('personlastname'),Organizations.objects.all().order_by('organizationname'))
+# AffiliationsChoiceField(People.objects.all().order_by('personlastname'),
+# Organizations.objects.all().order_by('organizationname'))
 
 # a complicated use of search_fields described in ResultsAdminForm
 
-# the following define what fields should be overridden so that dropdown lists can be populated with useful information
+# the following define what fields should be overridden so that
+# dropdown lists can be populated with useful information
 
 def link_list_display_DOI(link):
     match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])\S)+", link)
@@ -115,15 +117,14 @@ class FeatureActionsInline(admin.StackedInline):
 
 class CitationextensionpropertyvalueInline(admin.StackedInline):
     model = Citationextensionpropertyvalues
-    fieldsets = (('Details', {
-        'classes': ('collapse',),
-        'fields': ('citationid',
-                   'propertyid',
-                   'propertyvalue',
-
-                   )
-    }),
-                 )
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('citationid',
+                       'propertyid',
+                       'propertyvalue',)
+        }),
+    )
     extra = 6
 
 
@@ -149,7 +150,8 @@ class DataqualityAdminForm(ModelForm):
 
 
 class DataqualityAdmin(admin.ModelAdmin):
-    list_display = ('dataqualitytypecv', 'dataqualitycode', 'dataqualityvalue', 'dataqualityvalueunitsid')
+    list_display = (
+        'dataqualitytypecv', 'dataqualitycode', 'dataqualityvalue', 'dataqualityvalueunitsid')
     form = DataqualityAdminForm
 
 
@@ -164,10 +166,12 @@ class MethodcitationsAdmin(admin.ModelAdmin):
     form = MethodcitationsAdminForm
 
     def method_link(self, obj):
-        return u'<a href="%smethods/%s/">See Method</a>' % (CUSTOM_TEMPLATE_PATH, obj.methodid.methodid)
+        return u'<a href="%smethods/%s/">See Method</a>' % (
+            CUSTOM_TEMPLATE_PATH, obj.methodid.methodid)
 
     def citation_link(self, obj):
-        return u'<a href="%scitations/%s/">%s</a>' % (CUSTOM_TEMPLATE_PATH, obj.citationid.citationid, obj.citationid)
+        return u'<a href="%scitations/%s/">%s</a>' % (
+            CUSTOM_TEMPLATE_PATH, obj.citationid.citationid, obj.citationid)
 
     def method_id(self, obj):
         return obj.methodid
@@ -242,11 +246,14 @@ class DOIInline(admin.StackedInline):
 
 
 class CitationsAdmin(admin.ModelAdmin):
-    list_display = ('primary_author', 'publicationyear', 'title', 'other_author', 'publisher', 'doi', 'citation_link')
+    list_display = (
+        'primary_author', 'publicationyear', 'title', 'other_author', 'publisher', 'doi',
+        'citation_link')
     list_display_links = ['title']
     inlines = [authorlistInline, DOIInline, CitationextensionpropertyvalueInline]
     form = CitationsAdminForm
-    search_fields = ['title', 'publisher', 'publicationyear', 'authorlists__personid__personfirstname',
+    search_fields = ['title', 'publisher', 'publicationyear',
+                     'authorlists__personid__personfirstname',
                      'authorlists__personid__personlastname']
 
     def citation_link(self, obj):
@@ -254,18 +261,21 @@ class CitationsAdmin(admin.ModelAdmin):
 
     def doi(self, obj):
         external_id = Citationexternalidentifiers.objects.get(citationid=obj.citationid)
-        return u'<a href="http://dx.doi.org/{0}" target="_blank">{0}</a>'.format(external_id.citationexternalidentifier)
+        return u'<a href="http://dx.doi.org/{0}" target="_blank">{0}</a>'.format(
+            external_id.citationexternalidentifier)
 
     def primary_author(self, obj):
         self.author_list = Authorlists.objects.filter(citationid=obj.citationid)
         first_author = self.author_list.get(authororder=1)
-        return "{0}, {1}".format(first_author.personid.personlastname, first_author.personid.personfirstname)
+        return "{0}, {1}".format(first_author.personid.personlastname,
+                                 first_author.personid.personfirstname)
 
     def other_author(self, obj):
         list_et_al = list()
         for author in self.author_list:
             if author.authororder != 1:
-                list_et_al.append("{0}, {1}".format(author.personid.personlastname, author.personid.personfirstname))
+                list_et_al.append("{0}, {1}".format(author.personid.personlastname,
+                                                    author.personid.personfirstname))
         return "; ".join(list_et_al)
 
     doi.allow_tags = True
@@ -289,7 +299,8 @@ class CitationextensionpropertyvaluesAdmin(admin.ModelAdmin):
 
 
 class ExtensionpropertiesAdminForm(ModelForm):
-    propertydescription = forms.CharField(max_length=255, widget=forms.Textarea, label="Property description")
+    propertydescription = forms.CharField(max_length=255, widget=forms.Textarea,
+                                          label="Property description")
 
     class Meta:
         model = Extensionproperties
@@ -312,11 +323,17 @@ class VariablesAdminForm(ModelForm):
     # variable_type = make_ajax_field(Variables,'variable_type','cv_variable_type')
     speciation = make_ajax_field(Variables, 'speciation', 'cv_speciation')
 
-    variable_name.help_text = u'view variable names here <a href="http://vocabulary.odm2.org/variablename/" target="_blank">http://vocabulary.odm2.org/variablename/</a>'
+    variable_name.help_text = u'view variable names here <a href="http://vocabulary.odm2.org/' \
+                              u'variablename/" target="_blank">' \
+                              u'http://vocabulary.odm2.org/variablename/</a>'
     variable_name.allow_tags = True
-    variable_type.help_text = u'view variable types here <a href="http://vocabulary.odm2.org/variabletype/" target="_blank" >http://vocabulary.odm2.org/variabletype/</a>'
+    variable_type.help_text = u'view variable types here <a href="http://vocabulary.odm2.org/' \
+                              u'variabletype/" target="_blank" >' \
+                              u'http://vocabulary.odm2.org/variabletype/</a>'
     variable_type.allow_tags = True
-    speciation.help_text = u'view variable types here <a href="http://vocabulary.odm2.org/speciation/" target="_blank" >http://vocabulary.odm2.org/speciation/</a>'
+    speciation.help_text = u'view variable types here <a href="http://vocabulary.odm2.org/' \
+                           u'speciation/" target="_blank" >' \
+                           u'http://vocabulary.odm2.org/speciation/</a>'
     speciation.allow_tags = True
 
     class Meta:
@@ -326,29 +343,31 @@ class VariablesAdminForm(ModelForm):
 
 class VariablesAdmin(admin.ModelAdmin):
     form = VariablesAdminForm
-    list_display = ('variablecode', 'variable_name_linked', 'variable_type_linked', 'speciation_linked')
-    search_fields = ['variable_type__name', 'variable_name__name', 'variablecode', 'speciation__name']
+    list_display = (
+        'variablecode', 'variable_name_linked', 'variable_type_linked', 'speciation_linked')
+    search_fields = ['variable_type__name', 'variable_name__name', 'variablecode',
+                     'speciation__name']
 
     def variable_name_linked(self, obj):
         if obj.variable_name:
-            return u'<a href="http://vocabulary.odm2.org/variablename/{0}" target="_blank">{1}</a>'.format(
-                obj.variable_name.term, obj.variable_name.name)
+            return u'<a href="http://vocabulary.odm2.org/variablename/{0}" ' \
+                   u'target="_blank">{1}</a>'.format(obj.variable_name.term, obj.variable_name.name)
 
     variable_name_linked.short_description = 'Variable Name'
     variable_name_linked.allow_tags = True
 
     def variable_type_linked(self, obj):
         if obj.variable_type:
-            return u'<a href="http://vocabulary.odm2.org/variabletype/{0}" target="_blank">{1}</a>'.format(
-                obj.variable_type.term, obj.variable_type.name)
+            return u'<a href="http://vocabulary.odm2.org/variabletype/{0}" ' \
+                   u'target="_blank">{1}</a>'.format(obj.variable_type.term, obj.variable_type.name)
 
     variable_type_linked.short_description = 'Variable Type'
     variable_type_linked.allow_tags = True
 
     def speciation_linked(self, obj):
         if obj.speciation:
-            return u'<a href="http://vocabulary.odm2.org/speciation/{0}" target="_blank">{1}</a>'.format(
-                obj.speciation.term, obj.speciation.name)
+            return u'<a href="http://vocabulary.odm2.org/speciation/{0}" ' \
+                   u'target="_blank">{1}</a>'.format(obj.speciation.term, obj.speciation.name)
 
     speciation_linked.short_description = 'Speciation'
     speciation_linked.allow_tags = True
@@ -357,11 +376,16 @@ class VariablesAdmin(admin.ModelAdmin):
 class TaxonomicclassifiersAdminForm(ModelForm):
     taxonomic_classifier_type = make_ajax_field(Taxonomicclassifiers, 'taxonomic_classifier_type',
                                                 'cv_taxonomic_classifier_type')
-    taxonomic_classifier_type.help_text = u'A vocabulary for describing types of taxonomies from which descriptive terms used ' \
-                                          u'in an ODM2 database have been drawn. Taxonomic classifiers provide a way to classify' \
-                                          u' Results and Specimens according to terms from a formal taxonomy. Check ' \
-                                          u'<a href="http://vocabulary.odm2.org/taxonomicclassifiertype/" target="_blank">' \
-                                          u'http://vocabulary.odm2.org/taxonomicclassifiertype/</a>  for more info'
+    taxonomic_classifier_type.help_text = u'A vocabulary for describing types of taxonomies ' \
+                                          u'from which descriptive terms used ' \
+                                          u'in an ODM2 database have been drawn. ' \
+                                          u'Taxonomic classifiers provide a way to classify' \
+                                          u' Results and Specimens according to terms ' \
+                                          u'from a formal taxonomy. Check ' \
+                                          u'<a href="http://vocabulary.odm2.org/' \
+                                          u'taxonomicclassifiertype/" target="_blank">' \
+                                          u'http://vocabulary.odm2.org/' \
+                                          u'taxonomicclassifiertype/</a> for more info'
     taxonomic_classifier_type.allow_tags = True
 
     class Meta:
@@ -392,7 +416,8 @@ class SamplingfeaturesAdminForm(ModelForm):
     class Meta:
         model = Samplingfeatures
         fields = ['sampling_feature_type', 'samplingfeaturecode', 'samplingfeaturename',
-                  'samplingfeaturedescription', 'sampling_feature_geo_type', 'featuregeometrywkt', 'featuregeometry',
+                  'samplingfeaturedescription', 'sampling_feature_geo_type', 'featuregeometrywkt',
+                  'featuregeometry',
                   'elevation_m', 'elevation_datum']
 
     def __init__(self, *args, **kwargs):
@@ -404,41 +429,57 @@ class SamplingfeaturesAdminForm(ModelForm):
             kwargs['initial'] = initial
         super(SamplingfeaturesAdminForm, self).__init__(*args, **kwargs)
 
-    featuregeometrywkt = forms.CharField(help_text="feature geometry (to add a point format is POINT(lat, lon)" +
-                                                   " where long and lat are in decimal degrees. If you don't want to add a location" +
-                                                   " leave default value of POINT(0 0).", label='Featuregeometrywkt',
-                                         widget=forms.Textarea, required=False)
+    featuregeometrywkt = forms.CharField(
+        help_text="feature geometry (to add a point format is POINT(lat, lon)" +
+                  " where long and lat are in decimal degrees. If you don't want to add a "
+                  "location" + " leave default value of POINT(0 0).", label='Featuregeometrywkt',
+        widget=forms.Textarea, required=False)
     featuregeometrywkt.initial = GEOSGeometry("POINT(0 0)")
 
-    sampling_feature_type = make_ajax_field(Samplingfeatures, 'sampling_feature_type', 'cv_sampling_feature_type')
+    sampling_feature_type = make_ajax_field(Samplingfeatures, 'sampling_feature_type',
+                                            'cv_sampling_feature_type')
     sampling_feature_type.help_text = u'A vocabulary for describing the type of SamplingFeature. ' \
-                                      u'Many different SamplingFeature types can be represented in ODM2. ' \
-                                      u'SamplingFeatures of type Site and Specimen will be the most common, ' \
-                                      u'but many different types of varying levels of complexity can be used. ' \
+                                      u'Many different SamplingFeature types can be represented ' \
+                                      u'in ODM2. SamplingFeatures of type Site and Specimen ' \
+                                      u'will be the most common, ' \
+                                      u'but many different types of varying levels of ' \
+                                      u'complexity can be used. ' \
                                       u'details for individual values ' \
-                                      u'here: <a href="http://vocabulary.odm2.org/samplingfeaturetype/" target="_blank">http://vocabulary.odm2.org/samplingfeaturetype/</a>'
+                                      u'here: <a href="http://vocabulary.odm2.org/' \
+                                      u'samplingfeaturetype/" target="_blank">http://vocabulary.' \
+                                      u'odm2.org/samplingfeaturetype/</a>'
     sampling_feature_type.allow_tags = True
 
-    samplingfeaturedescription = CharField(max_length=5000, label="feature description", widget=forms.Textarea,
+    samplingfeaturedescription = CharField(max_length=5000, label="feature description",
+                                           widget=forms.Textarea,
                                            required=False)
 
     sampling_feature_geo_type = make_ajax_field(Samplingfeatures, 'sampling_feature_geo_type',
                                                 'cv_sampling_feature_geo_type')
-    sampling_feature_geo_type.help_text = u'A vocabulary for describing the geospatial feature type associated with a SamplingFeature. ' \
-                                          u'For example, Site SamplingFeatures are represented as points. ' \
-                                          u'In ODM2, each SamplingFeature may have only one geospatial type, ' \
-                                          u'but a geospatial types may range from simple points to a complex polygons ' \
+    sampling_feature_geo_type.help_text = u'A vocabulary for describing the geospatial feature ' \
+                                          u'type associated with a SamplingFeature. ' \
+                                          u'For example, Site SamplingFeatures are ' \
+                                          u'represented as ' \
+                                          u'points. ' \
+                                          u'In ODM2, each SamplingFeature may have only one ' \
+                                          u'geospatial type, ' \
+                                          u'but a geospatial types may range from ' \
+                                          u'simple points to ' \
+                                          u'a complex polygons ' \
                                           u'or even three dimensional volumes. ' \
                                           u'details for individual values ' \
-                                          u'here: <a href="http://vocabulary.odm2.org/samplingfeaturegeotype/" ' \
-                                          u'target="_blank">http://vocabulary.odm2.org/samplingfeaturegeotype/</a>'
+                                          u'here: <a href="http://vocabulary.odm2.org/' \
+                                          u'samplingfeaturegeotype/" ' \
+                                          u'target="_blank">http://vocabulary.odm2.org/' \
+                                          u'samplingfeaturegeotype/</a>'
     sampling_feature_geo_type.allow_tags = True
     sampling_feature_geo_type.required = False
 
     elevation_datum = make_ajax_field(Samplingfeatures, 'elevation_datum',
                                       'cv_elevation_datum')
     elevation_datum.help_text = u'A vocabulary for describing vertical datums. ' \
-                                u'Vertical datums are used in ODM2 to specify the origin for elevations ' \
+                                u'Vertical datums are used in ODM2 to specify the ' \
+                                u'origin for elevations ' \
                                 u'assocated with SamplingFeatures.' \
                                 u'details for individual values ' \
                                 u'here: <a href="http://vocabulary.odm2.org/elevationdatum/" ' \
@@ -458,12 +499,14 @@ class IGSNInline(admin.StackedInline):
 class SamplingfeaturesAdmin(admin.OSMGeoAdmin):
     form = SamplingfeaturesAdminForm
     inlines = [FeatureActionsInline, IGSNInline]
-    search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name', 'samplingfeaturename',
+    search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name',
+                     'samplingfeaturename',
                      'samplingfeaturecode', 'samplingfeatureid',
                      'samplingfeatureexternalidentifiers__samplingfeatureexternalidentifier']
 
     list_display = (
-        'samplingfeaturecode', 'samplingfeaturename', 'sampling_feature_type_linked', 'samplingfeaturedescription',
+        'samplingfeaturecode', 'samplingfeaturename', 'sampling_feature_type_linked',
+        'samplingfeaturedescription',
         'igsn',
         'dataset_code')
     readonly_fields = ('samplingfeatureuuid',)
@@ -477,9 +520,10 @@ class SamplingfeaturesAdmin(admin.OSMGeoAdmin):
     save_as = True
 
     def igsn(self, obj):
-        external_id = Samplingfeatureexternalidentifiers.objects.get(samplingfeatureid=obj.samplingfeatureid)
-        return u'<a href="https://app.geosamples.org/sample/igsn/{0}" target="_blank">{0}</a>'.format(
-            external_id.samplingfeatureexternalidentifier)
+        external_id = Samplingfeatureexternalidentifiers.objects.get(
+            samplingfeatureid=obj.samplingfeatureid)
+        return u'<a href="https://app.geosamples.org/sample/igsn/{0}" ' \
+               u'target="_blank">{0}</a>'.format(external_id.samplingfeatureexternalidentifier)
 
     igsn.allow_tags = True
 
@@ -493,8 +537,9 @@ class SamplingfeaturesAdmin(admin.OSMGeoAdmin):
 
     def sampling_feature_type_linked(self, obj):
         if obj.sampling_feature_type:
-            return u'<a href="http://vocabulary.odm2.org/samplingfeaturetype/{0}" target="_blank">{1}</a>'.format(
-                obj.sampling_feature_type.term, obj.sampling_feature_type.name)
+            return u'<a href="http://vocabulary.odm2.org/samplingfeaturetype/{0}" ' \
+                   u'target="_blank">{1}</a>'.format(obj.sampling_feature_type.term,
+                                                     obj.sampling_feature_type.name)
 
     sampling_feature_type_linked.short_description = 'Sampling Feature Type'
     sampling_feature_type_linked.allow_tags = True
@@ -593,7 +638,8 @@ class ProfileResultsInline(admin.StackedInline):
 
 
 class ResultsAdminForm(ModelForm):
-    # featureactionid = make_ajax_field(Featureactions,'featureactionid','featureaction_lookup',max_length=500)
+    # featureactionid = make_ajax_field(Featureactions,'featureactionid',
+    # 'featureaction_lookup',max_length=500)
     featureactionid = AutoCompleteSelectField('featureaction_lookup', required=True, help_text='',
                                               label='Sampling feature action')
 
@@ -617,14 +663,16 @@ class ResultsAdminForm(ModelForm):
         # }
 
 
-# The user can click, a popup window lets them create a new object, they click save, the popup closes and the AjaxSelect field is set.
+# The user can click, a popup window lets them create a new object, they click save,
+# the popup closes and the AjaxSelect field is set.
 # Your Admin must inherit from AjaxSelectAdmin
 # http://django-ajax-selects.readthedocs.org/en/latest/Admin-add-popup.html
 class ResultsAdmin(AjaxSelectAdmin):  # admin.ModelAdmin
     form = ResultsAdminForm
     inlines = [TimeseriesresultsInline, MeasurementResultsInline, ProfileResultsInline]
     list_display = ['resultid', 'featureactionid', 'variableid', 'processing_level']
-    search_fields = ['variableid__variable_name__name', 'variableid__variablecode', 'variableid__variabledefinition',
+    search_fields = ['variableid__variable_name__name', 'variableid__variablecode',
+                     'variableid__variabledefinition',
                      'featureactionid__samplingfeatureid__samplingfeaturename',
                      'result_type__name', 'processing_level__definition']
     actions = [duplicate_results_event]
@@ -662,7 +710,8 @@ class RelatedactionsAdmin(admin.ModelAdmin):
 
 class OrganizationsAdminForm(ModelForm):
     # organizationtypecv= TermModelChoiceField(CvOrganizationtype.objects.all().order_by('term'))
-    # parentorganizationid =OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
+    # parentorganizationid =OrganizationsModelChoiceField( Organizations.objects.all().
+    # order_by('organizationname'))
     class Meta:
         model = Organizations
         fields = '__all__'
@@ -749,7 +798,8 @@ class DatasetsAdmin(admin.ModelAdmin):
         extra_context['DatasetResultsList'] = self.get_datasetsresults(object_id)
         extra_context['ResultsList'] = self.get_results(object_id)
         extra_context['prefixpath'] = CUSTOM_TEMPLATE_PATH
-        return super(DatasetsAdmin, self).change_view(request, object_id, form_url, extra_context=extra_context)
+        return super(DatasetsAdmin, self).change_view(request, object_id, form_url,
+                                                      extra_context=extra_context)
 
 
 # class AffiliationsAdminForm(ModelForm):
@@ -763,11 +813,15 @@ class DatasetsAdmin(admin.ModelAdmin):
 
 
 class ActionsAdminForm(ModelForm):
-    actiondescription = CharField(max_length=5000, label="Action description", widget=forms.Textarea, required=False)
+    actiondescription = CharField(max_length=5000, label="Action description",
+                                  widget=forms.Textarea, required=False)
     action_type = make_ajax_field(Actions, 'action_type', 'cv_action_type')
-    action_type.help_text = u'A vocabulary for describing the type of actions performed in making observations. Depending' \
-                            u' on the action type, the action may or may not produce an observation result. view action type ' \
-                            u'details here <a href="http://vocabulary.odm2.org/actiontype/" target="_blank">http://vocabulary.odm2.org/actiontype/</a>'
+    action_type.help_text = u'A vocabulary for describing the type of actions performed in ' \
+                            u'making observations. Depending' \
+                            u' on the action type, the action may or may not produce an ' \
+                            u'observation result. view action type ' \
+                            u'details here <a href="http://vocabulary.odm2.org/actiontype/" ' \
+                            u'target="_blank">http://vocabulary.odm2.org/actiontype/</a>'
     action_type.allow_tags = True
 
     class Meta:
@@ -797,17 +851,23 @@ class ActionByAdmin(admin.ModelAdmin):
 
 
 class MethodsAdminForm(ModelForm):
-    methoddescription = CharField(max_length=5000, label="Method description", widget=forms.Textarea, required=False)
+    methoddescription = CharField(max_length=5000, label="Method description",
+                                  widget=forms.Textarea, required=False)
     methodtypecv = make_ajax_field(Methods, 'methodtypecv', 'cv_method_type')
-    methodtypecv.help_text = u'A vocabulary for describing types of Methods associated with creating observations. ' \
-                             u'MethodTypes correspond with ActionTypes in ODM2. An Action must be performed using an ' \
-                             u'appropriate MethodType - e.g., a specimen collection Action should be associated with a ' \
+    methodtypecv.help_text = u'A vocabulary for describing types of Methods associated ' \
+                             u'with creating observations. ' \
+                             u'MethodTypes correspond with ActionTypes in ODM2. ' \
+                             u'An Action must be performed using an ' \
+                             u'appropriate MethodType - e.g., a specimen collection ' \
+                             u'Action should be associated with a ' \
                              u'specimen collection method. details for individual values ' \
-                             u'here: <a href="http://vocabulary.odm2.org/methodtype/" target="_blank">http://vocabulary.odm2.org/methodtype/</a>'
+                             u'here: <a href="http://vocabulary.odm2.org/methodtype/" ' \
+                             u'target="_blank">http://vocabulary.odm2.org/methodtype/</a>'
     methodtypecv.allow_tags = True
 
     # methodtypecv= TermModelChoiceField(CvMethodtype.objects.all().order_by('term'))
-    # organizationid= OrganizationsModelChoiceField( Organizations.objects.all().order_by('organizationname'))
+    # organizationid= OrganizationsModelChoiceField( Organizations.objects.all().
+    # order_by('organizationname'))
     class Meta:
         model = Methods
         fields = '__all__'
@@ -819,7 +879,8 @@ class MethodsAdmin(admin.ModelAdmin):
     list_display_links = ['methodname']
     form = MethodsAdminForm
 
-    # DOI matching reg expresion came from http://stackoverflow.com/questions/27910/finding-a-doi-in-a-document-or-page
+    # DOI matching reg expresion came from http://stackoverflow.com/questions/27910/
+    # finding-a-doi-in-a-document-or-page
     def method_link(self, obj):
         return link_list_display_DOI(obj.methodlink)
 
@@ -828,8 +889,8 @@ class MethodsAdmin(admin.ModelAdmin):
 
     def method_type_linked(self, obj):
         if obj.methodtypecv:
-            return u'<a href="http://vocabulary.odm2.org/methodtype/{0}" target="_blank">{1}</a>'.format(
-                obj.methodtypecv.term, obj.methodtypecv.name)
+            return u'<a href="http://vocabulary.odm2.org/methodtype/{0}" ' \
+                   u'target="_blank">{1}</a>'.format(obj.methodtypecv.term, obj.methodtypecv.name)
 
     method_type_linked.short_description = 'Method Type'
     method_type_linked.allow_tags = True
@@ -849,12 +910,14 @@ def duplicate_Dataloggerfiles_event(ModelAdmin, request, queryset):
             columns.save()
 
 
-duplicate_Dataloggerfiles_event.short_description = "Duplicate selected datalogger file along with columns"
+duplicate_Dataloggerfiles_event.short_description = "Duplicate selected datalogger " \
+                                                    "file along with columns"
 
 
 class DataLoggerFileColumnsInlineAdminForm(ModelForm):
     resultid = AutoCompleteSelectField('result_lookup', required=True,
-                                       help_text='result to extend as a soil profile result', label='Result')
+                                       help_text='result to extend as a soil profile result',
+                                       label='Result')
 
     class Meta:
         model = Dataloggerfilecolumns
@@ -904,12 +967,14 @@ def duplicate_Dataloggerfilecolumns_event(ModelAdmin, request, queryset):
         object.save()
 
 
-duplicate_Dataloggerfilecolumns_event.short_description = "Duplicate selected datalogger file columns"
+duplicate_Dataloggerfilecolumns_event.short_description = "Duplicate selected " \
+                                                          "datalogger file columns"
 
 
 class DataloggerfilecolumnsAdminForm(ModelForm):
     resultid = AutoCompleteSelectField('result_lookup', required=True,
-                                       help_text='result to extend as a soil profile result', label='Result')
+                                       help_text='result to extend as a soil profile result',
+                                       label='Result')
 
     def clean_resultid(self):
         resultiduni = self.data['resultid']
@@ -984,7 +1049,8 @@ class DataloggerfilecolumnsAdmin(admin.ModelAdmin):
 class ProfileresultsAdminForm(ModelForm):
     # resultid = make_ajax_field(Results,'resultid','result_lookup')
     resultid = AutoCompleteSelectField('result_lookup', required=True,
-                                       help_text='result to extend as a soil profile result', label='Result')
+                                       help_text='result to extend as a soil profile result',
+                                       label='Result')
 
     # this processes the user input into the form.
     def clean_resultid(self):
@@ -1004,8 +1070,10 @@ class ProfileresultsAdminForm(ModelForm):
 
 class ProfileresultsAdmin(AjaxSelectAdmin):
     form = ProfileresultsAdminForm
-    list_display = ['intendedzspacing', 'intendedzspacingunitsid', 'aggregationstatisticcv', 'resultid', ]
-    list_display_links = ['intendedzspacing', 'intendedzspacingunitsid', 'aggregationstatisticcv', 'resultid', ]
+    list_display = ['intendedzspacing', 'intendedzspacingunitsid', 'aggregationstatisticcv',
+                    'resultid', ]
+    list_display_links = ['intendedzspacing', 'intendedzspacingunitsid', 'aggregationstatisticcv',
+                          'resultid', ]
     search_fields = ['resultid__featureactionid__samplingfeatureid__samplingfeaturename',
                      'resultid__variableid__variable_name__name', 'resultid__unitsid__unitsname',
                      'resultid__variableid__variable_type__name']
@@ -1018,16 +1086,21 @@ class ProfileresultvaluesResource(resources.ModelResource):
         import_id_fields = ('valueid',)
         fields = ('valueid', 'zlocation', 'zlocationunitsid', 'zaggregationinterval',
                   'resultid__resultid__variableid__variable_name',
-                  'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename', 'valuedatetime',
+                  'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',
+                  'valuedatetime',
                   'resultid__resultid__unitsid__unitsname', 'datavalue')
-        export_order = ('valueid', 'datavalue', 'zlocation', 'zlocationunitsid', 'zaggregationinterval',
-                        'resultid__resultid__variableid__variable_name', 'resultid__resultid__unitsid__unitsname',
-                        'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename', 'valuedatetime')
+        export_order = (
+            'valueid', 'datavalue', 'zlocation', 'zlocationunitsid', 'zaggregationinterval',
+            'resultid__resultid__variableid__variable_name',
+            'resultid__resultid__unitsid__unitsname',
+            'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',
+            'valuedatetime')
 
 
 class ProfileresultsvaluesAdminForm(ModelForm):
     # resultid = make_ajax_field(Profileresults,'resultid','profileresult_lookup')
-    resultid = AutoCompleteSelectField('profileresult_lookup', required=True, help_text='', label='Profile Result')
+    resultid = AutoCompleteSelectField('profileresult_lookup', required=True, help_text='',
+                                       label='Profile Result')
 
     def clean_resultid(self):
         resultiduni = self.data['resultid']
@@ -1047,12 +1120,16 @@ class ProfileresultsvaluesAdminForm(ModelForm):
 class ProfileresultsvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin):
     form = ProfileresultsvaluesAdminForm
     resource_class = ProfileresultvaluesResource
-    list_display = ['datavalue', 'zlocation', 'zlocationunitsid', 'zaggregationinterval', 'valuedatetime',
-                    'resultid', ]  # 'resultid','featureactionid_link','resultid__featureactionid__name', 'resultid__variable__name'
+    list_display = ['datavalue', 'zlocation', 'zlocationunitsid', 'zaggregationinterval',
+                    'valuedatetime',
+                    'resultid', ]
+    # 'resultid','featureactionid_link','resultid__featureactionid__name',
+    # 'resultid__variable__name'
     list_display_links = ['resultid', ]  # 'featureactionid_link'
     search_fields = ['resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',
                      'zaggregationinterval',
-                     'resultid__resultid__variableid__variable_name__name', 'resultid__resultid__unitsid__unitsname',
+                     'resultid__resultid__variableid__variable_name__name',
+                     'resultid__resultid__unitsid__unitsname',
                      'resultid__resultid__variableid__variable_type__name', ]
 
 
@@ -1092,7 +1169,8 @@ class MeasurementresultsAdmin(AjaxSelectAdmin):
 
     def data_link(self, obj):
         return u'<a href="%sfeatureactions/%s/">%s</a>' % (
-            CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid, obj.resultid.featureactionid)
+            CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid,
+            obj.resultid.featureactionid)
 
     data_link.short_description = 'sampling feature action'
     data_link.allow_tags = True
@@ -1103,13 +1181,18 @@ class MeasurementresultvaluesResource(resources.ModelResource):
     class Meta:
         model = Measurementresultvalues
         import_id_fields = ('valueid',)
-        fields = ('valueid', 'resultid__resultid__variableid__variable_name', 'resultid__resultid__unitsid__unitsname',
-                  'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename', 'valuedatetime',
-                  'datavalue', 'resultid__timeaggregationinterval', 'resultid__timeaggregationintervalunitsid')
-        export_order = ('valueid', 'valuedatetime', 'datavalue', 'resultid__timeaggregationinterval',
-                        'resultid__timeaggregationintervalunitsid', 'resultid__resultid__variableid__variable_name',
-                        'resultid__resultid__unitsid__unitsname',
-                        'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',)
+        fields = ('valueid', 'resultid__resultid__variableid__variable_name',
+                  'resultid__resultid__unitsid__unitsname',
+                  'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',
+                  'valuedatetime',
+                  'datavalue', 'resultid__timeaggregationinterval',
+                  'resultid__timeaggregationintervalunitsid')
+        export_order = (
+            'valueid', 'valuedatetime', 'datavalue', 'resultid__timeaggregationinterval',
+            'resultid__timeaggregationintervalunitsid',
+            'resultid__resultid__variableid__variable_name',
+            'resultid__resultid__unitsid__unitsname',
+            'resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',)
 
 
 class TimeseriesresultsAdminForm(ModelForm):
@@ -1148,7 +1231,8 @@ class TimeseriesresultsAdmin(AjaxSelectAdmin):
 
     def data_link(self, obj):
         return u'<a href="%sfeatureactions/%s/">%s</a>' % (
-            CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid, obj.resultid.featureactionid)
+            CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid,
+            obj.resultid.featureactionid)
 
     data_link.short_description = 'sampling feature action'
     data_link.allow_tags = True
@@ -1156,7 +1240,8 @@ class TimeseriesresultsAdmin(AjaxSelectAdmin):
 
 class TimeseriesresultvaluesAdminForm(ModelForm):
     # resultid = make_ajax_field(Measurementresults,'resultid','measurementresult_lookup') #
-    resultid = AutoCompleteSelectField('timeseriesresult_lookup', required=True, help_text='', label='Result')
+    resultid = AutoCompleteSelectField('timeseriesresult_lookup', required=True, help_text='',
+                                       label='Result')
 
     def clean_resultid(self):
         resultiduni = self.data['resultid']
@@ -1182,7 +1267,9 @@ class TimeseriesresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin)
 
     )
     list_display = ['datavalue', 'valuedatetime',
-                    'resultid']  # 'resultid','featureactionid_link','resultid__featureactionid__name', 'resultid__variable__name'
+                    'resultid']
+    # 'resultid','featureactionid_link','resultid__featureactionid__name',
+    # 'resultid__variable__name'
     list_display_links = ['resultid', ]  # 'featureactionid_link'
     search_fields = ['resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',
                      'resultid__resultid__variableid__variable_name__name',
@@ -1190,7 +1277,8 @@ class TimeseriesresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin)
 
     def feature_action_link(self, obj):
         return u'<a href="/admin/ODM2CZOData/featureactions/%s/">%s</a>' % (
-            obj.resultid.resultid.featureactionid.featureactionid, obj.resultid.resultid.featureactionid)
+            obj.resultid.resultid.featureactionid.featureactionid,
+            obj.resultid.resultid.featureactionid)
 
     feature_action_link.short_description = 'feature action'
     feature_action_link.allow_tags = True
@@ -1199,7 +1287,8 @@ class TimeseriesresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin)
 
 class MeasurementresultvaluesAdminForm(ModelForm):
     # resultid = make_ajax_field(Measurementresults,'resultid','measurementresult_lookup') #
-    resultid = AutoCompleteSelectField('measurementresult_lookup', required=True, help_text='', label='Result')
+    resultid = AutoCompleteSelectField('measurementresult_lookup', required=True, help_text='',
+                                       label='Result')
 
     def clean_resultid(self):
         resultiduni = self.data['resultid']
@@ -1226,7 +1315,9 @@ class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin
 
     )
     list_display = ['datavalue', 'valuedatetime',
-                    'resultid']  # 'resultid','featureactionid_link','resultid__featureactionid__name', 'resultid__variable__name'
+                    'resultid']
+    # 'resultid','featureactionid_link','resultid__featureactionid__name',
+    # 'resultid__variable__name'
     list_display_links = ['resultid', ]  # 'featureactionid_link'
     search_fields = ['resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',
                      'resultid__resultid__variableid__variable_name__name',
@@ -1234,7 +1325,8 @@ class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin
 
     def feature_action_link(self, obj):
         return u'<a href="/admin/ODM2CZOData/featureactions/%s/">%s</a>' % (
-            obj.resultid.resultid.featureactionid.featureactionid, obj.resultid.resultid.featureactionid)
+            obj.resultid.resultid.featureactionid.featureactionid,
+            obj.resultid.resultid.featureactionid)
 
     feature_action_link.short_description = 'feature action'
     feature_action_link.allow_tags = True
@@ -1249,7 +1341,8 @@ class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin
     #         for mresults in myMeasurementResults:
     #             myfile.write(mresults.csvoutput())
     #         response = HttpResponse(myfile.getvalue(),content_type='text/csv')
-    #         response['Content-Disposition'] = 'attachment; filename="'+ name_of_sampling_feature+'-'+ name_of_variable +'.csv"'
+    #         response['Content-Disposition'] = 'attachment; filename="'+
+    # name_of_sampling_feature+'-'+ name_of_variable +'.csv"'
     #         extra_context = response
     #     return super(MeasurementresultvaluesAdmin, self).change_view(request, object_id,
     #         form_url, extra_context=extra_context)
@@ -1263,8 +1356,10 @@ class MeasurementresultvalueFileForm(ModelForm):
 
 class UnitsAdminForm(ModelForm):
     unit_type = make_ajax_field(Units, 'unit_type', 'cv_unit_type')
-    unit_type.help_text = u'A vocabulary for describing the type of the Unit or the more general quantity that the Unit ' \
-                          u'represents. View unit type details here <a href="http://vocabulary.odm2.org/unitstype/" ' \
+    unit_type.help_text = u'A vocabulary for describing the type of the Unit or ' \
+                          u'the more general quantity that the Unit ' \
+                          u'represents. View unit type details here ' \
+                          u'<a href="http://vocabulary.odm2.org/unitstype/" ' \
                           u'target="_blank">http://vocabulary.odm2.org/unitstype/</a>'
     unit_type.allow_tags = True
 
@@ -1379,10 +1474,13 @@ class AffiliationsResource(resources.ModelResource):
     class Meta:
         model = Affiliations
         # import_id_fields = ('valueid',)
-        fields = ('organizationid__organizationname', 'personid__personfirstname', 'personid__personlastname',
-                  'isprimaryorganizationcontact',
-                  'primaryemail')
-        export_order = ['organizationid__organizationname', 'personid__personfirstname', 'personid__personlastname',
+        fields = (
+            'organizationid__organizationname', 'personid__personfirstname',
+            'personid__personlastname',
+            'isprimaryorganizationcontact',
+            'primaryemail')
+        export_order = ['organizationid__organizationname', 'personid__personfirstname',
+                        'personid__personlastname',
                         'isprimaryorganizationcontact', 'primaryemail']
 
 
@@ -1390,7 +1488,8 @@ class AffiliationsAdminForm(ModelForm):
     class Meta:
         model = Affiliations
         fields = '__all__'
-        export_order = ['organizationname', 'personfirstname', 'personlastname', 'isprimaryorganizationcontact',
+        export_order = ['organizationname', 'personfirstname', 'personlastname',
+                        'isprimaryorganizationcontact',
                         'primaryemail']
         # ordering = ['-primaryemail']
 
@@ -1402,7 +1501,8 @@ class AffiliationsAdmin(ExportMixin, admin.ModelAdmin):
                      'organizationid__organizationcode',
                      'personid__personfirstname', 'personid__personlastname']
     list_display = (
-        'organizationname', 'personfirstname', 'personlastname', 'isprimaryorganizationcontact', 'primaryemail')
+        'organizationname', 'personfirstname', 'personlastname', 'isprimaryorganizationcontact',
+        'primaryemail')
 
     def organizationname(self, obj):
         return obj.organizationid.organizationname
@@ -1417,14 +1517,16 @@ class AffiliationsAdmin(ExportMixin, admin.ModelAdmin):
 class PeopleAdmin(admin.ModelAdmin):
     form = PeopleAdminForm
     inlines = [AffiliationInLine, ORCIDInLine]
-    search_fields = ['personfirstname', 'personlastname', 'personexternalidentifiers__personexternalidentifier',
+    search_fields = ['personfirstname', 'personlastname',
+                     'personexternalidentifiers__personexternalidentifier',
                      'affiliations__organizationid__organizationname']
     list_display = ('personlastname', 'personfirstname', 'orcid', 'affiliation')
     save_as = True
 
     def orcid(self, obj):
         external_id = Personexternalidentifiers.objects.get(personid=obj.personid)
-        return u'<a href="http://orcid.org/{0}" target="_blank">{0}</a>'.format(external_id.personexternalidentifier)
+        return u'<a href="http://orcid.org/{0}" target="_blank">{0}</a>'.format(
+            external_id.personexternalidentifier)
 
     def affiliation(self, obj):
         org = Organizations.objects.filter(affiliations__personid_id=obj.personid)
@@ -1439,16 +1541,20 @@ class PeopleAdmin(admin.ModelAdmin):
                     u'{0}'.format(org_name.organizationname))
                 # if org_name.parentorganizationid:
                 #     if org_name.organizationlink:
-                #         name_list.append(u'<a href="{0}" target="_blank">{1}, {2}</a>'.format(org_name.organizationlink,
-                #                                                                               org_name.organizationname,
-                #                                                                               org_name.parentorganizationid.organizationname))
+                #         name_list.append(u'<a href="{0}" target="_blank">{1}, {2}</a>'.
+                # format(org_name.organizationlink,
+                #
+                # org_name.organizationname,
+                #
+                # org_name.parentorganizationid.organizationname))
                 #     else:
                 #         name_list.append(u'{0}, {1}'.format(org_name.organizationname,
                 #                                               org_name.parentorganizationid.organizationname))
                 # else:
                 #     if org_name.organizationlink:
                 #         name_list.append(
-                #             u'<a href="{0}" target="_blank">{1}</a>'.format(org_name.organizationlink, org_name.organizationname))
+                #             u'<a href="{0}" target="_blank">{1}</a>'.
+                # format(org_name.organizationlink, org_name.organizationname))
                 #     else:
                 #         name_list.append(
                 #             u'{0}'.format(org_name.organizationname))

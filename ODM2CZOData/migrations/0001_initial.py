@@ -123,7 +123,8 @@ class Migration(migrations.Migration):
             name='Calibrationactions',
             fields=[
                 ('actionid',
-                 models.ForeignKey(db_column='actionid', to='odm2testapp.Actions', serialize=False, primary_key=True)),
+                 models.ForeignKey(db_column='actionid', to='odm2testapp.Actions', serialize=False,
+                                   primary_key=True)),
                 ('calibrationcheckvalue', models.FloatField(null=True, blank=True)),
                 ('calibrationequation', models.CharField(blank=True, max_length=255)),
             ],
@@ -849,9 +850,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Externalidentifiersystems',
             fields=[
-                ('externalidentifiersystemid', models.IntegerField(serialize=False, primary_key=True)),
+                ('externalidentifiersystemid',
+                 models.IntegerField(serialize=False, primary_key=True)),
                 ('externalidentifiersystemname', models.CharField(max_length=255)),
-                ('externalidentifiersystemdescription', models.CharField(blank=True, max_length=500)),
+                ('externalidentifiersystemdescription',
+                 models.CharField(blank=True, max_length=500)),
                 ('externalidentifiersystemurl', models.CharField(blank=True, max_length=255)),
             ],
             options={
@@ -874,7 +877,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Instrumentoutputvariables',
             fields=[
-                ('instrumentoutputvariableid', models.IntegerField(serialize=False, primary_key=True)),
+                ('instrumentoutputvariableid',
+                 models.IntegerField(serialize=False, primary_key=True)),
                 ('instrumentresolution', models.CharField(blank=True, max_length=255)),
                 ('instrumentaccuracy', models.CharField(blank=True, max_length=255)),
             ],
@@ -888,7 +892,8 @@ class Migration(migrations.Migration):
             name='Maintenanceactions',
             fields=[
                 ('actionid',
-                 models.ForeignKey(db_column='actionid', to='odm2testapp.Actions', serialize=False, primary_key=True)),
+                 models.ForeignKey(db_column='actionid', to='odm2testapp.Actions', serialize=False,
+                                   primary_key=True)),
                 ('isfactoryservice', models.BooleanField()),
                 ('maintenancecode', models.CharField(blank=True, max_length=50)),
                 ('maintenancereason', models.CharField(blank=True, max_length=500)),
@@ -1131,7 +1136,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('bridgeid', models.IntegerField(serialize=False, primary_key=True)),
                 ('referencematerialexternalidentifier', models.CharField(max_length=255)),
-                ('referencematerialexternalidentifieruri', models.CharField(blank=True, max_length=255)),
+                ('referencematerialexternalidentifieruri',
+                 models.CharField(blank=True, max_length=255)),
             ],
             options={
                 'managed': False,
@@ -1158,7 +1164,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Referencematerialvalues',
             fields=[
-                ('referencematerialvalueid', models.IntegerField(serialize=False, primary_key=True)),
+                ('referencematerialvalueid',
+                 models.IntegerField(serialize=False, primary_key=True)),
                 ('referencematerialvalue', models.FloatField()),
                 ('referencematerialaccuracy', models.FloatField(null=True, blank=True)),
             ],
@@ -1310,7 +1317,8 @@ class Migration(migrations.Migration):
             name='Resultnormalizationvalues',
             fields=[
                 ('resultid',
-                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False, primary_key=True)),
+                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False,
+                                   primary_key=True)),
             ],
             options={
                 'managed': False,
@@ -1322,7 +1330,8 @@ class Migration(migrations.Migration):
             name='Resultderivationequations',
             fields=[
                 ('resultid',
-                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False, primary_key=True)),
+                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False,
+                                   primary_key=True)),
             ],
             options={
                 'managed': False,
@@ -1334,7 +1343,8 @@ class Migration(migrations.Migration):
             name='Profileresults',
             fields=[
                 ('resultid',
-                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False, primary_key=True)),
+                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False,
+                                   primary_key=True)),
                 ('xlocation', models.FloatField(null=True, blank=True)),
                 ('ylocation', models.FloatField(null=True, blank=True)),
                 ('intendedzspacing', models.FloatField(null=True, blank=True)),
@@ -1350,7 +1360,8 @@ class Migration(migrations.Migration):
             name='Pointcoverageresults',
             fields=[
                 ('resultid',
-                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False, primary_key=True)),
+                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False,
+                                   primary_key=True)),
                 ('zlocation', models.FloatField(null=True, blank=True)),
                 ('intendedxspacing', models.FloatField(null=True, blank=True)),
                 ('intendedyspacing', models.FloatField(null=True, blank=True)),
@@ -1367,7 +1378,8 @@ class Migration(migrations.Migration):
             name='Measurementresults',
             fields=[
                 ('resultid',
-                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False, primary_key=True)),
+                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False,
+                                   primary_key=True)),
                 ('xlocation', models.FloatField(null=True, blank=True)),
                 ('ylocation', models.FloatField(null=True, blank=True)),
                 ('zlocation', models.FloatField(null=True, blank=True)),
@@ -1383,7 +1395,8 @@ class Migration(migrations.Migration):
             name='Categoricalresults',
             fields=[
                 ('resultid',
-                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False, primary_key=True)),
+                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False,
+                                   primary_key=True)),
                 ('xlocation', models.FloatField(null=True, blank=True)),
                 ('xlocationunitsid', models.IntegerField(null=True, blank=True)),
                 ('ylocation', models.FloatField(null=True, blank=True)),
@@ -1436,7 +1449,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('bridgeid', models.IntegerField(serialize=False, primary_key=True)),
                 ('samplingfeatureexternalidentifier', models.CharField(max_length=255)),
-                ('samplingfeatureexternalidentifieruri', models.CharField(blank=True, max_length=255)),
+                ('samplingfeatureexternalidentifieruri',
+                 models.CharField(blank=True, max_length=255)),
             ],
             options={
                 'managed': False,
@@ -1465,7 +1479,8 @@ class Migration(migrations.Migration):
             name='Sectionresults',
             fields=[
                 ('resultid',
-                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False, primary_key=True)),
+                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False,
+                                   primary_key=True)),
                 ('ylocation', models.FloatField(null=True, blank=True)),
                 ('intendedxspacing', models.FloatField(null=True, blank=True)),
                 ('intendedzspacing', models.FloatField(null=True, blank=True)),
@@ -1531,7 +1546,8 @@ class Migration(migrations.Migration):
             name='Sites',
             fields=[
                 ('samplingfeatureid',
-                 models.ForeignKey(db_column='samplingfeatureid', to='odm2testapp.Samplingfeatures', serialize=False,
+                 models.ForeignKey(db_column='samplingfeatureid', to='odm2testapp.Samplingfeatures',
+                                   serialize=False,
                                    primary_key=True)),
                 ('latitude', models.FloatField()),
                 ('longitude', models.FloatField()),
@@ -1561,7 +1577,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('bridgeid', models.IntegerField(serialize=False, primary_key=True)),
                 ('spatialreferenceexternalidentifier', models.CharField(max_length=255)),
-                ('spatialreferenceexternalidentifieruri', models.CharField(blank=True, max_length=255)),
+                ('spatialreferenceexternalidentifieruri',
+                 models.CharField(blank=True, max_length=255)),
             ],
             options={
                 'managed': False,
@@ -1588,7 +1605,8 @@ class Migration(migrations.Migration):
             name='Specimenbatchpostions',
             fields=[
                 ('featureactionid',
-                 models.ForeignKey(db_column='featureactionid', to='odm2testapp.Featureactions', serialize=False,
+                 models.ForeignKey(db_column='featureactionid', to='odm2testapp.Featureactions',
+                                   serialize=False,
                                    primary_key=True)),
                 ('batchpositionnumber', models.IntegerField()),
                 ('batchpositionlabel', models.CharField(blank=True, max_length=255)),
@@ -1603,7 +1621,8 @@ class Migration(migrations.Migration):
             name='Specimens',
             fields=[
                 ('samplingfeatureid',
-                 models.ForeignKey(db_column='samplingfeatureid', to='odm2testapp.Samplingfeatures', serialize=False,
+                 models.ForeignKey(db_column='samplingfeatureid', to='odm2testapp.Samplingfeatures',
+                                   serialize=False,
                                    primary_key=True)),
                 ('isfieldspecimen', models.BooleanField()),
             ],
@@ -1628,7 +1647,8 @@ class Migration(migrations.Migration):
             name='Spectraresults',
             fields=[
                 ('resultid',
-                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False, primary_key=True)),
+                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False,
+                                   primary_key=True)),
                 ('xlocation', models.FloatField(null=True, blank=True)),
                 ('ylocation', models.FloatField(null=True, blank=True)),
                 ('zlocation', models.FloatField(null=True, blank=True)),
@@ -1673,7 +1693,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('bridgeid', models.IntegerField(serialize=False, primary_key=True)),
                 ('taxonomicclassifierexternalidentifier', models.CharField(max_length=255)),
-                ('taxonomicclassifierexternalidentifieruri', models.CharField(blank=True, max_length=255)),
+                ('taxonomicclassifierexternalidentifieruri',
+                 models.CharField(blank=True, max_length=255)),
             ],
             options={
                 'managed': False,
@@ -1699,7 +1720,8 @@ class Migration(migrations.Migration):
             name='Timeseriesresults',
             fields=[
                 ('resultid',
-                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False, primary_key=True)),
+                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False,
+                                   primary_key=True)),
                 ('xlocation', models.FloatField(null=True, blank=True)),
                 ('ylocation', models.FloatField(null=True, blank=True)),
                 ('zlocation', models.FloatField(null=True, blank=True)),
@@ -1741,7 +1763,8 @@ class Migration(migrations.Migration):
             name='Trajectoryresults',
             fields=[
                 ('resultid',
-                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False, primary_key=True)),
+                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False,
+                                   primary_key=True)),
                 ('intendedtrajectoryspacing', models.FloatField(null=True, blank=True)),
                 ('intendedtimespacing', models.FloatField(null=True, blank=True)),
             ],
@@ -1786,7 +1809,8 @@ class Migration(migrations.Migration):
             name='Transectresults',
             fields=[
                 ('resultid',
-                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False, primary_key=True)),
+                 models.ForeignKey(db_column='resultid', to='odm2testapp.Results', serialize=False,
+                                   primary_key=True)),
                 ('zlocation', models.FloatField(null=True, blank=True)),
                 ('intendedtransectspacing', models.FloatField(null=True, blank=True)),
                 ('intendedtimespacing', models.FloatField(null=True, blank=True)),

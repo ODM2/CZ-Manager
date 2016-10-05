@@ -2,13 +2,13 @@ import os
 import re
 from datetime import datetime
 
+from django.core.exceptions import MultipleObjectsReturned
 from django.db import transaction
+from django.db.models import Q
 
 from ODM2CZOData.models import *
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
-from django.db.models import Q
-from  django.core.exceptions import MultipleObjectsReturned
 
 __author__ = 'leonmi'
 
@@ -60,7 +60,8 @@ def newMeasurementResult(Level0values, plevel, printvals, save):
     samplemedium = sonadoraval.resultid.resultid.sampledmediumcv
     newr = Results(featureactionid=faid, result_type=resulttype, variableid=varid, unitsid=unitid,
                    processing_level=plevel,
-                   taxonomicclassifierid=taxid, resultdatetime=datetime, resultdatetimeutcoffset=datetimeoffset,
+                   taxonomicclassifierid=taxid, resultdatetime=datetime,
+                   resultdatetimeutcoffset=datetimeoffset,
                    valuecount=valcount, sampledmediumcv=samplemedium)
     if save: newr.save()
     if printvals: print(plevel)
@@ -80,20 +81,25 @@ def newMeasurementResult(Level0values, plevel, printvals, save):
     return newmr
 
 
-# badperiod = mrvsSonadoraTemp.filter(valuedatetime__gte='2015-04-24 15:15').filter(valuedatetime_lte='2015-05-18  11:15:00')
-def QAProcessLevelCreation(SeriesToProcess, result, timeRangesToRemove, printvals, save, highThreshold, lowThreshold,
+# badperiod = mrvsSonadoraTemp.filter(valuedatetime__gte='2015-04-24 15:15').
+# filter(valuedatetime_lte='2015-05-18  11:15:00')
+def QAProcessLevelCreation(SeriesToProcess, result, timeRangesToRemove, printvals, save,
+                           highThreshold, lowThreshold,
                            annotationtextHigh, annotationtextLow, annotationtextDateRange):
     QAFlagHigh = False
     QAFlagOutofWater = False
     QAFlagLow = False
-    annotationtypecv = CvAnnotationtype.objects.filter(name="Measurement result value annotation").get()
+    annotationtypecv = CvAnnotationtype.objects.filter(
+        name="Measurement result value annotation").get()
     annotatorid = People.objects.filter(personid=1).get()
     with transaction.atomic():
         for mrv in SeriesToProcess:
             datavalue = mrv.datavalue
             valuedatetime = mrv.valuedatetime
-            if printvals: print(valuedatetime)
-            flagdatavalue = mrv.datavalue  # datetime.strptime('Jun 1 2005  1:33PM', '%b %d %Y %I:%M%p')
+            if printvals:
+                print(valuedatetime)
+            # datetime.strptime('Jun 1 2005  1:33PM', '%b %d %Y %I:%M%p')
+            flagdatavalue = mrv.datavalue
             for range in timeRangesToRemove:
                 # if printvals: print(range[0] + ' to ' + range[1])
                 if valuedatetime > range[0] and valuedatetime < range[1]:
@@ -112,22 +118,29 @@ def QAProcessLevelCreation(SeriesToProcess, result, timeRangesToRemove, printval
                 if printvals: print("good " + str(mrv))
             valuedatetime = mrv.valuedatetime
             valuedatetimeutcoffset = mrv.valuedatetimeutcoffset
-            newmrv = Measurementresultvalues(resultid=result, datavalue=datavalue, valuedatetime=valuedatetime,
+            newmrv = Measurementresultvalues(resultid=result, datavalue=datavalue,
+                                             valuedatetime=valuedatetime,
                                              valuedatetimeutcoffset=valuedatetimeutcoffset)
             if save: newmrv.save()
             if printvals: print(str(newmrv))
             if QAFlagHigh or QAFlagOutofWater:
                 if QAFlagHigh:
-                    annotationtext = annotationtextHigh + str(flagdatavalue) + " on " + str(valuedatetime)
+                    annotationtext = annotationtextHigh + str(flagdatavalue) + " on " + str(
+                        valuedatetime)
                     annotationdatetime = datetime.now()
-                    newanno = Annotations(annotationtypecv=annotationtypecv, annotationcode="Value out of Range: High",
-                                          annotationtext=annotationtext, annotationdatetime=annotationdatetime,
+                    newanno = Annotations(annotationtypecv=annotationtypecv,
+                                          annotationcode="Value out of Range: High",
+                                          annotationtext=annotationtext,
+                                          annotationdatetime=annotationdatetime,
                                           annotationutcoffset=5, annotatorid=annotatorid)
                 elif QAFlagOutofWater:
-                    annotationtext = annotationtextDateRange + str(flagdatavalue) + " on " + str(valuedatetime)
+                    annotationtext = annotationtextDateRange + str(flagdatavalue) + " on " + str(
+                        valuedatetime)
                     annotationdatetime = datetime.now()
-                    newanno = Annotations(annotationtypecv=annotationtypecv, annotationcode="Date range excluded",
-                                          annotationtext=annotationtext, annotationdatetime=annotationdatetime,
+                    newanno = Annotations(annotationtypecv=annotationtypecv,
+                                          annotationcode="Date range excluded",
+                                          annotationtext=annotationtext,
+                                          annotationdatetime=annotationdatetime,
                                           annotationutcoffset=5, annotatorid=annotatorid)
                 if save: newanno.save()
                 newmrvanno = Measurementresultvalueannotations(valueid=newmrv, annotationid=newanno)
@@ -135,8 +148,10 @@ def QAProcessLevelCreation(SeriesToProcess, result, timeRangesToRemove, printval
             if QAFlagLow:
                 annotationtext = annotationtextLow + str(flagdatavalue)
                 annotationdatetime = datetime.now()
-                newanno = Annotations(annotationtypecv=annotationtypecv, annotationcode="Value out of Range: Low",
-                                      annotationtext=annotationtext, annotationdatetime=annotationdatetime,
+                newanno = Annotations(annotationtypecv=annotationtypecv,
+                                      annotationcode="Value out of Range: Low",
+                                      annotationtext=annotationtext,
+                                      annotationdatetime=annotationdatetime,
                                       annotationutcoffset=5, annotatorid=annotatorid)
                 if save: newanno.save()
                 newmrvanno = Measurementresultvalueannotations(valueid=newmrv, annotationid=newanno)
@@ -147,9 +162,12 @@ def QAProcessLevelCreation(SeriesToProcess, result, timeRangesToRemove, printval
 
 
 def groupSites(featurecode, containerfeaturecode):
-    samplingfeatures = Samplingfeatures.objects.filter(samplingfeaturecode__icontains=featurecode).filter(
+    samplingfeatures = Samplingfeatures.objects.filter(
+        samplingfeaturecode__icontains=featurecode).filter(
         ~Q(sampling_feature_type="Field area"))
-    # relatedfeatures = Samplingfeatures.objects.extra(where=["CHAR_LENGTH(samplingfeaturecode) < 11"])#samplingfeaturecode__icontains='PALMDYS-22')
+    # relatedfeatures = Samplingfeatures.objects.extra(where=["CHAR_LENGTH(samplingfeaturecode)
+    # < 11"])
+    # samplingfeaturecode__icontains='PALMDYS-22')
     # relatedfeatures = relatedfeatures.filter(sampling_feature_type="Excavation")
     # #MyModel.objects.extra(where=["CHAR_LENGTH(text) > 300"])
     print(containerfeaturecode)
@@ -208,8 +226,11 @@ def importValues(file, variableFileIndex, variableDBID, variableUnitID, actionID
             if fc != oldfc:
                 newSF = Samplingfeatures(sampling_feature_type=featuretype, samplingfeaturecode=fc,
                                          samplingfeaturename=fc,
-                                         samplingfeaturedescription="Stone M.M. et al. site, see http://dx.doi.org/10.1016/j.soilbio.2014.10.019",
-                                         sampling_feature_geo_type=featuregeotype, featuregeometry=xy, elevation_m=z)
+                                         samplingfeaturedescription="Stone M.M. et al. site, "
+                                                                    "see http://dx.doi.org/"
+                                                                    "10.1016/j.soilbio.2014.10.019",
+                                         sampling_feature_geo_type=featuregeotype,
+                                         featuregeometry=xy, elevation_m=z)
                 # print(newSF)
             oldfc = fc
 
@@ -231,18 +252,21 @@ def importValues(file, variableFileIndex, variableDBID, variableUnitID, actionID
     qualityCode = CvQualitycode.objects.filter(name='Good').get()
     censorCode = CvCensorcode.objects.filter(name='Not censored').get()
     aggStat = CvAggregationstatistic.objects.filter(name='Average').get()
-    featureactions = Featureactions.objects.filter(samplingfeatureid__in=features.values("samplingfeatureid")).filter(
+    featureactions = Featureactions.objects.filter(
+        samplingfeatureid__in=features.values("samplingfeatureid")).filter(
         action=actionID)
     # print(featureactions)
     act = Actions.objects.filter(actionid=actionID).get()
     # print(type(act))
     if featureactions.__len__() == 0:
-        famissing = features.filter(~Q(samplingfeatureid__in=featureactions.values("samplingfeatureid")))
+        famissing = features.filter(
+            ~Q(samplingfeatureid__in=featureactions.values("samplingfeatureid")))
         for feature in famissing:
             newFA = Featureactions(samplingfeatureid=feature, action=act)
             # newFA.save()
             print(newFA)
-    for value, fCode, containerFCode, zspacing, zinterval in zip(var, featureCode, containerfeatureCode, zspacinglist,
+    for value, fCode, containerFCode, zspacing, zinterval in zip(var, featureCode,
+                                                                 containerfeatureCode, zspacinglist,
                                                                  zintervallist):
         # for fCode in featureCode:
         # print(fCode)
@@ -252,23 +276,30 @@ def importValues(file, variableFileIndex, variableDBID, variableUnitID, actionID
         featureaction = Featureactions.objects.filter(samplingfeatureid=feature).get()
         if fCode in featureaction.samplingfeatureid.samplingfeaturecode:
 
-            result = Results(featureactionid=featureaction, variableid=variable, unitsid=unit, result_type=resulttype,
-                             processing_level=processinglevel, statuscv=status, sampledmediumcv=medium, valuecount=1)
+            result = Results(featureactionid=featureaction, variableid=variable, unitsid=unit,
+                             result_type=resulttype,
+                             processing_level=processinglevel, statuscv=status,
+                             sampledmediumcv=medium, valuecount=1)
 
             print(featureaction)
             if save:
                 result.save()
-            presult = Profileresults(resultid=result, intendedzspacing=zspacing, intendedzspacingunitsid=zspaceunit,
+            presult = Profileresults(resultid=result, intendedzspacing=zspacing,
+                                     intendedzspacingunitsid=zspaceunit,
                                      aggregationstatisticcv=aggStat)
             print(presult)
             if save:
                 presult.save()
-            presultvalue = Profileresultvalues(resultid=presult, datavalue=value, zlocation=zspacing,
+            presultvalue = Profileresultvalues(resultid=presult, datavalue=value,
+                                               zlocation=zspacing,
                                                zaggregationinterval=zinterval,
-                                               zlocationunitsid=zspaceunit, qualitycodecv=qualityCode,
+                                               zlocationunitsid=zspaceunit,
+                                               qualitycodecv=qualityCode,
                                                censorcodecv=censorCode,
-                                               valuedatetime='2011-01-01 00:00:00', valuedatetimeutcoffset=4,
-                                               timeaggregationinterval=0, timeaggregationintervalunitsid=timaggunits)
+                                               valuedatetime='2011-01-01 00:00:00',
+                                               valuedatetimeutcoffset=4,
+                                               timeaggregationinterval=0,
+                                               timeaggregationintervalunitsid=timaggunits)
             print(presultvalue)
             if save:
                 presultvalue.save()

@@ -1,12 +1,13 @@
-import os
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
 from ODM2CZOData.models import Timeseriesresults
 from ODM2CZOData.models import Timeseriesresultvalues
 from ODM2CZOData.models import Processinglevels
+
+import os
 from datetime import datetime
 import warnings
 import modelHelpers as modelHelpers
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
 
 __author__ = 'leonmi'
 
@@ -14,7 +15,8 @@ __author__ = 'leonmi'
 # measurementresutlannotations; annotations
 
 timeRangesToRemove = list()
-# timeRangesToRemove.append([datetime.strptime('2015-04-24 15:15', '%Y-%m-%d %H:%M'),datetime.strptime('2015-05-18  11:15', '%Y-%m-%d %H:%M')])
+# timeRangesToRemove.append([datetime.strptime('2015-04-24 15:15', '%Y-%m-%d %H:%M'),
+# datetime.strptime('2015-05-18  11:15', '%Y-%m-%d %H:%M')])
 timeRangesToRemove.append([datetime.strptime('2014-03-17 12:00', '%Y-%m-%d %H:%M'),
                            datetime.strptime('2014-03-28  19:00', '%Y-%m-%d %H:%M')])  # noqa
 timeRangesToRemove.append([datetime.strptime('2014-03-29 21:30', '%Y-%m-%d %H:%M'),
@@ -37,11 +39,14 @@ warnings.filterwarnings('ignore')
 # variableid = 2 conductivity
 # unitsid =1 microsimens per centimeter
 # unitsid=3 celsius
-# Sonadora Conductivity - featureaction 1 = http://lczodata.com/ODM2/ODM2CZOData/ODM2CZOData/featureactions/1/
+# Sonadora Conductivity - featureaction 1 =
+# http://lczodata.com/ODM2/ODM2CZOData/ODM2CZOData/featureactions/1/
 mrvsSonadoraTemp = Timeseriesresultvalues.objects.filter(resultid__resultid__variableid=3) \
-    .filter(resultid__resultid__unitsid=3).filter(resultid__resultid__featureactionid__samplingfeatureid=3). \
+    .filter(resultid__resultid__unitsid=3).filter(
+    resultid__resultid__featureactionid__samplingfeatureid=3). \
     filter(resultid__resultid__featureactionid=1) \
-    .filter(valuedatetime__gte='2014-01-01').filter(valuedatetime__lte='2015-12-30').order_by('valuedatetime')  # noqa
+    .filter(valuedatetime__gte='2014-01-01').filter(valuedatetime__lte='2015-12-30').order_by(
+    'valuedatetime')  # noqa
 
 # print(newmr)
 
@@ -56,9 +61,11 @@ plevel = Processinglevels.objects.filter(processinglevelid=2).get()
 # QAProcessLevelCreation(mrvsSonadoraTemp,result,timeRangesToRemove,printvals,save,43,0,annotationtextHigh,annotationtextLow,annotationtextDateRange) # noqa
 
 mrvsSonadoraCond = Timeseriesresultvalues.objects.filter(resultid__resultid__variableid=2) \
-    .filter(resultid__resultid__unitsid=1).filter(resultid__resultid__featureactionid__samplingfeatureid=3).filter(
+    .filter(resultid__resultid__unitsid=1).filter(
+    resultid__resultid__featureactionid__samplingfeatureid=3).filter(
     resultid__resultid__featureactionid=1) \
-    .filter(valuedatetime__gte='2014-01-01').filter(valuedatetime__lte='2016-03-23').order_by('valuedatetime')  # noqa
+    .filter(valuedatetime__gte='2014-01-01').filter(valuedatetime__lte='2016-03-23').order_by(
+    'valuedatetime')  # noqa
 # result=Measurementresults.objects.filter(resultid=16153).get()
 
 annotationtextHigh = "Value above 1000 uS/cm, this is considered out of range for stream conductivity, Original value was "  # noqa
@@ -70,5 +77,6 @@ newmr = Timeseriesresults.objects.filter(resultid=16156).get()
 printvals = False
 save = False
 modelHelpers.QAProcessLevelCreation(mrvsSonadoraCond, newmr, timeRangesToRemove,
-                                    printvals, save, 1000, 15, annotationtextHigh, annotationtextLow,
+                                    printvals, save, 1000, 15, annotationtextHigh,
+                                    annotationtextLow,
                                     annotationtextDateRange)
