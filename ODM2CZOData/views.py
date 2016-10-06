@@ -1659,7 +1659,7 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
         # break
         if not lastVariable == variable or not lastUnit == unit or not lastProcessingCode == \
                 processingCode:
-            variablesAndUnits.append(unicode(variable) + unicode(unit) + unicode(processingCode))
+            variablesAndUnits.append(variable + unit + processingCode)
             if firstheader:
                 myfile.write(myresults.csvheader())
                 firstheader = False
@@ -1739,9 +1739,9 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
         # if variablesAndUnits.index(unicode(variable)+unicode(unit)) ==position:
         for i in range(
                 position,
-                variablesAndUnits.index(unicode(variable) +
-                                        unicode(unit) +
-                                        unicode(processingCode))
+                variablesAndUnits.index(variable +
+                                        unit +
+                                        processingCode)
         ):
             myfile.write(",")
             position += 1
