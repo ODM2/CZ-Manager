@@ -16,8 +16,6 @@ from ODM2CZOData.models import CvMedium
 from ODM2CZOData.models import CvQualitycode
 from ODM2CZOData.models import CvRelationshiptype
 from ODM2CZOData.models import CvResulttype
-from ODM2CZOData.models import CvSamplingfeaturegeotype
-from ODM2CZOData.models import CvSamplingfeaturetype
 from ODM2CZOData.models import CvStatus
 from ODM2CZOData.models import Featureactions
 from ODM2CZOData.models import Measurementresults
