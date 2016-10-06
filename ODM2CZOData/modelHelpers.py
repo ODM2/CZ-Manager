@@ -1,3 +1,4 @@
+import csv
 import os
 import re
 from datetime import datetime
@@ -6,7 +7,31 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.db import transaction
 from django.db.models import Q
 
-from ODM2CZOData.models import *
+from ODM2CZOData.models import Actions
+from ODM2CZOData.models import Annotations
+from ODM2CZOData.models import CvAggregationstatistic
+from ODM2CZOData.models import CvAnnotationtype
+from ODM2CZOData.models import CvCensorcode
+from ODM2CZOData.models import CvMedium
+from ODM2CZOData.models import CvQualitycode
+from ODM2CZOData.models import CvRelationshiptype
+from ODM2CZOData.models import CvResulttype
+from ODM2CZOData.models import CvSamplingfeaturegeotype
+from ODM2CZOData.models import CvSamplingfeaturetype
+from ODM2CZOData.models import CvStatus
+from ODM2CZOData.models import Featureactions
+from ODM2CZOData.models import Measurementresults
+from ODM2CZOData.models import Measurementresultvalueannotations
+from ODM2CZOData.models import Measurementresultvalues
+from ODM2CZOData.models import People
+from ODM2CZOData.models import Processinglevels
+from ODM2CZOData.models import Profileresults
+from ODM2CZOData.models import Profileresultvalues
+from ODM2CZOData.models import Relatedfeatures
+from ODM2CZOData.models import Results
+from ODM2CZOData.models import Samplingfeatures
+from ODM2CZOData.models import Units
+from ODM2CZOData.models import Variables
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
 
@@ -63,9 +88,12 @@ def newMeasurementResult(Level0values, plevel, printvals, save):
                    taxonomicclassifierid=taxid, resultdatetime=datetime,
                    resultdatetimeutcoffset=datetimeoffset,
                    valuecount=valcount, sampledmediumcv=samplemedium)
-    if save: newr.save()
-    if printvals: print(plevel)
-    if printvals: print(newr)
+    if save:
+        newr.save()
+    if printvals:
+        print(plevel)
+    if printvals:
+        print(newr)
 
     censorcode = sonadoraval.resultid.censorcodecv
     qualitycode = sonadoraval.resultid.qualitycodecv
@@ -76,8 +104,10 @@ def newMeasurementResult(Level0values, plevel, printvals, save):
                                aggregationstatisticcv=aggregationstatistic,
                                timeaggregationinterval=timeaggregationinterval,
                                timeaggregationintervalunitsid=timeaggregationintervalunitsid)
-    if save: newmr.save()
-    if printvals: print(newmr)
+    if save:
+        newmr.save()
+    if printvals:
+        print(newmr)
     return newmr
 
 
@@ -105,24 +135,30 @@ def QAProcessLevelCreation(SeriesToProcess, result, timeRangesToRemove, printval
                 if range[0] < valuedatetime < range[1]:
                     QAFlagOutofWater = True
                     datavalue = -6999
-                    if printvals: print("bad " + str(mrv))
+                    if printvals:
+                        print("bad " + str(mrv))
             if datavalue > highThreshold:
                 QAFlagHigh = True
                 datavalue = -6999
-                if printvals: print("bad " + str(mrv))
+                if printvals:
+                    print("bad " + str(mrv))
             elif datavalue <= lowThreshold:
                 QAFlagLow = True
                 datavalue = -6999
-                if printvals: print("bad " + str(mrv))
+                if printvals:
+                    print("bad " + str(mrv))
             elif not QAFlagOutofWater:
-                if printvals: print("good " + str(mrv))
+                if printvals:
+                    print("good " + str(mrv))
             valuedatetime = mrv.valuedatetime
             valuedatetimeutcoffset = mrv.valuedatetimeutcoffset
             newmrv = Measurementresultvalues(resultid=result, datavalue=datavalue,
                                              valuedatetime=valuedatetime,
                                              valuedatetimeutcoffset=valuedatetimeutcoffset)
-            if save: newmrv.save()
-            if printvals: print(str(newmrv))
+            if save:
+                newmrv.save()
+            if printvals:
+                print(str(newmrv))
             if QAFlagHigh or QAFlagOutofWater:
                 if QAFlagHigh:
                     annotationtext = annotationtextHigh + str(flagdatavalue) + " on " + str(
@@ -142,9 +178,11 @@ def QAProcessLevelCreation(SeriesToProcess, result, timeRangesToRemove, printval
                                           annotationtext=annotationtext,
                                           annotationdatetime=annotationdatetime,
                                           annotationutcoffset=5, annotatorid=annotatorid)
-                if save: newanno.save()
+                if save:
+                    newanno.save()
                 newmrvanno = Measurementresultvalueannotations(valueid=newmrv, annotationid=newanno)
-                if save: newmrvanno.save()
+                if save:
+                    newmrvanno.save()
             if QAFlagLow:
                 annotationtext = annotationtextLow + str(flagdatavalue)
                 annotationdatetime = datetime.now()
@@ -153,9 +191,11 @@ def QAProcessLevelCreation(SeriesToProcess, result, timeRangesToRemove, printval
                                       annotationtext=annotationtext,
                                       annotationdatetime=annotationdatetime,
                                       annotationutcoffset=5, annotatorid=annotatorid)
-                if save: newanno.save()
+                if save:
+                    newanno.save()
                 newmrvanno = Measurementresultvalueannotations(valueid=newmrv, annotationid=newanno)
-                if save: newmrvanno.save()
+                if save:
+                    newmrvanno.save()
             QAFlagHigh = False
             QAFlagLow = False
             QAFlagOutofWater = False

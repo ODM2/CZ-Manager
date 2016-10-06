@@ -18,7 +18,26 @@ from templatesAndSettings.base import ADMIN_SHORTCUTS
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
 from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DSICLAIMER
 from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
-from .models import *
+
+from .models import Actions
+from .models import Authorlists
+from .models import Citationextensionpropertyvalues
+from .models import Citations
+from .models import Datasets
+from .models import Datasetsresults
+from .models import Featureactions
+from .models import Measurementresultvalues
+from .models import Methods
+from .models import People
+from .models import Profileresults
+from .models import Profileresultvalues
+from .models import Relatedfeatures
+from .models import Results
+from .models import Samplingfeatureexternalidentifiers
+from .models import Samplingfeatures
+from .models import Timeseriesresultvalues
+from .models import Units
+from .models import Variables
 
 register = template.Library()
 
@@ -537,11 +556,11 @@ def TimeSeriesGraphing(request, feature_action='All'):
     # update_result_on_related_feature
     done = False
     selected_relatedfeatid, done, \
-        resultList, selected_resultid = relatedFeaturesFilter(request,
-                                                              done,
-                                                              selected_relatedfeatid,
-                                                              selected_resultid,
-                                                              feature_action)
+    resultList, selected_resultid = relatedFeaturesFilter(request,
+                                                          done,
+                                                          selected_relatedfeatid,
+                                                          selected_resultid,
+                                                          feature_action)
 
     if 'SelectedFeatureAction' in request.POST and not done:
         # raise ValidationError(done)
@@ -776,10 +795,10 @@ def TimeSeriesGraphing(request, feature_action='All'):
     # update_result_on_related_feature
     done = False
     selected_relatedfeatid, done, \
-        resultList, selected_resultid = relatedFeaturesFilter(
-            request, done, selected_relatedfeatid,
-            selected_resultid, feature_action
-        )
+    resultList, selected_resultid = relatedFeaturesFilter(
+        request, done, selected_relatedfeatid,
+        selected_resultid, feature_action
+    )
 
     if 'SelectedFeatureAction' in request.POST and not done:
         # raise ValidationError(done)
@@ -945,8 +964,6 @@ def TimeSeriesGraphing(request, feature_action='All'):
     xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
     yAxis = {"title": {"text": seriesStr}}
     graphType = 'line'
-
-
     actionList = Actions.objects.filter(
         action_type="Observation")  # where the action is not of type estimation
     # assuming an estimate is a single value.
@@ -1104,7 +1121,6 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         dataset = int(dataset)
 
     if resultidu != 'NotSet':
-
         resultidu = int(resultidu)
 
     selected_results = []
@@ -1497,7 +1513,7 @@ def scatter_plot(request):
                     tmpLoc = "{0} {1}-{2} {3};{4};{5};{6};{7}".format(
                         str(
                             y.resultid.resultid
-                            .featureactionid.samplingfeatureid.samplingfeaturename
+                                .featureactionid.samplingfeatureid.samplingfeaturename
                         ),
                         str(y.zlocation - y.zaggregationinterval), str(y.zlocation),
                         str(y.zlocationunitsid.unitsabbreviation),
@@ -1610,8 +1626,6 @@ def exportcitations(request, citations, csv):
 
 def exportspreadsheet(request, resultValuesSeries, profileResult=True):
     # if the user hit the export csv button export the measurement results to csv
-
-
     myfile = StringIO.StringIO()
     # raise ValidationError(resultValues)
     k = 0
@@ -1707,7 +1721,7 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
             depth = myresults.resultid.intendedzspacing
 
             if not k == 0 and (not lastSamplingFeatureCode == samplingFeatureCode or
-                               not depth == lastDepth):
+                                   not depth == lastDepth):
                 myfile.write('\n')
                 temp = myresults.csvoutput()
                 myfile.write(temp)
@@ -1719,7 +1733,7 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
             lastTime = time
             time = myresults.valuedatetime
             if not k == 0 and (not lastSamplingFeatureCode == samplingFeatureCode or
-                               not time == lastTime):
+                                   not time == lastTime):
                 myfile.write('\n')
                 temp = myresults.csvoutput()
                 myfile.write(temp)
@@ -1732,8 +1746,8 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
         for i in range(
                 position,
                 variablesAndUnits.index(unicode(variable) +
-                                        unicode(unit) +
-                                        unicode(processingCode))
+                                                unicode(unit) +
+                                                unicode(processingCode))
         ):
             myfile.write(",")
             position += 1
@@ -1967,8 +1981,6 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
                 titleStr = tmpVariableName
                 # titleStr += tmpVariableName
                 # series.append(data['datavalue'+str(i)])
-
-
     chartID = 'chart_id'
     chart = {"renderTo": chartID, "type": 'column', "zoomType": 'xy'}
     title2 = {"text": titleStr}
@@ -1976,8 +1988,6 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
     # 'category',"title": {"text": xAxisCategories},
     yAxis = {"title": {"text": seriesStr}}
     graphType = 'column'
-
-
     withProfileResults = Profileresults.objects.all()
     results = Results.objects.filter(resultid__in=withProfileResults)
     samplefeatid = Featureactions.objects.filter(featureactionid__in=results).values(

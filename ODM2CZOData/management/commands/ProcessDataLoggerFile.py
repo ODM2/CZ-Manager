@@ -166,10 +166,10 @@ class Command(BaseCommand):
                                     datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                         # for each column in the data table
                         # raise ValidationError("".join(str(rowColumnMap)))
-                        if check_dates:
-                            mrs = Results.objects.filter(
-                                resultid__in=DataloggerfilecolumnSet.values("resultid"))
-                            mrvs = Timeseriesresultvalues.objects.filter(resultid__in=mrs)
+                        # if check_dates:
+                        #     mrs = Results.objects.filter(
+                        #         resultid__in=DataloggerfilecolumnSet.values("resultid"))
+                        #     mrvs = Timeseriesresultvalues.objects.filter(resultid__in=mrs)
                         for colnum in rowColumnMap:
                             # x[0] for x in my_tuples
                             # colnum[0] = column number, colnum[1] = dataloggerfilecolumn object
@@ -208,10 +208,11 @@ class Command(BaseCommand):
                                                     valuedatetimeutcoffset=4,
                                                     censorcodecv=censorcode,
                                                     qualitycodecv=qualitycode,
-                                                    timeaggregationinterval=
-                                                    mresults.intendedtimespacing,
-                                                    timeaggregationintervalunitsid=
-                                                    mresults.intendedtimespacingunitsid).save()
+                                                    timeaggregationinterval=mresults
+                                                    .intendedtimespacing,
+                                                    timeaggregationintervalunitsid=mresults
+                                                    .intendedtimespacingunitsid
+                                                ).save()
                                         else:
                                             Timeseriesresultvalues(
                                                 resultid=mresults,
@@ -220,10 +221,11 @@ class Command(BaseCommand):
                                                 valuedatetimeutcoffset=4,
                                                 censorcodecv=censorcode,
                                                 qualitycodecv=qualitycode,
-                                                timeaggregationinterval=
-                                                mresults.intendedtimespacing,
-                                                timeaggregationintervalunitsid=
-                                                mresults.intendedtimespacingunitsid).save()
+                                                timeaggregationinterval=mresults
+                                                .intendedtimespacing,
+                                                timeaggregationintervalunitsid=mresults
+                                                .intendedtimespacingunitsid
+                                            ).save()
                                     except IntegrityError:
                                         pass
                                         # Timeseriesresultvalues.delete()

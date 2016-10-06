@@ -31,8 +31,7 @@ class TimeseriesResultsLookup(LookupChannel):
                 qset = Timeseriesresults.objects.filter(
                     Q(resultid__resultid__icontains=part) |
                     Q(
-                        resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains
-                        =part) |
+                        resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) |
                     Q(resultid__featureactionid__action__method__methodname__icontains=part) |
                     Q(resultid__variableid__variablecode__icontains=part) |
                     Q(resultid__variableid__variable_name__name__icontains=part))
@@ -41,8 +40,7 @@ class TimeseriesResultsLookup(LookupChannel):
                 qset = qset & Timeseriesresults.objects.filter(
                     Q(resultid__resultid__icontains=part) |
                     Q(
-                        resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains
-                        =part) |
+                        resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) |
                     Q(resultid__featureactionid__action__method__methodname__icontains=part) |
                     Q(resultid__variableid__variablecode__icontains=part) |
                     Q(resultid__variableid__variable_name__name__icontains=part))
@@ -71,8 +69,7 @@ class MeasurementResultsLookup(LookupChannel):
             if not qset:
                 qset = Measurementresults.objects.filter(
                     Q(resultid__resultid__icontains=part) |
-                    Q(resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains
-                        =part) |
+                    Q(resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) |
                     Q(resultid__featureactionid__action__method__methodname__icontains=part) |
                     Q(resultid__variableid__variablecode__icontains=part) |
                     Q(resultid__variableid__variable_name__name__icontains=part))
@@ -80,8 +77,7 @@ class MeasurementResultsLookup(LookupChannel):
             else:
                 qset = qset & Measurementresults.objects.filter(
                     Q(resultid__resultid__icontains=part) |
-                    Q(resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains
-                        =part) |
+                    Q(resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) |
                     Q(resultid__featureactionid__action__method__methodname__icontains=part) |
                     Q(resultid__variableid__variablecode__icontains=part) |
                     Q(resultid__variableid__variable_name__name__icontains=part))
@@ -110,8 +106,7 @@ class ProfileResultsLookup(LookupChannel):
             if not qset:
                 qset = Profileresults.objects.filter(
                     Q(resultid__resultid__icontains=part) |
-                    Q(resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains
-                        =part) |
+                    Q(resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) |
                     Q(resultid__featureactionid__action__method__methodname__icontains=part) |
                     Q(resultid__variableid__variablecode__icontains=part) |
                     Q(resultid__variableid__variable_name__name__icontains=part))
@@ -119,8 +114,7 @@ class ProfileResultsLookup(LookupChannel):
             else:
                 qset = qset & Profileresults.objects.filter(
                     Q(resultid__resultid__icontains=part) |
-                    Q(resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains
-                        =part) |
+                    Q(resultid__featureactionid__samplingfeatureid__samplingfeaturename__icontains=part) |
                     Q(resultid__featureactionid__action__method__methodname__icontains=part) |
                     Q(resultid__variableid__variablecode__icontains=part) |
                     Q(resultid__variableid__variable_name__name__icontains=part))

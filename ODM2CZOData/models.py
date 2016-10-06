@@ -2119,9 +2119,10 @@ class Resultextensionpropertyvalues(models.Model):
 
 class Resultnormalizationvalues(models.Model):
     resultid = models.OneToOneField('Results', db_column='resultid', primary_key=True)
-    normalizedbyreferencematerialvalueid = models.ForeignKey(Referencematerialvalues,
-                                                             db_column=
-                                                             'normalizedbyreferencematerialvalueid')
+    normalizedbyreferencematerialvalueid = models.ForeignKey(
+        Referencematerialvalues,
+        db_column='normalizedbyreferencematerialvalueid'
+    )
 
     class Meta:
         managed = False
@@ -2469,11 +2470,13 @@ class Spectraresults(models.Model):
     spatialreferenceid = models.ForeignKey(Spatialreferences, db_column='spatialreferenceid',
                                            blank=True, null=True)
     intendedwavelengthspacing = models.FloatField(blank=True, null=True)
-    intendedwavelengthspacingunitsid = models.ForeignKey('Units', related_name='+',
-                                                         db_column=
-                                                         'intendedwavelengthspacingunitsid',
-                                                         blank=True,
-                                                         null=True)
+    intendedwavelengthspacingunitsid = models.ForeignKey(
+        'Units',
+        related_name='+',
+        db_column='intendedwavelengthspacingunitsid',
+        blank=True,
+        null=True
+    )
     aggregationstatisticcv = models.ForeignKey(CvAggregationstatistic,
                                                db_column='aggregationstatisticcv')
 
@@ -2828,11 +2831,12 @@ class Units(models.Model):
                                   help_text="A vocabulary for describing the type of the Unit "
                                             "or the more general quantity that the Unit "
                                             "represents. View unit type details here "
-                                            "http://vocabulary.odm2.org/unitstype/"
-                                  , db_column='unitstypecv')
+                                            "http://vocabulary.odm2.org/unitstype/",
+                                  db_column='unitstypecv')
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
     unitsname = models.CharField(verbose_name='unit name', max_length=255)
-    unitslink = models.CharField(verbose_name='reference for the unit (web link)', max_length=255,
+    unitslink = models.CharField(verbose_name='reference for the unit (web link)',
+                                 max_length=255,
                                  blank=True)
 
     def __unicode__(self):
