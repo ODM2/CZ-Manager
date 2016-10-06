@@ -259,8 +259,8 @@ def importValues(file, variableFileIndex, variableDBID, variableUnitID, actionID
         zlist.append(line[5])
     features = Samplingfeatures.objects.filter(samplingfeaturecode__in=featureCode)
     if features.__len__() == 0:  # create features
-        featuretype = CvSamplingfeaturetype.objects.filter(name="Excavation").get()
-        featuregeotype = CvSamplingfeaturegeotype.objects.filter(name="Point").get()
+        # featuretype = CvSamplingfeaturetype.objects.filter(name="Excavation").get()
+        # featuregeotype = CvSamplingfeaturegeotype.objects.filter(name="Point").get()
         oldfc = None
         for fc, xy, z in zip(featureCode, xylist, zlist):
             if fc != oldfc:

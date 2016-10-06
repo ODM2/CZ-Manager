@@ -20,7 +20,6 @@ from ODM2CZOData.models import Dataloggerfilecolumns
 from ODM2CZOData.models import Dataloggerfiles
 from ODM2CZOData.models import Extensionproperties
 from ODM2CZOData.models import Resultextensionpropertyvalues
-from ODM2CZOData.models import Results
 from ODM2CZOData.models import Timeseriesresults
 from ODM2CZOData.models import Timeseriesresultvalues
 from templatesAndSettings.settings import MEDIA_ROOT

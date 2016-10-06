@@ -556,11 +556,11 @@ def TimeSeriesGraphing(request, feature_action='All'):
     # update_result_on_related_feature
     done = False
     selected_relatedfeatid, done, \
-    resultList, selected_resultid = relatedFeaturesFilter(request,
-                                                          done,
-                                                          selected_relatedfeatid,
-                                                          selected_resultid,
-                                                          feature_action)
+        resultList, selected_resultid = relatedFeaturesFilter(request,
+                                                              done,
+                                                              selected_relatedfeatid,
+                                                              selected_resultid,
+                                                              feature_action)
 
     if 'SelectedFeatureAction' in request.POST and not done:
         # raise ValidationError(done)
@@ -795,10 +795,10 @@ def TimeSeriesGraphing(request, feature_action='All'):
     # update_result_on_related_feature
     done = False
     selected_relatedfeatid, done, \
-    resultList, selected_resultid = relatedFeaturesFilter(
-        request, done, selected_relatedfeatid,
-        selected_resultid, feature_action
-    )
+        resultList, selected_resultid = relatedFeaturesFilter(
+            request, done, selected_relatedfeatid,
+            selected_resultid, feature_action
+        )
 
     if 'SelectedFeatureAction' in request.POST and not done:
         # raise ValidationError(done)
@@ -1417,9 +1417,9 @@ def scatter_plot(request):
     # second filter = exclude summary results attached to field areas
     pr = Results.objects.filter(resultid__in=prv).filter(
         ~Q(
-            featureactionid__samplingfeatureid__sampling_feature_type=
-            "Ecological land classification")) \
-        .filter(~Q(featureactionid__samplingfeatureid__sampling_feature_type="Field area"))
+            featureactionid__samplingfeatureid__sampling_feature_type="Ecological land "
+                                                                      "classification")).filter(
+        ~Q(featureactionid__samplingfeatureid__sampling_feature_type="Field area"))
     # variables is the list to pass to the html template
     variables = Variables.objects.filter(variableid__in=pr.values("variableid"))
     fieldareas = Samplingfeatures.objects.filter(
@@ -1513,7 +1513,7 @@ def scatter_plot(request):
                     tmpLoc = "{0} {1}-{2} {3};{4};{5};{6};{7}".format(
                         str(
                             y.resultid.resultid
-                                .featureactionid.samplingfeatureid.samplingfeaturename
+                            .featureactionid.samplingfeatureid.samplingfeaturename
                         ),
                         str(y.zlocation - y.zaggregationinterval), str(y.zlocation),
                         str(y.zlocationunitsid.unitsabbreviation),
@@ -1636,13 +1636,11 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
     processingCode = None
     resultValuesHeaders = resultValuesSeries.filter(
         ~Q(
-            resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type
-            ="Ecological land classification"
+            resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Ecological land classification"  # noqa
         )
     ).filter(
         ~Q(
-            resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type
-            ="Field area"
+            resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area"  # noqa
         )
     ).order_by(
         "resultid__resultid__variableid", "resultid__resultid__unitsid",
@@ -1671,12 +1669,10 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
     if profileResult:
         resultValuesSeries = resultValuesSeries.filter(
             ~Q(
-                resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type=
-                "Ecological land classification"
+                resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Ecological land classification"  # noqa
             )
         ).filter(
-            ~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type=
-               "Field area"
+            ~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area"  # noqa
                )
         ).order_by(
             "resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
@@ -1686,12 +1682,10 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
     else:
         resultValuesSeries = resultValuesSeries.filter(
             ~Q(
-                resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type=
-                "Ecological land classification")
+                resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Ecological land classification")  # noqa
         ).filter(
             ~Q(
-                resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type=
-                "Field area"
+                resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area"  # noqa
             )
         ).order_by(
             "valuedatetime",
@@ -1721,7 +1715,7 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
             depth = myresults.resultid.intendedzspacing
 
             if not k == 0 and (not lastSamplingFeatureCode == samplingFeatureCode or
-                                   not depth == lastDepth):
+                               not depth == lastDepth):
                 myfile.write('\n')
                 temp = myresults.csvoutput()
                 myfile.write(temp)
@@ -1733,7 +1727,7 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
             lastTime = time
             time = myresults.valuedatetime
             if not k == 0 and (not lastSamplingFeatureCode == samplingFeatureCode or
-                                   not time == lastTime):
+                               not time == lastTime):
                 myfile.write('\n')
                 temp = myresults.csvoutput()
                 myfile.write(temp)
@@ -1746,8 +1740,8 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
         for i in range(
                 position,
                 variablesAndUnits.index(unicode(variable) +
-                                                unicode(unit) +
-                                                unicode(processingCode))
+                                        unicode(unit) +
+                                        unicode(processingCode))
         ):
             myfile.write(",")
             position += 1
@@ -1811,13 +1805,10 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
     ).order_by(
         "variableid", "unitsid"
     ).filter(
-        ~Q(featureactionid__samplingfeatureid__sampling_feature_type=
-           "Ecological land classification")
+        ~Q(featureactionid__samplingfeatureid__sampling_feature_type="Ecological land "
+                                                                     "classification")
     ).filter(
-        ~Q(
-            featureactionid__samplingfeatureid__sampling_feature_type=
-            "Field area")
-    )
+        ~Q(featureactionid__samplingfeatureid__sampling_feature_type="Field area"))
     variableList = Variables.objects.filter(variableid__in=featureresults.values("variableid"))
 
     # find the profile results series for the selected variable
