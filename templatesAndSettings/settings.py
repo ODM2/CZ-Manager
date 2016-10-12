@@ -12,6 +12,10 @@ map_config = {
     "lat": 0,
     "lon": 0,
     "zoom": 2,
+    # MapBox
+    "MapBox": {
+        "access_token": 'mapbox accessToken'
+    },
     # should sampling features of type site be added to marker clusters or not
     "cluster_sites": False,
     # how many months by default should time series generated from the map display

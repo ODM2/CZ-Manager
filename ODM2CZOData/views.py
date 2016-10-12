@@ -1,5 +1,6 @@
 import cStringIO as StringIO
 import math
+import json
 from datetime import datetime
 from datetime import timedelta
 
@@ -482,15 +483,69 @@ def web_map(request, dataset='NotSet'):
              style_class="awesome-marker-icon-cadetblue")
     ]
 
+    base_maps = [
+        {
+            'name': 'Esri_NatGeoWorldMap',
+            'url': 'http://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/'
+                   'MapServer/tile/{z}/{y}/{x}',
+            'options': {
+                'attribution': 'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, '
+                               'NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, '
+                               'iPC',
+                'maxZoom': 16
+            },
+            'group':'ESRI Basemaps'
+        },
+        {
+            'name': 'Esri_WorldImagery',
+            'url': 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/'
+                   'MapServer/tile/{z}/{y}/{x}',
+            'options': {
+                'attribution': 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, '
+                               'AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the '
+                               'GIS User Community'
+            },
+            'group': 'ESRI Basemaps'
+        },
+        {
+            'name': 'Esri_WorldTopoMap',
+            'url': 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/'
+                   'MapServer/tile/{z}/{y}/{x}',
+            'options': {
+                'attribution': 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, '
+                               'Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, '
+                               'Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and '
+                               'the GIS User Community'
+            },
+            'group': 'ESRI Basemaps'
+        },
+        {
+            'name': 'MapBox_RunBikeHike',
+            'url': 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?'
+                   'access_token={accessToken}',
+            'options': {
+                'maxZoom': 20,
+                'attribution': 'Map data &copy; '
+                               '<a href="http://openstreetmap.org">OpenStreetMap</a> '
+                               'contributors, <a href="http://creativecommons.org/licenses/'
+                               'by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; '
+                               '<a href="http://mapbox.com">Mapbox</a>',
+                'id': 'mapbox.run-bike-hike',
+                'accessToken': map_config['MapBox']['access_token']
+            },
+            'group': 'OpenStreetMap Basemaps'
+        }
+    ]
+
     context = {
-        'prefixpath': CUSTOM_TEMPLATE_PATH, 'legends': legend_ref, 'features': features,
+        'prefixpath': CUSTOM_TEMPLATE_PATH, 'legends': json.dumps(legend_ref), 'features': features,
         'results': results,
         'externalidentifiers': externalidentifiers,
         'datasets': datasets, 'selecteddatasets': selected, 'authenticated': authenticated,
         'map_config': map_config,
         'data_disclaimer': data_disclaimer, 'name': request.user,
         'site_title': admin.site.site_title,
-        'site_header': admin.site.site_header, 'short_title': 'Map Locations'}
+        'site_header': admin.site.site_header, 'short_title': 'Map Locations', 'basemaps':base_maps}
     return render(request, 'mapdata.html', context)
 
 
