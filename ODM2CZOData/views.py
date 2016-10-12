@@ -494,7 +494,7 @@ def web_map(request, dataset='NotSet'):
                                'iPC',
                 'maxZoom': 16
             },
-            'group':'ESRI Basemaps'
+            'group': 'ESRI Basemaps'
         },
         {
             'name': 'Esri_WorldImagery',
@@ -545,7 +545,7 @@ def web_map(request, dataset='NotSet'):
         'map_config': map_config,
         'data_disclaimer': data_disclaimer, 'name': request.user,
         'site_title': admin.site.site_title,
-        'site_header': admin.site.site_header, 'short_title': 'Map Locations', 'basemaps':base_maps}
+        'site_header': admin.site.site_header, 'short_title': 'Map Locations', 'basemaps': base_maps}
     return render(request, 'mapdata.html', context)
 
 
