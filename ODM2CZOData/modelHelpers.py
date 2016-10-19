@@ -36,6 +36,7 @@ from ODM2CZOData.models import Variables
 
 __author__ = 'leonmi'
 
+
 # searchTextString = some string to search a models charField for
 # Model = the model in which to search
 # columnName = the name of the charField column to search in
