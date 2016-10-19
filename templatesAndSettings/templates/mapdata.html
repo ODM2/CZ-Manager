@@ -59,6 +59,8 @@
     <script src="http://nile.apl.washington.edu/files/cz/czimea/odm2admin/leaflet-awesome-marker/js/leaflet.awesome-markers.js"></script>
     <link rel="stylesheet" href="http://nile.apl.washington.edu/files/cz/czimea/odm2admin/leaflet-legend/leaflet-legend.css">
     <script src="http://nile.apl.washington.edu/files/cz/czimea/odm2admin/leaflet-legend/leaflet-legend.js"></script>
+    <link rel="stylesheet" href="https://cdn.rawgit.com/ismyrnow/Leaflet.groupedlayercontrol/gh-pages/src/leaflet.groupedlayercontrol.css" />
+    <script src="https://cdn.rawgit.com/ismyrnow/Leaflet.groupedlayercontrol/gh-pages/src/leaflet.groupedlayercontrol.js"></script>
 
 	<style type="text/css">
         .leaflet-google-layer {
@@ -118,6 +120,16 @@
             width: 100%;
             height: 100%;
         }
+
+        #latlng {
+            background-color: #595F65;
+            color: #ffffff;
+            padding: 10px 0 10px 20px;
+        }
+
+        #latlng p, #latlng p > span {
+            font-size: 15px;
+        }
     </style>
     {% admin_shortcuts_js %}{% endblock %}
 
@@ -133,6 +145,11 @@
 {% block content %}
 
     <div id='content-main'> {% csrf_token %}</div>
+    <div id="latlng">
+        <p>
+            Lat: <span id="lat">0</span>, Lon: <span id="lng">0</span>
+        </p>
+    </div>
     <div style="width:100%; height:900px;" id="map"></div>
     <div id="legend">
        {% include 'DatasetsList.html' %}
@@ -143,44 +160,51 @@
     </script>
     {% endcomment %}
     <script type='text/javascript'>
-        var feature_list = [];
-        {% for feats in legends %}
-            feature_list.push(
-                    {
-                        "name": "{{ feats.feature_type }}",
-                        "styleclass": "{{ feats.style_class }}",
-                        "icon": "{{ feats.icon }}",
-                        "color": "{{ feats.color }}"
-                    }
-            );
-        {% endfor %}
-        // Create Map and set view to LatLong: 18.28263, -65.77458 with zoom level 14
-        var myMap = L.map('map',{worldCopyJump:true}).setView([ {{ map_config.lat }}, {{ map_config.lon }}], {{ map_config.zoom }});
-        // var myMap = L.map('map',{worldCopyJump:true}).setView([ 18.28263, -65.77458], 14);
-        // var myMap = L.map('map',{worldCopyJump:true}).setView([40.000,-95.000], 5); // For Crossczo
-		var m = null;
-        var Esri_NatGeoWorldMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/NatGeo_World_Map/MapServer/tile/{z}/{y}/{x}', {
-			attribution: 'Tiles &copy; Esri &mdash; National Geographic, Esri, DeLorme, NAVTEQ, UNEP-WCMC, USGS, NASA, ESA, METI, NRCAN, GEBCO, NOAA, iPC',
-			maxZoom: 16
-			}).addTo(myMap);
-		var Esri_WorldImagery = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-			attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-			}).addTo(myMap);
-		var Esri_WorldTopoMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
-		attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, iPC, USGS, FAO, NPS, NRCAN, GeoBase, Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), and the GIS User Community'
-		}).addTo(myMap);
-		var osm = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
-            maxZoom: 20,
-            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-            '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-            'Imagery &copy; <a href="http://mapbox.com">Mapbox</a>', id: 'mapbox.run-bike-hike'
-        }).addTo(myMap);
-        var markerClusters = L.markerClusterGroup(singleMarkerMode=true); //,maxClusterRadius=1
-		var done = false;
+        var mapFeatures = {};
+        var baseMaps = {};
+        var overlays = {};
+        var featureList = {{ legends|safe }};
+        var mapCenter = [{{ map_config.lat }}, {{ map_config.lon }}];
+        var initZoom = {{ map_config.zoom }};
+
+        // Initalize map
+        var mapOptions = {
+            worldCopyJump:true
+        };
+        var myMap = L.map('map',mapOptions).setView(mapCenter, initZoom);
+
+        function displayCoords(e){
+            document.getElementById("lat").innerHTML = e.latlng['lat'].toFixed(4);
+            document.getElementById('lng').innerHTML = e.latlng['lng'].toFixed(4);
+        }
+        myMap.on({
+            mousemove: displayCoords
+        });
+
+        myMap.attributionControl.setPrefix('');
+        // Make Basemaps
+        function makeBaseMaps(basemaps) {
+            for (var i = 0; i < basemaps.length; i++) {
+                if (basemaps[i]['name'] == 'MapBox_RunBikeHike') {
+                    baseMaps[basemaps[i]['name']] = L.tileLayer(basemaps[i]
+                        ['url'],basemaps[i]['options']).addTo(myMap);
+                } else {
+                    baseMaps[basemaps[i]['name']] = L.tileLayer(basemaps[i]
+                        ['url'],basemaps[i]['options']);
+                }
+            }
+        }
+
+        makeBaseMaps({{ basemaps|safe }});
+
+        // Initialize marker cluster groupings
+        var markerClusters = L.markerClusterGroup(
+                singleMarkerMode=true
+        ); //,maxClusterRadius=1
         {% for site in features|filter_coords %}
-            var feat_obj = feature_list.filter(
+            var feat_obj = featureList.filter(
                     function( obj ){
-                        return obj.name == '{{ site.sampling_feature_type.name }}'
+                        return obj['feature_type'] == '{{ site.sampling_feature_type.name }}'
                     });
             var popup = '';
 			done = false;
@@ -192,7 +216,7 @@
 						done= true;
 						{% endif %}
 			{% endfor %}
-			if (done ==false){
+			if (done == false){
 				{% if not done == 1 and site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" or site.sampling_feature_type.name == "Stream gage" or site.sampling_feature_type.name == "Transect" or site.sampling_feature_type.name == "Weather station" %}
 					popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
 							+ '<hr />'
@@ -232,7 +256,7 @@
             });
 			}else{
 			 var iconDiv = new L.DivIcon({
-                className: feat_obj[0].styleclass + ' awesome-marker leaflet-zoom-animated leaflet-interactive',
+                className: feat_obj[0].style_class + ' awesome-marker leaflet-zoom-animated leaflet-interactive',
                 html: '<i class="fa '+  feat_obj[0].icon +' icon-white" aria-hidden="true"></i><p style="margin-top:20px;font-weight:bold;">{{ site.samplingfeaturecode }}</p>'
             });
 			}
@@ -242,7 +266,7 @@
                 }).bindPopup( popup,{minWidth: 600, minHeight: 500,autoPanPadding: [10, 50],  autoPan: true, closeButton: true,offset: [0, 5]} );
 			    {% if map_config.cluster_sites and  site.sampling_feature_type.name == "Site" %}
 					markerClusters.addLayer(m);
-				{% else %} 
+				{% else %}
 				    m.addTo(myMap);
 				{% endif %}
 			{% else %}
@@ -252,29 +276,29 @@
 				markerClusters.addLayer(m);
 			{% endif %}
         {% endfor %}
-        var legend = L.control({position: 'bottomright'});
+
+
+        // Make legend
+        var legend = L.control({
+            position: 'bottomright'
+        });
         legend.onAdd = function (myMap) {
             var div = L.DomUtil.create('div', 'info legend');
             div.innerHTML += '<h2>Sample Feature Types</h2>';
             // loop through our density intervals and generate a label with a colored square for each interval
-            for (var i = 0; i < feature_list.length; i++) {
+            for (var i = 0; i < featureList.length; i++) {
                 div.innerHTML +=
                         '<div class="legend-item">' +
-                        '      <div class="legend-icon ' + feature_list[i].styleclass + '">' +
-                        '           <i class="fa ' + feature_list[i].icon + '" aria-hidden="true"></i>' +
+                        '      <div class="legend-icon ' + featureList[i]['style_class'] + '">' +
+                        '           <i class="fa ' + featureList[i]['icon'] + '" aria-hidden="true"></i>' +
                         '      </div>' +
-                        '      <div class="legend-text">' + feature_list[i].name + '</div>' +
+                        '      <div class="legend-text">' + featureList[i]['feature_type'] + '</div>' +
                         '</div>'
             }
                 return div;
         };
 
-        /*var legend2 = L.control({position:'bottomleft'});
-        legend2.onAdd = function (myMap) {
-            var div = L.DomUtil.create('div', 'info datasets-listing');
-            div.innerHTML += document.getElementById('datasetsList').innerHTML;
-            return div;
-        };*/
+
         // https://github.com/mikeskaug/Leaflet.Legend
         var legend2 = new L.Control.Legend({
                         position: 'topleft',
@@ -290,17 +314,16 @@
         //legend2.addTo(myMap);
         legend.addTo(myMap);
         // Basemaps Choices
-        basemaps = {
-			'Esri_WorldImagery':Esri_WorldImagery,
-			'Esri_WorldTopoMap':Esri_WorldTopoMap,
-			'Esri_NatGeoWorldMap':Esri_NatGeoWorldMap,
-			'OSM': osm,
-        };
+
         myMap.addLayer(markerClusters);
+
         // Overlay Choices
         overlayMaps = {};
         // Put Control on map
-        L.control.layers(basemaps, overlayMaps).addTo(myMap);
+        L.control.groupedLayers(baseMaps, overlayMaps).addTo(myMap);
+        L.control.scale({
+            position:'bottomleft'
+}       ).addTo(myMap);
     </script>
 
 {% endblock %}

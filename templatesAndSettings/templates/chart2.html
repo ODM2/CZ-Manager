@@ -60,14 +60,14 @@
 	 <script src="http://highcharts.github.io/export-csv/export-csv.js"></script>
 	 
 	<script>
-    var chart_id = 'chartid'
-    var chart = {{ chart|safe }}
-    var title2 = {{ title2|safe }}
-    var xAxis = {{ xAxis|safe }}
-    var yAxis = {{ yAxis|safe }}
-    var series = {{ series|safe }}
-	var graphType =   '{{graphType|safe }}'
-	var name_of_units = {{name_of_units|safe}}
+    var chart_id = 'chartid';
+    var chart = {{ chart|safe }};
+    var title2 = {{ title2|safe }};
+    var xAxis = {{ xAxis|safe }};
+    var yAxis = {{ yAxis|safe }};
+    var series = {{ series|safe }};
+	var graphType =   '{{graphType|safe }}';
+	var name_of_units = {{name_of_units|safe}};
 	
 $(document).ready(function() {
 	
@@ -157,21 +157,21 @@ Location - {{featureActionLocation}}<br>
 {% if not useSamplingFeature and not useDataset %}
 Method- {{featureActionMethod}}
 {% endif %}
-</h1></p>
+</h1>
     <div id='content-main'> {% csrf_token %}
 	 </div>
-	<div id='chartid' class="chart" style="height:75%; width:100 margin: 0 auto"></div>
+	<div id='chartid' class="chart" style="height:75%; width:100px; margin: 0 auto;"></div>
 	
 <br>
 {% if useDataset %}
 {{datasetAbstract}}
 {% endif %}
 <table><tr><td>
-<input id="miny"   name="new Minimum of left y-axis" type="number" value=0>new minimum of left y-axis</input></td>
-<td><input id="maxy"   name="new Maximum of left y-axis" type="number">new maximum of left y-axis</input></td></tr>
-<tr><td><input id="miny2"   name="new Minimum of left y-axis" type="number" value=0>new minimum of right y-axis</input></td>
-<td><input id="maxy2"   name="new Maximum of left y-axis" type="number">new maximum of right y-axis</input></td>
-<td><button id="extremesButton" class="autocompare">Set extremes y-axis</button></td></tr>
+<input id="miny"   name="new Minimum of left y-axis" type="number" value=0>new minimum of left y-axis</td>
+<td><input id="maxy"   name="new Maximum of left y-axis" type="number">new maximum of left y-axis</td></tr>
+<tr><td><input id="miny2"   name="new Minimum of left y-axis" type="number" value=0>new minimum of right y-axis</td>
+<td><input id="maxy2"   name="new Maximum of left y-axis" type="number">new maximum of right y-axis</td>
+<td><button id="extremesButton" class="autocompare">Set extremes y-axis</button></td></tr></table>
 {% include 'StartEndDate.html' %}
 <br><br>
 <p>{{data_disclaimer.text}} <a href={{data_disclaimer.link}} target="_blank"> {{data_disclaimer.linktext}}</a></p>

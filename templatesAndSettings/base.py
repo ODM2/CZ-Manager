@@ -10,8 +10,6 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from templatesAndSettings.settings import *
-import os
-
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 TEMPLATE_DIR = os.path.dirname(__file__)
@@ -43,7 +41,7 @@ CUSTOM_TEMPLATE_PATH = custom_template_path
 URL_PATH = url_path
 STATIC_ROOT = static_root
 MAP_CONFIG = map_config
-DATA_DISCLAIMER= data_disclaimer
+DATA_DISCLAIMER = data_disclaimer
 # https://github.com/mishbahr/django-modeladmin-reorder
 # {'app': 'auth', 'models': ('auth.User', 'auth.Group')},
 # ADMIN_REORDER = ('odm2testsite',
@@ -80,7 +78,9 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
     'apptemplates.Loader',
 )
-# find icon images here https://github.com/alesdotio/django-admin-shortcuts/blob/master/admin_shortcuts/templatetags/admin_shortcuts_tags.py#L134
+# find icon images here https://github.com/alesdotio/
+# django-admin-shortcuts/blob/master/admin_shortcuts/
+# templatetags/admin_shortcuts_tags.py#L134
 ADMIN_SHORTCUTS = [
     {
 
@@ -130,25 +130,23 @@ ADMIN_SHORTCUTS_SETTINGS = {
 }
 
 # https://github.com/crucialfelix/django-ajax-selects
-AJAX_LOOKUP_CHANNELS = {
-    #  simple: search Person.objects.filter(name__icontains=q)
-    'cv_variable_name': ('{}.lookups'.format(app_name), 'CvVariableNameLookup'),
-    'cv_variable_type': ('{}.lookups'.format(app_name), 'CvVariableTypeLookup'),
-    'cv_unit_type': ('{}.lookups'.format(app_name), 'CvUnitTypeLookup'),
-    'cv_speciation': ('{}.lookups'.format(app_name), 'CvVariableSpeciationLookup'),
-    'featureaction_lookup': ('{}.lookups'.format(app_name), 'FeatureactionsLookup'),
-    'result_lookup': ('{}.lookups'.format(app_name), 'ResultsLookup'),
-    'profileresult_lookup': ('{}.lookups'.format(app_name), 'ProfileResultsLookup'),
-    'measurementresult_lookup': ('{}.lookups'.format(app_name), 'MeasurementResultsLookup'),
-    'timeseriesresult_lookup': ('{}.lookups'.format(app_name), 'TimeseriesResultsLookup'),
-    'cv_taxonomic_classifier_type': ('{}.lookups'.format(app_name), 'CvTaxonomicClassifierTypeLookup'),
-    'cv_method_type':('{}.lookups'.format(app_name),'CvMethodTypeLookup'),
-    'cv_action_type':('{}.lookups'.format(app_name),'CvActionTypeLookup'),
-    'cv_sampling_feature_type':('{}.lookups'.format(app_name),'CvSamplingFeatureTypeLookup'),
-    'cv_sampling_feature_geo_type': ('{}.lookups'.format(app_name), 'CvSamplingFeatureGeoTypeLookup'),
-    'cv_elevation_datum': ('{}.lookups'.format(app_name), 'CvElevationDatumLookup'),
-    # define a custom lookup channel
-}
+AJAX_LOOKUP_CHANNELS = dict(
+    cv_variable_name=('{}.lookups'.format(app_name), 'CvVariableNameLookup'),
+    cv_variable_type=('{}.lookups'.format(app_name), 'CvVariableTypeLookup'),
+    cv_unit_type=('{}.lookups'.format(app_name), 'CvUnitTypeLookup'),
+    cv_speciation=('{}.lookups'.format(app_name), 'CvVariableSpeciationLookup'),
+    featureaction_lookup=('{}.lookups'.format(app_name), 'FeatureactionsLookup'),
+    result_lookup=('{}.lookups'.format(app_name), 'ResultsLookup'),
+    profileresult_lookup=('{}.lookups'.format(app_name), 'ProfileResultsLookup'),
+    measurementresult_lookup=('{}.lookups'.format(app_name), 'MeasurementResultsLookup'),
+    timeseriesresult_lookup=('{}.lookups'.format(app_name), 'TimeseriesResultsLookup'),
+    cv_taxonomic_classifier_type=('{}.lookups'.format(app_name),
+                                  'CvTaxonomicClassifierTypeLookup'),
+    cv_method_type=('{}.lookups'.format(app_name), 'CvMethodTypeLookup'),
+    cv_action_type=('{}.lookups'.format(app_name), 'CvActionTypeLookup'),
+    cv_sampling_feature_type=('{}.lookups'.format(app_name), 'CvSamplingFeatureTypeLookup'),
+    cv_sampling_feature_geo_type=('{}.lookups'.format(app_name), 'CvSamplingFeatureGeoTypeLookup'),
+    cv_elevation_datum=('{}.lookups'.format(app_name), 'CvElevationDatumLookup'))
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',

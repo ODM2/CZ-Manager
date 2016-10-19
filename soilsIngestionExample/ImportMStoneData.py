@@ -1,15 +1,15 @@
-__author__ = 'leonmi'
-
 import os
 from django.core.wsgi import get_wsgi_application
 
 import ODM2CZOData.modelHelpers as modelHelpers
 
+from ODM2CZOData.models import Actions, Units, Variables
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")  # noqa
 application = get_wsgi_application()
 
-from ODM2CZOData.models import Actions, Units
 
+__author__ = 'leonmi'
 # Carbon Percent.
 samplingfeaturedescription = "Stone M.M. et al. site, see http://dx.doi.org/10.1016/j.soilbio.2014.10.019",  # noqa
 fname = 'EnzBiomass.csv'
@@ -96,4 +96,4 @@ act = Actions.objects.filter(actionid=actionID).get()
 print(act)
 # zspacing = 20
 # zinterval = 20
-modelHelpers.importValues(fname, variableFileIndex, variableDBID, variableUnitID, actionID, False, samplingfeaturedescription)  # noqa
+modelHelpers.importValues(fname, variableFileIndex, variableDBID, variableUnitID, actionID, False,)  # noqa

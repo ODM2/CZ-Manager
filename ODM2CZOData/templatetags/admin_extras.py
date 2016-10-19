@@ -1,24 +1,26 @@
-#this came from https://djangosnippets.org/snippets/2196/
-#adds a collect tag for templates so you can build lists
+# this came from https://djangosnippets.org/snippets/2196/
+# adds a collect tag for templates so you can build lists
 
 from django import template
-from django.contrib.gis.geos import GEOSGeometry
 from django.contrib import admin
+from django.contrib.gis.geos import GEOSGeometry
+
 from templatesAndSettings.base import ADMIN_SHORTCUTS
 
 register = template.Library()
+
+
 @register.tag
-
-
-
-def collect(parser, token):
+def collect(token):
     bits = list(token.split_contents())
     if len(bits) > 3 and bits[-2] == 'as':
         varname = bits[-1]
         items = bits[1:-2]
         return CollectNode(items, varname)
     else:
-        raise template.TemplateSyntaxError('%r expected format is "item [item ...] as varname"' % bits[0])
+        raise template.TemplateSyntaxError('%r expected format is "item [item ...] as varname"'
+                                           % bits[0])
+
 
 class CollectNode(template.Node):
     def __init__(self, items, varname):
@@ -39,6 +41,7 @@ class AssignNode(template.Node):
         context[self.name] = self.value.resolve(context, True)
         return ''
 
+
 def do_assign(parser, token):
     """
     Assign an expression to a variable in the current context.
@@ -55,8 +58,10 @@ def do_assign(parser, token):
     value = parser.compile_filter(bits[2])
     return AssignNode(bits[1], value)
 
+
 register = template.Library()
 register.tag('assign', do_assign)
+
 
 # Extra template tags for map
 @register.filter()
@@ -81,6 +86,7 @@ def filter_coords(value):
 
     return sites
 
+
 @register.filter()
 def get_title(value, short):
     if value == 'site_title':
@@ -89,6 +95,7 @@ def get_title(value, short):
         return admin.site.site_header
     elif value == 'shortcut_title':
         return ADMIN_SHORTCUTS[0]['shortcuts'][short]['title']
+
 
 @register.filter()
 def in_field(value):
