@@ -1,7 +1,8 @@
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings") # noqa
-from django.core.wsgi import get_wsgi_application  # noqa
-application = get_wsgi_application()  # noqa
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
+
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
 
 from datetime import datetime
 import warnings
