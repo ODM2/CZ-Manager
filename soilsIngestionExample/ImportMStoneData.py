@@ -9,8 +9,6 @@ from ODM2CZOData.models import Actions, Units, Variables
 
 __author__ = 'leonmi'
 
-
-__author__ = 'leonmi'
 # Carbon Percent.
 samplingfeaturedescription = "Stone M.M. et al. site, see http://dx.doi.org/10.1016/j.soilbio.2014.10.019",  # noqa
 fname = 'EnzBiomass.csv'
