@@ -1,12 +1,13 @@
 import os
-from django.core.wsgi import get_wsgi_application
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")  #noqa
+from django.core.wsgi import get_wsgi_application  #noqa
+application = get_wsgi_application()  #noqa
 
 import ODM2CZOData.modelHelpers as modelHelpers
 
 from ODM2CZOData.models import Actions, Units, Variables
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")  # noqa
-application = get_wsgi_application()
+__author__ = 'leonmi'
 
 
 __author__ = 'leonmi'

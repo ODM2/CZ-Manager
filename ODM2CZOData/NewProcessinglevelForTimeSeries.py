@@ -1,15 +1,16 @@
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings") #noqa
+from django.core.wsgi import get_wsgi_application  #noqa
+application = get_wsgi_application()  #noqa
+
+from datetime import datetime
+import warnings
+import ODM2CZOData.modelHelpers as modelHelpers
 from ODM2CZOData.models import Timeseriesresults
 from ODM2CZOData.models import Timeseriesresultvalues
 from ODM2CZOData.models import Processinglevels
 
-import os
-from datetime import datetime
-import warnings
-import modelHelpers as modelHelpers
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
-
-__author__ = 'leonmi'
 
 # range 0 to 26.7
 # measurementresutlannotations; annotations
