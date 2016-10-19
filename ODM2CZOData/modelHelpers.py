@@ -34,7 +34,6 @@ from ODM2CZOData.models import Samplingfeatures
 from ODM2CZOData.models import Units
 from ODM2CZOData.models import Variables
 
-
 __author__ = 'leonmi'
 
 

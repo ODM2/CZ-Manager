@@ -10,11 +10,6 @@ from ODM2CZOData.models import Timeseriesresults
 from ODM2CZOData.models import Timeseriesresultvalues
 from ODM2CZOData.models import Processinglevels
 
-
-
-# range 0 to 26.7
-# measurementresutlannotations; annotations
-
 timeRangesToRemove = list()
 # timeRangesToRemove.append([datetime.strptime('2015-04-24 15:15', '%Y-%m-%d %H:%M'),
 # datetime.strptime('2015-05-18  11:15', '%Y-%m-%d %H:%M')])
