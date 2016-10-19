@@ -424,7 +424,7 @@ def web_map(request, dataset='NotSet'):
     data_disclaimer = DATA_DSICLAIMER
 
     datasets = Datasets.objects.all()
-
+    externalidentifiers=None
     ids = [ds.datasetid for ds in datasets]
 
     selections = request.POST.getlist('datasetselection')
