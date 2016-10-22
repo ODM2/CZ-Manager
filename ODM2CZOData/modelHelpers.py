@@ -1,8 +1,8 @@
 import csv
 import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")  # noqa
-from django.core.wsgi import get_wsgi_application  # noqa
-application = get_wsgi_application() # noqa
+from django.core.wsgi import get_wsgi_application   # noqa
+application = get_wsgi_application()  # noqa
 import re
 from datetime import datetime
 

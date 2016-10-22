@@ -37,7 +37,10 @@ from .models import Organizations
 from .models import People
 from .models import Personexternalidentifiers
 from .models import Profileresults
+from .models import Processinglevels
+from .models import ProcessDataloggerfile
 from .models import Relatedactions
+from .models import Relatedfeatures
 from .models import Results
 from .models import Resultsdataquality
 from .models import Samplingfeatureexternalidentifiers
@@ -58,6 +61,7 @@ from .models import Profileresultvalues
 # from .views import dataloggercolumnView
 from daterange_filter.filter import DateRangeFilter
 import re
+from .readonlyadmin import ReadOnlyAdmin
 
 
 # from .admin import MeasurementresultvaluesResource
@@ -115,6 +119,14 @@ class FeatureActionsInline(admin.StackedInline):
     extra = 0
 
 
+class ReadOnlyFeatureActionsInline(FeatureActionsInline):
+    readonly_fields = FeatureActionsInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+
 class CitationextensionpropertyvalueInline(admin.StackedInline):
     model = Citationextensionpropertyvalues
     fieldsets = (
@@ -128,19 +140,57 @@ class CitationextensionpropertyvalueInline(admin.StackedInline):
     extra = 6
 
 
+class ReadOnlyCitationextensionpropertyvalueInline(CitationextensionpropertyvalueInline):
+    readonly_fields = CitationextensionpropertyvalueInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+
 class resultsInLine(admin.StackedInline):
     model = Results
 
 
+# Resultsdataquality AdminForm
 class ResultsdataqualityAdminForm(ModelForm):
+    resultid = make_ajax_field(Datasetsresults, 'resultid',
+                               'result_lookup')
+
     class Meta:
         model = Resultsdataquality
-        fields = '__all__'
+        fields = ['dataqualityid', 'bridgeid', 'resultid']
 
 
-class ResultsdataqualityAdmin(admin.ModelAdmin):
-    list_display = ('resultid', 'dataqualityid')
+class ResultsdataqualityAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Resultsdataquality._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = ResultsdataqualityAdminForm
+    inlines_list = list()
+
+    list_display = ('resultid', 'dataqualityid')
+
+
+class DatasetsresultsAdminForm(ModelForm):
+    resultid = make_ajax_field(Datasetsresults, 'resultid',
+                               'result_lookup')
+
+    class Meta:
+        model = Datasetsresults
+        fields = ['datasetid', 'bridgeid', 'resultid']
+
+
+class DatasetsresultsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Datasetsresults._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
+    form = DatasetsresultsAdminForm
+    inlines_list = list()
 
 
 class DataqualityAdminForm(ModelForm):
@@ -149,10 +199,19 @@ class DataqualityAdminForm(ModelForm):
         fields = '__all__'
 
 
-class DataqualityAdmin(admin.ModelAdmin):
-    list_display = (
-        'dataqualitytypecv', 'dataqualitycode', 'dataqualityvalue', 'dataqualityvalueunitsid')
+class DataqualityAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Dataquality._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = DataqualityAdminForm
+    inlines_list = list()
+
+    list_display = ('dataqualitytypecv',
+                    'dataqualitycode',
+                    'dataqualityvalue',
+                    'dataqualityvalueunitsid')
 
 
 class MethodcitationsAdminForm(ModelForm):
@@ -161,17 +220,25 @@ class MethodcitationsAdminForm(ModelForm):
         fields = '__all__'
 
 
-class MethodcitationsAdmin(admin.ModelAdmin):
-    list_display = ('method_id', 'method_link', 'relationshiptypecv', 'citation_link')
+class MethodcitationsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Methodcitations._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = MethodcitationsAdminForm
+    inlines_list = list()
+
+    list_display = ('method_id', 'method_link', 'relationshiptypecv', 'citation_link')
 
     def method_link(self, obj):
-        return u'<a href="%smethods/%s/">See Method</a>' % (
-            CUSTOM_TEMPLATE_PATH, obj.methodid.methodid)
+        return u'<a href="%smethods/%s/">See Method</a>' % (CUSTOM_TEMPLATE_PATH,
+                                                            obj.methodid.methodid)
 
     def citation_link(self, obj):
-        return u'<a href="%scitations/%s/">%s</a>' % (
-            CUSTOM_TEMPLATE_PATH, obj.citationid.citationid, obj.citationid)
+        return u'<a href="%scitations/%s/">%s</a>' % (CUSTOM_TEMPLATE_PATH,
+                                                      obj.citationid.citationid,
+                                                      obj.citationid)
 
     def method_id(self, obj):
         return obj.methodid
@@ -189,9 +256,16 @@ class AuthorlistsAdminForm(ModelForm):
         fields = '__all__'
 
 
-class AuthorlistsAdmin(admin.ModelAdmin):
-    list_display = ('personid', 'citationid')
+class AuthorlistsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Authorlists._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = AuthorlistsAdminForm
+    inlines_list = list()
+
+    list_display = ('personid', 'citationid')
 
 
 class DatasetcitationsAdminForm(ModelForm):
@@ -200,14 +274,41 @@ class DatasetcitationsAdminForm(ModelForm):
         fields = '__all__'
 
 
-class DatasetcitationsAdmin(admin.ModelAdmin):
-    list_display = ('datasetid', 'relationshiptypecv', 'citationid')
+class DatasetcitationsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Datasetcitations._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = DatasetcitationsAdminForm
+    inlines_list = list()
+
+    list_display = ('datasetid', 'relationshiptypecv', 'citationid')
 
 
 class InstrumentoutputvariablesInline(admin.StackedInline):
     model = Instrumentoutputvariables
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('instrumentoutputvariableid',
+                       'modelid',
+                       'variableid',
+                       'instrumentmethodid',
+                       'instrumentresolution',
+                       'instrumentaccuracy',
+                       'instrumentrawoutputunitsid',)
+        }),
+    )
     extra = 0
+
+
+class ReadOnlyInstrumentoutputvariablesInline(InstrumentoutputvariablesInline):
+    readonly_fields = InstrumentoutputvariablesInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
 
 
 class authorlistInline(admin.StackedInline):
@@ -220,6 +321,14 @@ class authorlistInline(admin.StackedInline):
         }),
     )
     extra = 0
+
+
+class ReadOnlyauthorlistInline(authorlistInline):
+    readonly_fields = authorlistInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
 
 
 class CitationsAdminForm(ModelForm):
@@ -245,15 +354,32 @@ class DOIInline(admin.StackedInline):
     extra = 0
 
 
-class CitationsAdmin(admin.ModelAdmin):
-    list_display = (
-        'primary_author', 'publicationyear', 'title', 'other_author', 'publisher', 'doi',
-        'citation_link')
-    list_display_links = ['title']
-    inlines = [authorlistInline, DOIInline, CitationextensionpropertyvalueInline]
+class ReadOnlyDOIInline(DOIInline):
+    readonly_fields = DOIInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+
+class CitationsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Citations._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = [ReadOnlyauthorlistInline,
+                             ReadOnlyDOIInline,
+                             ReadOnlyCitationextensionpropertyvalueInline]
+
+    # For admin users
     form = CitationsAdminForm
-    search_fields = ['title', 'publisher', 'publicationyear',
-                     'authorlists__personid__personfirstname',
+    inlines_list = [authorlistInline, DOIInline, CitationextensionpropertyvalueInline]
+
+    list_display = ('primary_author', 'publicationyear',
+                    'title', 'other_author',
+                    'publisher', 'doi',
+                    'citation_link')
+    list_display_links = ['title']
+    search_fields = ['title', 'publisher',
+                     'publicationyear', 'authorlists__personid__personfirstname',
                      'authorlists__personid__personlastname']
 
     def citation_link(self, obj):
@@ -265,16 +391,19 @@ class CitationsAdmin(admin.ModelAdmin):
             external_id.citationexternalidentifier)
 
     def primary_author(self, obj):
-        first_author = self.author_list.get(authororder=1)
+        author_list = Authorlists.objects.filter(citationid=obj.citationid)
+        first_author = author_list.get(authororder=1)
         return "{0}, {1}".format(first_author.personid.personlastname,
                                  first_author.personid.personfirstname)
 
-    def other_author(self):
+    def other_author(self, obj):
         list_et_al = list()
-        for author in self.author_list:
+        author_list = Authorlists.objects.filter(citationid=obj.citationid)
+        for author in author_list:
             if author.authororder != 1:
-                list_et_al.append("{0}, {1}".format(author.personid.personlastname,
-                                                    author.personid.personfirstname))
+                list_et_al.append(
+                    "{0}, {1}".format(author.personid.personlastname,
+                                      author.personid.personfirstname))
         return "; ".join(list_et_al)
 
     doi.allow_tags = True
@@ -292,9 +421,17 @@ class CitationextensionpropertyvaluesAdminForm(ModelForm):
         fields = '__all__'
 
 
-class CitationextensionpropertyvaluesAdmin(admin.ModelAdmin):
-    list_display = ('citationid', 'propertyid', 'propertyvalue')
+class CitationextensionpropertyvaluesAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Citationextensionpropertyvalues._meta.get_fields() if
+                     not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = CitationextensionpropertyvaluesAdminForm
+    inlines_list = list()
+
+    list_display = ('citationid', 'propertyid', 'propertyvalue')
 
 
 class ExtensionpropertiesAdminForm(ModelForm):
@@ -306,9 +443,16 @@ class ExtensionpropertiesAdminForm(ModelForm):
         fields = '__all__'
 
 
-class ExtensionpropertiesAdmin(admin.ModelAdmin):
-    list_display = ('propertyname', 'propertydescription', 'propertydatatypecv', 'propertyunitsid')
+class ExtensionpropertiesAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Extensionproperties._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = ExtensionpropertiesAdminForm
+    inlines_list = list()
+
+    list_display = ('propertyname', 'propertydescription', 'propertydatatypecv', 'propertyunitsid')
 
 
 class VariablesAdminForm(ModelForm):
@@ -340,33 +484,44 @@ class VariablesAdminForm(ModelForm):
         fields = '__all__'
 
 
-class VariablesAdmin(admin.ModelAdmin):
+class VariablesAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Variables._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = VariablesAdminForm
-    list_display = (
-        'variablecode', 'variable_name_linked', 'variable_type_linked', 'speciation_linked')
-    search_fields = ['variable_type__name', 'variable_name__name', 'variablecode',
+    inlines_list = list()
+
+    list_display = ('variablecode',
+                    'variable_name_linked',
+                    'variable_type_linked',
+                    'speciation_linked')
+    search_fields = ['variable_type__name',
+                     'variable_name__name',
+                     'variablecode',
                      'speciation__name']
 
     def variable_name_linked(self, obj):
         if obj.variable_name:
-            return u'<a href="http://vocabulary.odm2.org/variablename/{0}" ' \
-                   u'target="_blank">{1}</a>'.format(obj.variable_name.term, obj.variable_name.name)
+            return u'<a href="http://vocabulary.odm2.org/variablename/{0}" target=' \
+                   u'"_blank">{1}</a>'.format(obj.variable_name.term, obj.variable_name.name)
 
     variable_name_linked.short_description = 'Variable Name'
     variable_name_linked.allow_tags = True
 
     def variable_type_linked(self, obj):
         if obj.variable_type:
-            return u'<a href="http://vocabulary.odm2.org/variabletype/{0}" ' \
-                   u'target="_blank">{1}</a>'.format(obj.variable_type.term, obj.variable_type.name)
+            return u'<a href="http://vocabulary.odm2.org/variabletype/{0}" target=' \
+                   u'"_blank">{1}</a>'.format(obj.variable_type.term, obj.variable_type.name)
 
     variable_type_linked.short_description = 'Variable Type'
     variable_type_linked.allow_tags = True
 
     def speciation_linked(self, obj):
         if obj.speciation:
-            return u'<a href="http://vocabulary.odm2.org/speciation/{0}" ' \
-                   u'target="_blank">{1}</a>'.format(obj.speciation.term, obj.speciation.name)
+            return u'<a href="http://vocabulary.odm2.org/speciation/{0}" target=' \
+                   u'"_blank">{1}</a>'.format(obj.speciation.term, obj.speciation.name)
 
     speciation_linked.short_description = 'Speciation'
     speciation_linked.allow_tags = True
@@ -392,8 +547,15 @@ class TaxonomicclassifiersAdminForm(ModelForm):
         fields = '__all__'
 
 
-class TaxonomicclassifiersAdmin(admin.ModelAdmin):
+class TaxonomicclassifiersAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Taxonomicclassifiers._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = TaxonomicclassifiersAdminForm
+    inlines_list = list()
+
     search_fields = ['taxonomicclassifiername', 'taxonomicclassifiercommonname',
                      'taxonomicclassifierdescription', 'taxonomic_classifier_type__name']
 
@@ -492,12 +654,37 @@ class SamplingfeaturesAdminForm(ModelForm):
 
 class IGSNInline(admin.StackedInline):
     model = Samplingfeatureexternalidentifiers
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('bridgeid',
+                       'samplingfeatureid',
+                       'externalidentifiersystemid',
+                       'samplingfeatureexternalidentifier',
+                       'samplingfeatureexternalidentifieruri',
+                       )
+        }),
+    )
+    max_num = 1
     extra = 0
 
 
-class SamplingfeaturesAdmin(admin.OSMGeoAdmin):
+class ReadOnlyIGSNInline(IGSNInline):
+    readonly_fields = IGSNInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+
+class SamplingfeaturesAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Samplingfeatures._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = [ReadOnlyFeatureActionsInline, ReadOnlyIGSNInline]
+
     form = SamplingfeaturesAdminForm
-    inlines = [FeatureActionsInline, IGSNInline]
+    inlines_list = [FeatureActionsInline, IGSNInline]
+
     search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name',
                      'samplingfeaturename',
                      'samplingfeaturecode', 'samplingfeatureid',
@@ -521,13 +708,12 @@ class SamplingfeaturesAdmin(admin.OSMGeoAdmin):
     def igsn(self, obj):
         external_id = Samplingfeatureexternalidentifiers.objects.get(
             samplingfeatureid=obj.samplingfeatureid)
-        return u'<a href="https://app.geosamples.org/sample/igsn/{0}" ' \
-               u'target="_blank">{0}</a>'.format(external_id.samplingfeatureexternalidentifier)
+        return u'<a href="https://app.geosamples.org/sample/igsn/{0}" target="_blank">{0}</a>'.format(
+            external_id.samplingfeatureexternalidentifier)
 
     igsn.allow_tags = True
 
-    @staticmethod
-    def dataset_code(obj):
+    def dataset_code(self, obj):
         fid = Featureactions.objects.filter(samplingfeatureid=obj.samplingfeatureid)
         ds = Datasets.objects.filter(datasetsresults__resultid__featureactionid__in=fid).distinct()
         ds_list = list()
@@ -543,6 +729,62 @@ class SamplingfeaturesAdmin(admin.OSMGeoAdmin):
 
     sampling_feature_type_linked.short_description = 'Sampling Feature Type'
     sampling_feature_type_linked.allow_tags = True
+
+    @staticmethod
+    def __user_is_readonly(request):
+        groups = [x.name for x in request.user.groups.all()]
+        return "readonly" in groups
+
+
+# class SamplingfeaturesAdmin(admin.OSMGeoAdmin):
+#     form = SamplingfeaturesAdminForm
+#     inlines = [FeatureActionsInline, IGSNInline]
+#     search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name',
+#                      'samplingfeaturename',
+#                      'samplingfeaturecode', 'samplingfeatureid',
+#                      'samplingfeatureexternalidentifiers__samplingfeatureexternalidentifier']
+#
+#     list_display = (
+#         'samplingfeaturecode', 'samplingfeaturename', 'sampling_feature_type_linked',
+#         'samplingfeaturedescription',
+#         'igsn',
+#         'dataset_code')
+#     readonly_fields = ('samplingfeatureuuid',)
+#
+#     # your own processing
+#     def save_model(self, request, obj, form, change):
+#         # for example:
+#         obj.featuregeometry = '%s' % form.cleaned_data['featuregeometrywkt']
+#         obj.save()
+#
+#     save_as = True
+#
+#     def igsn(self, obj):
+#         external_id = Samplingfeatureexternalidentifiers.objects.get(
+#             samplingfeatureid=obj.samplingfeatureid)
+#         return u'<a href="https://app.geosamples.org/sample/igsn/{0}" ' \
+#                u'target="_blank">{0}</a>'.format(external_id.samplingfeatureexternalidentifier)
+#
+#     igsn.allow_tags = True
+#
+#     @staticmethod
+#     def dataset_code(obj):
+#         fid = Featureactions.objects.filter(samplingfeatureid=obj.samplingfeatureid)
+#         ds = Datasets.objects.filter(datasetsresults__resultid__featureactionid__in=fid).
+# distinct()
+#         ds_list = list()
+#         for d in ds:
+#             ds_list.append(d.datasetcode)
+#         return ", ".join(ds_list)
+#
+#     def sampling_feature_type_linked(self, obj):
+#         if obj.sampling_feature_type:
+#             return u'<a href="http://vocabulary.odm2.org/samplingfeaturetype/{0}" ' \
+#                    u'target="_blank">{1}</a>'.format(obj.sampling_feature_type.term,
+#                                                      obj.sampling_feature_type.name)
+#
+#     sampling_feature_type_linked.short_description = 'Sampling Feature Type'
+#     sampling_feature_type_linked.allow_tags = True
 
 
 def duplicate_results_event(queryset):
@@ -589,6 +831,14 @@ class TimeseriesresultsInline(admin.StackedInline):
     extra = 0
 
 
+class ReadOnlyTimeseriesresultsInline(TimeseriesresultsInline):
+    readonly_fields = TimeseriesresultsInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+
 class MeasurementResultsInline(admin.StackedInline):
     model = Measurementresults
     fieldsets = (
@@ -614,6 +864,14 @@ class MeasurementResultsInline(admin.StackedInline):
     extra = 0
 
 
+class ReadOnlyMeasurementResultsInline(MeasurementResultsInline):
+    readonly_fields = MeasurementResultsInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+
 class ProfileResultsInline(admin.StackedInline):
     model = Profileresults
     fieldsets = (
@@ -637,9 +895,20 @@ class ProfileResultsInline(admin.StackedInline):
     extra = 0
 
 
+class ReadOnlyProfileResultsInline(ProfileResultsInline):
+    readonly_fields = ProfileResultsInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
 class ResultsAdminForm(ModelForm):
-    # featureactionid = make_ajax_field(Featureactions,'featureactionid',
-    # 'featureaction_lookup',max_length=500)
+    # featureactionid = make_ajax_field(Featureactions,'featureactionid','featureaction_lookup',
+    # max_length=500)
     featureactionid = AutoCompleteSelectField('featureaction_lookup', required=True, help_text='',
                                               label='Sampling feature action')
 
@@ -667,32 +936,41 @@ class ResultsAdminForm(ModelForm):
 # the popup closes and the AjaxSelect field is set.
 # Your Admin must inherit from AjaxSelectAdmin
 # http://django-ajax-selects.readthedocs.org/en/latest/Admin-add-popup.html
-class ResultsAdmin(AjaxSelectAdmin):  # admin.ModelAdmin
+class ResultsAdmin(ReadOnlyAdmin):  # admin.ModelAdmin
+    # The user can click, a popup window lets them create a new object,
+    # they click save, the popup closes and the AjaxSelect field is set.
+    # http://django-ajax-selects.readthedocs.org/en/latest/Admin-add-popup.html
+    # For readonly usergroup
+    user_readonly = [p.name for p in Results._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = [ReadOnlyTimeseriesresultsInline,
+                             ReadOnlyMeasurementResultsInline,
+                             ReadOnlyProfileResultsInline]
+
+    # For admin users
     form = ResultsAdminForm
-    inlines = [TimeseriesresultsInline, MeasurementResultsInline, ProfileResultsInline]
+    inlines_list = [TimeseriesresultsInline, MeasurementResultsInline, ProfileResultsInline]
+
     list_display = ['resultid', 'featureactionid', 'variableid', 'processing_level']
     search_fields = ['variableid__variable_name__name', 'variableid__variablecode',
                      'variableid__variabledefinition',
                      'featureactionid__samplingfeatureid__samplingfeaturename',
                      'result_type__name', 'processing_level__definition']
+
     actions = [duplicate_results_event]
     save_as = True
 
-    # def get_form(self, request, obj=None, **kwargs):
-    # form = super(ResultsAdmin, self).get_form(request, obj, **kwargs)
-    # autoselect_fields_check_can_add(form, self.model, request.user)
-    # raise ValidationError(form)
-    # return form
-    # def save_model(self, request, obj, form, change):
-    #     featureactionidstr = request.featureactionid
-    #     featureactionid = None
-    #     for featureactionidstr in str.split():
-    #         if featureactionidstr.isdigit():
-    #             featureactionid = featureactionidstr
-    #             continue
-    #     raise ValidationError(featureactionid)
-    #     obj.featureactionid = featureactionid
-    #     obj.save()
+    def get_actions(self, request):
+        actions = super(ReadOnlyAdmin, self).get_actions(request)
+
+        if self.__user_is_readonly(request):
+            actions = list()
+
+        return actions
+
+    @staticmethod
+    def __user_is_readonly(request):
+        groups = [x.name for x in request.user.groups.all()]
+        return "readonly" in groups
 
 
 class RelatedactionsAdminForm(ModelForm):
@@ -704,8 +982,14 @@ class RelatedactionsAdminForm(ModelForm):
         fields = '__all__'
 
 
-class RelatedactionsAdmin(admin.ModelAdmin):
+class RelatedactionsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Relatedactions._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = RelatedactionsAdminForm
+    inlines_list = list()
 
 
 class OrganizationsAdminForm(ModelForm):
@@ -717,9 +1001,16 @@ class OrganizationsAdminForm(ModelForm):
         fields = '__all__'
 
 
-class OrganizationsAdmin(admin.ModelAdmin):
-    list_display = ('organizationname', 'organizationdescription', 'organization_link')
+class OrganizationsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Organizations._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = OrganizationsAdminForm
+    inlines_list = list()
+
+    list_display = ('organizationname', 'organizationdescription', 'organization_link')
 
     def organization_link(self, org):
         return u'<a href={0} target="_blank">{0}</a>'.format(org.organizationlink)
@@ -753,15 +1044,30 @@ class ActionsInline(admin.StackedInline):
     extra = 0
 
 
+class ReadOnlyActionsInline(ActionsInline):
+    readonly_fields = ActionsInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+
 class FeatureactionsAdminForm(ModelForm):
     class Meta:
         model = Featureactions
         fields = '__all__'
 
 
-class FeatureactionsAdmin(admin.ModelAdmin):
-    list_display = ['samplingfeatureid', 'action', ]
+class FeatureactionsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Featureactions._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = FeatureactionsAdminForm
+    inlines_list = list()
+
+    list_display = ['samplingfeatureid', 'action', ]
     save_as = True
     search_fields = ['action__method__methodname', 'samplingfeatureid__samplingfeaturename']
 
@@ -774,18 +1080,23 @@ class DatasetsAdminForm(ModelForm):
         fields = '__all__'
 
 
-class DatasetsAdmin(admin.ModelAdmin):
+class DatasetsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Datasets._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = DatasetsAdminForm
+    inlines_list = list()
+
     list_display = ['datasetcode', 'datasettitle', 'datasettypecv']
 
-    @staticmethod
-    def get_datasetsresults(object_id):
+    def get_datasetsresults(self, object_id):
         datasetResults = Datasetsresults.objects.filter(datasetid=object_id)
         # raise ValidationError(datasetResults)
         return datasetResults
 
-    @staticmethod
-    def get_results(object_id):
+    def get_results(self, object_id):
         ids = []
         datasetResults = Datasetsresults.objects.filter(datasetid=object_id)
         for result in datasetResults:
@@ -795,6 +1106,7 @@ class DatasetsAdmin(admin.ModelAdmin):
         # return queryset.filter(resultid__in=ids)
         return resultsList
 
+    # What is this for?
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
         extra_context['DatasetResultsList'] = self.get_datasetsresults(object_id)
@@ -831,12 +1143,18 @@ class ActionsAdminForm(ModelForm):
         fields = '__all__'
 
 
-class ActionsAdmin(admin.ModelAdmin):
+class ActionsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Actions._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = [ReadOnlyFeatureActionsInline]
+
+    # For admin users
+    form = ActionsAdminForm
+    inlines_list = [FeatureActionsInline]
+
     list_display = ('action_type', 'method', 'begindatetime', 'enddatetime')
-    inlines = [FeatureActionsInline]
     list_display_links = ('action_type',)
     search_fields = ['action_type__name', 'method__methodname']  # ,
-    form = ActionsAdminForm
 
 
 class ActionByAdminForm(ModelForm):
@@ -845,10 +1163,17 @@ class ActionByAdminForm(ModelForm):
         fields = '__all__'
 
 
-class ActionByAdmin(admin.ModelAdmin):
-    list_display = ('actionid', 'affiliationid')
-    # list_display_links = ('affiliationid', 'actionid')  #
+class ActionByAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Actionby._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = ActionByAdminForm
+    inlines_list = list()
+
+    list_display = ('actionid', 'affiliationid')
+    # list_display_links = ('affiliationid', 'actionid')
     # list_select_related = True
 
 
@@ -875,11 +1200,17 @@ class MethodsAdminForm(ModelForm):
         fields = '__all__'
 
 
-class MethodsAdmin(admin.ModelAdmin):
-    list_display = ('methodname', 'method_type_linked', 'method_link')
-    inlines = [ActionsInline]
-    list_display_links = ['methodname']
+class MethodsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Methods._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = [ReadOnlyActionsInline]
+
+    # For admin users
     form = MethodsAdminForm
+    inlines_list = [ActionsInline]
+
+    list_display = ('methodname', 'method_type_linked', 'method_link')
+    list_display_links = ['methodname']
 
     # DOI matching reg expresion came from http://stackoverflow.com/questions/27910/
     # finding-a-doi-in-a-document-or-page
@@ -891,8 +1222,8 @@ class MethodsAdmin(admin.ModelAdmin):
 
     def method_type_linked(self, obj):
         if obj.methodtypecv:
-            return u'<a href="http://vocabulary.odm2.org/methodtype/{0}" ' \
-                   u'target="_blank">{1}</a>'.format(obj.methodtypecv.term, obj.methodtypecv.name)
+            return u'<a href="http://vocabulary.odm2.org/methodtype/{0}" target=' \
+                   u'"_blank">{1}</a>'.format(obj.methodtypecv.term, obj.methodtypecv.name)
 
     method_type_linked.short_description = 'Method Type'
     method_type_linked.allow_tags = True
@@ -950,16 +1281,43 @@ class DataLoggerFileColumnsInline(admin.StackedInline):
     extra = 0
 
 
+class ReadOnlyDataLoggerFileColumnsInline(DataLoggerFileColumnsInline):
+    readonly_fields = DataLoggerFileColumnsInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+
 class DataloggerfilesAdminForm(ModelForm):
     class Meta:
         model = Dataloggerfiles
         fields = '__all__'
 
 
-class DataloggerfilesAdmin(admin.ModelAdmin):
+class DataloggerfilesAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Dataloggerfiles._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = [ReadOnlyDataLoggerFileColumnsInline]
+
+    # For admin users
     form = DataloggerfilesAdminForm
+    inlines_list = [DataLoggerFileColumnsInline]
+
     actions = [duplicate_Dataloggerfiles_event]
-    inlines = [DataLoggerFileColumnsInline]
+
+    def get_actions(self, request):
+        actions = super(ReadOnlyAdmin, self).get_actions(request)
+
+        if self.__user_is_readonly(request):
+            actions = list()
+
+        return actions
+
+    @staticmethod
+    def __user_is_readonly(request):
+        groups = [x.name for x in request.user.groups.all()]
+        return "readonly" in groups
 
 
 def duplicate_Dataloggerfilecolumns_event(queryset):
@@ -992,13 +1350,50 @@ class DataloggerfilecolumnsAdminForm(ModelForm):
         fields = '__all__'
 
 
-class DataloggerfilecolumnsAdmin(admin.ModelAdmin):
+class DataloggerfilecolumnsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Dataloggerfilecolumns._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = DataloggerfilecolumnsAdminForm
+    inlines_list = list()
+
     list_display = ['columnlabel', 'resultid', 'dataloggerfileid']
     actions = [duplicate_Dataloggerfilecolumns_event]
     search_fields = ['columnlabel', 'dataloggerfileid__dataloggerfilename',
                      'resultid__variableid__variable_name__name', ]
     save_as = True
+
+    def get_actions(self, request):
+        actions = super(ReadOnlyAdmin, self).get_actions(request)
+
+        if self.__user_is_readonly(request):
+            actions = list()
+
+        return actions
+
+    @staticmethod
+    def __user_is_readonly(request):
+        groups = [x.name for x in request.user.groups.all()]
+        return "readonly" in groups
+
+
+class ProcessDataloggerfileAdminForm(ModelForm):
+    class Meta:
+        model = ProcessDataloggerfile
+        fields = '__all__'
+
+
+class ProcessDataloggerfileAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in ProcessDataloggerfile._meta.get_fields() if
+                     not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
+    form = ProcessDataloggerfileAdminForm
+    inlines_list = list()
 
 
 # class MeasurementResultFilter(SimpleListFilter):
@@ -1007,7 +1402,8 @@ class DataloggerfilecolumnsAdmin(admin.ModelAdmin):
 #
 #     def lookups(self, request, model_admin):
 #         mrs = Measurementresults.objects.values('resultid',
-#                                                 'resultid__featureactionid__samplingfeatureid__samplingfeaturename',
+#                                                 'resultid__featureactionid__samplingfeatureid
+# __samplingfeaturename',
 #                                                 'resultid__variableid__variable_name__name')
 #         # need to make a custom list with feature name and variable name.
 #         resultidlist = [(p['resultid'], '{0} {1}'.format(
@@ -1069,8 +1465,15 @@ class ProfileresultsAdminForm(ModelForm):
         fields = '__all__'
 
 
-class ProfileresultsAdmin(AjaxSelectAdmin):
+class ProfileresultsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Profileresults._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = ProfileresultsAdminForm
+    inlines_list = list()
+
     list_display = ['intendedzspacing', 'intendedzspacingunitsid', 'aggregationstatisticcv',
                     'resultid', ]
     list_display_links = ['intendedzspacing', 'intendedzspacingunitsid', 'aggregationstatisticcv',
@@ -1118,20 +1521,72 @@ class ProfileresultsvaluesAdminForm(ModelForm):
         fields = '__all__'
 
 
-class ProfileresultsvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin):
+class ProfileresultsvaluesAdmin(ImportExportActionModelAdmin, ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Profileresultvalues._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = ProfileresultsvaluesAdminForm
+    inlines_list = list()
+
     resource_class = ProfileresultvaluesResource
     list_display = ['datavalue', 'zlocation', 'zlocationunitsid', 'zaggregationinterval',
                     'valuedatetime',
-                    'resultid', ]
-    # 'resultid','featureactionid_link','resultid__featureactionid__name',
-    # 'resultid__variable__name'
+                    'resultid', ]  # 'resultid','featureactionid_link',
+    # 'resultid__featureactionid__name', 'resultid__variable__name'
     list_display_links = ['resultid', ]  # 'featureactionid_link'
     search_fields = ['resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',
                      'zaggregationinterval',
                      'resultid__resultid__variableid__variable_name__name',
                      'resultid__resultid__unitsid__unitsname',
                      'resultid__resultid__variableid__variable_type__name', ]
+
+    def changelist_view(self, request, extra_context=None):
+        if self.__user_is_readonly(request):
+            self.change_list_template = None
+        else:
+            self.change_list_template = 'admin/import_export/change_list_import.html'
+        return super(ProfileresultsvaluesAdmin, self).changelist_view(
+            request, extra_context=extra_context)
+
+    @staticmethod
+    def __user_is_readonly(request):
+        groups = [x.name for x in request.user.groups.all()]
+        return "readonly" in groups
+
+
+# Relatedfeatures AdminForm
+class RelatedfeaturesAdminForm(ModelForm):
+    class Meta:
+        model = Relatedfeatures
+        fields = '__all__'
+
+
+class RelatedfeaturesAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Relatedfeatures._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
+    form = RelatedactionsAdminForm
+    inlines_list = list()
+
+
+class ProcessingLevelsAdminForm(ModelForm):
+    class Meta:
+        model = Processinglevels
+        fields = '__all__'
+
+
+class ProcessingLevelsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Processinglevels._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
+    form = ProcessingLevelsAdminForm
+    inlines_list = list()
 
 
 class MeasurementresultsAdminForm(ModelForm):
@@ -1154,8 +1609,15 @@ class MeasurementresultsAdminForm(ModelForm):
         fields = '__all__'
 
 
-class MeasurementresultsAdmin(AjaxSelectAdmin):
+class MeasurementresultsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Measurementresults._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = MeasurementresultsAdminForm
+    inlines_list = list()
+
     list_display = ('resultid', 'censorcodecv', 'data_link')
     list_display_links = ('resultid', 'data_link')
     # def resultvalues_valuedatetime(self,obj):
@@ -1175,6 +1637,7 @@ class MeasurementresultsAdmin(AjaxSelectAdmin):
 
     data_link.short_description = 'sampling feature action'
     data_link.allow_tags = True
+
     # resultValues = Measurementresultvalues.objects.filter(resultid=)
 
 
@@ -1216,8 +1679,15 @@ class TimeseriesresultsAdminForm(ModelForm):
         fields = '__all__'
 
 
-class TimeseriesresultsAdmin(AjaxSelectAdmin):
+class TimeseriesresultsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Timeseriesresults._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = TimeseriesresultsAdminForm
+    inlines_list = list()
+
     list_display = ('resultid', 'intendedtimespacing', 'intendedtimespacingunitsid', 'data_link')
     list_display_links = ('resultid', 'data_link')
     # def resultvalues_valuedatetime(self,obj):
@@ -1259,9 +1729,15 @@ class TimeseriesresultvaluesAdminForm(ModelForm):
         fields = '__all__'
 
 
-class TimeseriesresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin):
+class TimeseriesresultvaluesAdmin(ImportExportActionModelAdmin, ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Timeseriesresultvalues._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = TimeseriesresultvaluesAdminForm
-    # date time filter and list of results you can filter on
+    inlines_list = list()
+
     list_filter = (
         ('valuedatetime', DateRangeFilter),
         # MeasurementResultFilter,
@@ -1284,6 +1760,35 @@ class TimeseriesresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin)
     feature_action_link.short_description = 'feature action'
     feature_action_link.allow_tags = True
     feature_action_link.admin_order_field = 'resultid__resultid__featureactionid__samplingfeatureid'
+
+    # get_feature_action = 'resultid__resultid__feature_action'
+    # def change_view(self, request, object_id, form_url='', extra_context=None):
+    #
+    #     if request.REQUEST.get('export_data'):
+    #         csvexport=True
+    #         myMeasurementResults = Measurementresultvalues.objects.all().filter()
+    #         myfile = StringIO.StringIO()
+    #         for mresults in myMeasurementResults:
+    #             myfile.write(mresults.csvoutput())
+    #         response = HttpResponse(myfile.getvalue(),content_type='text/csv')
+    #         response['Content-Disposition'] = 'attachment; filename="'+ name_of_sampling_feature+
+    # '-'+ name_of_variable +'.csv"'
+    #         extra_context = response
+    #     return super(MeasurementresultvaluesAdmin, self).change_view(request, object_id,
+    #         form_url, extra_context=extra_context)
+
+    def changelist_view(self, request, extra_context=None):
+        if self.__user_is_readonly(request):
+            self.change_list_template = None
+        else:
+            self.change_list_template = 'admin/import_export/change_list_import.html'
+        return super(TimeseriesresultvaluesAdmin, self).changelist_view(
+            request, extra_context=extra_context)
+
+    @staticmethod
+    def __user_is_readonly(request):
+        groups = [x.name for x in request.user.groups.all()]
+        return "readonly" in groups
 
 
 class MeasurementresultvaluesAdminForm(ModelForm):
@@ -1306,9 +1811,20 @@ class MeasurementresultvaluesAdminForm(ModelForm):
         fields = '__all__'
 
 
-class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin):
+class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin, ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Measurementresultvalues._meta.get_fields() if
+                     not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = MeasurementresultvaluesAdminForm
-    # resource_class = MeasurementresultvaluesResource
+    inlines_list = list()
+
+    # MeasurementresultvaluesResource is for exporting values to different file types.
+    # resource_class uses django-import-export
+    resource_class = MeasurementresultvaluesResource
+
     # date time filter and list of results you can filter on
     list_filter = (
         ('valuedatetime', DateRangeFilter),
@@ -1316,9 +1832,8 @@ class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin
 
     )
     list_display = ['datavalue', 'valuedatetime',
-                    'resultid']
-    # 'resultid','featureactionid_link','resultid__featureactionid__name',
-    # 'resultid__variable__name'
+                    'resultid']  # 'resultid','featureactionid_link',
+    # 'resultid__featureactionid__name', 'resultid__variable__name'
     list_display_links = ['resultid', ]  # 'featureactionid_link'
     search_fields = ['resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename',
                      'resultid__resultid__variableid__variable_name__name',
@@ -1332,6 +1847,7 @@ class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin
     feature_action_link.short_description = 'feature action'
     feature_action_link.allow_tags = True
     feature_action_link.admin_order_field = 'resultid__resultid__featureactionid__samplingfeatureid'
+
     # get_feature_action = 'resultid__resultid__feature_action'
     # def change_view(self, request, object_id, form_url='', extra_context=None):
     #
@@ -1342,17 +1858,41 @@ class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin, AjaxSelectAdmin
     #         for mresults in myMeasurementResults:
     #             myfile.write(mresults.csvoutput())
     #         response = HttpResponse(myfile.getvalue(),content_type='text/csv')
-    #         response['Content-Disposition'] = 'attachment; filename="'+
-    # name_of_sampling_feature+'-'+ name_of_variable +'.csv"'
+    #         response['Content-Disposition'] = 'attachment; filename="'+ name_of_sampling_feature+
+    # '-'+ name_of_variable +'.csv"'
     #         extra_context = response
     #     return super(MeasurementresultvaluesAdmin, self).change_view(request, object_id,
     #         form_url, extra_context=extra_context)
 
+    def changelist_view(self, request, extra_context=None):
+        if self.__user_is_readonly(request):
+            self.change_list_template = None
+        else:
+            self.change_list_template = 'admin/import_export/change_list_import.html'
+        return super(MeasurementresultvaluesAdmin, self).changelist_view(
+            request, extra_context=extra_context)
 
-class MeasurementresultvalueFileForm(ModelForm):
+    @staticmethod
+    def __user_is_readonly(request):
+        groups = [x.name for x in request.user.groups.all()]
+        return "readonly" in groups
+
+
+class MeasurementresultvalueFileAdminForm(ModelForm):
     class Meta:
         model = MeasurementresultvalueFile
         fields = '__all__'
+
+
+class MeasurementresultvalueFileAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in MeasurementresultvalueFile._meta.get_fields() if
+                     not p.one_to_many]  # noqa
+    user_readonly_inlines = list()
+
+    # For admin users
+    form = ProcessingLevelsAdminForm
+    inlines_list = list()
 
 
 class UnitsAdminForm(ModelForm):
@@ -1369,8 +1909,15 @@ class UnitsAdminForm(ModelForm):
         fields = '__all__'
 
 
-class UnitsAdmin(admin.ModelAdmin):
+class UnitsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Units._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = UnitsAdminForm
+    inlines_list = list()
+
     search_fields = ['unit_type__name', 'unitsabbreviation', 'unitsname']
     list_display = ['unitsabbreviation', 'unitsname', 'unit_type']
 
@@ -1393,8 +1940,14 @@ class DataloggerprogramfilesAdminForm(ModelForm):
         fields = '__all__'
 
 
-class DataloggerprogramfilesAdmin(admin.ModelAdmin):
+class DataloggerprogramfilesAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Dataloggerprogramfiles._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = DataloggerprogramfilesAdminForm
+    inlines_list = list()
 
 
 class InstrumentoutputvariablesAdminForm(ModelForm):
@@ -1403,8 +1956,15 @@ class InstrumentoutputvariablesAdminForm(ModelForm):
         fields = '__all__'
 
 
-class InstrumentoutputvariablesAdmin(admin.ModelAdmin):
+class InstrumentoutputvariablesAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Instrumentoutputvariables._meta.get_fields() if
+                     not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = InstrumentoutputvariablesAdminForm
+    inlines_list = list()
 
 
 class EquipmentmodelsAdminForm(ModelForm):
@@ -1421,9 +1981,14 @@ class EquipmentmodelsAdminForm(ModelForm):
         fields = '__all__'
 
 
-class EquipmentmodelsAdmin(admin.ModelAdmin):
+class EquipmentmodelsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Equipmentmodels._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = [ReadOnlyInstrumentoutputvariablesInline]
+
+    # For admin users
     form = EquipmentmodelsAdminForm
-    inlines = [InstrumentoutputvariablesInline]
+    inlines_list = [InstrumentoutputvariablesInline]
 
 
 class PeopleAdminForm(ModelForm):
@@ -1486,6 +2051,22 @@ class AffiliationsResource(resources.ModelResource):
                         'isprimaryorganizationcontact', 'primaryemail']
 
 
+class ReadOnlyAffiliationInline(AffiliationInLine):
+    readonly_fields = AffiliationInLine.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+
+class ReadOnlyORCIDInline(ORCIDInLine):
+    readonly_fields = ORCIDInLine.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+
 class AffiliationsAdminForm(ModelForm):
     class Meta:
         model = Affiliations
@@ -1496,8 +2077,14 @@ class AffiliationsAdminForm(ModelForm):
         # ordering = ['-primaryemail']
 
 
-class AffiliationsAdmin(ExportMixin, admin.ModelAdmin):
+class AffiliationsAdmin(ExportMixin, ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in Affiliations._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
     form = AffiliationsAdminForm
+    inlines_list = list()
     resource_class = AffiliationsResource
     search_fields = ['organizationid__organizationname', 'organizationid__organizationtypecv__name',
                      'organizationid__organizationcode',
@@ -1506,22 +2093,25 @@ class AffiliationsAdmin(ExportMixin, admin.ModelAdmin):
         'organizationname', 'personfirstname', 'personlastname', 'isprimaryorganizationcontact',
         'primaryemail')
 
-    @staticmethod
-    def organizationname(obj):
+    def organizationname(self, obj):
         return obj.organizationid.organizationname
 
-    @staticmethod
-    def personfirstname(obj):
+    def personfirstname(self, obj):
         return obj.personid.personfirstname
 
-    @staticmethod
-    def personlastname(obj):
+    def personlastname(self, obj):
         return obj.personid.personlastname
 
 
-class PeopleAdmin(admin.ModelAdmin):
+class PeopleAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+    user_readonly = [p.name for p in People._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = [ReadOnlyAffiliationInline, ReadOnlyORCIDInline]
+
+    # For admin users
     form = PeopleAdminForm
-    inlines = [AffiliationInLine, ORCIDInLine]
+    inlines_list = [AffiliationInLine, ORCIDInLine]
+
     search_fields = ['personfirstname', 'personlastname',
                      'personexternalidentifiers__personexternalidentifier',
                      'affiliations__organizationid__organizationname']
@@ -1544,25 +2134,6 @@ class PeopleAdmin(admin.ModelAdmin):
             else:
                 name_list.append(
                     u'{0}'.format(org_name.organizationname))
-                # if org_name.parentorganizationid:
-                #     if org_name.organizationlink:
-                #         name_list.append(u'<a href="{0}" target="_blank">{1}, {2}</a>'.
-                # format(org_name.organizationlink,
-                #
-                # org_name.organizationname,
-                #
-                # org_name.parentorganizationid.organizationname))
-                #     else:
-                #         name_list.append(u'{0}, {1}'.format(org_name.organizationname,
-                #                                               org_name.parentorganizationid.organizationname))
-                # else:
-                #     if org_name.organizationlink:
-                #         name_list.append(
-                #             u'<a href="{0}" target="_blank">{1}</a>'.
-                # format(org_name.organizationlink, org_name.organizationname))
-                #     else:
-                #         name_list.append(
-                #             u'{0}'.format(org_name.organizationname))
 
         return u'; '.join(name_list)
 
@@ -1576,5 +2147,12 @@ class ExternalidentifiersystemForm(ModelForm):
         fields = '__all__'
 
 
-class ExternalidentifiersystemAdmin(admin.ModelAdmin):
+class ExternalidentifiersystemAdmin(ReadOnlyAdmin):
+    # For admin users
     form = ExternalidentifiersystemForm
+    inlines_list = list()
+
+    # For readonly users
+    user_readonly = [p.name for p in Externalidentifiersystems._meta.get_fields() if
+                     not p.one_to_many]
+    user_readonly_inlines = list()

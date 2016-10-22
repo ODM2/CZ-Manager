@@ -12,6 +12,7 @@ from .forms import DataloggerprogramfilesAdmin
 from .forms import DataqualityAdmin
 from .forms import DatasetcitationsAdmin
 from .forms import DatasetsAdmin
+from .forms import DatasetsresultsAdmin
 from .forms import EquipmentmodelsAdmin
 from .forms import ExtensionpropertiesAdmin
 from .forms import ExternalidentifiersystemAdmin
@@ -19,13 +20,17 @@ from .forms import FeatureactionsAdmin
 from .forms import InstrumentoutputvariablesAdmin
 from .forms import MeasurementresultsAdmin
 from .forms import MeasurementresultvaluesAdmin
+from .forms import MeasurementresultvalueFileAdmin
 from .forms import MethodcitationsAdmin
 from .forms import MethodsAdmin
 from .forms import OrganizationsAdmin
 from .forms import PeopleAdmin
 from .forms import ProfileresultsAdmin
 from .forms import ProfileresultsvaluesAdmin
+from .forms import ProcessingLevelsAdmin
+from .forms import ProcessDataloggerfileAdmin
 from .forms import RelatedactionsAdmin
+from .forms import RelatedfeaturesAdmin
 from .forms import ResultsAdmin
 from .forms import ResultsdataqualityAdmin
 from .forms import SamplingfeatureexternalidentifiersAdmin
@@ -108,17 +113,17 @@ admin.site.register(Actions, ActionsAdmin)
 admin.site.register(Results, ResultsAdmin)
 admin.site.register(Relatedactions, RelatedactionsAdmin)
 admin.site.register(Variables, VariablesAdmin)
-admin.site.register(ProcessDataloggerfile)
+admin.site.register(ProcessDataloggerfile, ProcessDataloggerfileAdmin)
 admin.site.register(Externalidentifiersystems, ExternalidentifiersystemAdmin)
 
 admin.site.register(Taxonomicclassifiers, TaxonomicclassifiersAdmin)
 admin.site.register(Datasets, DatasetsAdmin)
-admin.site.register(Datasetsresults)
-admin.site.register(Processinglevels)
-admin.site.register(Relatedfeatures)
+admin.site.register(Datasetsresults, DatasetsresultsAdmin)
+admin.site.register(Processinglevels, ProcessingLevelsAdmin)
+admin.site.register(Relatedfeatures, RelatedfeaturesAdmin)
 admin.site.register(Timeseriesresults, TimeseriesresultsAdmin)
 admin.site.register(Timeseriesresultvalues, TimeseriesresultvaluesAdmin)
 admin.site.register(Measurementresults, MeasurementresultsAdmin)
 admin.site.register(Measurementresultvalues, MeasurementresultvaluesAdmin)
-admin.site.register(MeasurementresultvalueFile)
+admin.site.register(MeasurementresultvalueFile, MeasurementresultvalueFileAdmin)
 admin.site.index_template = "admin/my_index.html"
