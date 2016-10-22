@@ -53,7 +53,6 @@ from .models import Variables
 
 # from io import StringIO
 from ajax_select import make_ajax_field
-from ajax_select.admin import AjaxSelectAdmin
 from ajax_select.fields import AutoCompleteSelectField
 from .models import Measurementresults
 from .models import Measurementresultvalues
@@ -708,8 +707,8 @@ class SamplingfeaturesAdmin(ReadOnlyAdmin):
     def igsn(self, obj):
         external_id = Samplingfeatureexternalidentifiers.objects.get(
             samplingfeatureid=obj.samplingfeatureid)
-        return u'<a href="https://app.geosamples.org/sample/igsn/{0}" target="_blank">{0}</a>'.format(
-            external_id.samplingfeatureexternalidentifier)
+        return u'<a href="https://app.geosamples.org/sample/igsn/{0}" ' \
+               u'target="_blank">{0}</a>'.format(external_id.samplingfeatureexternalidentifier)
 
     igsn.allow_tags = True
 

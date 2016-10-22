@@ -8,7 +8,11 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
 
-from templatesAndSettings.settings import *
+# from templatesAndSettings.settings import *
+from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
+from templatesAndSettings.settings import app_name
+from templatesAndSettings.settings import verbose_name
+from templatesAndSettings.settings import URL_PATH
 
 try:
     from django.utils.module_loading import import_module
