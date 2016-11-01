@@ -39,6 +39,7 @@ from .models import Samplingfeatures
 from .models import Timeseriesresultvalues
 from .models import Units
 from .models import Variables
+from .models import Timeseriesresults
 
 register = template.Library()
 
@@ -1389,6 +1390,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         #         k+=1
         # response = HttpResponse(myfile.getvalue(),content_type='text/csv')
         # response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
+    timeseriesresults = Timeseriesresults.objects.filter(resultid__in=resultList.values("resultid"))
+
     if csvexport:
         return response
     else:
@@ -1407,7 +1410,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                                                     'enddate': enddate,
                                                     'SelectedResults': int_selectedresultid_ids,
                                                     'authenticated': authenticated,
-                                                    'methods': methods,
+                                                    'methods': methods,'timeseriesresults':timeseriesresults,
                                                     'chartID': chartID, 'chart': chart,
                                                     'series': series,
                                                     'title2': title2, 'resultList': resultList,
