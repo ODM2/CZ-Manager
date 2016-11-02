@@ -1182,7 +1182,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
 
     selected_results = []
     name_of_sampling_features = []
-    name_of_variables = []
+    #name_of_variables = []
     name_of_units = []
 
     myresultSeries = []
@@ -1214,7 +1214,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     else:
         datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
         resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid")).filter(
-            ~Q(processing_level=4))
+            ~Q(processing_level=4)).order_by("featureactionid")
         datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
         datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
     numresults = resultList.count()
@@ -1271,31 +1271,6 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         tmpname = get_name_of_sampling_feature(selected_result)
         name_of_sampling_features.append(tmpname)
 
-        tmpname = get_name_of_variable(selected_result)
-        if name_of_variables.__len__() > 0:
-            namefound = False
-            for name in name_of_variables:
-                if name == tmpname:
-                    namefound = True
-            if not namefound:
-                name_of_variables.append(tmpname)
-            else:
-                name_of_variables.append('')
-        else:
-            name_of_variables.append(tmpname)
-
-        tmpname = get_name_of_units(selected_result)
-        if name_of_units.__len__() > 0:
-            namefound = False
-            for name in name_of_units:
-                if name == tmpname:
-                    namefound = True
-            if not namefound:
-                name_of_units.append(tmpname)
-            else:
-                name_of_units.append('')
-        else:
-            name_of_units.append(tmpname)
 
         myresultSeries.append(Timeseriesresultvalues.objects.all()
                               .filter(~Q(datavalue__lte=-6999))
@@ -1327,32 +1302,36 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             # data['datavalue'].extend(tmplist )
             # data['valuedatetime'].append(dumptoMillis(result.valuedatetime))
 
+    timeseriesresults = Timeseriesresults.objects.\
+        filter(resultid__in=resultList.values("resultid")).\
+        order_by("resultid__variableid","aggregationstatisticcv")
     # build strings for graph labels
-    i = 0
+
+    i=0
     seriesStr = ''
+    unit=''
     series = []
+    r = Results.objects.filter(resultid__in=selectedMResultSeries).order_by("featureactionid")#.order_by("unitsid")
+    tsrs = Timeseriesresults.objects.filter(resultid__in=selectedMResultSeries).order_by("featureactionid")
+    for selectedMResult in r:
+        i+=1
+        tsr=tsrs.get(resultid=selectedMResult)
+        aggStatistic=tsr.aggregationstatisticcv
+        unit = selectedMResult.unitsid.unitsabbreviation
+        variable = selectedMResult.variableid.variable_name
+        location = selectedMResult.featureactionid.samplingfeatureid.samplingfeaturename
+        if i == 1 and not unit == '':
+            seriesStr += str(unit)
+            name_of_units.append(str(unit))
+        elif not unit == '':
+            seriesStr += ' - ' + str(unit)
+            name_of_units.append(str(unit))
+        series.append( {"name": str(unit) + ' - ' + str(variable) +' - '+ str(aggStatistic) + ' - ' + str(location), "yAxis": str(unit),
+                        "data": data['datavalue' + str(i)]})
+
+    i = 0
     titleStr = ''
-    tmpUnit = ''
-    tmpVariableName = ''
-    tmpLocName = ''
-    for name_of_unit, name_of_sampling_feature, name_of_variable in zip(name_of_units,
-                                                                        name_of_sampling_features,
-                                                                        name_of_variables):
-        i += 1
-        if i == 1 and not name_of_unit == '':
-            seriesStr += name_of_unit
-        elif not name_of_unit == '':
-            tmpUnit = name_of_unit
-            seriesStr += ' - ' + name_of_unit
-        if not name_of_variable == '':
-            tmpVariableName = name_of_variable
-        if not name_of_unit == '':
-            tmpUnit = name_of_unit
-        if not name_of_sampling_feature == '':
-            tmpLocName = name_of_sampling_feature
-        series.append(
-            {"name": tmpUnit + ' - ' + tmpVariableName + ' - ' + tmpLocName, "yAxis": tmpUnit,
-             "data": data['datavalue' + str(i)]})
+
     i = 0
     name_of_sampling_features = set(name_of_sampling_features)
 
@@ -1390,7 +1369,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         #         k+=1
         # response = HttpResponse(myfile.getvalue(),content_type='text/csv')
         # response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
-    timeseriesresults = Timeseriesresults.objects.filter(resultid__in=resultList.values("resultid"))
+
 
     if csvexport:
         return response
