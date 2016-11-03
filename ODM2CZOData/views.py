@@ -7,6 +7,7 @@ from datetime import timedelta
 from django import template
 from django.contrib import admin
 from django.db.models import Max
+from django.db.models import Min
 from django.db.models import Q
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -1159,16 +1160,17 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                 annotate(Min('valuedatetime')).\
                 order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
             enddate = Timeseriesresultvalues.objects.\
-                filter(resultid__in = resultList.values("resultid")).annotate(Max('valuedatetime')).\
+                filter(resultid__in = resultList.values("resultid")).\
+                annotate(Max('valuedatetime')).\
                 order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
         except IndexError:
             # html = "<html><body>No Data Available Yet.</body></html>"
             # return HttpResponse(html)
-            methodsOnly='True'
+            methodsOnly = 'True'
     except ValueError:
             # html = "<html><body>No Data Available Yet.</body></html>"
             # return HttpResponse(html)
-            methodsOnly='True'
+            methodsOnly = 'True'
 
     return TemplateResponse(request, template, {'prefixpath': CUSTOM_TEMPLATE_PATH,
                                                 'useSamplingFeature': useSamplingFeature,
@@ -1219,7 +1221,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
 
     selected_results = []
     name_of_sampling_features = []
-    #name_of_variables = []
+    # name_of_variables = []
     name_of_units = []
 
     myresultSeries = []
@@ -1344,14 +1346,14 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
 
     i=0
     seriesStr = ''
-    unit=''
+    unit = ''
     series = []
     r = Results.objects.filter(resultid__in = selectedMResultSeries)\
         .order_by("featureactionid") # .order_by("unitsid")
     tsrs = Timeseriesresults.objects.filter(resultid__in = selectedMResultSeries)\
         .order_by("featureactionid")
     for selectedMResult in r:
-        i+=1
+        i+= 1
         tsr = tsrs.get(resultid=selectedMResult)
         aggStatistic = tsr.aggregationstatisticcv
         unit = selectedMResult.unitsid.unitsabbreviation
@@ -1363,7 +1365,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         elif not unit == '':
             seriesStr += ' - ' + str(unit)
             name_of_units.append(str(unit))
-        series.append( {"name": str(unit) + ' - ' + str(variable) +' - '+ str(aggStatistic) + ' - ' + str(location), "yAxis": str(unit),
+        series.append( {"name": str(unit) + ' - ' + str(variable) +' - '
+                        + str(aggStatistic) + ' - ' + str(location), "yAxis": str(unit),
                         "data": data['datavalue' + str(i)]})
     i = 0
     titleStr = ''
@@ -1425,7 +1428,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                                                     'enddate': enddate,
                                                     'SelectedResults': int_selectedresultid_ids,
                                                     'authenticated': authenticated,
-                                                    'methods': methods,'timeseriesresults':timeseriesresults,
+                                                    'methods': methods,
+                                                    'timeseriesresults': timeseriesresults,
                                                     'chartID': chartID, 'chart': chart,
                                                     'series': series,
                                                     'title2': title2, 'resultList': resultList,

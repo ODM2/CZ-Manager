@@ -545,7 +545,7 @@ class SamplingfeaturesAdmin(admin.OSMGeoAdmin):
     sampling_feature_type_linked.allow_tags = True
 
 
-def duplicate_results_event(queryset):
+def duplicate_results_event(ModelAdmin, request, queryset):
     for obj in queryset:
         obj.resultid = None
         obj.save()
@@ -898,7 +898,7 @@ class MethodsAdmin(admin.ModelAdmin):
     method_type_linked.allow_tags = True
 
 
-def duplicate_Dataloggerfiles_event(ModelAdmin, request,queryset):
+def duplicate_Dataloggerfiles_event(ModelAdmin, request, queryset):
     for dataloggerfile in queryset:
         fileid = dataloggerfile.dataloggerfileid
         filecolumns = Dataloggerfilecolumns.objects.filter(dataloggerfileid=fileid)

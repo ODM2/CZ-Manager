@@ -96,7 +96,7 @@ class Command(BaseCommand):
         else:
             file = MEDIA_ROOT + args[0].name
             fileid = args[1]
-        check_dates = False # bool(args[4]) for some reason this arg is not working
+        check_dates = False  # bool(args[4]) for some reason this arg is not working
         databeginson = int(args[2])  # int(databeginson[0])
         columnheaderson = int(args[3])  # int(columnheaderson[0])
         rowColumnMap = list()
