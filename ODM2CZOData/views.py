@@ -14,6 +14,7 @@ from django.http import StreamingHttpResponse
 from django.shortcuts import render
 from django.template import loader
 from django.template.response import TemplateResponse
+from django.core.exceptions import ObjectDoesNotExist
 
 from templatesAndSettings.base import ADMIN_SHORTCUTS
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
@@ -40,6 +41,8 @@ from .models import Timeseriesresultvalues
 from .models import Units
 from .models import Variables
 from .models import Timeseriesresults
+from .models import Resultextensionpropertyvalues
+from .models import Extensionproperties
 
 register = template.Library()
 
@@ -1104,6 +1107,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
     featureActionLocation = None
     featureActionMethod = None
     datasetTitle = None
+    featureActions = None
     datasetAbstract = None
     methods = None
     methodsOnly = 'False'
@@ -1132,6 +1136,38 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
             ~Q(processing_level=4)).order_by("featureactionid__action__method")
         datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
         datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
+    try:
+        StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
+        EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
+        startdates = Resultextensionpropertyvalues.objects.\
+            filter(resultid__in=resultList.values("resultid")).filter(propertyid=StartDateProperty)
+        enddates = Resultextensionpropertyvalues.objects.\
+            filter(resultid__in=resultList.values("resultid")).filter(propertyid=EndDateProperty)
+        realstartdates = []
+        realenddates=[]
+        for startdate in startdates:
+            realstartdates.append(datetime.strptime(startdate.propertyvalue,"%Y-%m-%d %H:%M"))
+        for enddate in enddates:
+            realenddates.append(datetime.strptime(enddate.propertyvalue,"%Y-%m-%d %H:%M"))
+        startdate= min(realstartdates).strftime('%Y-%m-%d %H:%M')
+        enddate = max(realenddates).strftime('%Y-%m-%d %H:%M')
+
+    except (ObjectDoesNotExist) as e:
+        try:
+            startdate= Timeseriesresultvalues.objects.filter(resultid__in=resultList.values("resultid")).\
+                annotate(Min('valuedatetime')).\
+                order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+            enddate= Timeseriesresultvalues.objects.filter(resultid__in=resultList.values("resultid")).\
+                annotate(Max('valuedatetime')).\
+                order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+        except IndexError:
+            #html = "<html><body>No Data Available Yet.</body></html>"
+            #return HttpResponse(html)
+            methodsOnly='True'
+    except ValueError:
+            #html = "<html><body>No Data Available Yet.</body></html>"
+            #return HttpResponse(html)
+            methodsOnly='True'
 
     return TemplateResponse(request, template, {'prefixpath': CUSTOM_TEMPLATE_PATH,
                                                 'useSamplingFeature': useSamplingFeature,
