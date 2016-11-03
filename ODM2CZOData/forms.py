@@ -786,7 +786,7 @@ class SamplingfeaturesAdmin(ReadOnlyAdmin):
 #     sampling_feature_type_linked.allow_tags = True
 
 
-def duplicate_results_event(queryset):
+def duplicate_results_event(ModelAdmin, request, queryset):
     for obj in queryset:
         obj.resultid = None
         obj.save()
@@ -1228,7 +1228,7 @@ class MethodsAdmin(ReadOnlyAdmin):
     method_type_linked.allow_tags = True
 
 
-def duplicate_Dataloggerfiles_event(queryset):
+def duplicate_Dataloggerfiles_event(ModelAdmin, request, queryset):
     for dataloggerfile in queryset:
         fileid = dataloggerfile.dataloggerfileid
         filecolumns = Dataloggerfilecolumns.objects.filter(dataloggerfileid=fileid)
@@ -1319,7 +1319,7 @@ class DataloggerfilesAdmin(ReadOnlyAdmin):
         return "readonly" in groups
 
 
-def duplicate_Dataloggerfilecolumns_event(queryset):
+def duplicate_Dataloggerfilecolumns_event(ModelAdmin, request, queryset):
     for object in queryset:
         object.dataloggerfilecolumnid = None
         object.save()
