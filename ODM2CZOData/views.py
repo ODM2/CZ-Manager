@@ -1160,7 +1160,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                 annotate(Min('valuedatetime')).\
                 order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
             enddate = Timeseriesresultvalues.objects.\
-                filter(resultid__in = resultList.values("resultid")).\
+                filter(resultid__in=resultList.values("resultid")).\
                 annotate(Max('valuedatetime')).\
                 order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
         except IndexError:
@@ -1340,20 +1340,20 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             # data['valuedatetime'].append(dumptoMillis(result.valuedatetime))
 
     timeseriesresults = Timeseriesresults.objects.\
-        filter(resultid__in = resultList.values("resultid")).\
-        order_by("resultid__variableid","aggregationstatisticcv")
+        filter(resultid__in=resultList.values("resultid")).\
+        order_by("resultid__variableid", "aggregationstatisticcv")
     # build strings for graph labels
 
-    i=0
+    i = 0
     seriesStr = ''
     unit = ''
     series = []
-    r = Results.objects.filter(resultid__in = selectedMResultSeries)\
+    r = Results.objects.filter(resultid__in=selectedMResultSeries)\
         .order_by("featureactionid") # .order_by("unitsid")
-    tsrs = Timeseriesresults.objects.filter(resultid__in = selectedMResultSeries)\
+    tsrs = Timeseriesresults.objects.filter(resultid__in=selectedMResultSeries)\
         .order_by("featureactionid")
     for selectedMResult in r:
-        i+= 1
+        i += 1
         tsr = tsrs.get(resultid=selectedMResult)
         aggStatistic = tsr.aggregationstatisticcv
         unit = selectedMResult.unitsid.unitsabbreviation
@@ -1365,9 +1365,9 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         elif not unit == '':
             seriesStr += ' - ' + str(unit)
             name_of_units.append(str(unit))
-        series.append( {"name": str(unit) + ' - ' + str(variable) +' - '
-                        + str(aggStatistic) + ' - ' + str(location), "yAxis": str(unit),
-                        "data": data['datavalue' + str(i)]})
+        series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
+                    str(aggStatistic) + ' - ' + str(location), "yAxis": str(unit),
+                    "data": data['datavalue' + str(i)]})
     i = 0
     titleStr = ''
 
@@ -1408,8 +1408,6 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         #         k+=1
         # response = HttpResponse(myfile.getvalue(),content_type='text/csv')
         # response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
-
-
     if csvexport:
         return response
     else:
