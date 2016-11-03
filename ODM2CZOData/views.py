@@ -1144,29 +1144,30 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         enddates = Resultextensionpropertyvalues.objects.\
             filter(resultid__in=resultList.values("resultid")).filter(propertyid=EndDateProperty)
         realstartdates = []
-        realenddates=[]
+        realenddates = []
         for startdate in startdates:
-            realstartdates.append(datetime.strptime(startdate.propertyvalue,"%Y-%m-%d %H:%M"))
+            realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M"))
         for enddate in enddates:
-            realenddates.append(datetime.strptime(enddate.propertyvalue,"%Y-%m-%d %H:%M"))
-        startdate= min(realstartdates).strftime('%Y-%m-%d %H:%M')
+            realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M"))
+        startdate = min(realstartdates).strftime('%Y-%m-%d %H:%M')
         enddate = max(realenddates).strftime('%Y-%m-%d %H:%M')
 
     except (ObjectDoesNotExist) as e:
         try:
-            startdate= Timeseriesresultvalues.objects.filter(resultid__in=resultList.values("resultid")).\
+            startdate = Timeseriesresultvalues.objects.\
+                filter(resultid__in=resultList.values("resultid")).\
                 annotate(Min('valuedatetime')).\
                 order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-            enddate= Timeseriesresultvalues.objects.filter(resultid__in=resultList.values("resultid")).\
-                annotate(Max('valuedatetime')).\
+            enddate = Timeseriesresultvalues.objects.\
+                filter(resultid__in = resultList.values("resultid")).annotate(Max('valuedatetime')).\
                 order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
         except IndexError:
-            #html = "<html><body>No Data Available Yet.</body></html>"
-            #return HttpResponse(html)
+            # html = "<html><body>No Data Available Yet.</body></html>"
+            # return HttpResponse(html)
             methodsOnly='True'
     except ValueError:
-            #html = "<html><body>No Data Available Yet.</body></html>"
-            #return HttpResponse(html)
+            # html = "<html><body>No Data Available Yet.</body></html>"
+            # return HttpResponse(html)
             methodsOnly='True'
 
     return TemplateResponse(request, template, {'prefixpath': CUSTOM_TEMPLATE_PATH,
@@ -1293,7 +1294,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         # entered_start_date= Measurementresultvalues.objects.
         # filter(resultid__in=selectedMResultSeries).annotate(Min('valuedatetime')).\
         # order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-        # #.annotate(Min('price')).order_by('price')[0]
+        # .annotate(Min('price')).order_by('price')[0]
         datetime_entered_end_date = datetime.strptime(entered_end_date, '%Y-%m-%d %H:%M')
         entered_start_date = datetime_entered_end_date - timedelta(
             map_config['time_series_months'] * 365 / 12)  # .strftime('%Y-%m-%d %H:%M')
@@ -1306,8 +1307,6 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
 
         tmpname = get_name_of_sampling_feature(selected_result)
         name_of_sampling_features.append(tmpname)
-
-
         myresultSeries.append(Timeseriesresultvalues.objects.all()
                               .filter(~Q(datavalue__lte=-6999))
                               .filter(valuedatetime__gt=entered_start_date)
@@ -1339,7 +1338,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             # data['valuedatetime'].append(dumptoMillis(result.valuedatetime))
 
     timeseriesresults = Timeseriesresults.objects.\
-        filter(resultid__in=resultList.values("resultid")).\
+        filter(resultid__in = resultList.values("resultid")).\
         order_by("resultid__variableid","aggregationstatisticcv")
     # build strings for graph labels
 
@@ -1347,12 +1346,14 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     seriesStr = ''
     unit=''
     series = []
-    r = Results.objects.filter(resultid__in=selectedMResultSeries).order_by("featureactionid")#.order_by("unitsid")
-    tsrs = Timeseriesresults.objects.filter(resultid__in=selectedMResultSeries).order_by("featureactionid")
+    r = Results.objects.filter(resultid__in = selectedMResultSeries)\
+        .order_by("featureactionid") # .order_by("unitsid")
+    tsrs = Timeseriesresults.objects.filter(resultid__in = selectedMResultSeries)\
+        .order_by("featureactionid")
     for selectedMResult in r:
         i+=1
-        tsr=tsrs.get(resultid=selectedMResult)
-        aggStatistic=tsr.aggregationstatisticcv
+        tsr = tsrs.get(resultid=selectedMResult)
+        aggStatistic = tsr.aggregationstatisticcv
         unit = selectedMResult.unitsid.unitsabbreviation
         variable = selectedMResult.variableid.variable_name
         location = selectedMResult.featureactionid.samplingfeatureid.samplingfeaturename
@@ -1364,7 +1365,6 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             name_of_units.append(str(unit))
         series.append( {"name": str(unit) + ' - ' + str(variable) +' - '+ str(aggStatistic) + ' - ' + str(location), "yAxis": str(unit),
                         "data": data['datavalue' + str(i)]})
-
     i = 0
     titleStr = ''
 

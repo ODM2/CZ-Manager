@@ -56,14 +56,14 @@ def updateStartDateEndDate(results, startdate, enddate):
             propertyid=StartDateProperty).update(propertyvalue=startdate)
         # repvstart = Resultextensionpropertyvalues.objects.filter(resultid=results.
         # resultid).filter(propertyid=StartDateProperty).get()
-        #print(repvstart.propertyvalue)
+        # print(repvstart.propertyvalue)
         Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
             propertyid=EndDateProperty).update(propertyvalue=enddate)
         # repvend = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).
         # filter(propertyid=EndDateProperty).get()
         # repvend, new = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).
         # filter(propertyid=EndDateProperty).get()
-        #print(repvend.propertyvalue)
+        # print(repvend.propertyvalue)
     except ObjectDoesNotExist:
         # raise CommandError("couldn't find extension property values " +str(repvstart) + "for " +
         # str(StartDateProperty + "for" + str(results))
@@ -96,7 +96,7 @@ class Command(BaseCommand):
         else:
             file = MEDIA_ROOT + args[0].name
             fileid = args[1]
-        check_dates = False #bool(args[4]) for some reason this arg is not working
+        check_dates = False # bool(args[4]) for some reason this arg is not working
         databeginson = int(args[2])  # int(databeginson[0])
         columnheaderson = int(args[3])  # int(columnheaderson[0])
         rowColumnMap = list()
@@ -121,7 +121,7 @@ class Command(BaseCommand):
                         ' dataloggerfilecolumns ' + str(
                             numCols) + ' associated with the dataloggerfile in the database. ')
                 for row in reader:
-                    #print(row)
+                    # print(row)
                     # map the column objects to the column in the file assumes first row in
                     # file contains columnlabel.
                     if i == columnheaderson:
@@ -187,8 +187,8 @@ class Command(BaseCommand):
                                         'results are needed.')
                                 # only one measurement result is allowed per result
                                 value = row[colnum.columnnum]
-                                #print("value to save")
-                                #print(value)
+                                # print("value to save")
+                                # print(value)
                                 censorcode = CvCensorcode.objects.filter(name="Not censored").get()
                                 qualitycode = CvQualitycode.objects.filter(name="Good").get()
                                 for mresults in Timeseriesresult:
