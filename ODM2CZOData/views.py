@@ -1349,7 +1349,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     unit = ''
     series = []
     r = Results.objects.filter(resultid__in=selectedMResultSeries)\
-        .order_by("featureactionid") # .order_by("unitsid")
+        .order_by("featureactionid")  # .order_by("unitsid")
     tsrs = Timeseriesresults.objects.filter(resultid__in=selectedMResultSeries)\
         .order_by("featureactionid")
     for selectedMResult in r:
@@ -1366,8 +1366,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             seriesStr += ' - ' + str(unit)
             name_of_units.append(str(unit))
         series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
-                    str(aggStatistic) + ' - ' + str(location), "yAxis": str(unit),
-                    "data": data['datavalue' + str(i)]})
+                      str(aggStatistic) + ' - ' + str(location), "yAxis": str(unit),
+                      "data": data['datavalue' + str(i)]})
     i = 0
     titleStr = ''
 
