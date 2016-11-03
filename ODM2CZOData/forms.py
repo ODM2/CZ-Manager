@@ -898,7 +898,7 @@ class MethodsAdmin(admin.ModelAdmin):
     method_type_linked.allow_tags = True
 
 
-def duplicate_Dataloggerfiles_event(queryset):
+def duplicate_Dataloggerfiles_event(ModelAdmin, request,queryset):
     for dataloggerfile in queryset:
         fileid = dataloggerfile.dataloggerfileid
         filecolumns = Dataloggerfilecolumns.objects.filter(dataloggerfileid=fileid)
@@ -962,7 +962,7 @@ class DataloggerfilesAdmin(admin.ModelAdmin):
     inlines = [DataLoggerFileColumnsInline]
 
 
-def duplicate_Dataloggerfilecolumns_event(queryset):
+def duplicate_Dataloggerfilecolumns_event(ModelAdmin, request, queryset):
     for object in queryset:
         object.dataloggerfilecolumnid = None
         object.save()
