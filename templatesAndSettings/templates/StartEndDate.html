@@ -49,21 +49,29 @@ option {
 				<th scope="col"  class="sortable column-resultid">Variable</th>
 				<th scope="col"  class="sortable column-resultid">Units</th>
 				<th scope="col"  class="sortable column-resultid">Location</th>
-				<th scope="col"  class="sortable column-resultid">Processing Level</th></tr>
-				{% for Result in resultList %}
-					<tr class="row1">
-							<td ><input type="checkbox" class="action-checkbox-column" id="s1" 
-							{% for SelectedResult in SelectedResults %}
-								{% if Result.resultid == SelectedResult %}
-									checked  
-								{% endif %}
-							{% endfor %}
-							name="selection{{ forloop.counter0 }}" value="{{ Result.resultid }}">{{ Result.feature_action }} </input><br></td>
-								<td >{{Result.resultid}}</td>
-								<td >{{Result.variableid.variablecode}}</td>
-								<td >{{Result.unitsid}}</td>
-								<td >{{Result.featureactionid.samplingfeatureid}}</td>
-								<td > {{Result.processing_level}}</td>
+				<th scope="col"  class="sortable column-resultid">Processing Level</th>
+				<th scope="col"  class="sortable column-resultid">Aggregation Statistic</th></tr>
+				
+				{% for tsr in timeseriesresults %}
+					{% for Result in resultList %}
+						{% if tsr.resultid.resultid == Result.resultid %}
+							<tr class="row1">
+									<td ><input type="checkbox" class="action-checkbox-column" id="s1" 
+									{% for SelectedResult in SelectedResults %}
+										{% if Result.resultid == SelectedResult %}
+											checked  
+										{% endif %}
+									{% endfor %}
+									name="selection{{ forloop.counter0 }}" value="{{ Result.resultid }}">{{ Result.feature_action }} </input><br></td>
+										
+										<td >{{Result.resultid}}</td>
+										<td >{{Result.variableid.variablecode}}</td>
+										<td >{{Result.unitsid}}</td>
+										<td >{{Result.featureactionid.samplingfeatureid}}</td>
+										<td > {{Result.processing_level}}</td>
+										<td > {{tsr.aggregationstatisticcv}}</td>
+						{% endif %}
+					{% endfor %}
 								</tr>
 				
                 {% endfor %}

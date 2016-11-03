@@ -7,6 +7,7 @@ from datetime import timedelta
 from django import template
 from django.contrib import admin
 from django.db.models import Max
+from django.db.models import Min
 from django.db.models import Q
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -14,6 +15,7 @@ from django.http import StreamingHttpResponse
 from django.shortcuts import render
 from django.template import loader
 from django.template.response import TemplateResponse
+from django.core.exceptions import ObjectDoesNotExist
 
 from templatesAndSettings.base import ADMIN_SHORTCUTS
 from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
@@ -39,6 +41,9 @@ from .models import Samplingfeatures
 from .models import Timeseriesresultvalues
 from .models import Units
 from .models import Variables
+from .models import Timeseriesresults
+from .models import Resultextensionpropertyvalues
+from .models import Extensionproperties
 
 register = template.Library()
 
@@ -1103,6 +1108,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
     featureActionLocation = None
     featureActionMethod = None
     datasetTitle = None
+    featureActions = None
     datasetAbstract = None
     methods = None
     methodsOnly = 'False'
@@ -1131,6 +1137,40 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
             ~Q(processing_level=4)).order_by("featureactionid__action__method")
         datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
         datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
+    try:
+        StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
+        EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
+        startdates = Resultextensionpropertyvalues.objects.\
+            filter(resultid__in=resultList.values("resultid")).filter(propertyid=StartDateProperty)
+        enddates = Resultextensionpropertyvalues.objects.\
+            filter(resultid__in=resultList.values("resultid")).filter(propertyid=EndDateProperty)
+        realstartdates = []
+        realenddates = []
+        for startdate in startdates:
+            realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M"))
+        for enddate in enddates:
+            realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M"))
+        startdate = min(realstartdates).strftime('%Y-%m-%d %H:%M')
+        enddate = max(realenddates).strftime('%Y-%m-%d %H:%M')
+
+    except (ObjectDoesNotExist) as e:
+        try:
+            startdate = Timeseriesresultvalues.objects.\
+                filter(resultid__in=resultList.values("resultid")).\
+                annotate(Min('valuedatetime')).\
+                order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+            enddate = Timeseriesresultvalues.objects.\
+                filter(resultid__in=resultList.values("resultid")).\
+                annotate(Max('valuedatetime')).\
+                order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+        except IndexError:
+            # html = "<html><body>No Data Available Yet.</body></html>"
+            # return HttpResponse(html)
+            methodsOnly = 'True'
+    except ValueError:
+            # html = "<html><body>No Data Available Yet.</body></html>"
+            # return HttpResponse(html)
+            methodsOnly = 'True'
 
     return TemplateResponse(request, template, {'prefixpath': CUSTOM_TEMPLATE_PATH,
                                                 'useSamplingFeature': useSamplingFeature,
@@ -1181,7 +1221,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
 
     selected_results = []
     name_of_sampling_features = []
-    name_of_variables = []
+    # name_of_variables = []
     name_of_units = []
 
     myresultSeries = []
@@ -1213,7 +1253,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     else:
         datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
         resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid")).filter(
-            ~Q(processing_level=4))
+            ~Q(processing_level=4)).order_by("featureactionid")
         datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
         datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
     numresults = resultList.count()
@@ -1256,7 +1296,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         # entered_start_date= Measurementresultvalues.objects.
         # filter(resultid__in=selectedMResultSeries).annotate(Min('valuedatetime')).\
         # order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-        # #.annotate(Min('price')).order_by('price')[0]
+        # .annotate(Min('price')).order_by('price')[0]
         datetime_entered_end_date = datetime.strptime(entered_end_date, '%Y-%m-%d %H:%M')
         entered_start_date = datetime_entered_end_date - timedelta(
             map_config['time_series_months'] * 365 / 12)  # .strftime('%Y-%m-%d %H:%M')
@@ -1269,33 +1309,6 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
 
         tmpname = get_name_of_sampling_feature(selected_result)
         name_of_sampling_features.append(tmpname)
-
-        tmpname = get_name_of_variable(selected_result)
-        if name_of_variables.__len__() > 0:
-            namefound = False
-            for name in name_of_variables:
-                if name == tmpname:
-                    namefound = True
-            if not namefound:
-                name_of_variables.append(tmpname)
-            else:
-                name_of_variables.append('')
-        else:
-            name_of_variables.append(tmpname)
-
-        tmpname = get_name_of_units(selected_result)
-        if name_of_units.__len__() > 0:
-            namefound = False
-            for name in name_of_units:
-                if name == tmpname:
-                    namefound = True
-            if not namefound:
-                name_of_units.append(tmpname)
-            else:
-                name_of_units.append('')
-        else:
-            name_of_units.append(tmpname)
-
         myresultSeries.append(Timeseriesresultvalues.objects.all()
                               .filter(~Q(datavalue__lte=-6999))
                               .filter(valuedatetime__gt=entered_start_date)
@@ -1326,32 +1339,38 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             # data['datavalue'].extend(tmplist )
             # data['valuedatetime'].append(dumptoMillis(result.valuedatetime))
 
+    timeseriesresults = Timeseriesresults.objects.\
+        filter(resultid__in=resultList.values("resultid")).\
+        order_by("resultid__variableid", "aggregationstatisticcv")
     # build strings for graph labels
+
     i = 0
     seriesStr = ''
+    unit = ''
     series = []
-    titleStr = ''
-    tmpUnit = ''
-    tmpVariableName = ''
-    tmpLocName = ''
-    for name_of_unit, name_of_sampling_feature, name_of_variable in zip(name_of_units,
-                                                                        name_of_sampling_features,
-                                                                        name_of_variables):
+    r = Results.objects.filter(resultid__in=selectedMResultSeries)\
+        .order_by("featureactionid")  # .order_by("unitsid")
+    tsrs = Timeseriesresults.objects.filter(resultid__in=selectedMResultSeries)\
+        .order_by("featureactionid")
+    for selectedMResult in r:
         i += 1
-        if i == 1 and not name_of_unit == '':
-            seriesStr += name_of_unit
-        elif not name_of_unit == '':
-            tmpUnit = name_of_unit
-            seriesStr += ' - ' + name_of_unit
-        if not name_of_variable == '':
-            tmpVariableName = name_of_variable
-        if not name_of_unit == '':
-            tmpUnit = name_of_unit
-        if not name_of_sampling_feature == '':
-            tmpLocName = name_of_sampling_feature
-        series.append(
-            {"name": tmpUnit + ' - ' + tmpVariableName + ' - ' + tmpLocName, "yAxis": tmpUnit,
-             "data": data['datavalue' + str(i)]})
+        tsr = tsrs.get(resultid=selectedMResult)
+        aggStatistic = tsr.aggregationstatisticcv
+        unit = selectedMResult.unitsid.unitsabbreviation
+        variable = selectedMResult.variableid.variable_name
+        location = selectedMResult.featureactionid.samplingfeatureid.samplingfeaturename
+        if i == 1 and not unit == '':
+            seriesStr += str(unit)
+            name_of_units.append(str(unit))
+        elif not unit == '':
+            seriesStr += ' - ' + str(unit)
+            name_of_units.append(str(unit))
+        series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
+                      str(aggStatistic) + ' - ' + str(location), "yAxis": str(unit),
+                      "data": data['datavalue' + str(i)]})
+    i = 0
+    titleStr = ''
+
     i = 0
     name_of_sampling_features = set(name_of_sampling_features)
 
@@ -1408,6 +1427,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                                                     'SelectedResults': int_selectedresultid_ids,
                                                     'authenticated': authenticated,
                                                     'methods': methods,
+                                                    'timeseriesresults': timeseriesresults,
                                                     'chartID': chartID, 'chart': chart,
                                                     'series': series,
                                                     'title2': title2, 'resultList': resultList,
