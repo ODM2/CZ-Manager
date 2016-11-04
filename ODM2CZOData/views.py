@@ -1115,7 +1115,8 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
     if not useDataset:
         if useSamplingFeature:
             samplefeature = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
-            featureActions = Featureactions.objects.filter(samplingfeatureid=samplefeature)
+            featureActions = Featureactions.objects.filter(samplingfeatureid=samplefeature).\
+                order_by("action_method")
             resultList = Results.objects.filter(featureactionid__in=featureActions).filter(
                 ~Q(processing_level=4)).order_by("featureactionid__action__method")
             actions = Actions.objects.filter(actionid__in=featureActions.values("action"))

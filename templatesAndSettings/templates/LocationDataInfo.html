@@ -24,28 +24,50 @@ option {
 	{% endifequal %}
 	<p>Collection methods include:</p>
 	{% assign done 0 %}
+	{% assign done2 0 %}
 	{% for featureAction in featureActions %}
 		{% if not useDataset %}
-			<table >
-			{% ifequal methodsOnly "True" %}
 			
-				{% if not done == 1 %}
+			{% ifequal methodsOnly "True" %}
+				{% if not lastMethod == featureAction.action.method   %}
 					<th scope="col"  class="sortable column-resultid">method name</th>
+					<th scope="col"  class="sortable column-resultid">description</th>
 					<th scope="col"  class="sortable column-resultid">link</th>
-					<th scope="col"  class="sortable column-resultid">description</th></tr>
+					</tr>
+					<tr class="row1">
+				<td width="20%">{{ featureAction.action.method.methodname }} </td>
+				<td width="60%" >{{featureAction.action.method.methoddescription}}</td>
+				<td width="20%"><a target="_blank", href='{{featureAction.action.method.methodlink}}'> All Data For this Method </a></td>
+				</tr>
+				{% endif %}
+				{% if not done == 1 %}
+				<table >
+					<th scope="col"  class="sortable column-resultid">start date</th>
+					<th scope="col"  class="sortable column-resultid">description</th>
+					<th scope="col"  class="sortable column-resultid">link</th>
+					
+					
 				{% endif %}
 				{% assign done 1 %}
 				<tr class="row1">
-				<td>{{ featureAction.action.method.methodname }} </td>
-				<td ><a target="_blank", href='{{featureAction.action.actionfilelink}}'> link </a></td>
-				<td >{{featureAction.action.actiondescription}}</td></tr>
+				<td width="20%" >{{featureAction.action.begindatetime.date}}</td>
+				<td width="60%" >{{featureAction.action.actiondescription}}</td>
+				<td width="20%"><a target="_blank", href='{{featureAction.action.actionfilelink}}'> link </a></td></tr>
+				
 			
 			{% else %}
-				{% assign done 0 %}
+                {% if not done2 == 1 %}
+                                <br><a  target="_blank" href="{{prefixpath}}../graphfa/samplingfeature&#61;{{featureAction.samplingfeatureid}}">view times series data for all methods in new page</a></br>
+                {% endif %}
+                {% assign done2 1 %}
+				<table >
+                {% assign done 0 %}
 				{% for Result in resultList %}
 					{% if featureAction.action.method.methodname == Result.featureactionid.action.method.methodname  %}
 						{% if not done == 1 %}
-							<p><a target="_blank", href="{{prefixpath}}../graphfa/featureaction&#61;{{Result.featureactionid.featureactionid}} ">{{featureAction.action.method.methodname}}</a></p>
+                            
+						
+							 <p><a target="_blank", href="{{prefixpath}}../graphfa/featureaction&#61;{{Result.featureactionid.featureactionid}} ">{{featureAction.action.method.methodname}}</a></p>
 
 					
 					<tr ><th scope="col" class="section">Result Series</td>
@@ -56,6 +78,7 @@ option {
 					<th scope="col"  class="sortable column-resultid">Processing Level</th>
 					<th scope="col"  class="sortable column-resultid">Number of Records Available</th></tr>
 						{% endif %}
+						{% assign donut 1 %}
 						{% assign done 1 %}
 						<tr class="row1">
 								<td>{{ Result.feature_action }} </td>
@@ -72,6 +95,7 @@ option {
 		{% endifequal %}
 	{% endif %}
 </td></tr>
+{% assign lastMethod featureAction.action.method %}
 {% endfor %}
 </table>
 
