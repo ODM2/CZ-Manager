@@ -1,5 +1,6 @@
 {% extends "admin/base_site.html" %}
 {% load admin_extras %}
+{% load admin_shortcuts_mod %}
 {% load staticfiles %}
 {% load static %}
 
@@ -32,9 +33,23 @@
 
 {% block breadcrumbs %}
     {% if authenticated %}
-        <div class="admin_shortcuts">
-            {% admin_shortcuts %}
-        </div>
+        {% if not user.groups.all.0 %}
+            <div class="admin_shortcuts">
+                {% admin_shortcuts %}
+            </div>
+        {% else %}
+            {% for group in user.groups.all %}
+                {% if group.name != 'readonly' %}
+                    <div class="admin_shortcuts">
+                        {% admin_shortcuts %}
+                    </div>
+                {% else %}
+                    <div class="admin_shortcuts">
+                        {% admin_shortcuts_filter %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
     {% endif %}
 {% endblock %}
 
