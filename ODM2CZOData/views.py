@@ -715,19 +715,20 @@ def TimeSeriesGraphing(request, feature_action='All'):
         else:
             name_of_units.append(tmpname)
 
-        myresultSeries.append(Measurementresultvalues.objects.all()
-                              .filter(~Q(datavalue__lte=-6999))
-                              .filter(valuedatetime__gt=entered_start_date)
-                              .filter(valuedatetime__lt=entered_end_date)
-                              .filter(resultid=selectedMResult).order_by('-valuedatetime'))
+        myresultSeries.append(Timeseriesresultvalues.objects.all().filter(
+            ~Q(datavalue__lte=-6999)).filter(
+            valuedatetime__gt=entered_start_date).filter(
+            valuedatetime__lt=entered_end_date).filter(
+            resultid=selectedMResult).order_by('-valuedatetime'))
 
         data.update({'datavalue' + str(i): []})
 
-    myresultSeriesExport = Measurementresultvalues.objects.all() \
+    myresultSeriesExport = Timeseriesresultvalues.objects.all() \
         .filter(valuedatetime__gt=entered_start_date) \
         .filter(valuedatetime__lt=entered_end_date) \
         .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
     i = 0
+
 
     for myresults in myresultSeries:
         i += 1
@@ -739,7 +740,8 @@ def TimeSeriesGraphing(request, feature_action='All'):
                 dataval = 'null'
             else:
                 dataval = result.datavalue
-            data['datavalue' + str(i)].append([mills, dataval])
+            data['datavalue' + str(i)].append(
+                [mills, dataval])
             # data['datavalue' + str(i)].append([mills, result.datavalue])
             # #dumptoMillis(result.valuedatetime)
             # data['datavalue'].extend(tmplist )
