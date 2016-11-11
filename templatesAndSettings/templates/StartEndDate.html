@@ -49,6 +49,7 @@ option {
 				<th scope="col"  class="sortable column-resultid">Variable</th>
 				<th scope="col"  class="sortable column-resultid">Units</th>
 				<th scope="col"  class="sortable column-resultid">Location</th>
+				<th scope="col"  class="sortable column-resultid">Method</th>
 				<th scope="col"  class="sortable column-resultid">Processing Level</th>
 				<th scope="col"  class="sortable column-resultid">Aggregation Statistic</th></tr>
 				
@@ -68,6 +69,7 @@ option {
 										<td >{{Result.variableid.variablecode}}</td>
 										<td >{{Result.unitsid}}</td>
 										<td >{{Result.featureactionid.samplingfeatureid}}</td>
+										<td >{{Result.featureactionid.action.method.methodcode}}</td>
 										<td > {{Result.processing_level}}</td>
 										<td > {{tsr.aggregationstatisticcv}}</td>
 						{% endif %}
