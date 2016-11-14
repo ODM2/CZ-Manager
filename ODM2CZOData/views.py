@@ -729,7 +729,6 @@ def TimeSeriesGraphing(request, feature_action='All'):
         .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
     i = 0
 
-
     for myresults in myresultSeries:
         i += 1
         for result in myresults:
@@ -1117,8 +1116,10 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
     try:
         if not useDataset:
             if useSamplingFeature:
-                samplefeature = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
-                featureActions = Featureactions.objects.filter(samplingfeatureid=samplefeature).\
+                samplefeature = Samplingfeatures.objects.\
+                    filter(samplingfeatureid=samplingfeature).get()
+                featureActions = Featureactions.objects.\
+                    filter(samplingfeatureid=samplefeature).\
                     order_by("action__method")
                 resultList = Results.objects.filter(featureactionid__in=featureActions).filter(
                     ~Q(processing_level=4)).order_by("featureactionid__action__method")
@@ -1136,7 +1137,8 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                 methods = Methods.objects.filter(methodid=actions.method.methodid)
         else:
             datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
-            resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid")).filter(
+            resultList = Results.objects.filter(resultid__in=datasetResults.
+                values("resultid")).filter(
                 ~Q(processing_level=4)).order_by("featureactionid__action__method")
             datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
             datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract

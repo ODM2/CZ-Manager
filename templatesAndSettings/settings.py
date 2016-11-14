@@ -61,15 +61,15 @@ ODM2_configs = {
 static_url = '/static/'
 
 admins = [{
-    "name": "first last",
-    "email": "email@example.com"
+             "name": "first last",
+             "email": "email@example.com"
   }]
 
 # ========================================================================
 # ACTUAL SETTINGS ========================================================
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 templates_dir = os.path.dirname(__file__)
-#TEMPLATE_DIR_APP = os.path.join(os.path.dirname(__file__), '..')
+# TEMPLATE_DIR_APP = os.path.join(os.path.dirname(__file__), '..')
 templates_path = os.path.join(templates_dir, 'templates')
 # TEMPLATE_PATH2 = os.path.join(TEMPLATE_DIR, 'templates/odm2testapp')
 # print(TEMPLATE_PATH)
@@ -101,7 +101,7 @@ SECRET_KEY = secret_key
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = debug
 
-TEMPLATE_DEBUG = template_debug
+# TEMPLATE_DEBUG = template_debug
 ADMINS = admins
 ALLOWED_HOSTS = []
 
@@ -145,11 +145,11 @@ INSTALLED_APPS = (
     # 'admin_reorder',
 
 )
-#TEMPLATE_LOADERS = (
+# TEMPLATE_LOADERS = (
 #    'django.template.loaders.filesystem.Loader',
 #    'django.template.loaders.app_directories.Loader',
 #    'apptemplates.Loader',
-#)
+# )
 # find icon images here https://github.com/alesdotio/
 # django-admin-shortcuts/blob/master/admin_shortcuts/
 # templatetags/admin_shortcuts_tags.py#L134

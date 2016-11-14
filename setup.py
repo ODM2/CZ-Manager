@@ -28,6 +28,7 @@ def extract_version(module='odm2djangoadmin'):
                 break
     return version
 
+
 rootpath = os.path.abspath(os.path.dirname(__file__))
 
 
