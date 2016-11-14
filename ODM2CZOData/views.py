@@ -1114,32 +1114,35 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
     datasetAbstract = None
     methods = None
     methodsOnly = 'False'
-    if not useDataset:
-        if useSamplingFeature:
-            samplefeature = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
-            featureActions = Featureactions.objects.filter(samplingfeatureid=samplefeature).\
-                order_by("action_method")
-            resultList = Results.objects.filter(featureactionid__in=featureActions).filter(
-                ~Q(processing_level=4)).order_by("featureactionid__action__method")
-            actions = Actions.objects.filter(actionid__in=featureActions.values("action"))
-            methods = Methods.objects.filter(methodid__in=actions.values("method"))
-            featureActionLocation = samplefeature.samplingfeaturename
+    try:
+        if not useDataset:
+            if useSamplingFeature:
+                samplefeature = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
+                featureActions = Featureactions.objects.filter(samplingfeatureid=samplefeature).\
+                    order_by("action__method")
+                resultList = Results.objects.filter(featureactionid__in=featureActions).filter(
+                    ~Q(processing_level=4)).order_by("featureactionid__action__method")
+                actions = Actions.objects.filter(actionid__in=featureActions.values("action"))
+                methods = Methods.objects.filter(methodid__in=actions.values("method"))
+                featureActionLocation = samplefeature.samplingfeaturename
+            else:
+                resultList = Results.objects.filter(featureactionid=feature_action).filter(
+                    ~Q(processing_level=4)).order_by(
+                    "featureactionid__action__method")
+                featureActions = Featureactions.objects.filter(featureactionid=feature_action).get()
+                featureActionLocation = featureActions.samplingfeatureid.samplingfeaturename
+                featureActionMethod = featureActions.action.method.methodname
+                actions = Actions.objects.filter(actionid=featureActions.action.actionid).get()
+                methods = Methods.objects.filter(methodid=actions.method.methodid)
         else:
-            resultList = Results.objects.filter(featureactionid=feature_action).filter(
-                ~Q(processing_level=4)).order_by(
-                "featureactionid__action__method")
-            featureActions = Featureactions.objects.filter(featureactionid=feature_action).get()
-            featureActionLocation = featureActions.samplingfeatureid.samplingfeaturename
-            featureActionMethod = featureActions.action.method.methodname
-            actions = Actions.objects.filter(actionid=featureActions.action.actionid).get()
-            methods = Methods.objects.filter(methodid=actions.method.methodid)
-
-    else:
-        datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
-        resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid")).filter(
-            ~Q(processing_level=4)).order_by("featureactionid__action__method")
-        datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
-        datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
+            datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
+            resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid")).filter(
+                ~Q(processing_level=4)).order_by("featureactionid__action__method")
+            datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
+            datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
+    except(ObjectDoesNotExist) as e:
+        html = "<html><body>No Data Available Yet.</body></html>"
+        return HttpResponse(html)
     try:
         StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
         EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
