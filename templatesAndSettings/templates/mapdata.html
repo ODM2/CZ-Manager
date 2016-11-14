@@ -233,13 +233,13 @@
 			{% endfor %}
 			if (done == false){
 				{% if not done == 1 and site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" or site.sampling_feature_type.name == "Stream gage" or site.sampling_feature_type.name == "Transect" or site.sampling_feature_type.name == "Weather station" %}
-					popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
+                         popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
 							+ '<hr />'
 							+ '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
 							+ '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
 							+ '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
 							+ '<br> {{ site.sampling_feature_type.name}}'
-							+ '<br> <a  target="_blank" href="{{prefixpath}}../graphfa/samplingfeature&#61;{{site.samplingfeatureid}}">view times series data in new page</a></p><iframe  width=600, height=600, src="{{prefixpath}}../mappopup/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
+							+ '<br> </p><iframe  width=600, height=600, src="{{prefixpath}}../mappopup/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
 				{% elif  site.sampling_feature_type.name == "Excavation" %}
 					popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
 							+ '<hr />'
