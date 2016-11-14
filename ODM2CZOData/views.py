@@ -29,7 +29,6 @@ from .models import Citations
 from .models import Datasets
 from .models import Datasetsresults
 from .models import Featureactions
-from .models import Measurementresultvalues
 from .models import Methods
 from .models import People
 from .models import Profileresults
@@ -1137,8 +1136,8 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                 methods = Methods.objects.filter(methodid=actions.method.methodid)
         else:
             datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
-            resultList = Results.objects.filter(resultid__in=datasetResults.
-                values("resultid")).filter(
+            resultList = Results.objects.filter(resultid__in=datasetResults.values(
+                "resultid")).filter(
                 ~Q(processing_level=4)).order_by("featureactionid__action__method")
             datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
             datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract

@@ -18,8 +18,7 @@ admin.site.site_header = site_header
 admin.site.site_title = site_title
 
 # admin_site.admin_view()
-urlpatterns = [
-               url(r'^' + URL_PATH + '', include(admin.site.urls)),
+urlpatterns = [url(r'^' + URL_PATH + '', include(admin.site.urls)),
                url(r'^' + URL_PATH + 'lookups/', include(ajax_select_urls)),
                url(r'^$', lambda r: HttpResponseRedirect('admin/{}/'.format(app_name))),
                url(r'^' + URL_PATH + 'AddSensor.html', views.AddSensor, name="AddSensor"),

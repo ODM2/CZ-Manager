@@ -61,8 +61,8 @@ ODM2_configs = {
 static_url = '/static/'
 
 admins = [{
-             "name": "first last",
-             "email": "email@example.com"
+    "name": "first last",
+    "email": "email@example.com"
   }]
 
 # ========================================================================
