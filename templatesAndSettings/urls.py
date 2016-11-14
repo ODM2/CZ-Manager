@@ -1,9 +1,10 @@
 from ajax_select import urls as ajax_select_urls
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.contrib import admin
 from django.http.response import HttpResponseRedirect
-
-from templatesAndSettings.settings import MEDIA_ROOT
+from django.conf import settings
+from django.conf.urls.static import static
+#from templatesAndSettings.settings import MEDIA_ROOT
 from templatesAndSettings.settings import URL_PATH
 from templatesAndSettings.settings import app_name, site_header, site_title
 
@@ -17,10 +18,7 @@ admin.site.site_header = site_header
 admin.site.site_title = site_title
 
 # admin_site.admin_view()
-urlpatterns = patterns('',
-                       # Examples:
-                       # url(r'^$', 'tango_with_django_project_17.views.home', name='home'),
-                       # url(r'^blog/', include('blog.urls')),
+urlpatterns = [
                        url(r'^' + URL_PATH + '', include(admin.site.urls)),
                        url(r'^' + URL_PATH + 'lookups/', include(ajax_select_urls)),
                        url(r'^$', lambda r: HttpResponseRedirect('admin/{}/'.format(app_name))),
@@ -179,12 +177,12 @@ urlpatterns = patterns('',
                        # url(r'^' + MEDIA_URL +'(?P<path>.*)$', 'django.views.static.serve', {
                        #        'document_root': MEDIA_ROOT,
                        #    }),
-                       url(r'^' + URL_PATH + 'upfiles/(?P<path>.*)$', 'django.views.static.serve',
-                           {'document_root': MEDIA_ROOT}),
+                       #url(r'^' + URL_PATH + 'upfiles/(?P<path>.*)$', 'django.views.static.serve',
+                       #    {'document_root': MEDIA_ROOT}),
                        # url(r'^admin/DataloggerfilecolumnsDisplay.html',
                        # views.dataloggercolumnView,
                        # name="dataloggercolumnView"),
 
                        # url(r'^contas_pagar/pagamento/(?P<id_parcela>\d+)/$',
                        # 'contas_pagar.views.retorna_pagamentos_parcela')
-                       )
+                       ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

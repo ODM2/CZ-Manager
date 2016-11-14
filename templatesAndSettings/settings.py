@@ -63,18 +63,34 @@ static_url = '/static/'
 admins = [{
     "name": "first last",
     "email": "email@example.com"
-}]
+  }]
 
 # ========================================================================
 # ACTUAL SETTINGS ========================================================
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-TEMPLATE_DIR = os.path.dirname(__file__)
-TEMPLATE_DIR_APP = os.path.join(os.path.dirname(__file__), '..')
-TEMPLATE_PATH = os.path.join(TEMPLATE_DIR, 'templates')
+templates_dir = os.path.dirname(__file__)
+#TEMPLATE_DIR_APP = os.path.join(os.path.dirname(__file__), '..')
+templates_path = os.path.join(templates_dir, 'templates')
 # TEMPLATE_PATH2 = os.path.join(TEMPLATE_DIR, 'templates/odm2testapp')
 # print(TEMPLATE_PATH)
-TEMPLATE_DIRS = [TEMPLATE_PATH, ]  # TEMPLATE_PATH2,
+templates_dirs = [templates_path, ]  # TEMPLATE_PATH2,
 
+
+TEMPLATES = [{
+    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+    'DIRS': templates_dirs,
+    'APP_DIRS': True,
+    'OPTIONS': {
+        'context_processors': [
+            'django.template.context_processors.media',
+            'django.template.context_processors.static',
+            'django.template.context_processors.debug',
+            'django.template.context_processors.request',
+            'django.contrib.auth.context_processors.auth',
+            'django.contrib.messages.context_processors.messages',
+        ],
+    },
+}]
 # TEMPLATE_LOADERS = ('django.template.loaders.filesystem.Loader',)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -129,11 +145,11 @@ INSTALLED_APPS = (
     # 'admin_reorder',
 
 )
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    'apptemplates.Loader',
-)
+#TEMPLATE_LOADERS = (
+#    'django.template.loaders.filesystem.Loader',
+#    'django.template.loaders.app_directories.Loader',
+#    'apptemplates.Loader',
+#)
 # find icon images here https://github.com/alesdotio/
 # django-admin-shortcuts/blob/master/admin_shortcuts/
 # templatetags/admin_shortcuts_tags.py#L134
