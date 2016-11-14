@@ -60,9 +60,8 @@ ODM2_configs = {
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 static_url = '/static/'
 
-admins = [{
-    "name": "first last",
-    "email": "email@example.com"
+admins = [{"name": "first last",
+           "email": "email@example.com"
   }]
 
 # ========================================================================
