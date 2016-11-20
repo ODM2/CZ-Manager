@@ -19,19 +19,16 @@ matrix:
 
 
 before_install:
-    - pip install -r requirements.txt
-    - pip install -r requirements-dev.txt
+  - pip install -r requirements.txt
+  - pip install -r requirements-dev.txt
 
-# Test the tarball creation.
-# TODO: Will be available in the next PR
-#install:
-    #- python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2djangoadmin-${version}.tar.gz && popd
+install:
+  - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2djangoadmin-${version}.tar.gz && popd
 
 script:
-    # TODO: Will be available once we can package and run the tests.
-    # - if [[ $TEST_TARGET == 'default' ]]; then
-    #     python setup.py test';
-    #   fi
-    - if [[ $TEST_TARGET == 'coding_standards' ]]; then
-        find . -type f -name "*.py" ! -name "base.py" | xargs flake8 --max-line-length=100 --ignore=E402 ;
-      fi
+  - if [[ $TEST_TARGET == 'default' ]]; then
+      python setup.py test;
+    fi
+  - if [[ $TEST_TARGET == 'coding_standards' ]]; then
+      find . -type f -name "*.py" ! -name "base.py" | xargs flake8 --max-line-length=100 --ignore=E402 ;
+    fi
