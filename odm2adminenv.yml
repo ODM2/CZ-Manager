@@ -3,7 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - python=2.7
-  - django=1.9
+  - django=1.10
   - psycopg2
   - pip:
     - django-uuidfield
