@@ -1,7 +1,7 @@
 
 
 #  C extensions
-*.ipynb
+#.ipynb
 *.so
 
 #  Packages
