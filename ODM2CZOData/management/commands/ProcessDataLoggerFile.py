@@ -216,7 +216,7 @@ class Command(BaseCommand):
                                                     .intendedtimespacingunitsid
                                                 ).save()
                                         else:
-                                            print(row[colnum.columnnum])
+                                            # print(row[colnum.columnnum])
                                             Timeseriesresultvalues(
                                                 resultid=mresults,
                                                 datavalue=row[colnum.columnnum],
@@ -229,7 +229,7 @@ class Command(BaseCommand):
                                                 timeaggregationintervalunitsid=mresults
                                                 .intendedtimespacingunitsid
                                             ).save()
-                                            print("saved value")
+                                            # print("saved value")
                                     except IntegrityError:
                                         pass
                                         # Timeseriesresultvalues.delete()

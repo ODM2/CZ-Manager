@@ -1244,13 +1244,13 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             samplefeature = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
             feature_actions = Featureactions.objects.filter(samplingfeatureid=samplefeature)
             resultList = Results.objects.filter(featureactionid__in=feature_actions).filter(
-                ~Q(processing_level=4))
+                ~Q(processing_level=4)).order_by("featureactionid","resultid")
             actions = Actions.objects.filter(actionid__in=feature_actions.values("action"))
             methods = Methods.objects.filter(methodid__in=actions.values("method"))
             featureActionLocation = samplefeature.samplingfeaturename
         else:
             resultList = Results.objects.filter(featureactionid=feature_action).filter(
-                ~Q(processing_level=4))
+                ~Q(processing_level=4)).order_by("featureactionid","resultid")
             featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
             featureActionLocation = featureAction.samplingfeatureid.samplingfeaturename
             featureActionMethod = featureAction.action.method.methodname
@@ -1260,7 +1260,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     else:
         datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
         resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid")).filter(
-            ~Q(processing_level=4)).order_by("featureactionid")
+            ~Q(processing_level=4)).order_by("featureactionid","resultid")
         datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
         datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
     numresults = resultList.count()
@@ -1356,9 +1356,9 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     unit = ''
     series = []
     r = Results.objects.filter(resultid__in=selectedMResultSeries)\
-        .order_by("featureactionid")  # .order_by("unitsid")
+        .order_by("featureactionid","resultid")  # .order_by("unitsid")
     tsrs = Timeseriesresults.objects.filter(resultid__in=selectedMResultSeries)\
-        .order_by("featureactionid")
+        .order_by("resultid__resultid__featureactionid","resultid")
     for selectedMResult in r:
         i += 1
         tsr = tsrs.get(resultid=selectedMResult)
