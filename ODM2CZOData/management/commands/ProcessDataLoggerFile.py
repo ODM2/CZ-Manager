@@ -79,26 +79,27 @@ def updateStartDateEndDate(results, startdate, enddate):
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument('dataloggerfilelink', nargs=1)
-        parser.add_argument('dataloggerfileid', nargs=1)
-        parser.add_argument('databeginson', nargs=1, type=int)
-        parser.add_argument('columnheaderson', nargs=1, type=int)
+        parser.add_argument('dataloggerfilelink',nargs=1, type=str)
+        parser.add_argument('dataloggerfileid',nargs=1, type=str)
+        parser.add_argument('databeginson',nargs=1, type=str)
+        parser.add_argument('columnheaderson',nargs=1, type=str)
         parser.add_argument('check_dates', nargs=1, type=bool)
         parser.add_argument('cmdline', nargs=1, type=bool)
 
     @transaction.atomic
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
-        cmdline = bool(args[5])
+        cmdline = bool(options['cmdline'][0])
         if cmdline:
-            file = MEDIA_ROOT + args[0]  # f[0]
-            fileid = args[1]  # fileid[0]
-            fileid = Dataloggerfiles.objects.filter(dataloggerfilename=fileid).get()
+            file = str(MEDIA_ROOT) + str(options['dataloggerfilelink'][0])  # f[0]
+            fileid = int(options['dataloggerfileid'][0])  # fileid[0]
+            fileid = Dataloggerfiles.objects.filter(dataloggerfileid=fileid).get()
         else:
-            file = MEDIA_ROOT + args[0].name
-            fileid = args[1]
+            filename = str(options['dataloggerfilelink'][0])
+            file = str(MEDIA_ROOT) + filename  #args[0].name
+            fileid = int(options['dataloggerfileid'][0])
         check_dates = False  # bool(args[4]) for some reason this arg is not working
-        databeginson = int(args[2])  # int(databeginson[0])
-        columnheaderson = int(args[3])  # int(columnheaderson[0])
+        databeginson = int(options['databeginson'][0])  # int(databeginson[0])
+        columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
         rowColumnMap = list()
         try:
             with io.open(file, 'rt', encoding='ascii') as f:
@@ -108,7 +109,7 @@ class Command(BaseCommand):
                 for i in range(0, databeginson):
                     columnsinCSV = len(next(reader2))
                 DataloggerfilecolumnSet = Dataloggerfilecolumns.objects.filter(
-                    dataloggerfileid=fileid.dataloggerfileid)
+                    dataloggerfileid=fileid)
                 i = 0
                 numCols = DataloggerfilecolumnSet.count()
                 if numCols == 0:
