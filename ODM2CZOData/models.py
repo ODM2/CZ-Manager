@@ -1002,7 +1002,9 @@ class Dataloggerfiles(models.Model):
     dataloggerfiledescription = models.CharField(max_length=5000, blank=True)
     # dataloggerfilelink = models.CharField(max_length=255, blank=True)
     dataloggerfilelink = models.FileField(upload_to='dataloggerfiles')  # upload_to='.'
-
+    
+    def dataloggerfilelinkname(self):
+        return self.dataloggerfilelink.name
     def __unicode__(self):
         s = u"%s" % self.dataloggerfilename
         return s
@@ -1015,7 +1017,7 @@ class Dataloggerfiles(models.Model):
 
 class ProcessDataloggerfile(models.Model):
     processdataloggerfileid = models.AutoField(primary_key=True)
-    dataloggerfileid = models.ForeignKey('dataloggerfiles', related_name='+',
+    dataloggerfileid = models.ForeignKey('dataloggerfiles',
                                          help_text="CAUTION dataloggerfilecolumns must be setup" +
                                                    ", the date and time stamp is expected to " +
                                                    "be the first column, " +
@@ -1043,8 +1045,10 @@ class ProcessDataloggerfile(models.Model):
     def save(self, *args, **kwargs):
         # ProcessDataLoggerFile(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid,
         # self.databeginson, self.columnheaderson, False)
-        management.call_command('ProcessDataLoggerFile', self.dataloggerfileid.dataloggerfilelink,
-                                self.dataloggerfileid, self.databeginson, self.columnheaderson,
+        linkname = str(self.dataloggerfileid.dataloggerfilelinkname())
+        fileid = self.dataloggerfileid.dataloggerfileid
+        management.call_command('ProcessDataLoggerFile', linkname,str(fileid)
+                                , str(self.databeginson), str(self.columnheaderson),
                                 False, False)
         super(ProcessDataloggerfile, self).save(*args, **kwargs)
         # def get_actions(self, request):
