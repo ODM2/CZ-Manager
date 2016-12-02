@@ -88,7 +88,7 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
-        #cmdline = bool(options['cmdline'][0])
+        # cmdline = bool(options['cmdline'][0])
         filename = str(options['dataloggerfilelink'][0])
         file = str(MEDIA_ROOT) + filename  #args[0].name
         fileid = int(options['dataloggerfileid'][0])
