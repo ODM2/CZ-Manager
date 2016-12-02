@@ -23,6 +23,10 @@ developed using a postgresql version of ODM2 data model, additional
 modifications will be needed to make this work with MSSQL or another
 database.
 
+An example postgresqldatabase named ODM2AdminExamplePostgresqlDB, this
+is a custom postgresql format backup which can be restored to an empty
+database.
+
 You might find issues with psycopg2 on windows
 
 To install psycopg2 for windows follow the instructions here:

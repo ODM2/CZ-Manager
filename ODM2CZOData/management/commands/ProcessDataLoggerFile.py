@@ -88,15 +88,11 @@ class Command(BaseCommand):
 
     @transaction.atomic
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
-        cmdline = bool(options['cmdline'][0])
-        if cmdline:
-            file = str(MEDIA_ROOT) + str(options['dataloggerfilelink'][0])  # f[0]
-            fileid = int(options['dataloggerfileid'][0])  # fileid[0]
-            fileid = Dataloggerfiles.objects.filter(dataloggerfileid=fileid).get()
-        else:
-            filename = str(options['dataloggerfilelink'][0])
-            file = str(MEDIA_ROOT) + filename  #args[0].name
-            fileid = int(options['dataloggerfileid'][0])
+        # cmdline = bool(options['cmdline'][0])
+        filename = str(options['dataloggerfilelink'][0])
+        file = str(MEDIA_ROOT) + filename  #args[0].name
+        fileid = int(options['dataloggerfileid'][0])
+        fileid = Dataloggerfiles.objects.filter(dataloggerfileid=fileid).get()
         check_dates = False  # bool(args[4]) for some reason this arg is not working
         databeginson = int(options['databeginson'][0])  # int(databeginson[0])
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
