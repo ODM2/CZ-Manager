@@ -1,7 +1,9 @@
 
 
 #  C extensions
-#.ipynb
+.ipynb_checkpoints
+*~
+*DS_Store
 *.so
 
 #  Packages
