@@ -1,5 +1,6 @@
 
 {% load admin_extras %}
+
 <style>
 select {
     width:85%; 
@@ -36,9 +37,19 @@ option {
 			Start Date (format YYYY-MM-DD HH:MM) </input>
 			<input id="endDate" maxlength="100" value= "{{ endDate }}" name="endDate" type="text"/>
 			End Date (format YYYY-MM-DD HH:MM) </input>
-			<input type="submit" name="update_chart" value="Update Chart" /></td></tr>
+			
+			<input type="submit" name="update_chart" value="Update Chart" />
+			
+			</td></tr>
+			<tr><td><div class="g-recaptcha" data-sitekey="6LdTKw8UAAAAAFxRwp71gyxwlz-iigbOxzhcUdBi"></div></td></tr>
+			<tr><td><input id="useDates" type="checkbox" name="useDates" checked>use dates to filter data in email</input>
+			<input id="outEmail" maxlength="100" name="outEmail" type="text">Email data to:</input><input type="submit" name="email_data" value="Email Data" />
+			
+			</td></tr>
 	
-
+{% if emailsent %}
+<p>Email request received, your request is being processed.</p>			
+{% endif %}
 
 	</td></tr></table>
 

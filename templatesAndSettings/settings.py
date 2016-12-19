@@ -74,6 +74,13 @@ templates_path = os.path.join(templates_dir, 'templates')
 # print(TEMPLATE_PATH)
 templates_dirs = [templates_path, ]  # TEMPLATE_PATH2,
 
+email_host = 'smtp.host'
+email_host_user = 'user'
+email_host_password = 'password'
+recaptcha_public_key = 'googlerecaptchakey'
+recaptcha_private_key = 'googlerecaptchaprivatekey'
+email_use_tls = True
+email_port = 123
 
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',

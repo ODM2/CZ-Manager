@@ -7,4 +7,6 @@ django-apptemplates
 django-daterange-filter
 django-import-export
 django-jquery
+django-recaptcha
 psycopg2
+requests

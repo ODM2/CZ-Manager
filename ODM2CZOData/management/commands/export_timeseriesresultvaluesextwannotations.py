@@ -23,18 +23,20 @@ parser = argparse.ArgumentParser(description='export time series result values w
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('outgoingemail',nargs=1, type=str)
+        parser.add_argument('startdate',nargs=1, type=str)
+        parser.add_argument('enddate',nargs=1, type=str)
+        parser.add_argument('usedates',nargs=1, type=str)
         parser.add_argument('timeseriesresults',nargs='+', type=str)
 
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
         timeseriesresults = options['timeseriesresults'][0]
         outgoingemail = options['outgoingemail'][0]
-        # csvfile = StringIO.StringIO()
-        # csvwriter = csv.writer(csvfile)
-        # for leads in assigned_leads:
-        #     csvwriter.writerow([leads.business_name, leads.first_name, leads.last_name, leads.email, leads.phone_number,leads.address, leads.city, leads.state, leads.zipcode, leads.submission_date, leads.time_frame, leads.comments])
-        # message = EmailMessage("Hello","Your Leads","myemail@gmail.com",["myemail@gmail.com"])
-        # message.attach('invoice.csv', csvfile.getvalue(), 'text/csv')
+        usedates = bool(options['usedates'][0])
+        entered_start_date = options['startdate'][0]
+        entered_end_date = options['enddate'][0]
         csvfile = StringIO.StringIO()
+        emailtitle = 'your ODM2 Admin data is attached'
+        emailtext = 'Attached are results for the following time series: '
         # csvwriter = csv.writer(csvfile)
         # print(timeseriesresults)
         timeseriesresultlist= [item for item in timeseriesresults.split(',') if item.isdigit()]
@@ -42,7 +44,6 @@ class Command(BaseCommand):
         timeseriesresultlist2 =[]
         tmpResult = ''
         for resultval in timeseriesresults:
-            
             if not resultval ==',':
                 tmpResult += resultval
             else:
@@ -50,17 +51,24 @@ class Command(BaseCommand):
                 tmpResult = ''
         timeseriesresultlist2.append(int(tmpResult))
         print(timeseriesresultlist2)
-        tsrvs = Timeseriesresultvaluesext.objects.filter(resultid__in=timeseriesresultlist2).order_by('valuedatetime')
+        if usedates:
+            tsrvs = Timeseriesresultvaluesext.objects.filter(resultid__in=timeseriesresultlist2)\
+                .filter(valuedatetime__gte=entered_start_date)\
+                .filter(valuedatetime__lt=entered_end_date).order_by('valuedatetime')
+        else:
+            tsrvs = Timeseriesresultvaluesext.objects.filter(resultid__in=timeseriesresultlist2).\
+                order_by('valuedatetime')
         i=0
         # print("time series result list2")
         # print(timeseriesresultlist2)
         print(outgoingemail)
         tolist = []
-        tolist.append('leonmi@sas.upenn.edu') #= re.findall('\'([^\']*)\'',outgoingemail)
+        tolist.append(outgoingemail) #= re.findall('\'([^\']*)\'',outgoingemail)
         resultid = None
         lastResultid = None
         results = Results.objects.filter(resultid__in=timeseriesresultlist2)
         for result in results:
+            emailtext = emailtext + ' - ' + result.csvheaderShort()
             csvfile.write(result.csvheader())
             csvfile.write(result.csvheaderShort())
         csvfile.write('\n')
@@ -78,7 +86,7 @@ class Command(BaseCommand):
             csvfile.write(tsrv.csvoutput())
             csvfile.write(tsrv.csvoutputShort())
 
-        email = EmailMessage('data email subject', 'your data is attached body.',
+        email = EmailMessage(emailtitle,emailtext,
                              'leonmi@sas.upenn.edu', tolist)
         email.attach('mydata.csv', csvfile.getvalue(),'text/csv')
         email.send()

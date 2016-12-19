@@ -16,12 +16,16 @@ from django.shortcuts import render
 from django.template import loader
 from django.template.response import TemplateResponse
 from django.core.exceptions import ObjectDoesNotExist
-
+from django.core import management
+from oauth2_provider.views.generic import ProtectedResourceView
+from django.http import HttpResponse
+import requests
+from django.conf import settings
 from templatesAndSettings.base import ADMIN_SHORTCUTS
-from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
-from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DSICLAIMER
-from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
-
+# from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
+# from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DSICLAIMER
+# from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
+# from templatesAndSettings.settings import RECAPTCHA_PRIVATE_KEY
 from .models import Actions
 from .models import Authorlists
 from .models import Citationextensionpropertyvalues
@@ -38,11 +42,17 @@ from .models import Results
 from .models import Samplingfeatureexternalidentifiers
 from .models import Samplingfeatures
 from .models import Timeseriesresultvalues
+from .models import Timeseriesresultvaluesext
+from .models import Timeseriesresultvaluesextwannotations
 from .models import Units
 from .models import Variables
 from .models import Timeseriesresults
 from .models import Resultextensionpropertyvalues
 from .models import Extensionproperties
+# from .forms import LoginForm
+from django.views.decorators.cache import never_cache
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 
 register = template.Library()
 
@@ -258,13 +268,13 @@ def publications(request):
                              'selectedCategory': selectedCategory,
                              'selectedTag': selectedTag, 'peopleList': peopleList,
                              'selectedAuthor': selectedAuthor,
-                             'prefixpath': CUSTOM_TEMPLATE_PATH})
+                             'prefixpath': settings.CUSTOM_TEMPLATE_PATH})
 
 
 # ======================= SHORTCUTS =========================================
 def AddSensor(request):
     if request.user.is_authenticated():
-        context = {'prefixpath': CUSTOM_TEMPLATE_PATH, 'name': request.user,
+        context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
                    'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][1]['title']}
@@ -275,7 +285,7 @@ def AddSensor(request):
 
 def chartIndex(request):
     if request.user.is_authenticated():
-        context = {'prefixpath': CUSTOM_TEMPLATE_PATH, 'name': request.user,
+        context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
                    'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][5]['title']}
@@ -287,7 +297,7 @@ def chartIndex(request):
 # chartIndex
 def AddProfile(request):
     if request.user.is_authenticated():
-        context = {'prefixpath': CUSTOM_TEMPLATE_PATH, 'name': request.user,
+        context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
                    'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][2]['title']}
@@ -298,7 +308,7 @@ def AddProfile(request):
 
 def RecordAction(request):
     if request.user.is_authenticated():
-        context = {'prefixpath': CUSTOM_TEMPLATE_PATH, 'name': request.user,
+        context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
                    'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][3]['title']}
@@ -309,7 +319,7 @@ def RecordAction(request):
 
 def ManageCitations(request):
     if request.user.is_authenticated():
-        context = {'prefixpath': CUSTOM_TEMPLATE_PATH, 'name': request.user,
+        context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
                    'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][4]['title']}
@@ -424,8 +434,8 @@ def web_map(request, dataset='NotSet'):
         authenticated = True
     else:
         authenticated = False
-    map_config = MAP_CONFIG
-    data_disclaimer = DATA_DSICLAIMER
+    map_config = settings.MAP_CONFIG
+    data_disclaimer = settings.DATA_DSICLAIMER
 
     datasets = Datasets.objects.all()
     externalidentifiers = None
@@ -542,7 +552,8 @@ def web_map(request, dataset='NotSet'):
     ]
 
     context = {
-        'prefixpath': CUSTOM_TEMPLATE_PATH, 'legends': json.dumps(legend_ref), 'features': features,
+        'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'legends': json.dumps(legend_ref),
+        'features': features,
         'results': results,
         'externalidentifiers': externalidentifiers,
         'datasets': datasets, 'selecteddatasets': selected, 'authenticated': authenticated,
@@ -823,8 +834,8 @@ def TimeSeriesGraphing(request, feature_action='All'):
         return TemplateResponse(request,
                                 template,
                                 {'featureactionList': featureactionList,
-                                 'prefixpath': CUSTOM_TEMPLATE_PATH,
-                                 'data_disclaimer': DATA_DSICLAIMER,
+                                 'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+                                 'data_disclaimer': settings.DATA_DSICLAIMER,
                                  'resultList': resultList,
                                  'startDate': entered_start_date,
                                  'endDate': entered_end_date,
@@ -1059,8 +1070,8 @@ def TimeSeriesGraphing(request, feature_action='All'):
         # raise ValidationError(relatedFeatureList)
         return TemplateResponse(request, template,
                                 {'featureactionList': featureactionList,
-                                 'prefixpath': CUSTOM_TEMPLATE_PATH,
-                                 'data_disclaimer': DATA_DSICLAIMER, 'resultList': resultList,
+                                 'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+                                 'data_disclaimer': settings.DATA_DSICLAIMER, 'resultList': resultList,
                                  'startDate': entered_start_date, 'endDate': entered_end_date,
                                  'SelectedResults': int_selectedresultid_ids,
                                  'authenticated': authenticated,
@@ -1089,7 +1100,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         template = loader.get_template('chart2.html')
     else:
         template = loader.get_template('chartpopup.html')
-    data_disclaimer = DATA_DSICLAIMER
+    data_disclaimer = settings.DATA_DSICLAIMER
     useDataset = False
     useSamplingFeature = False
     if dataset == 'NotSet':
@@ -1179,7 +1190,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
             # return HttpResponse(html)
             methodsOnly = 'True'
 
-    return TemplateResponse(request, template, {'prefixpath': CUSTOM_TEMPLATE_PATH,
+    return TemplateResponse(request, template, {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'useSamplingFeature': useSamplingFeature,
                                                 'methodsOnly': methodsOnly,
                                                 'featureActions': featureActions,
@@ -1206,8 +1217,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         template = loader.get_template('chart2.html')
     else:
         template = loader.get_template('chartpopup.html')
-    data_disclaimer = DATA_DSICLAIMER
-    map_config = MAP_CONFIG
+    data_disclaimer = settings.DATA_DSICLAIMER
+    map_config = settings.MAP_CONFIG
     useDataset = False
     useSamplingFeature = False
     # if 'annotation' in request.POST:
@@ -1324,7 +1335,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
 
         data.update({'datavalue' + str(i): []})
 
-    myresultSeriesExport = Timeseriesresultvalues.objects.all() \
+    myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
         .filter(valuedatetime__gt=entered_start_date) \
         .filter(valuedatetime__lt=entered_end_date) \
         .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
@@ -1400,9 +1411,10 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         int_selectedresultid_ids.append(int(int_selectedresultid))
     csvexport = False
     # if the user hit the export csv button export the measurement results to csv
-    if 'export_data' in request.POST:
-        response = exportspreadsheet(request, myresultSeriesExport, False)
-        csvexport = True
+    emailsent = False
+    if 'email_data' in request.POST:
+        emailsent = emailspreadsheet(request, myresultSeriesExport, False)
+        # csvexport = True
         # k=0
         # myfile = StringIO.StringIO()
         # for myresults in myresultSeriesExport:
@@ -1415,32 +1427,33 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         #         k+=1
         # response = HttpResponse(myfile.getvalue(),content_type='text/csv')
         # response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
-    if csvexport:
-        return response
-    else:
+    # if csvexport:
+    #     return response
+    # else:
         # raise ValidationError(relatedFeatureList)
-        return TemplateResponse(request, template, {'prefixpath': CUSTOM_TEMPLATE_PATH,
-                                                    'startDate': entered_start_date,
-                                                    'endDate': entered_end_date,
-                                                    'useSamplingFeature': useSamplingFeature,
-                                                    'featureActionMethod': featureActionMethod,
-                                                    'featureActionLocation': featureActionLocation,
-                                                    'data_disclaimer': data_disclaimer,
-                                                    'datasetTitle': datasetTitle,
-                                                    'datasetAbstract': datasetAbstract,
-                                                    'useDataset': useDataset,
-                                                    'startdate': startdate,
-                                                    'enddate': enddate,
-                                                    'SelectedResults': int_selectedresultid_ids,
-                                                    'authenticated': authenticated,
-                                                    'methods': methods,
-                                                    'timeseriesresults': timeseriesresults,
-                                                    'chartID': chartID, 'chart': chart,
-                                                    'series': series,
-                                                    'title2': title2, 'resultList': resultList,
-                                                    'graphType': graphType, 'xAxis': xAxis,
-                                                    'yAxis': yAxis,
-                                                    'name_of_units': name_of_units}, )
+    return TemplateResponse(request, template, {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+                                                'startDate': entered_start_date,
+                                                'endDate': entered_end_date,
+                                                'emailsent': emailsent,
+                                                'useSamplingFeature': useSamplingFeature,
+                                                'featureActionMethod': featureActionMethod,
+                                                'featureActionLocation': featureActionLocation,
+                                                'data_disclaimer': data_disclaimer,
+                                                'datasetTitle': datasetTitle,
+                                                'datasetAbstract': datasetAbstract,
+                                                'useDataset': useDataset,
+                                                'startdate': startdate,
+                                                'enddate': enddate,
+                                                'SelectedResults': int_selectedresultid_ids,
+                                                'authenticated': authenticated,
+                                                'methods': methods,
+                                                'timeseriesresults': timeseriesresults,
+                                                'chartID': chartID, 'chart': chart,
+                                                'series': series,
+                                                'title2': title2, 'resultList': resultList,
+                                                'graphType': graphType, 'xAxis': xAxis,
+                                                'yAxis': yAxis,
+                                                'name_of_units': name_of_units}, )
 
 
 #
@@ -1621,7 +1634,8 @@ def scatter_plot(request):
         response = exportspreadsheet(request, resultValuesSeries)
         return response
     return TemplateResponse(request, 'soilsscatterplot.html',
-                            {'prefixpath': CUSTOM_TEMPLATE_PATH, 'data_disclaimer': DATA_DSICLAIMER,
+                            {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+                             'data_disclaimer': settings.DATA_DSICLAIMER,
                              'xVariables': variables, 'yVariables': variables,
                              'authenticated': authenticated,
                              'xVariableSelection': xVariableSelection,
@@ -1705,12 +1719,61 @@ def exportcitations(request, citations, csv):
         response['Content-Disposition'] = 'attachment; filename="myCitationsEndNoteImport.txt"'
 
     return response
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
 
+def grecaptcha_verify(request):
+    if request.method == 'POST':
+        response = {}
+        data = request.POST
+        captcha_rs = data.get('g-recaptcha-response')
+        url = "https://www.google.com/recaptcha/api/siteverify"
+        params = {
+            'secret': settings.RECAPTCHA_SECRET_KEY,
+            'response': captcha_rs,
+            'remoteip': get_client_ip(request)
+        }
+        verify_rs = requests.get(url, params=params, verify=True)
+        verify_rs = verify_rs.json()
+        response["status"] = verify_rs.get("success", False)
+        response['message'] = verify_rs.get('error-codes', None) or "Unspecified error."
+        return HttpResponse(response)
+
+def emailspreadsheet(request, resultValuesSeries, profileResult=True):
+    # if the user hit the export csv button export the measurement results to csv
+    response = grecaptcha_verify(request)
+    captach_status = response["status"]
+    out_email = ''
+    entered_start_date =''
+    entered_end_date =''
+    use_dates =''
+    emailsent = False
+    if captach_status:
+        if 'startDate' in request.POST:
+            entered_start_date = request.POST['startDate']
+        if 'endDate' in request.POST:
+            entered_end_date = request.POST['endDate']
+        if 'useDates' in request.POST:
+            use_dates = request.POST['useDates']
+        if 'outEmail' in request.POST:
+            outgoingemail = request.POST['outEmail']
+        management.call_command('export_timeseriesresultvaluesextwannotations', outgoingemail,
+                                entered_start_date, entered_end_date, use_dates,
+                                resultValuesSeries)
+        emailsent = True
+    return emailsent
 
 def exportspreadsheet(request, resultValuesSeries, profileResult=True):
     # if the user hit the export csv button export the measurement results to csv
+
+
     myfile = StringIO.StringIO()
-    # raise ValidationError(resultValues)
+     # raise ValidationError(resultValues)
     k = 0
     variablesAndUnits = []
     variable = ''
@@ -1845,7 +1908,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
     else:
         template = loader.get_template('profileresultgraphpopup.html')
     selected_relatedfeatid = 15
-    data_disclaimer = DATA_DSICLAIMER
+    data_disclaimer = settings.DATA_DSICLAIMER
     # relatedfeatureList
     # update_result_on_related_feature
 
@@ -2088,7 +2151,8 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         name_of_units = removeDupsFromListOfStrings(name_of_units)
         # raise ValidationError(relatedFeatureList)
         return TemplateResponse(request, template,
-                                {'prefixpath': CUSTOM_TEMPLATE_PATH, 'variableList': variableList,
+                                {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+                                 'variableList': variableList,
                                  'SelectedVariables': int_selectedvariable_ids,
                                  'authenticated': authenticated, 'data_disclaimer': data_disclaimer,
                                  'chartID': chartID, 'chart': chart, 'series': series,
