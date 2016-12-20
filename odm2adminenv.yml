@@ -6,7 +6,6 @@ dependencies:
   - django=1.10
   - psycopg2
   - pip:
-    - django-uuidfield
     - django-ajax-selects
     - django-admin-shortcuts
     - djangocms-admin-style==0.2.7
