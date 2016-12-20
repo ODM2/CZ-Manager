@@ -24,7 +24,8 @@ from templatesAndSettings.settings import MEDIA_ROOT
 # from django.contrib.gis.db import models
 import csv
 import io
-from uuidfield import UUIDField
+import uuid
+from django.db.models import UUIDField
 from django.core import management
 from django.core.exceptions import ValidationError
 
@@ -1123,7 +1124,7 @@ class Datasetcitations(models.Model):
 
 class Datasets(models.Model):
     datasetid = models.AutoField(primary_key=True)
-    datasetuuid = UUIDField(auto=True)
+    datasetuuid = UUIDField(default=uuid.uuid4, editable=False)
     datasettypecv = models.ForeignKey(CvDatasettypecv, verbose_name="dataset type",
                                       db_column='datasettypecv')
     datasetcode = models.CharField(verbose_name="dataset code", max_length=50)
@@ -2135,7 +2136,7 @@ class Resultnormalizationvalues(models.Model):
 
 class Results(models.Model):
     resultid = models.AutoField(primary_key=True, verbose_name="result")
-    resultuuid = UUIDField(auto=True)
+    resultuuid = UUIDField(default=uuid.uuid4, editable=False)
     featureactionid = models.ForeignKey(Featureactions, related_name="feature_actions",
                                         verbose_name="sampling feature action",
                                         db_column='featureactionid')
@@ -2252,7 +2253,7 @@ class Samplingfeatureexternalidentifiers(models.Model):
 
 class Samplingfeatures(models.Model):
     samplingfeatureid = models.AutoField(primary_key=True)
-    samplingfeatureuuid = UUIDField(auto=True)
+    samplingfeatureuuid = UUIDField(default=uuid.uuid4, editable=False)
     sampling_feature_type = models.ForeignKey(CvSamplingfeaturetype,
                                               db_column='samplingfeaturetypecv')
     samplingfeaturecode = models.CharField(verbose_name='sampling feature code', max_length=50)
