@@ -1340,7 +1340,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     myresultSeriesExport = None
     if 'useDates' in request.POST:
         use_dates = bool(request.POST['useDates'])
-        if not use_dates:
+        if use_dates=='off':
              myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
                 .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
         else:
