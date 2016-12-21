@@ -2746,6 +2746,9 @@ class Timeseriesresultvaluesext(models.Model):
                                                        on_delete=models.DO_NOTHING)
     samplingfeaturename = models.CharField(verbose_name='sampling feature name',
                                            max_length=255, blank=True, null=True)
+    sampling_feature_type = models.ForeignKey(CvSamplingfeaturetype,
+                                              db_column='samplingfeaturetypecv',
+                                              on_delete=models.DO_NOTHING)
     processinglevelcode = models.CharField(verbose_name='processing level code', max_length=50)
     variablecode = models.CharField(verbose_name='variable code', max_length=50)
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
@@ -2823,6 +2826,9 @@ class Timeseriesresultvaluesextwannotations(models.Model):
                                                        on_delete=models.DO_NOTHING)
     samplingfeaturename = models.CharField(verbose_name='sampling feature name',
                                            max_length=255, blank=True, null=True)
+    sampling_feature_type = models.ForeignKey(CvSamplingfeaturetype,
+                                              db_column='samplingfeaturetypecv',
+                                              on_delete=models.DO_NOTHING)
     processinglevelcode = models.CharField(verbose_name='processing level code', max_length=50)
     variablecode = models.CharField(verbose_name='variable code', max_length=50)
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)

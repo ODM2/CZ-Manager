@@ -14,16 +14,19 @@ from django.http import HttpResponseRedirect
 from django.http import StreamingHttpResponse
 from django.shortcuts import render
 from django.template import loader
+from django.core.mail import EmailMessage
+from django.core import mail
 from django.template.response import TemplateResponse
 from django.core.exceptions import ObjectDoesNotExist
+import after_response
 from django.core import management
-from oauth2_provider.views.generic import ProtectedResourceView
+# from oauth2_provider.views.generic import ProtectedResourceView
 from django.http import HttpResponse
 import requests
 from django.conf import settings
 from templatesAndSettings.base import ADMIN_SHORTCUTS
 # from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
-# from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DSICLAIMER
+# from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DISCLAIMER
 # from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
 # from templatesAndSettings.settings import RECAPTCHA_PRIVATE_KEY
 from .models import Actions
@@ -435,7 +438,7 @@ def web_map(request, dataset='NotSet'):
     else:
         authenticated = False
     map_config = settings.MAP_CONFIG
-    data_disclaimer = settings.DATA_DSICLAIMER
+    data_disclaimer = settings.DATA_DISCLAIMER
 
     datasets = Datasets.objects.all()
     externalidentifiers = None
@@ -835,7 +838,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
                                 template,
                                 {'featureactionList': featureactionList,
                                  'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
-                                 'data_disclaimer': settings.DATA_DSICLAIMER,
+                                 'data_disclaimer': settings.DATA_DISCLAIMER,
                                  'resultList': resultList,
                                  'startDate': entered_start_date,
                                  'endDate': entered_end_date,
@@ -1071,7 +1074,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
         return TemplateResponse(request, template,
                                 {'featureactionList': featureactionList,
                                  'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
-                                 'data_disclaimer': settings.DATA_DSICLAIMER, 'resultList': resultList,
+                                 'data_disclaimer': settings.DATA_DISCLAIMER, 'resultList': resultList,
                                  'startDate': entered_start_date, 'endDate': entered_end_date,
                                  'SelectedResults': int_selectedresultid_ids,
                                  'authenticated': authenticated,
@@ -1100,7 +1103,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         template = loader.get_template('chart2.html')
     else:
         template = loader.get_template('chartpopup.html')
-    data_disclaimer = settings.DATA_DSICLAIMER
+    data_disclaimer = settings.DATA_DISCLAIMER
     useDataset = False
     useSamplingFeature = False
     if dataset == 'NotSet':
@@ -1217,7 +1220,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         template = loader.get_template('chart2.html')
     else:
         template = loader.get_template('chartpopup.html')
-    data_disclaimer = settings.DATA_DSICLAIMER
+    data_disclaimer = settings.DATA_DISCLAIMER
     map_config = settings.MAP_CONFIG
     useDataset = False
     useSamplingFeature = False
@@ -1407,13 +1410,15 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     graphType = 'line'
 
     int_selectedresultid_ids = []
+    str_selectedresultid_ids = []
     for int_selectedresultid in selectedMResultSeries:
         int_selectedresultid_ids.append(int(int_selectedresultid))
+        str_selectedresultid_ids.append(str(int_selectedresultid))
     csvexport = False
     # if the user hit the export csv button export the measurement results to csv
     emailsent = False
     if 'email_data' in request.POST:
-        emailsent = emailspreadsheet(request, myresultSeriesExport, False)
+        emailspreadsheet2.after_response(request, myresultSeriesExport, False) # for command str_selectedresultid_ids
         # csvexport = True
         # k=0
         # myfile = StringIO.StringIO()
@@ -1635,7 +1640,7 @@ def scatter_plot(request):
         return response
     return TemplateResponse(request, 'soilsscatterplot.html',
                             {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
-                             'data_disclaimer': settings.DATA_DSICLAIMER,
+                             'data_disclaimer': settings.DATA_DISCLAIMER,
                              'xVariables': variables, 'yVariables': variables,
                              'authenticated': authenticated,
                              'xVariableSelection': xVariableSelection,
@@ -1734,7 +1739,7 @@ def grecaptcha_verify(request):
         captcha_rs = data.get('g-recaptcha-response')
         url = "https://www.google.com/recaptcha/api/siteverify"
         params = {
-            'secret': settings.RECAPTCHA_SECRET_KEY,
+            'secret': settings.RECAPTCHA_PRIVATE_KEY,
             'response': captcha_rs,
             'remoteip': get_client_ip(request)
         }
@@ -1742,7 +1747,7 @@ def grecaptcha_verify(request):
         verify_rs = verify_rs.json()
         response["status"] = verify_rs.get("success", False)
         response['message'] = verify_rs.get('error-codes', None) or "Unspecified error."
-        return HttpResponse(response)
+        return response
 
 def emailspreadsheet(request, resultValuesSeries, profileResult=True):
     # if the user hit the export csv button export the measurement results to csv
@@ -1768,6 +1773,157 @@ def emailspreadsheet(request, resultValuesSeries, profileResult=True):
         emailsent = True
     return emailsent
 
+@after_response.enable
+def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
+    response = grecaptcha_verify(request)
+    captach_status = response["status"]
+    outgoingemail = ''
+    entered_start_date =''
+    entered_end_date =''
+    use_dates =''
+    emailsent = False
+    emailtitle = 'your ODM2 Admin data is attached'
+    emailtext = 'Attached are results for the following time series: '
+
+    if captach_status:
+        if 'useDates' in request.POST:
+            use_dates = request.POST['useDates']
+        if 'outEmail' in request.POST:
+            outgoingemail = request.POST['outEmail']
+            # print(outgoingemail)
+    tolist = []
+    tolist.append(str(outgoingemail))
+    # print(tolist)
+    
+    myfile = StringIO.StringIO()
+     # raise ValidationError(resultValues)
+    k = 0
+    variablesAndUnits = []
+    variable = ''
+    unit = ''
+    firstheader = True
+    processingCode = None
+    resultValuesHeaders = resultValuesSeries.filter(
+        ~Q(
+            sampling_feature_type="Ecological land classification"  # noqa
+        )
+    ).filter(
+        ~Q(
+            sampling_feature_type="Field area"  # noqa
+        )
+    ).order_by(
+        "variableid", "unitsid",
+        "processing_level"
+    )
+    # .distinct("resultid__resultid__variableid","resultid__resultid__unitsid")
+    for myresults in resultValuesHeaders:
+        lastVariable = variable
+        variable = myresults.resultid.resultid.variableid.variablecode
+        lastUnit = unit
+        unit = myresults.resultid.resultid.unitsid.unitsabbreviation
+        lastProcessingCode = processingCode
+        processingCode = myresults.resultid.resultid.processing_level.processinglevelcode
+        # if not firstheader and firstVar==variable and firstUnit==unit:
+        # only add the first instance of each variable, once one repeats your done.
+        # break
+        if not lastVariable == variable or not lastUnit == unit or not lastProcessingCode == \
+                processingCode:
+            variablesAndUnits.append(variable + unit + processingCode)
+            if firstheader:
+                myfile.write(myresults.csvheader())
+                firstheader = False
+            myfile.write(myresults.csvheaderShort())
+            emailtext = emailtext + ' - ' + myresults.csvheaderShort()
+            # elif not lastUnit==unit:
+            # myfile.write(myresults.csvheaderShortUnitOnly())
+    if profileResult:
+        resultValuesSeries = resultValuesSeries.filter(
+            ~Q(
+                resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Ecological land classification"  # noqa
+            )
+        ).filter(
+            ~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area"  # noqa
+               )
+        ).order_by(
+            "resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
+            "resultid__intendedzspacing", "resultid__resultid__variableid",
+            "resultid__resultid__unitsid__unitsabbreviation"
+        )
+    else:
+        resultValuesSeries = resultValuesSeries.filter(
+            ~Q(sampling_feature_type="Ecological land classification")  # noqa
+        ).filter(
+            ~Q(sampling_feature_type="Field area"  # noqa
+            )
+        ).order_by(
+            "valuedatetime",
+            "samplingfeaturename",
+            "variablecode", "unitsabbreviation",
+            "processinglevelcode"
+        )
+    # myfile.write(lastResult.csvheaderShort())
+    myfile.write('\n')
+
+    samplingFeatureCode = ''
+
+    depth = 0
+    position = 0
+    time = None
+
+    # resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode
+    for myresults in resultValuesSeries:
+        variable = myresults.resultid.resultid.variableid.variablecode
+        unit = myresults.resultid.resultid.unitsid.unitsabbreviation
+        lastSamplingFeatureCode = samplingFeatureCode
+        samplingFeatureCode = myresults.resultid.resultid.featureactionid.samplingfeatureid \
+            .samplingfeaturecode
+        lastDepth = depth
+        processingCode = myresults.resultid.resultid.processing_level.processinglevelcode
+        if profileResult:
+            depth = myresults.resultid.intendedzspacing
+
+            if not k == 0 and (not lastSamplingFeatureCode == samplingFeatureCode or
+                               not depth == lastDepth):
+                myfile.write('\n')
+                temp = myresults.csvoutput()
+                myfile.write(temp)
+                position = 0
+            elif k == 0:
+                temp = myresults.csvoutput()
+                myfile.write(temp)
+        else:
+            lastTime = time
+            time = myresults.valuedatetime
+            if not k == 0 and (not lastSamplingFeatureCode == samplingFeatureCode or
+                               not time == lastTime):
+                myfile.write('\n')
+                temp = myresults.csvoutput()
+                myfile.write(temp)
+                position = 0
+            elif k == 0:
+                temp = myresults.csvoutput()
+                myfile.write(temp)
+        # else:
+        # if variablesAndUnits.index(unicode(variable)+unicode(unit)) ==position:
+        for i in range(
+                position,
+                variablesAndUnits.index(variable +
+                                        unit +
+                                        processingCode)
+        ):
+            myfile.write(",")
+            position += 1
+        myfile.write(myresults.csvoutputShort())
+        position += 1
+        k += 1
+    # response = StreamingHttpResponse(myfile.getvalue(), content_type='text/csv')
+    # response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
+    email = EmailMessage(emailtitle,emailtext,
+                         'leonmi@sas.upenn.edu', tolist)
+    email.attach('mydata.csv', myfile.getvalue(),'text/csv')
+    email.send()
+    return True
+
 def exportspreadsheet(request, resultValuesSeries, profileResult=True):
     # if the user hit the export csv button export the measurement results to csv
 
@@ -1790,7 +1946,7 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
         )
     ).order_by(
         "resultid__resultid__variableid", "resultid__resultid__unitsid",
-        "resultid__resultid__processing_level"
+        "resultid__resultid__processing_level__processinglevelcode"
     )
     # .distinct("resultid__resultid__variableid","resultid__resultid__unitsid")
     for myresults in resultValuesHeaders:
@@ -1837,7 +1993,7 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
             "valuedatetime",
             "resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
             "resultid__resultid__variableid", "resultid__resultid__unitsid",
-            "resultid__resultid__processing_level"
+            "resultid__resultid__processing_level__processinglevelcode"
         )
     # myfile.write(lastResult.csvheaderShort())
     myfile.write('\n')
@@ -1856,7 +2012,7 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
         samplingFeatureCode = myresults.resultid.resultid.featureactionid.samplingfeatureid \
             .samplingfeaturecode
         lastDepth = depth
-        processingCode = myresults.resultid.resultid.processing_level
+        processingCode = myresults.resultid.resultid.processing_level.processinglevelcode
         if profileResult:
             depth = myresults.resultid.intendedzspacing
 
@@ -1896,6 +2052,10 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
         k += 1
     response = StreamingHttpResponse(myfile.getvalue(), content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
+    # email = EmailMessage(emailtitle,emailtext,
+    #                      'leonmi@sas.upenn.edu', tolist)
+    # email.attach('mydata.csv', myfile.getvalue(),'text/csv')
+    # email.send()
     return response
 
 
@@ -1908,7 +2068,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
     else:
         template = loader.get_template('profileresultgraphpopup.html')
     selected_relatedfeatid = 15
-    data_disclaimer = settings.DATA_DSICLAIMER
+    data_disclaimer = settings.DATA_DISCLAIMER
     # relatedfeatureList
     # update_result_on_related_feature
 

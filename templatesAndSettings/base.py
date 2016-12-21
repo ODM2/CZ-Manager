@@ -68,6 +68,7 @@ INSTALLED_APPS = (
     'import_export',
     'admin_shortcuts',
     'daterange_filter',
+    'after_response'
     'captcha',
     # 'dal',
     # 'dal_select2',
