@@ -1337,11 +1337,17 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                               .filter(resultid=selectedMResult).order_by('-valuedatetime'))
 
         data.update({'datavalue' + str(i): []})
-
-    myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
-        .filter(valuedatetime__gt=entered_start_date) \
-        .filter(valuedatetime__lt=entered_end_date) \
-        .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
+    myresultSeriesExport = None
+    if 'useDates' in request.POST:
+        use_dates = bool(request.POST['useDates'])
+        if not use_dates:
+             myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
+                .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
+        else:
+            myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
+                .filter(valuedatetime__gte=entered_start_date) \
+                .filter(valuedatetime__lte=entered_end_date) \
+                .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
 
     i = 0
 
@@ -1786,143 +1792,142 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
     emailtext = 'Attached are results for the following time series: '
 
     if captach_status:
-        if 'useDates' in request.POST:
-            use_dates = request.POST['useDates']
         if 'outEmail' in request.POST:
             outgoingemail = request.POST['outEmail']
             # print(outgoingemail)
-    tolist = []
-    tolist.append(str(outgoingemail))
-    # print(tolist)
-    
-    myfile = StringIO.StringIO()
-     # raise ValidationError(resultValues)
-    k = 0
-    variablesAndUnits = []
-    variable = ''
-    unit = ''
-    firstheader = True
-    processingCode = None
-    resultValuesHeaders = resultValuesSeries.filter(
-        ~Q(
-            sampling_feature_type="Ecological land classification"  # noqa
-        )
-    ).filter(
-        ~Q(
-            sampling_feature_type="Field area"  # noqa
-        )
-    ).order_by(
-        "variableid", "unitsid",
-        "processing_level"
-    )
-    # .distinct("resultid__resultid__variableid","resultid__resultid__unitsid")
-    for myresults in resultValuesHeaders:
-        lastVariable = variable
-        variable = myresults.resultid.resultid.variableid.variablecode
-        lastUnit = unit
-        unit = myresults.resultid.resultid.unitsid.unitsabbreviation
-        lastProcessingCode = processingCode
-        processingCode = myresults.resultid.resultid.processing_level.processinglevelcode
-        # if not firstheader and firstVar==variable and firstUnit==unit:
-        # only add the first instance of each variable, once one repeats your done.
-        # break
-        if not lastVariable == variable or not lastUnit == unit or not lastProcessingCode == \
-                processingCode:
-            variablesAndUnits.append(variable + unit + processingCode)
-            if firstheader:
-                myfile.write(myresults.csvheader())
-                firstheader = False
-            myfile.write(myresults.csvheaderShort())
-            emailtext = emailtext + ' - ' + myresults.csvheaderShort()
-            # elif not lastUnit==unit:
-            # myfile.write(myresults.csvheaderShortUnitOnly())
-    if profileResult:
-        resultValuesSeries = resultValuesSeries.filter(
+        tolist = []
+        tolist.append(str(outgoingemail))
+        # print(tolist)
+
+        myfile = StringIO.StringIO()
+         # raise ValidationError(resultValues)
+        k = 0
+        variablesAndUnits = []
+        variable = ''
+        unit = ''
+        firstheader = True
+        processingCode = None
+        resultValuesHeaders = resultValuesSeries.filter(
             ~Q(
-                resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Ecological land classification"  # noqa
+                sampling_feature_type="Ecological land classification"  # noqa
             )
         ).filter(
-            ~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area"  # noqa
-               )
-        ).order_by(
-            "resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
-            "resultid__intendedzspacing", "resultid__resultid__variableid",
-            "resultid__resultid__unitsid__unitsabbreviation"
-        )
-    else:
-        resultValuesSeries = resultValuesSeries.filter(
-            ~Q(sampling_feature_type="Ecological land classification")  # noqa
-        ).filter(
-            ~Q(sampling_feature_type="Field area"  # noqa
+            ~Q(
+                sampling_feature_type="Field area"  # noqa
             )
         ).order_by(
-            "valuedatetime",
-            "samplingfeaturename",
             "variablecode", "unitsabbreviation",
             "processinglevelcode"
         )
-    # myfile.write(lastResult.csvheaderShort())
-    myfile.write('\n')
-
-    samplingFeatureCode = ''
-
-    depth = 0
-    position = 0
-    time = None
-
-    # resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode
-    for myresults in resultValuesSeries:
-        variable = myresults.resultid.resultid.variableid.variablecode
-        unit = myresults.resultid.resultid.unitsid.unitsabbreviation
-        lastSamplingFeatureCode = samplingFeatureCode
-        samplingFeatureCode = myresults.resultid.resultid.featureactionid.samplingfeatureid \
-            .samplingfeaturecode
-        lastDepth = depth
-        processingCode = myresults.resultid.resultid.processing_level.processinglevelcode
+        # .distinct("resultid__resultid__variableid","resultid__resultid__unitsid")
+        for myresults in resultValuesHeaders:
+            lastVariable = variable
+            variable = myresults.variablecode
+            lastUnit = unit
+            unit = myresults.unitsabbreviation
+            lastProcessingCode = processingCode
+            processingCode = myresults.processinglevelcode
+            # if not firstheader and firstVar==variable and firstUnit==unit:
+            # only add the first instance of each variable, once one repeats your done.
+            # break
+            if not lastVariable == variable or not lastUnit == unit or not lastProcessingCode == \
+                    processingCode:
+                variablesAndUnits.append(variable + unit + processingCode)
+                if firstheader:
+                    myfile.write(myresults.csvheader())
+                    firstheader = False
+                myfile.write(myresults.csvheaderShort())
+                emailtext = emailtext + ' - ' + myresults.csvheaderShort()
+                # elif not lastUnit==unit:
+                # myfile.write(myresults.csvheaderShortUnitOnly())
         if profileResult:
-            depth = myresults.resultid.intendedzspacing
-
-            if not k == 0 and (not lastSamplingFeatureCode == samplingFeatureCode or
-                               not depth == lastDepth):
-                myfile.write('\n')
-                temp = myresults.csvoutput()
-                myfile.write(temp)
-                position = 0
-            elif k == 0:
-                temp = myresults.csvoutput()
-                myfile.write(temp)
+            resultValuesSeries = resultValuesSeries.filter(
+                ~Q(
+                    resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Ecological land classification"  # noqa
+                )
+            ).filter(
+                ~Q(resultid__resultid__featureactionid__samplingfeatureid__sampling_feature_type="Field area"  # noqa
+                   )
+            ).order_by(
+                "resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
+                "resultid__intendedzspacing", "resultid__resultid__variableid",
+                "resultid__resultid__unitsid__unitsabbreviation"
+            )
         else:
-            lastTime = time
-            time = myresults.valuedatetime
-            if not k == 0 and (not lastSamplingFeatureCode == samplingFeatureCode or
-                               not time == lastTime):
-                myfile.write('\n')
-                temp = myresults.csvoutput()
-                myfile.write(temp)
-                position = 0
-            elif k == 0:
-                temp = myresults.csvoutput()
-                myfile.write(temp)
-        # else:
-        # if variablesAndUnits.index(unicode(variable)+unicode(unit)) ==position:
-        for i in range(
-                position,
-                variablesAndUnits.index(variable +
-                                        unit +
-                                        processingCode)
-        ):
-            myfile.write(",")
+            resultValuesSeries = resultValuesSeries.filter(
+                ~Q(sampling_feature_type="Ecological land classification")  # noqa
+            ).filter(
+                ~Q(sampling_feature_type="Field area"  # noqa
+                )
+            ).order_by(
+                "valuedatetime",
+                "samplingfeaturename",
+                "variablecode", "unitsabbreviation",
+                "processinglevelcode"
+            )
+        # myfile.write(lastResult.csvheaderShort())
+        myfile.write('\n')
+
+        samplingfeaturename = ''
+        lastsamplingfeaturename = ''
+        depth = 0
+        position = 0
+        time = None
+
+        # resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename
+        for myresults in resultValuesSeries:
+            variable = myresults.variablecode
+            unit = myresults.unitsabbreviation
+            lastsamplingfeaturename = samplingfeaturename
+            samplingfeaturename = myresults.samplingfeaturename
+            lastDepth = depth
+            processingCode = myresults.processinglevelcode
+            if profileResult:
+                depth = myresults.resultid.intendedzspacing
+
+                if not k == 0 and (not lastsamplingfeaturename == samplingfeaturename or
+                                   not depth == lastDepth):
+                    myfile.write('\n')
+                    temp = myresults.csvoutput()
+                    myfile.write(temp)
+                    position = 0
+                elif k == 0:
+                    temp = myresults.csvoutput()
+                    myfile.write(temp)
+            else:
+                lastTime = time
+                time = myresults.valuedatetime
+                if not k == 0 and (not lastsamplingfeaturename == samplingfeaturename or
+                                   not time == lastTime):
+                    myfile.write('\n')
+                    temp = myresults.csvoutput()
+                    myfile.write(temp)
+                    position = 0
+                elif k == 0:
+                    temp = myresults.csvoutput()
+                    myfile.write(temp)
+            # else:
+            # if variablesAndUnits.index(unicode(variable)+unicode(unit)) ==position:
+            for i in range(
+                    position,
+                    variablesAndUnits.index(variable +
+                                            unit +
+                                            processingCode)
+            ):
+                myfile.write(",")
+                position += 1
+            myfile.write(myresults.csvoutputShort())
             position += 1
-        myfile.write(myresults.csvoutputShort())
-        position += 1
-        k += 1
-    # response = StreamingHttpResponse(myfile.getvalue(), content_type='text/csv')
-    # response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
-    email = EmailMessage(emailtitle,emailtext,
-                         'leonmi@sas.upenn.edu', tolist)
-    email.attach('mydata.csv', myfile.getvalue(),'text/csv')
-    email.send()
-    return True
+            k += 1
+        # response = StreamingHttpResponse(myfile.getvalue(), content_type='text/csv')
+        # response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
+        email = EmailMessage(emailtitle,emailtext,
+                             'do-not-reply-LuquilloCZO@sendgrid.net', tolist)
+        email.attach('mydata.csv', myfile.getvalue(),'text/csv')
+        email.send()
+        return True
+    else:
+        return False
 
 def exportspreadsheet(request, resultValuesSeries, profileResult=True):
     # if the user hit the export csv button export the measurement results to csv
