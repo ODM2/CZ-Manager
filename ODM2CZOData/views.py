@@ -1339,7 +1339,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         data.update({'datavalue' + str(i): []})
     myresultSeriesExport = None
     if 'useDates' in request.POST:
-        use_dates = bool(request.POST['useDates'])
+        use_dates = request.POST['useDates']
         if use_dates=='off':
              myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
                 .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
@@ -1423,8 +1423,11 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     csvexport = False
     # if the user hit the export csv button export the measurement results to csv
     emailsent = False
+    if 'outEmail' in request.POST:
+            outEmail = request.POST['outEmail']
     if 'email_data' in request.POST:
         emailspreadsheet2.after_response(request, myresultSeriesExport, False) # for command str_selectedresultid_ids
+        emailsent=True
         # csvexport = True
         # k=0
         # myfile = StringIO.StringIO()
@@ -1446,6 +1449,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                                                 'startDate': entered_start_date,
                                                 'endDate': entered_end_date,
                                                 'emailsent': emailsent,
+                                                'outEmail': outEmail,
                                                 'useSamplingFeature': useSamplingFeature,
                                                 'featureActionMethod': featureActionMethod,
                                                 'featureActionLocation': featureActionLocation,
