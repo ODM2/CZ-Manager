@@ -1207,6 +1207,41 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                                                 'authenticated': authenticated, 'methods': methods,
                                                 'resultList': resultList}, )
 
+def email_data_from_graph(request):
+    emailsent = False
+    outEmail = ''
+    entered_end_date = ''
+    entered_start_date = ''
+    myresultSeriesExport = []
+    if 'outEmail' in request.POST:
+            outEmail = request.POST['outEmail']
+    if 'email_data' in request.POST and 'myresultSeriesExport' in request.POST:
+        selectedMResultSeries = request.POST['myresultSeriesExport']
+        myresultSeriesExport = None
+        if 'useDates' in request.POST:
+            if 'endDate' in request.POST:
+                print(entered_end_date)
+                entered_end_date = request.POST['endDate']
+            if 'startDate' in request.POST:
+                entered_start_date = request.POST['startDate']
+            myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
+                    .filter(valuedatetime__gte=entered_start_date) \
+                    .filter(valuedatetime__lte=entered_end_date) \
+                    .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
+            i=0
+            for val in myresultSeriesExport:
+                print(val)
+                i+=1
+                if i >10:
+                    break
+        else:
+            myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
+                    .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
+        emailspreadsheet2.after_response(request, myresultSeriesExport, False) # for command str_selectedresultid_ids
+        emailsent=True
+    return HttpResponse({'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+                                                'emailsent': emailsent,
+                                                'outEmail': outEmail,},content_type='application/json')
 
 def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='NotSet',
                             dataset='NotSet',
@@ -1337,17 +1372,25 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                               .filter(resultid=selectedMResult).order_by('-valuedatetime'))
 
         data.update({'datavalue' + str(i): []})
-    myresultSeriesExport = None
-    if 'useDates' in request.POST:
-        use_dates = request.POST['useDates']
-        if use_dates=='off':
-             myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
-                .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
-        else:
-            myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
-                .filter(valuedatetime__gte=entered_start_date) \
-                .filter(valuedatetime__lte=entered_end_date) \
-                .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
+    # myresultSeriesExport = None
+    # if 'useDates' in request.POST:
+    #     use_dates = request.POST['useDates']
+    #     myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
+    #             .filter(valuedatetime__gte=entered_start_date) \
+    #             .filter(valuedatetime__lte=entered_end_date) \
+    #             .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
+    #
+    # else:
+    #     myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
+    #             .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
+    # if the user hit the export csv button export the measurement results to csv
+    # emailsent = False
+    # outEmail = ''
+    # if 'outEmail' in request.POST:
+    #         outEmail = request.POST['outEmail']
+    # if 'email_data' in request.POST:
+    #     emailspreadsheet2.after_response(request, myresultSeriesExport, False) # for command str_selectedresultid_ids
+    #     emailsent=True
 
     i = 0
 
@@ -1421,13 +1464,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         int_selectedresultid_ids.append(int(int_selectedresultid))
         str_selectedresultid_ids.append(str(int_selectedresultid))
     csvexport = False
-    # if the user hit the export csv button export the measurement results to csv
-    emailsent = False
-    if 'outEmail' in request.POST:
-            outEmail = request.POST['outEmail']
-    if 'email_data' in request.POST:
-        emailspreadsheet2.after_response(request, myresultSeriesExport, False) # for command str_selectedresultid_ids
-        emailsent=True
+
+
         # csvexport = True
         # k=0
         # myfile = StringIO.StringIO()
@@ -1448,8 +1486,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     return TemplateResponse(request, template, {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'startDate': entered_start_date,
                                                 'endDate': entered_end_date,
-                                                'emailsent': emailsent,
-                                                'outEmail': outEmail,
+                                                # 'emailsent': emailsent,
+                                                # 'outEmail': outEmail,
                                                 'useSamplingFeature': useSamplingFeature,
                                                 'featureActionMethod': featureActionMethod,
                                                 'featureActionLocation': featureActionLocation,
@@ -1746,7 +1784,7 @@ def grecaptcha_verify(request):
     if request.method == 'POST':
         response = {}
         data = request.POST
-        captcha_rs = data.get('g-recaptcha-response')
+        captcha_rs = data.get('g_recaptcha_response')
         url = "https://www.google.com/recaptcha/api/siteverify"
         params = {
             'secret': settings.RECAPTCHA_PRIVATE_KEY,
@@ -1787,6 +1825,7 @@ def emailspreadsheet(request, resultValuesSeries, profileResult=True):
 def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
     response = grecaptcha_verify(request)
     captach_status = response["status"]
+    # captach_status = True
     outgoingemail = ''
     entered_start_date =''
     entered_end_date =''
@@ -1796,6 +1835,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
     emailtext = 'Attached are results for the following time series: '
 
     if captach_status:
+        print("captach ok")
         if 'outEmail' in request.POST:
             outgoingemail = request.POST['outEmail']
             # print(outgoingemail)
@@ -1931,6 +1971,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
         email.send()
         return True
     else:
+        print("captcha not ok")
         return False
 
 def exportspreadsheet(request, resultValuesSeries, profileResult=True):

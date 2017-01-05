@@ -17,11 +17,52 @@ option {
 .loadinggif {
     background:url('http://www.hsi.com.hk/HSI-Net/pages/images/en/share/ajax-loader.gif') no-repeat right center;
 </style>
+<script>
+
+//$.getJSON('/er/poll/'+question_id ,function(data) {
+$(document).ready(function(){
+	$('#email_data').click(function(){
+	    console.log("clicked");
+		var outEmail = $("#outEmail").val();
+		var startDate = $("#startDate").val();
+		var email_data = true;
+		var endDate = $("#endDate").val();
+		var useDates = $("#useDates").val();
+		var g_recaptcha_response = $("#g-recaptcha-response").val();
+		var myresultSeriesExport = {{SelectedResults|safe}};
+		console.log(myresultSeriesExport);
+		var emailbutton = document.getElementById("email_data"); //$("#email_data");
+		console.log(emailbutton.firstChild.data);
+		emailbutton.firstChild.data = "emailing data";
+		$.ajax({
+				url: "{{prefixpath}}../emaildata/",
+				type: "POST",
+				dataType: "json",  
+				data: {
+					outEmail: outEmail,
+					email_data: email_data,
+					startDate: startDate,
+					endDate: endDate,
+					useDates: useDates,
+					g_recaptcha_response: g_recaptcha_response,
+					myresultSeriesExport: myresultSeriesExport,
+					csrfmiddlewaretoken: '{{ csrf_token }}', 
+				},
+				cache:false,
+				success: function(resp){
+					console.log(data);
+				}
+		});
+		});
+//	});
+});
+</script>
 <br>
 <br>
     
 	<form action="" method="post">
 	{% csrf_token %} 
+	
 	<table >
 	{% for method in methods %}
 	<tr><td>
@@ -41,14 +82,14 @@ option {
 			<input type="submit" name="update_chart" value="Update Chart" />
 			
 			</td></tr>
-			<tr><td><div class="g-recaptcha" data-sitekey="6LdTKw8UAAAAAFxRwp71gyxwlz-iigbOxzhcUdBi"></div></td></tr>
+			<tr><td><div class="g-recaptcha" data-sitekey="6Lc8RA8UAAAAAOG9JmCk7CSGIZG-js4PkmB8xFL9"></div></td></tr>
 			<tr><td><input id="useDates" type="checkbox" name="useDates" checked>use dates to filter data in email</input>
-			<input id="outEmail" maxlength="100" name="outEmail" type="text">Email data to:</input><input type="submit" name="email_data" value="Email Data" />
+			<input id="outEmail" maxlength="100" name="outEmail" type="text">Email data to:</input><button type="button" id="email_data" name="email_data">Email Data</button>
 			
 			</td></tr>
 	
 {% if emailsent %}
-<p>Email request received, your request is being processed.</p>			
+<p>Email request received, email will be delivered to {{outEmail}}</p>			
 {% endif %}
 
 	</td></tr></table>
