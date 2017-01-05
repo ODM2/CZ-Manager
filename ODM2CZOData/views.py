@@ -18,7 +18,6 @@ from django.core.mail import EmailMessage
 from django.core import mail
 from django.template.response import TemplateResponse
 from django.core.exceptions import ObjectDoesNotExist
-import after_response
 from django.core import management
 # from oauth2_provider.views.generic import ProtectedResourceView
 from django.http import HttpResponse
@@ -1213,14 +1212,12 @@ def email_data_from_graph(request):
     entered_end_date = ''
     entered_start_date = ''
     myresultSeriesExport = []
-    if 'outEmail' in request.POST:
-            outEmail = request.POST['outEmail']
-    if 'email_data' in request.POST and 'myresultSeriesExport' in request.POST:
-        selectedMResultSeries = request.POST['myresultSeriesExport']
+    if 'email_data' in request.POST and 'myresultSeriesExport[]' in request.POST:
+        selectedMResultSeries = request.POST.getlist('myresultSeriesExport[]')
         myresultSeriesExport = None
         if 'useDates' in request.POST:
             if 'endDate' in request.POST:
-                print(entered_end_date)
+                # print(entered_end_date)
                 entered_end_date = request.POST['endDate']
             if 'startDate' in request.POST:
                 entered_start_date = request.POST['startDate']
@@ -1228,16 +1225,12 @@ def email_data_from_graph(request):
                     .filter(valuedatetime__gte=entered_start_date) \
                     .filter(valuedatetime__lte=entered_end_date) \
                     .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
-            i=0
-            for val in myresultSeriesExport:
-                print(val)
-                i+=1
-                if i >10:
-                    break
         else:
             myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
                     .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
-        emailspreadsheet2.after_response(request, myresultSeriesExport, False) # for command str_selectedresultid_ids
+        emailspreadsheet2(request, myresultSeriesExport, False) # for command str_selectedresultid_ids
+        
+        # .after_response    
         emailsent=True
     return HttpResponse({'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'emailsent': emailsent,
@@ -1821,7 +1814,7 @@ def emailspreadsheet(request, resultValuesSeries, profileResult=True):
         emailsent = True
     return emailsent
 
-@after_response.enable
+# @after_response.enable
 def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
     response = grecaptcha_verify(request)
     captach_status = response["status"]
@@ -1835,7 +1828,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
     emailtext = 'Attached are results for the following time series: '
 
     if captach_status:
-        print("captach ok")
+        # print("captach ok")
         if 'outEmail' in request.POST:
             outgoingemail = request.POST['outEmail']
             # print(outgoingemail)
@@ -1971,7 +1964,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
         email.send()
         return True
     else:
-        print("captcha not ok")
+        # print("captcha not ok")
         return False
 
 def exportspreadsheet(request, resultValuesSeries, profileResult=True):

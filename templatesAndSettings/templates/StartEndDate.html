@@ -37,16 +37,15 @@ $(document).ready(function(){
 		$.ajax({
 				url: "{{prefixpath}}../emaildata/",
 				type: "POST",
-				dataType: "json",  
 				data: {
-					outEmail: outEmail,
-					email_data: email_data,
-					startDate: startDate,
-					endDate: endDate,
-					useDates: useDates,
-					g_recaptcha_response: g_recaptcha_response,
-					myresultSeriesExport: myresultSeriesExport,
-					csrfmiddlewaretoken: '{{ csrf_token }}', 
+					'outEmail': outEmail,
+					'email_data': email_data,
+					'startDate': startDate,
+					'endDate': endDate,
+					'useDates': useDates,
+					'g_recaptcha_response': g_recaptcha_response,
+					'myresultSeriesExport[]': myresultSeriesExport,
+					'csrfmiddlewaretoken': '{{ csrf_token }}', 
 				},
 				cache:false,
 				success: function(resp){
@@ -82,7 +81,7 @@ $(document).ready(function(){
 			<input type="submit" name="update_chart" value="Update Chart" />
 			
 			</td></tr>
-			<tr><td><div class="g-recaptcha" data-sitekey="6Lc8RA8UAAAAAOG9JmCk7CSGIZG-js4PkmB8xFL9"></div></td></tr>
+			<tr><td><div class="g-recaptcha" data-sitekey="6LdYnQ8UAAAAAI38kvlrKy4kF28VMYWnGO4dDjPA"></div></td></tr>
 			<tr><td><input id="useDates" type="checkbox" name="useDates" checked>use dates to filter data in email</input>
 			<input id="outEmail" maxlength="100" name="outEmail" type="text">Email data to:</input><button type="button" id="email_data" name="email_data">Email Data</button>
 			
