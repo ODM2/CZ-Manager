@@ -8,7 +8,5 @@ django-daterange-filter
 django-import-export
 django-jquery
 django-recaptcha
-django-after-response
 psycopg2
-requests
 
