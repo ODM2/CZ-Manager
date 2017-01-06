@@ -32,9 +32,17 @@ DEBUG = debug
 TEMPLATE_DEBUG = template_debug
 ADMINS = admins
 ALLOWED_HOSTS = []
+EMAIL_HOST = email_host
+EMAIL_HOST_USER = email_host_user
+EMAIL_HOST_PASSWORD = email_host_password
+EMAIL_USE_TLS = email_use_tls
+EMAIL_PORT = email_port
+RECAPTCHA_PUBLIC_KEY = recaptcha_public_key
+RECAPTCHA_PRIVATE_KEY = recaptcha_private_key
 
 MEDIA_ROOT = media_root
 MEDIA_URL = media_url
+
 # Application definition
 CUSTOM_TEMPLATE_PATH = custom_template_path
 # ADMIN_SHORTCUTS_PATH=admin_shortcuts_path
@@ -60,6 +68,7 @@ INSTALLED_APPS = (
     'import_export',
     'admin_shortcuts',
     'daterange_filter',
+    'captcha',
     # 'dal',
     # 'dal_select2',
     'ajax_select',

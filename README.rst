@@ -9,8 +9,8 @@ was created through National Science Foundation Grant EAR-1224638.
 Support for the development of this application comes
 from NSF Grant EAR-1331841 Luquillo CZO.
 
-Django models exist for all ODM2 tables. Forms for ODM2Core and some
-additional tables have been created. Graphing of measurement result
+Django models exist for all ODM2 tables. Forms for ODM2Core and
+a number of additional ODM2 tables. Graphing of measurement result
 values via highcharts are implemented. Data logger files can be
 imported as long as data logger file columns and results are properly
 setup.
@@ -25,7 +25,8 @@ database.
 
 An example postgresqldatabase named ODM2AdminExamplePostgresqlDB, this
 is a custom postgresql format backup which can be restored to an empty
-database.
+database. An extrasql.sql file contains some extra views used for 
+efficiently exporting data as emails. 
 
 You might find issues with psycopg2 on windows
 

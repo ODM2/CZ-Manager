@@ -2171,7 +2171,26 @@ class Results(models.Model):
 
     # def __unicode__(self):
     #    return u'%s - %s' % (self.resultid, self.feature_action)
+    @staticmethod
+    def csvheader():
+        s = 'databaseid,'
+        # s+='Value,'
+        s += 'Date and Time,'
+        # s += 'Variable Name,'
+        # s += 'Unit Name,'
+        # s += 'processing level,'
+        s += 'sampling feature/location,'
+        s += 'time aggregation interval,'
+        s += 'time aggregation unit,'
+        #s += 'citation,'
 
+        return s
+    def csvheaderShort(self):
+        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
+            self.variableid.variablecode,
+            self.unitsid.unitsabbreviation,
+            self.processing_level.processinglevelcode)
+        return s
     def __unicode__(self):
         return u"%s - %s - ID: %s" % (self.variableid, self.featureactionid, self.resultid)
 
@@ -2709,6 +2728,171 @@ class Timeseriesresultvalues(models.Model):
         db_table = r'odm2"."timeseriesresultvalues'
         verbose_name = 'time series result value'
 
+
+class Timeseriesresultvaluesext(models.Model):
+    valueid = models.AutoField(primary_key=True)
+    resultid = models.ForeignKey(Timeseriesresults, db_column='resultid',
+                                 on_delete=models.DO_NOTHING)
+    datavalue = models.FloatField()
+    valuedatetime = models.DateTimeField()
+    valuedatetimeutcoffset = models.IntegerField()
+    censorcodecv = models.ForeignKey(CvCensorcode, db_column='censorcodecv',
+                                     on_delete=models.DO_NOTHING)
+    qualitycodecv = models.ForeignKey(CvQualitycode, db_column='qualitycodecv',
+                                      on_delete=models.DO_NOTHING)
+    timeaggregationinterval = models.FloatField(verbose_name="Time Interval")
+    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+',
+                                                       verbose_name="Time Units",
+                                                       db_column='timeaggregationintervalunitsid',
+                                                       on_delete=models.DO_NOTHING)
+    samplingfeaturename = models.CharField(verbose_name='sampling feature name',
+                                           max_length=255, blank=True, null=True)
+    sampling_feature_type = models.ForeignKey(CvSamplingfeaturetype,
+                                              db_column='samplingfeaturetypecv',
+                                              on_delete=models.DO_NOTHING)
+    processinglevelcode = models.CharField(verbose_name='processing level code', max_length=50)
+    variablecode = models.CharField(verbose_name='variable code', max_length=50)
+    unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
+    aggregationstatisticname = models.CharField(primary_key=True, max_length=255)
+    def __unicode__(self):
+        s = u"%s " % self.resultid
+        s += u"- %s" % self.datavalue
+        s += u"- %s" % self.valuedatetime
+        return s
+
+    @staticmethod
+    def csvheader():
+        s = 'databaseid,'
+        # s+='Value,'
+        s += 'Date and Time,'
+        # s += 'Variable Name,'
+        # s += 'Unit Name,'
+        # s += 'processing level,'
+        s += 'sampling feature/location,'
+        s += 'time aggregation interval,'
+        s += 'time aggregation unit,'
+        #s += 'citation,'
+
+        return s
+    def csvheaderShort(self):
+        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
+            self.variablecode,
+            self.unitsabbreviation,
+            self.processinglevelcode)
+        return s
+    def csvoutput(self):
+        s = str(self.valueid)
+        # s += ', {0}'.format(self.datavalue)
+        s += ', {0}'.format(self.valuedatetime)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
+        s += ',\" {0}\"'.format(
+            self.samplingfeaturename)
+        s += ', {0}'.format(self.timeaggregationinterval)
+        s += ', {0},'.format(self.timeaggregationintervalunitsid)
+        #s = buildCitation(s, self)
+
+        # s += ' {0}\"'.format(citation.citationlink)
+        return s
+
+
+
+    def csvoutputShort(self):
+        s = '{0}'.format(self.datavalue)
+        s += ','
+        return s
+
+    class Meta:
+        managed = False
+        db_table = r'odm2extra"."timeseriesresultvaluesext'
+        verbose_name = 'time series result value'
+
+
+class Timeseriesresultvaluesextwannotations(models.Model):
+    valueid = models.AutoField(primary_key=True)
+    resultid = models.ForeignKey(Timeseriesresults, db_column='resultid',
+                                 on_delete=models.DO_NOTHING)
+    datavalue = models.FloatField()
+    valuedatetime = models.DateTimeField()
+    valuedatetimeutcoffset = models.IntegerField()
+    censorcodecv = models.ForeignKey(CvCensorcode, db_column='censorcodecv',
+                                     on_delete=models.DO_NOTHING)
+    qualitycodecv = models.ForeignKey(CvQualitycode, db_column='qualitycodecv',
+                                      on_delete=models.DO_NOTHING)
+    timeaggregationinterval = models.FloatField(verbose_name="Time Interval")
+    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+',
+                                                       verbose_name="Time Units",
+                                                       db_column='timeaggregationintervalunitsid',
+                                                       on_delete=models.DO_NOTHING)
+    samplingfeaturename = models.CharField(verbose_name='sampling feature name',
+                                           max_length=255, blank=True, null=True)
+    sampling_feature_type = models.ForeignKey(CvSamplingfeaturetype,
+                                              db_column='samplingfeaturetypecv',
+                                              on_delete=models.DO_NOTHING)
+    processinglevelcode = models.CharField(verbose_name='processing level code', max_length=50)
+    variablecode = models.CharField(verbose_name='variable code', max_length=50)
+    unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
+    aggregationstatisticname = models.CharField(primary_key=True, max_length=255)
+    annotationtext = models.CharField(max_length=500)
+    def __unicode__(self):
+        s = u"%s " % self.resultid
+        s += u"- %s" % self.datavalue
+        s += u"- %s" % self.valuedatetime
+        return s
+
+    @staticmethod
+    def csvheader():
+        s = 'databaseid,'
+        # s+='Value,'
+        s += 'Date and Time,'
+        # s += 'Variable Name,'
+        # s += 'Unit Name,'
+        # s += 'processing level,'
+        s += 'sampling feature/location,'
+        s += 'time aggregation interval,'
+        s += 'time aggregation unit,'
+        s += 'citation,'
+        return s
+
+    def csvoutput(self):
+        s = str(self.valueid)
+        # s += ', {0}'.format(self.datavalue)
+        s += ', {0}'.format(self.valuedatetime)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
+        # s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
+        s += ',\" {0}\"'.format(
+            self.samplingfeaturename)
+        s += ', {0}'.format(self.timeaggregationinterval)
+        s += ', {0},'.format(self.timeaggregationintervalunitsid)
+        s = buildCitation(s, self)
+
+        # s += ' {0}\"'.format(citation.citationlink)
+        return s
+
+    def csvheaderShort(self):
+        s = '\" {0} -unit-{1}-processing level-{2}\",annotation,'.format(
+            self.resultid.resultid.variableid.variablecode,
+            self.resultid.resultid.unitsid.unitsname,
+            self.resultid.resultid.processing_level)
+        return s
+
+    def csvoutputShort(self):
+        s = '{0}'.format(self.datavalue)
+        mrvannotation = Measurementresultvalueannotations.objects.filter(valueid=self.valueid)
+        annotations = Annotations.objects.filter(annotationid__in=mrvannotation)
+        s += ',\"'
+        for anno in annotations:
+            s += '{0} '.format(anno)
+        s += '\"'
+        s += ','
+        return s
+
+    class Meta:
+        managed = False
+        db_table = r'odm2extra"."timeseriesresultvaluesextwannotations'
+        verbose_name = 'time series result value'
 
 class Trajectoryresults(models.Model):
     resultid = models.OneToOneField(Results, db_column='resultid', primary_key=True)

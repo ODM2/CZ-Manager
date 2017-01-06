@@ -35,12 +35,13 @@ urlpatterns = [url(r'^' + URL_PATH + '', include(admin.site.urls)),
                url(r'^' + URL_PATH + 'mapdata.html/dataset=(?P<dataset>(\d+))/$',
                    views.web_map, name="WebMap"),
                url(r'^' + URL_PATH + 'mapdata.html', views.web_map, name="WebMap"),
-
+               #  url(r'^' + URL_PATH +'^login/$', login, {'template_name': 'login.html'}),
                url(r'^' + URL_PATH + 'graph/$', views.TimeSeriesGraphing),
                url(r'^' + URL_PATH + 'graph/featureaction=(?P<feature_action>(\d+))/$',
                    views.TimeSeriesGraphing, name="TimeSeriesGraphing"),
                # (?:featureaction-(?P<featureaction>\d+)/)?$  (?P<variable_a>(\d+)
                # (?P<feature_action>(\d+))
+               url(r'^' + URL_PATH + 'emaildata/$', views.email_data_from_graph),
                url(r'^' + URL_PATH + 'graphfa/featureaction=(?P<feature_action>(\d+))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
