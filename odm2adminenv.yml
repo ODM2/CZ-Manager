@@ -5,6 +5,7 @@ dependencies:
   - python=2.7
   - django=1.10
   - psycopg2
+  - requests
   - pip:
     - django-ajax-selects
     - django-admin-shortcuts
@@ -13,3 +14,4 @@ dependencies:
     - django-daterange-filter
     - django-import-export
     - django-jquery
+    - django-recaptcha
