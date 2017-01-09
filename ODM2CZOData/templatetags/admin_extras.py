@@ -4,8 +4,7 @@
 from django import template
 from django.contrib import admin
 from django.contrib.gis.geos import GEOSGeometry
-
-from templatesAndSettings.base import ADMIN_SHORTCUTS
+from django.core.management import settings
 
 register = template.Library()
 
@@ -94,7 +93,7 @@ def get_title(value, short):
     elif value == 'site_header':
         return admin.site.site_header
     elif value == 'shortcut_title':
-        return ADMIN_SHORTCUTS[0]['shortcuts'][short]['title']
+        return settings.ADMIN_SHORTCUTS[0]['shortcuts'][short]['title']
 
 
 @register.filter()

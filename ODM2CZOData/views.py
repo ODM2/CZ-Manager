@@ -16,14 +16,13 @@ from django.shortcuts import render
 from django.template import loader
 from django.core.mail import EmailMessage
 from django.core import mail
+from django.core.management import settings
 from django.template.response import TemplateResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.core import management
 # from oauth2_provider.views.generic import ProtectedResourceView
 from django.http import HttpResponse
 import requests
-from django.conf import settings
-from templatesAndSettings.base import ADMIN_SHORTCUTS
 # from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
 # from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DISCLAIMER
 # from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
@@ -279,7 +278,7 @@ def AddSensor(request):
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
-                   'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][1]['title']}
+                   'short_title': settings.ADMIN_SHORTCUTS[0]['shortcuts'][1]['title']}
         return TemplateResponse(request, 'AddSensor.html', context)
     else:
         return HttpResponseRedirect('../')
@@ -290,7 +289,7 @@ def chartIndex(request):
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
-                   'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][5]['title']}
+                   'short_title': settings.ADMIN_SHORTCUTS[0]['shortcuts'][5]['title']}
         return TemplateResponse(request, 'chartIndex.html', context)
     else:
         return HttpResponseRedirect('../')
@@ -302,7 +301,7 @@ def AddProfile(request):
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
-                   'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][2]['title']}
+                   'short_title': settings.ADMIN_SHORTCUTS[0]['shortcuts'][2]['title']}
         return TemplateResponse(request, 'AddProfile.html', context)
     else:
         return HttpResponseRedirect('../')
@@ -313,7 +312,7 @@ def RecordAction(request):
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
-                   'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][3]['title']}
+                   'short_title': settings.ADMIN_SHORTCUTS[0]['shortcuts'][3]['title']}
         return TemplateResponse(request, 'RecordAction.html', context)
     else:
         return HttpResponseRedirect('../')
@@ -324,7 +323,7 @@ def ManageCitations(request):
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
-                   'short_title': ADMIN_SHORTCUTS[0]['shortcuts'][4]['title']}
+                   'short_title': settings.ADMIN_SHORTCUTS[0]['shortcuts'][4]['title']}
         return TemplateResponse(request, 'ManageCitations.html', context)
     else:
         return HttpResponseRedirect('../')
@@ -1765,6 +1764,8 @@ def exportcitations(request, citations, csv):
         response['Content-Disposition'] = 'attachment; filename="myCitationsEndNoteImport.txt"'
 
     return response
+
+
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
@@ -1772,6 +1773,7 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
 
 def grecaptcha_verify(request):
     if request.method == 'POST':

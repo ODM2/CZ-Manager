@@ -3,69 +3,16 @@ Keep this file untracked
 """
 import os
 
-# Custom App settings
-app_name = "ODM2CZOData"  # This has to match the name of the folder that the app is saved
-verbose_name = "ODM2CZOData"
-site_title = "ODM2 Admin"
-site_header = "ODM2 Admin"
-map_config = {
-    "lat": 0,
-    "lon": 0,
-    "zoom": 2,
-    # MapBox
-    "MapBox": {
-        "access_token": 'mapbox accessToken'
-    },
-    # should sampling features of type site be added to marker clusters or not
-    "cluster_sites": False,
-    # how many months by default should time series generated from the map display
-    "time_series_months": 3,
-}
-
-data_disclaimer = {
-    "text": "Add a link discribing where your data come from ",
-    "linktext": "The name of my site",
-    "link": "http://mysiteswegpage.page/",
-
-}
-# SECURITY WARNING: keep the secret key used in production secret!
-secret_key = 'random_secret_key_like_so_7472873649836'
-_root = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin'
-
-media_root = '{}'.format(_root)
-media_url = '/odm2testapp/upfiles/'
-
-# Application definition
-custom_template_path = '/admin/{}/'.format(app_name)
-url_path = 'admin/'
-static_root = '{}/static'.format(_root)
-debug = True
-template_debug = True
-# Database
-# https://docs.djangoproject.com/en/1.7/ref/settings/#databases
-ODM2_configs = {
-
-    'ENGINE': 'django.contrib.gis.db.backends.postgis',  # 'django.db.backends.postgresql_psycopg2',
-    'NAME': 'name',
-    'USER': 'postgres',
-    'PASSWORD': 'password',
-    'HOST': 'localhost',
-    'PORT': '5432',
-    'OPTIONS': {
-        'options': '-c search_path=admin,odm2,odm2extra'
-    }
-}
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
-static_url = '/static/'
-
-admins = [{"name": "first last",
-           "email": "email@example.com"
-           }]
-
 # ========================================================================
 # ACTUAL SETTINGS ========================================================
+APP_NAME = "ODM2CZOData" # This has to match the name of the folder that the app is saved
+VERBOSE_NAME = "ODM2CZOData"
+
+SITE_HEADER = "ODM2 Admin"
+SITE_TITLE = "ODM2 Admin"
+
+ROOT = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin'
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 templates_dir = os.path.dirname(__file__)
 # TEMPLATE_DIR_APP = os.path.join(os.path.dirname(__file__), '..')
@@ -74,14 +21,14 @@ templates_path = os.path.join(templates_dir, 'templates')
 # print(TEMPLATE_PATH)
 templates_dirs = [templates_path, ]  # TEMPLATE_PATH2,
 
-email_host = 'smtp.host'
-email_host_user = 'user'
-email_host_password = 'password'
-email_from_address = 'do-not-reply-ODM2-Admin@cuahsi.org'
-recaptcha_public_key = 'googlerecaptchakey'
-recaptcha_private_key = 'googlerecaptchaprivatekey'
-email_use_tls = True
-email_port = 123
+EMAIL_HOST = 'smtp.host'
+EMAIL_HOST_USER = 'user'
+EMAIL_HOST_PASSWORD = 'password'
+EMAIL_FROM_ADDRESS = 'do-not-reply-ODM2-Admin@cuahsi.org'
+RECAPTCHA_PUBLIC_KEY = 'googlerecaptchakey'
+RECAPTCHA_PRIVATE_KEY = 'googlerecaptchaprivatekey'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 123
 
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -103,24 +50,43 @@ TEMPLATES = [{
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = secret_key
+SECRET_KEY = 'random_secret_key_like_so_7472873649836'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = debug
+DEBUG = True
 
 # TEMPLATE_DEBUG = template_debug
-ADMINS = admins
+ADMINS = [{"name": "first last",
+           "email": "email@example.com"
+           }]
 ALLOWED_HOSTS = []
 
-MEDIA_ROOT = media_root
-MEDIA_URL = media_url
+MEDIA_ROOT = '{}'.format(ROOT)
+MEDIA_URL = '/odm2testapp/upfiles/'
 # Application definition
-CUSTOM_TEMPLATE_PATH = custom_template_path
+CUSTOM_TEMPLATE_PATH = '/admin/{}/'.format(APP_NAME)
 # ADMIN_SHORTCUTS_PATH=admin_shortcuts_path
-URL_PATH = url_path
-STATIC_ROOT = static_root
-MAP_CONFIG = map_config
-DATA_DISCLAIMER = data_disclaimer
+URL_PATH = 'admin/'
+STATIC_ROOT = '{}/static'.format(ROOT)
+MAP_CONFIG = {
+    "lat": 0,
+    "lon": 0,
+    "zoom": 2,
+    # MapBox
+    "MapBox": {
+        "access_token": 'mapbox accessToken'
+    },
+    # should sampling features of type site be added to marker clusters or not
+    "cluster_sites": False,
+    # how many months by default should time series generated from the map display
+    "time_series_months": 3,
+}
+DATA_DISCLAIMER = {
+    "text": "Add a link discribing where your data come from ",
+    "linktext": "The name of my site",
+    "link": "http://mysiteswegpage.page/",
+
+}
 # https://github.com/mishbahr/django-modeladmin-reorder
 # {'app': 'auth', 'models': ('auth.User', 'auth.Group')},
 # ADMIN_REORDER = ('odm2testsite',
@@ -135,7 +101,7 @@ DATA_DISCLAIMER = data_disclaimer
 INSTALLED_APPS = (
     'jquery',
     'djangocms_admin_style',
-    '{}'.format(app_name),
+    '{}'.format(APP_NAME),
     'import_export',
     'admin_shortcuts',
     'daterange_filter',
@@ -166,37 +132,37 @@ ADMIN_SHORTCUTS = [
         'shortcuts': [
             {
                 'url': CUSTOM_TEMPLATE_PATH,
-                'app_name': '{}'.format(app_name),
-                'title': '{} Admin'.format(verbose_name),
+                'app_name': '{}'.format(APP_NAME),
+                'title': '{} Admin'.format(VERBOSE_NAME),
                 'class': 'config',
             },
             {
                 'url': '/' + URL_PATH + 'AddSensor.html',
-                'app_name': '{}'.format(app_name),
+                'app_name': '{}'.format(APP_NAME),
                 'title': 'Add Sensor Data',
                 'class': 'tool',
             },
             {
                 'url': '/' + URL_PATH + 'AddProfile.html',
-                'app_name': '{}'.format(app_name),
+                'app_name': '{}'.format(APP_NAME),
                 'title': 'Add Soil Profile Data',
                 'class': 'flag',
             },
             {
                 'url': '/' + URL_PATH + 'RecordAction.html',
-                'app_name': '{}'.format(app_name),
+                'app_name': '{}'.format(APP_NAME),
                 'title': 'Record an Action',
                 'class': 'notepad',
             },
             {
                 'url': '/' + URL_PATH + 'ManageCitations.html',
-                'app_name': '{}'.format(app_name),
+                'app_name': '{}'.format(APP_NAME),
                 'title': 'Manage Citations',
                 'class': 'pencil',
             },
             {
                 'url': '/' + URL_PATH + 'chartIndex.html',
-                'app_name': '{}'.format(app_name),
+                'app_name': '{}'.format(APP_NAME),
                 'title': 'Graph My Data',
                 'class': 'monitor',
             },
@@ -210,21 +176,21 @@ ADMIN_SHORTCUTS_SETTINGS = {
 
 # https://github.com/crucialfelix/django-ajax-selects
 AJAX_LOOKUP_CHANNELS = dict(
-    cv_variable_name=('{}.lookups'.format(app_name), 'CvVariableNameLookup'),
-    cv_variable_type=('{}.lookups'.format(app_name), 'CvVariableTypeLookup'),
-    cv_unit_type=('{}.lookups'.format(app_name), 'CvUnitTypeLookup'),
-    cv_speciation=('{}.lookups'.format(app_name), 'CvVariableSpeciationLookup'),
-    featureaction_lookup=('{}.lookups'.format(app_name), 'FeatureactionsLookup'),
-    result_lookup=('{}.lookups'.format(app_name), 'ResultsLookup'),
-    profileresult_lookup=('{}.lookups'.format(app_name), 'ProfileResultsLookup'),
-    measurementresult_lookup=('{}.lookups'.format(app_name), 'MeasurementResultsLookup'),
-    timeseriesresult_lookup=('{}.lookups'.format(app_name), 'TimeseriesResultsLookup'),
-    cv_taxonomic_classifier_type=('{}.lookups'.format(app_name), 'CvTaxonomicClassifierTypeLookup'),
-    cv_method_type=('{}.lookups'.format(app_name), 'CvMethodTypeLookup'),
-    cv_action_type=('{}.lookups'.format(app_name), 'CvActionTypeLookup'),
-    cv_sampling_feature_type=('{}.lookups'.format(app_name), 'CvSamplingFeatureTypeLookup'),
-    cv_sampling_feature_geo_type=('{}.lookups'.format(app_name), 'CvSamplingFeatureGeoTypeLookup'),
-    cv_elevation_datum=('{}.lookups'.format(app_name), 'CvElevationDatumLookup'))
+    cv_variable_name=('{}.lookups'.format(APP_NAME), 'CvVariableNameLookup'),
+    cv_variable_type=('{}.lookups'.format(APP_NAME), 'CvVariableTypeLookup'),
+    cv_unit_type=('{}.lookups'.format(APP_NAME), 'CvUnitTypeLookup'),
+    cv_speciation=('{}.lookups'.format(APP_NAME), 'CvVariableSpeciationLookup'),
+    featureaction_lookup=('{}.lookups'.format(APP_NAME), 'FeatureactionsLookup'),
+    result_lookup=('{}.lookups'.format(APP_NAME), 'ResultsLookup'),
+    profileresult_lookup=('{}.lookups'.format(APP_NAME), 'ProfileResultsLookup'),
+    measurementresult_lookup=('{}.lookups'.format(APP_NAME), 'MeasurementResultsLookup'),
+    timeseriesresult_lookup=('{}.lookups'.format(APP_NAME), 'TimeseriesResultsLookup'),
+    cv_taxonomic_classifier_type=('{}.lookups'.format(APP_NAME), 'CvTaxonomicClassifierTypeLookup'),
+    cv_method_type=('{}.lookups'.format(APP_NAME), 'CvMethodTypeLookup'),
+    cv_action_type=('{}.lookups'.format(APP_NAME), 'CvActionTypeLookup'),
+    cv_sampling_feature_type=('{}.lookups'.format(APP_NAME), 'CvSamplingFeatureTypeLookup'),
+    cv_sampling_feature_geo_type=('{}.lookups'.format(APP_NAME), 'CvSamplingFeatureGeoTypeLookup'),
+    cv_elevation_datum=('{}.lookups'.format(APP_NAME), 'CvElevationDatumLookup'))
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -245,15 +211,17 @@ WSGI_APPLICATION = 'templatesAndSettings.wsgi.application'
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
 DATABASES = {
     'default': {
-        'ENGINE': ODM2_configs['ENGINE'],
-        'NAME': ODM2_configs['NAME'],
-        'USER': ODM2_configs['USER'],
-        'PASSWORD': ODM2_configs['PASSWORD'],
-        'HOST': ODM2_configs['HOST'],
-        'PORT': ODM2_configs['PORT'],
-        'OPTIONS': ODM2_configs['OPTIONS'],
-
-    }}
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'odm2',
+        'USER': 'postgres',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'PORT': '5432',
+        'OPTIONS': {
+            'options': '-c search_path=admin,odm2,odm2extra'
+        }
+    }
+}
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
@@ -270,5 +238,5 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
-STATIC_URL = static_url
+STATIC_URL = '/static/'
 # =======================================================

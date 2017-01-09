@@ -24,33 +24,33 @@ TEMPLATE_DIRS = [TEMPLATE_PATH, ]  # TEMPLATE_PATH2,
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = secret_key
+SECRET_KEY = SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = debug
+DEBUG = DEBUG
 
-TEMPLATE_DEBUG = template_debug
-ADMINS = admins
+# TEMPLATE_DEBUG = TEMPLATE_DEBUG
+ADMINS = ADMINS
 ALLOWED_HOSTS = []
-EMAIL_HOST = email_host
-EMAIL_HOST_USER = email_host_user
-EMAIL_HOST_PASSWORD = email_host_password
-EMAIL_USE_TLS = email_use_tls
-EMAIL_PORT = email_port
-EMAIL_FROM_ADDRESS = email_from_address
-RECAPTCHA_PUBLIC_KEY = recaptcha_public_key
-RECAPTCHA_PRIVATE_KEY = recaptcha_private_key
+EMAIL_HOST = EMAIL_HOST
+EMAIL_HOST_USER = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
+EMAIL_USE_TLS = EMAIL_USE_TLS
+EMAIL_PORT = EMAIL_PORT
+EMAIL_FROM_ADDRESS = EMAIL_FROM_ADDRESS
+RECAPTCHA_PUBLIC_KEY = RECAPTCHA_PUBLIC_KEY
+RECAPTCHA_PRIVATE_KEY = RECAPTCHA_PRIVATE_KEY
 
-MEDIA_ROOT = media_root
-MEDIA_URL = media_url
+MEDIA_ROOT = MEDIA_ROOT
+MEDIA_URL = MEDIA_URL
 
 # Application definition
-CUSTOM_TEMPLATE_PATH = custom_template_path
+CUSTOM_TEMPLATE_PATH = CUSTOM_TEMPLATE_PATH
 # ADMIN_SHORTCUTS_PATH=admin_shortcuts_path
-URL_PATH = url_path
-STATIC_ROOT = static_root
-MAP_CONFIG = map_config
-DATA_DISCLAIMER = data_disclaimer
+URL_PATH = URL_PATH
+STATIC_ROOT = STATIC_ROOT
+MAP_CONFIG = MAP_CONFIG
+DATA_DISCLAIMER = DATA_DISCLAIMER
 # https://github.com/mishbahr/django-modeladmin-reorder
 # {'app': 'auth', 'models': ('auth.User', 'auth.Group')},
 # ADMIN_REORDER = ('odm2testsite',
@@ -65,7 +65,7 @@ DATA_DISCLAIMER = data_disclaimer
 INSTALLED_APPS = (
     'jquery',
     'djangocms_admin_style',
-    '{}'.format(app_name),
+    '{}'.format(APP_NAME),
     'import_export',
     'admin_shortcuts',
     'daterange_filter',
@@ -91,72 +91,14 @@ TEMPLATE_LOADERS = (
 # find icon images here https://github.com/alesdotio/
 # django-admin-shortcuts/blob/master/admin_shortcuts/
 # templatetags/admin_shortcuts_tags.py#L134
-ADMIN_SHORTCUTS = [
-    {
-
-        'shortcuts': [
-            {
-                'url': CUSTOM_TEMPLATE_PATH,
-                'app_name': '{}'.format(app_name),
-                'title': '{} Admin'.format(verbose_name),
-                'class': 'config',
-            },
-            {
-                'url': '/' + URL_PATH + 'AddSensor.html',
-                'app_name': '{}'.format(app_name),
-                'title': 'Add Sensor Data',
-                'class': 'tool',
-            },
-            {
-                'url': '/' + URL_PATH + 'AddProfile.html',
-                'app_name': '{}'.format(app_name),
-                'title': 'Add Soil Profile Data',
-                'class': 'flag',
-            },
-            {
-                'url': '/' + URL_PATH + 'RecordAction.html',
-                'app_name': '{}'.format(app_name),
-                'title': 'Record an Action',
-                'class': 'notepad',
-            },
-            {
-                'url': '/' + URL_PATH + 'ManageCitations.html',
-                'app_name': '{}'.format(app_name),
-                'title': 'Manage Citations',
-                'class': 'pencil',
-            },
-            {
-                'url': '/' + URL_PATH + 'chartIndex.html',
-                'app_name': '{}'.format(app_name),
-                'title': 'Graph My Data',
-                'class': 'monitor',
-            },
-        ]
-    },
-]
+ADMIN_SHORTCUTS = ADMIN_SHORTCUTS
 ADMIN_SHORTCUTS_SETTINGS = {
     'hide_app_list': False,
     'open_new_window': False,
 }
 
 # https://github.com/crucialfelix/django-ajax-selects
-AJAX_LOOKUP_CHANNELS = dict(
-    cv_variable_name=('{}.lookups'.format(app_name), 'CvVariableNameLookup'),
-    cv_variable_type=('{}.lookups'.format(app_name), 'CvVariableTypeLookup'),
-    cv_unit_type=('{}.lookups'.format(app_name), 'CvUnitTypeLookup'),
-    cv_speciation=('{}.lookups'.format(app_name), 'CvVariableSpeciationLookup'),
-    featureaction_lookup=('{}.lookups'.format(app_name), 'FeatureactionsLookup'),
-    result_lookup=('{}.lookups'.format(app_name), 'ResultsLookup'),
-    profileresult_lookup=('{}.lookups'.format(app_name), 'ProfileResultsLookup'),
-    measurementresult_lookup=('{}.lookups'.format(app_name), 'MeasurementResultsLookup'),
-    timeseriesresult_lookup=('{}.lookups'.format(app_name), 'TimeseriesResultsLookup'),
-    cv_taxonomic_classifier_type=('{}.lookups'.format(app_name),
-                                  'CvTaxonomicClassifierTypeLookup'),
-    cv_method_type=('{}.lookups'.format(app_name), 'CvMethodTypeLookup'),
-    cv_action_type=('{}.lookups'.format(app_name), 'CvActionTypeLookup'),
-    cv_sampling_feature_type=('{}.lookups'.format(app_name), 'CvSamplingFeatureTypeLookup'),
-    cv_sampling_feature_geo_type=('{}.lookups'.format(app_name), 'CvSamplingFeatureGeoTypeLookup'),
-    cv_elevation_datum=('{}.lookups'.format(app_name), 'CvElevationDatumLookup'))
+AJAX_LOOKUP_CHANNELS = AJAX_LOOKUP_CHANNELS
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -175,17 +117,7 @@ WSGI_APPLICATION = 'templatesAndSettings.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': ODM2_configs['ENGINE'],
-        'NAME': ODM2_configs['NAME'],
-        'USER': ODM2_configs['USER'],
-        'PASSWORD': ODM2_configs['PASSWORD'],
-        'HOST': ODM2_configs['HOST'],
-        'PORT': ODM2_configs['PORT'],
-        'OPTIONS': ODM2_configs['OPTIONS'],
-
-    }}
+DATABASES = DATABASES
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
@@ -202,4 +134,4 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
-STATIC_URL = static_url
+STATIC_URL = STATIC_URL
