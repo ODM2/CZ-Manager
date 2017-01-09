@@ -212,7 +212,7 @@ WSGI_APPLICATION = 'templatesAndSettings.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'odm2',
+        'NAME': 'name',
         'USER': 'postgres',
         'PASSWORD': 'password',
         'HOST': 'localhost',
