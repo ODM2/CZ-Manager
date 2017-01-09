@@ -22,7 +22,6 @@ option {
 //$.getJSON('/er/poll/'+question_id ,function(data) {
 $(document).ready(function(){
 	$('#email_data').click(function(){
-	    console.log("clicked");
 		var outEmail = $("#outEmail").val();
 		var startDate = $("#startDate").val();
 		var email_data = true;
@@ -30,9 +29,7 @@ $(document).ready(function(){
 		var useDates = $("#useDates").val();
 		var g_recaptcha_response = $("#g-recaptcha-response").val();
 		var myresultSeriesExport = {{SelectedResults|safe}};
-		console.log(myresultSeriesExport);
 		var emailbutton = document.getElementById("email_data"); //$("#email_data");
-		console.log(emailbutton.firstChild.data);
 		emailbutton.firstChild.data = "emailing data";
 		$.ajax({
 				url: "{{prefixpath}}../emaildata/",
@@ -48,9 +45,6 @@ $(document).ready(function(){
 					'csrfmiddlewaretoken': '{{ csrf_token }}', 
 				},
 				cache:false,
-				success: function(resp){
-					console.log(data);
-				}
 		});
 		});
 //	});

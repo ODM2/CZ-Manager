@@ -37,6 +37,7 @@ EMAIL_HOST_USER = email_host_user
 EMAIL_HOST_PASSWORD = email_host_password
 EMAIL_USE_TLS = email_use_tls
 EMAIL_PORT = email_port
+EMAIL_FROM_ADDRESS = email_from_address
 RECAPTCHA_PUBLIC_KEY = recaptcha_public_key
 RECAPTCHA_PRIVATE_KEY = recaptcha_private_key
 
