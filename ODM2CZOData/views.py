@@ -1959,7 +1959,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
         # response = StreamingHttpResponse(myfile.getvalue(), content_type='text/csv')
         # response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
         email = EmailMessage(emailtitle,emailtext,
-                             'do-not-reply-LuquilloCZO@sendgrid.net', tolist)
+                             settings.EMAIL_FROM_ADDRESS, tolist)
         email.attach('mydata.csv', myfile.getvalue(),'text/csv')
         email.send()
         return True

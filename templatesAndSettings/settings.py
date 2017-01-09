@@ -77,6 +77,7 @@ templates_dirs = [templates_path, ]  # TEMPLATE_PATH2,
 email_host = 'smtp.host'
 email_host_user = 'user'
 email_host_password = 'password'
+email_from_address = 'do-not-reply-ODM2-Admin@cuahsi.org'
 recaptcha_public_key = 'googlerecaptchakey'
 recaptcha_private_key = 'googlerecaptchaprivatekey'
 email_use_tls = True
