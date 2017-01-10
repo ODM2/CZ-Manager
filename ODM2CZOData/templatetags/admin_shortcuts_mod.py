@@ -2,17 +2,11 @@ import copy
 import inspect
 
 from django import template
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
+from django.core.management import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext
-
-# from templatesAndSettings.settings import *
-from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
-from templatesAndSettings.settings import app_name
-from templatesAndSettings.settings import verbose_name
-from templatesAndSettings.settings import URL_PATH
 
 try:
     from django.utils.module_loading import import_module
@@ -32,14 +26,14 @@ def admin_shortcuts_filter(context):
 
                 'shortcuts': [
                     {
-                        'url': CUSTOM_TEMPLATE_PATH,
-                        'app_name': '{}'.format(app_name),
-                        'title': '{} Admin'.format(verbose_name),
+                        'url': settings.CUSTOM_TEMPLATE_PATH,
+                        'app_name': '{}'.format(settings.APP_NAME),
+                        'title': '{} Admin'.format(settings.VERBOSE_NAME),
                         'class': 'config',
                     },
                     {
-                        'url': '/' + URL_PATH + 'chartIndex.html',
-                        'app_name': '{}'.format(app_name),
+                        'url': '/' + settings.URL_PATH + 'chartIndex.html',
+                        'app_name': '{}'.format(settings.APP_NAME),
                         'title': 'Graph My Data',
                         'class': 'monitor',
                     },

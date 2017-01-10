@@ -1,6 +1,7 @@
 # from __future__ import unicode_literals
 from django.contrib.gis import forms, admin
 from django.contrib.gis.geos import GEOSGeometry
+from django.core.management import settings
 from django.forms import CharField
 from django.forms import ModelForm
 from django.forms import TypedChoiceField
@@ -10,7 +11,6 @@ from import_export import resources
 from import_export.admin import ExportMixin
 from import_export.admin import ImportExportActionModelAdmin
 
-from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
 from .models import Actionby
 from .models import Actions
 from .models import Affiliations
@@ -231,11 +231,11 @@ class MethodcitationsAdmin(ReadOnlyAdmin):
     list_display = ('method_id', 'method_link', 'relationshiptypecv', 'citation_link')
 
     def method_link(self, obj):
-        return u'<a href="%smethods/%s/">See Method</a>' % (CUSTOM_TEMPLATE_PATH,
+        return u'<a href="%smethods/%s/">See Method</a>' % (settings.CUSTOM_TEMPLATE_PATH,
                                                             obj.methodid.methodid)
 
     def citation_link(self, obj):
-        return u'<a href="%scitations/%s/">%s</a>' % (CUSTOM_TEMPLATE_PATH,
+        return u'<a href="%scitations/%s/">%s</a>' % (settings.CUSTOM_TEMPLATE_PATH,
                                                       obj.citationid.citationid,
                                                       obj.citationid)
 
@@ -1110,7 +1110,7 @@ class DatasetsAdmin(ReadOnlyAdmin):
         extra_context = extra_context or {}
         extra_context['DatasetResultsList'] = self.get_datasetsresults(object_id)
         extra_context['ResultsList'] = self.get_results(object_id)
-        extra_context['prefixpath'] = CUSTOM_TEMPLATE_PATH
+        extra_context['prefixpath'] = settings.CUSTOM_TEMPLATE_PATH
         return super(DatasetsAdmin, self).change_view(request, object_id, form_url,
                                                       extra_context=extra_context)
 
@@ -1631,7 +1631,7 @@ class MeasurementresultsAdmin(ReadOnlyAdmin):
 
     def data_link(self, obj):
         return u'<a href="%sfeatureactions/%s/">%s</a>' % (
-            CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid,
+            settings.CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid,
             obj.resultid.featureactionid)
 
     data_link.short_description = 'sampling feature action'
@@ -1701,7 +1701,7 @@ class TimeseriesresultsAdmin(ReadOnlyAdmin):
 
     def data_link(self, obj):
         return u'<a href="%sfeatureactions/%s/">%s</a>' % (
-            CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid,
+            settings.CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid,
             obj.resultid.featureactionid)
 
     data_link.short_description = 'sampling feature action'

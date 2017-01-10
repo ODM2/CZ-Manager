@@ -1,8 +1,7 @@
 from django.apps import AppConfig
-
-from templatesAndSettings.settings import app_name, verbose_name
+from django.core.management import settings
 
 
 class ODM2AdminConfig(AppConfig):
-    name = '{}'.format(app_name)
-    verbose_name = '{}'.format(verbose_name)
+    name = '{}'.format(settings.APP_NAME)
+    verbose_name = '{}'.format(settings.VERBOSE_NAME)
