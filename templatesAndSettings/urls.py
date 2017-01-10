@@ -17,7 +17,7 @@ admin.site.site_title = settings.SITE_TITLE
 # admin_site.admin_view()
 urlpatterns = [url(r'^' + settings.URL_PATH + '', include(admin.site.urls)),
                url(r'^' + settings.URL_PATH + 'lookups/', include(ajax_select_urls)),
-               url(r'^$', lambda r: HttpResponseRedirect('admin/{}/'.format(settings.APP_NAME))),
+               url(r'^$', lambda r: HttpResponseRedirect(settings.URL_PATH + '{}/'.format(settings.APP_NAME))),
                url(r'^' + settings.URL_PATH + 'AddSensor.html', views.AddSensor, name="AddSensor"),
                url(r'^' + settings.URL_PATH + 'chartIndex.html', views.chartIndex,
                    name="chartIndex"),
