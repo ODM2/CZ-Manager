@@ -1,0 +1,48 @@
+# YAML
+App: odm2admin # This has to match the name of the folder that the app is saved
+
+Name: ODM2CZOData
+Site Title: ODM2 Admin
+Site Header: ODM2 Admin
+
+Map Config:
+  lat: 0
+  lon: 0
+  zoom: 2
+  MapBox:
+    access_token: mapbox accessToken
+  cluster_sites: False
+  time_series_months: 3
+
+Data Disclaimer:
+  text: Add a link discribing where your data come from
+  linktext: The name of my site
+  link: http://mysiteswegpage.page/
+
+Secret Key: random_secret_key_like_so_7472873649836
+Root: C:/Users/leonmi/Google Drive/ODM2Djangoadmin
+
+Database config:
+  name: db_name
+  user: postgres
+  password: database password
+  host: 127.0.0.1
+  port: 5432
+
+Administrator:
+  - name: first last
+    email: email@example.com
+
+
+Email Host: 'smtp.host'
+User: 'user'
+Password: 'password'
+Email From Address: 'do-not-reply-ODM2-Admin@cuahsi.org'
+Recaptcha Public Key: 'googlerecaptchakey'
+Recaptcha Private Key: 'googlerecaptchaprivatekey'
+Use TLS: True
+Email PORT: 123
+
+Debug: True
+
+
