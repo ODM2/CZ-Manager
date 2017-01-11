@@ -1,17 +1,20 @@
 name: odm2adminenv
 channels:
   - conda-forge
+  - defaults
 dependencies:
   - python=2.7
   - django=1.10
   - psycopg2
   - requests
-  - pip:
-    - django-ajax-selects
-    - django-admin-shortcuts
-    - djangocms-admin-style==0.2.7
-    - django-apptemplates
-    - django-daterange-filter
-    - django-import-export
-    - django-jquery
+  - django-admin-shortcuts
+  - django-ajax-selects
+  - django-apptemplates
+  - django-daterange-filter
+  - django-import-export
+  - django-jquery
+  - django-uuidfield
+  - djangocms-admin-style==0.2.7
+  - pip
     - django-recaptcha
+

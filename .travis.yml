@@ -19,8 +19,14 @@ matrix:
 
 
 before_install:
-  - pip install -r requirements.txt
-  - pip install -r requirements-dev.txt
+    - wget http://bit.ly/miniconda -O miniconda.sh
+    - bash miniconda.sh -b -p $HOME/miniconda
+    - export PATH="$HOME/miniconda/bin:$PATH"
+    - conda update conda --yes
+    - conda config --add channels conda-forge --force
+    - conda create --yes -n TEST python=$TRAVIS_PYTHON_VERSION --file requirements.txt --file requirements-dev.txt
+    - source activate TEST
+
 
 install:
   - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2djangoadmin-${version}.tar.gz && popd
