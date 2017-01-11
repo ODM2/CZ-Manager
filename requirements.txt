@@ -1,4 +1,4 @@
-django==1.10.3
+django==1.10.5
 django-ajax-selects
 django-admin-shortcuts
 djangocms_admin_style
