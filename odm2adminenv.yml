@@ -4,17 +4,16 @@ channels:
   - defaults
 dependencies:
   - python=2.7
-  - django=1.10
-  - psycopg2
-  - requests
   - django-admin-shortcuts
   - django-ajax-selects
   - django-apptemplates
   - django-daterange-filter
   - django-import-export
   - django-jquery
-  - django-uuidfield
+  - django=1.10
   - djangocms-admin-style==0.2.7
+  - psycopg2
+  - requests
   - pip
     - django-recaptcha
 
