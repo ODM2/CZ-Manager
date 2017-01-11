@@ -5,13 +5,13 @@ import os
 
 # ========================================================================
 # ACTUAL SETTINGS ========================================================
-APP_NAME = "ODM2CZOData" # This has to match the name of the folder that the app is saved
+APP_NAME = "odm2admin" # This has to match the name of the folder that the app is saved
 VERBOSE_NAME = "ODM2CZOData"
 
 SITE_HEADER = "ODM2 Admin"
 SITE_TITLE = "ODM2 Admin"
 
-ROOT = 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin'
+ROOT = 'C:/Users/leonmi/Google Drive/ODM2AdminFolder'
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 templates_dir = os.path.dirname(__file__)

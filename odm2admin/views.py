@@ -1998,9 +1998,9 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
         lastVariable = variable
         variable = myresults.resultid.resultid.variableid.variablecode
         lastUnit = unit
-        unit = myresults.resultid.resultid.unitsid
+        unit = myresults.resultid.resultid.unitsid.unitsabbreviation
         lastProcessingCode = processingCode
-        processingCode = myresults.resultid.resultid.processing_level
+        processingCode = myresults.resultid.resultid.processing_level.processinglevelcode
         # if not firstheader and firstVar==variable and firstUnit==unit:
         # only add the first instance of each variable, once one repeats your done.
         # break
@@ -2052,7 +2052,7 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
     # resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode
     for myresults in resultValuesSeries:
         variable = myresults.resultid.resultid.variableid.variablecode
-        unit = myresults.resultid.resultid.unitsid
+        unit = myresults.resultid.resultid.unitsid.unitsabbreviation
         lastSamplingFeatureCode = samplingFeatureCode
         samplingFeatureCode = myresults.resultid.resultid.featureactionid.samplingfeatureid \
             .samplingfeaturecode
