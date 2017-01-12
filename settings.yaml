@@ -19,6 +19,7 @@ Data Disclaimer:
   linktext: The name of my site
   link: http://mysiteswegpage.page/
 
+# Operational Settings
 Secret Key: random_secret_key_like_so_7472873649836
 Root: C:/Users/leonmi/Google Drive/ODM2Djangoadmin
 
@@ -44,5 +45,14 @@ Use TLS: True
 Email PORT: 123
 
 Debug: True
+Allowed Hosts: # Needed when debug is False
+  - dev-odm2admin.cuahsi.org
+  - odm2admin.cuahsi.org
+
+Media Root: C:/Users/leonmi/Google Drive/ODM2Djangoadmin
+Media URL: /odm2testapp/upfiles/
+Custom Template Path: /admin/odm2admin/
+URL Path: admin/
+Static Root: C:/Users/leonmi/Google Drive/ODM2Djangoadmin/static
 
 

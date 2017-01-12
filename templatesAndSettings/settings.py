@@ -30,7 +30,6 @@ DATABASES['default']['HOST'] = configs['Database config']['host']
 DATABASES['default']['PORT'] = configs['Database config']['port']
 
 ADMINS = configs['Administrator']
-
 APP_NAME = configs['App']
 
 EMAIL_HOST = configs['Email Host']
@@ -47,5 +46,13 @@ EMAIL_PORT = configs['Email PORT']
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 DEBUG = configs['Debug']
+if not DEBUG:
+    ALLOWED_HOSTS = configs['Allowed Hosts']
+
+MEDIA_ROOT = configs['Media Root']
+MEDIA_URL = configs['Media URL']
+CUSTOM_TEMPLATE_PATH = configs['Custom Template Path']
+URL_PATH = configs['URL Path']
+STATIC_ROOT = configs['Static Root']
 
 # =======================================================
