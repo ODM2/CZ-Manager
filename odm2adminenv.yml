@@ -15,5 +15,6 @@ dependencies:
   - psycopg2
   - requests
   - pip
+  - pip:
     - django-recaptcha
 
