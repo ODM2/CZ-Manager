@@ -9,4 +9,5 @@ django-jquery
 django-recaptcha
 psycopg2
 requests
+pyyaml
 
