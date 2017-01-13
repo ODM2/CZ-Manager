@@ -46,8 +46,7 @@ EMAIL_PORT = configs['Email PORT']
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 DEBUG = configs['Debug']
-if not DEBUG:
-    ALLOWED_HOSTS = configs['Allowed Hosts']
+ALLOWED_HOSTS = configs['Allowed Hosts']
 
 MEDIA_ROOT = configs['Media Root']
 MEDIA_URL = configs['Media URL']
