@@ -11,10 +11,9 @@ dependencies:
   - django-import-export
   - django-jquery
   - django=1.10
+  # Pinned to 0.2.7 to preserve page style.
   - djangocms-admin-style==0.2.7
   - psycopg2
   - requests
-  - pip
-  - pip:
-    - django-recaptcha
+  - django-recaptcha
 
