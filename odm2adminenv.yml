@@ -1,18 +1,19 @@
 name: odm2test
 channels:
   - conda-forge
+  - defaults
 dependencies:
   - python=2.7
-  - django=1.10
+  - django-admin-shortcuts
+  - django-ajax-selects
+  - django-apptemplates
+  - django-daterange-filter
+  - django-import-export
+  - django-jquery
+  - django==1.10.5
+  # Pinned to 0.2.7 to preserve page style.
+  - djangocms-admin-style==0.2.7
   - psycopg2
   - requests
+  - django-recaptcha
   - pyyaml
-  - pip:
-    - django-ajax-selects
-    - django-admin-shortcuts
-    - djangocms-admin-style
-    - django-apptemplates
-    - django-daterange-filter
-    - django-import-export
-    - django-jquery
-    - django-recaptcha
