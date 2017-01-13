@@ -10,3 +10,4 @@ djangocms-admin-style==0.2.7
 psycopg2
 requests
 django-recaptcha
+pyyaml

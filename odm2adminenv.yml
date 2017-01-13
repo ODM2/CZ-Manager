@@ -1,4 +1,4 @@
-name: odm2adminenv
+name: odm2test
 channels:
   - conda-forge
   - defaults
@@ -16,4 +16,4 @@ dependencies:
   - psycopg2
   - requests
   - django-recaptcha
-
+  - pyyaml
