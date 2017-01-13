@@ -15,7 +15,7 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
-def extract_version(module='odm2djangoadmin'):
+def extract_version(module='odm2admin'):
     version = None
     fdir = os.path.dirname(__file__)
     fnme = os.path.join(fdir, module, '__init__.py')
@@ -43,7 +43,7 @@ with open('requirements.txt') as f:
     require = f.readlines()
 install_requires = [r.strip() for r in require]
 
-setup(name='odm2djangoadmin',
+setup(name='odm2admin',
       version=extract_version(),
       license=LICENSE,
       long_description=long_description,
@@ -63,12 +63,7 @@ setup(name='odm2djangoadmin',
       platforms='any',
       keywords=['ODM2', 'Django'],
       install_requires=install_requires,
-      packages=['odm2djangoadmin',
-                'odm2djangoadmin/templatesAndSettings',
-                'odm2djangoadmin/ODM2CZOData',
-                'odm2djangoadmin/ODM2CZOData/migrations',
-                'odm2djangoadmin/ODM2CZOData/templatetags'
-                ],
+      packages=['odm2admin',],
       tests_require=['pytest'],
       cmdclass=dict(test=PyTest),
       author=['Miguel Leon'],
