@@ -28,6 +28,25 @@ is a custom postgresql format backup which can be restored to an empty
 database. An extrasql.sql file contains some extra views used for 
 efficiently exporting data as emails. 
 
+
+**Primary Installation**
+
+pip install -r requirements.txt
+or
+
+# creates an env with the depepencies
+conda create --yes -n ENVNAME python=3.5 --file requirements.txt
+
+# install the dependencies in the current env similar to the pip command above
+conda install --file requirements.txt
+
+You will need to run extrasql.sql on a postgreSQL instance of ODM2,
+a blank schema script can be found here
+(https://github.com/ODM2/ODM2/tree/master/src/blank_schema_scripts/postgresql).
+
+**Alternate Installation - if you have issues creating the environment above
+you may want to create it manually**
+
 You might find issues with psycopg2 on windows
 
 To install psycopg2 for windows follow the instructions here:
@@ -39,7 +58,7 @@ into your python library for instance
 ``C:\Python27\Lib\site-packages\psycopg2\``
 support tested for django 1.6.5 and 1.9.x
 
-python 2.7
+For python 2.7
 run pip install for each of these
 
 for geoDjango you will need to install osgeo4w
@@ -71,9 +90,4 @@ https://django-import-export.readthedocs.org/en/latest/installation.html
 
 django-jquery
 
-**Alternate Installation**
-
-If you have conda python package manager, the environment configuration
-file ``odm2adminenv.yml`` can be installed to run ODM2-Admin.
-
-``$ conda env create -f odm2adminenv.yml``
+django-recaptcha
