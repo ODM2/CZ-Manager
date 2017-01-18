@@ -13,6 +13,10 @@ Map Config:
     access_token: mapbox accessToken
   cluster_sites: False
   time_series_months: 3
+  result_value_processing_levels_to_display:
+    - 1
+    - 2
+    - 3
 
 Data Disclaimer:
   text: Add a link discribing where your data come from

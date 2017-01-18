@@ -94,6 +94,7 @@ MAP_CONFIG = {
     "cluster_sites": False,
     # how many months by default should time series generated from the map display
     "time_series_months": 3,
+    "result_value_processing_levels_to_display": { 1,2,3, },
 }
 DATA_DISCLAIMER = {
     "text": "Add a link discribing where your data come from ",
