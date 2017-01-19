@@ -15,8 +15,6 @@ APP_NAME = 'odm2admin'
 VERBOSE_NAME = 'ODM2CZOData'
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-SITE_HEADER = os.path.basename(BASE_DIR)
-SITE_TITLE = os.path.basename(BASE_DIR)
 
 ROOT = os.path.dirname(BASE_DIR) # 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin'
 
@@ -60,19 +58,6 @@ TEMPLATES = [{
 SECRET_KEY = 'random_secret_key_like_so_7472873649836'
 
 # TEMPLATE_DEBUG = TEMPLATE_DEBUG
-ADMINS = [{"name": "first last",
-           "email": "email@example.com"
-           }]
-ALLOWED_HOSTS = []
-EMAIL_HOST = 'smtp.host'
-EMAIL_HOST_USER = 'user'
-EMAIL_HOST_PASSWORD = 'password'
-EMAIL_FROM_ADDRESS = 'do-not-reply-ODM2-Admin@cuahsi.org'
-RECAPTCHA_PUBLIC_KEY = 'googlerecaptchakey'
-RECAPTCHA_PRIVATE_KEY = 'googlerecaptchaprivatekey'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 123
-
 
 MEDIA_ROOT = '{}'.format(ROOT)
 MEDIA_URL = '/odm2testapp/upfiles/'
@@ -82,25 +67,7 @@ CUSTOM_TEMPLATE_PATH = '/admin/{}/'.format(APP_NAME)
 # ADMIN_SHORTCUTS_PATH=admin_shortcuts_path
 URL_PATH = 'admin/'
 STATIC_ROOT = '{}/static'.format(ROOT)
-MAP_CONFIG = {
-    "lat": 0,
-    "lon": 0,
-    "zoom": 2,
-    # MapBox
-    "MapBox": {
-        "access_token": 'mapbox accessToken'
-    },
-    # should sampling features of type site be added to marker clusters or not
-    "cluster_sites": False,
-    # how many months by default should time series generated from the map display
-    "time_series_months": 3,
-}
-DATA_DISCLAIMER = {
-    "text": "Add a link discribing where your data come from ",
-    "linktext": "The name of my site",
-    "link": "http://mysiteswegpage.page/",
 
-}
 # https://github.com/mishbahr/django-modeladmin-reorder
 # {'app': 'auth', 'models': ('auth.User', 'auth.Group')},
 # ADMIN_REORDER = ('odm2testsite',

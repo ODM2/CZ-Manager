@@ -1132,15 +1132,14 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                 featureActions = Featureactions.objects.\
                     filter(samplingfeatureid=samplefeature).\
                     order_by("action__method")
-                resultList = Results.objects.filter(featureactionid__in=featureActions).filter(
-                    ~Q(processing_level=4)).order_by("featureactionid__action__method")
+                resultList = Results.objects.filter(featureactionid__in=featureActions)\
+                    .order_by("featureactionid__action__method")
                 actions = Actions.objects.filter(actionid__in=featureActions.values("action"))
                 methods = Methods.objects.filter(methodid__in=actions.values("method"))
                 featureActionLocation = samplefeature.samplingfeaturename
             else:
-                resultList = Results.objects.filter(featureactionid=feature_action).filter(
-                    ~Q(processing_level=4)).order_by(
-                    "featureactionid__action__method")
+                resultList = Results.objects.filter(featureactionid=feature_action)\
+                    .order_by("featureactionid__action__method")
                 featureActions = Featureactions.objects.filter(featureactionid=feature_action).get()
                 featureActionLocation = featureActions.samplingfeatureid.samplingfeaturename
                 featureActionMethod = featureActions.action.method.methodname
@@ -1149,8 +1148,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         else:
             datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
             resultList = Results.objects.filter(resultid__in=datasetResults.values(
-                "resultid")).filter(
-                ~Q(processing_level=4)).order_by("featureactionid__action__method")
+                "resultid")).order_by("featureactionid__action__method")
             datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
             datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
     except(ObjectDoesNotExist) as e:
@@ -1280,18 +1278,21 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     datasetTitle = None
     datasetAbstract = None
     methods = None
+    # print(settings.MAP_CONFIG['result_value_processing_levels_to_display'])
     if not useDataset:
         if useSamplingFeature:
             samplefeature = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
             feature_actions = Featureactions.objects.filter(samplingfeatureid=samplefeature)
             resultList = Results.objects.filter(featureactionid__in=feature_actions).filter(
-                ~Q(processing_level=4)).order_by("featureactionid","resultid")
+                 processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
+                 ).order_by("featureactionid","resultid")
             actions = Actions.objects.filter(actionid__in=feature_actions.values("action"))
             methods = Methods.objects.filter(methodid__in=actions.values("method"))
             featureActionLocation = samplefeature.samplingfeaturename
         else:
             resultList = Results.objects.filter(featureactionid=feature_action).filter(
-                ~Q(processing_level=4)).order_by("featureactionid","resultid")
+                 processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
+                 ).order_by("featureactionid","resultid")
             featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
             featureActionLocation = featureAction.samplingfeatureid.samplingfeaturename
             featureActionMethod = featureAction.action.method.methodname
@@ -1301,7 +1302,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     else:
         datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
         resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid")).filter(
-            ~Q(processing_level=4)).order_by("featureactionid","resultid")
+             processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
+             ).order_by("featureactionid","resultid")
         datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
         datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
     numresults = resultList.count()
@@ -1324,7 +1326,14 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                 html = "<html><body>No Data Available Yet.</body></html>"
                 return HttpResponse(html)
         else:
-            selectedMResultSeries.append(int(resultidu))
+            try:
+                Results.objects.filter(resultid=int(resultidu)).filter(
+                   processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
+                ).get()
+                selectedMResultSeries.append(int(resultidu))
+            except ObjectDoesNotExist:
+                html = "<html><body>No Data Available Yet.</body></html>"
+                return HttpResponse(html)
 
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
