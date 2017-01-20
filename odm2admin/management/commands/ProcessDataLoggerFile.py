@@ -15,14 +15,14 @@ from django.db import IntegrityError
 from django.db import transaction
 from django.db.models import Min, Max
 
-from ODM2CZOData.models import CvCensorcode
-from ODM2CZOData.models import CvQualitycode
-from ODM2CZOData.models import Dataloggerfilecolumns
-from ODM2CZOData.models import Dataloggerfiles
-from ODM2CZOData.models import Extensionproperties
-from ODM2CZOData.models import Resultextensionpropertyvalues
-from ODM2CZOData.models import Timeseriesresults
-from ODM2CZOData.models import Timeseriesresultvalues
+from odm2admin.models import CvCensorcode
+from odm2admin.models import CvQualitycode
+from odm2admin.models import Dataloggerfilecolumns
+from odm2admin.models import Dataloggerfiles
+from odm2admin.models import Extensionproperties
+from odm2admin.models import Resultextensionpropertyvalues
+from odm2admin.models import Timeseriesresults
+from odm2admin.models import Timeseriesresultvalues
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
 
@@ -49,31 +49,31 @@ def updateStartDateEndDate(results, startdate, enddate):
     StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
     EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
     # result = results#.objects.get(resultid=results.resultid.resultid)
-    repvstart = None
-    repvend = None
-    try:
+    if Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
+            propertyid=StartDateProperty).exists() and Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
+            propertyid=EndDateProperty).exists():
         # raise CommandError(" start date "str(startdate)))
         #
-        repvstart = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
-            propertyid=StartDateProperty) #.update(propertyvalue=startdate)
-        repvstart.propertyvalue=startdate
+        Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
+            propertyid=StartDateProperty).update(propertyvalue=startdate)
+        # repvstart.propertyvalue=startdate
 
-        repvend = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
-            propertyid=EndDateProperty) #.update(propertyvalue=enddate)
-        repvend.prepertyvalue = enddate
+        Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
+            propertyid=EndDateProperty).update(propertyvalue=enddate)
+        # repvend.propertyvalue = enddate
 
-    except ObjectDoesNotExist:
+    else:
         # raise CommandError("couldn't find extension property values " +str(repvstart) + "for " +
         # str(StartDateProperty + "for" + str(results))
         repvstart = Resultextensionpropertyvalues(resultid=results, propertyid=StartDateProperty,
                                                   propertyvalue=startdate)
         # print(repvstart.propertyvalue)
-        #repvstart.save()
+        repvstart.save()
         repvend = Resultextensionpropertyvalues(resultid=results, propertyid=EndDateProperty,
                                                 propertyvalue=enddate)
         # print(repvend.propertyvalue)
-        #repvend.save()
-    return repvstart, repvend
+        repvend.save()
+    # return repvstart, repvend
 
 
 class Command(BaseCommand):
@@ -249,8 +249,8 @@ class Command(BaseCommand):
                     enddate = Timeseriesresultvalues.objects.filter(resultid=result).annotate(
                         Max('valuedatetime')). \
                         order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-                    repvstart, repvend = updateStartDateEndDate(result, startdate, enddate)
-                    bulkpropertyvals.append(repvstart)
-                    bulkpropertyvals.append(repvend)
-        #will bulk create or update the property values
-        Resultextensionpropertyvalues.objects.bulk_create(bulkpropertyvals)
+                    updateStartDateEndDate(result, startdate, enddate) # repvstart, repvend =
+                    # bulkpropertyvals.append(repvstart)
+                    # bulkpropertyvals.append(repvend)
+        # will bulk create or update the property values
+        # Resultextensionpropertyvalues.objects.bulk_create(bulkpropertyvals)

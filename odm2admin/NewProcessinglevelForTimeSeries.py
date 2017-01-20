@@ -6,10 +6,10 @@ application = get_wsgi_application()
 
 from datetime import datetime
 import warnings
-import ODM2CZOData.modelHelpers as modelHelpers
-from ODM2CZOData.models import Timeseriesresults
-from ODM2CZOData.models import Timeseriesresultvalues
-from ODM2CZOData.models import Processinglevels
+import odm2admin.modelHelpers as modelHelpers
+from odm2admin.models import Timeseriesresults
+from odm2admin.models import Timeseriesresultvalues
+from odm2admin.models import Processinglevels
 
 
 # range 0 to 26.7

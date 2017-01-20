@@ -13,29 +13,29 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.db import transaction
 from django.db.models import Q
 
-from ODM2CZOData.models import Actions
-from ODM2CZOData.models import Annotations
-from ODM2CZOData.models import CvAggregationstatistic
-from ODM2CZOData.models import CvAnnotationtype
-from ODM2CZOData.models import CvCensorcode
-from ODM2CZOData.models import CvMedium
-from ODM2CZOData.models import CvQualitycode
-from ODM2CZOData.models import CvRelationshiptype
-from ODM2CZOData.models import CvResulttype
-from ODM2CZOData.models import CvStatus
-from ODM2CZOData.models import Featureactions
-from ODM2CZOData.models import Measurementresults
-from ODM2CZOData.models import Measurementresultvalueannotations
-from ODM2CZOData.models import Measurementresultvalues
-from ODM2CZOData.models import People
-from ODM2CZOData.models import Processinglevels
-from ODM2CZOData.models import Profileresults
-from ODM2CZOData.models import Profileresultvalues
-from ODM2CZOData.models import Relatedfeatures
-from ODM2CZOData.models import Results
-from ODM2CZOData.models import Samplingfeatures
-from ODM2CZOData.models import Units
-from ODM2CZOData.models import Variables
+from odm2admin.models import Actions
+from odm2admin.models import Annotations
+from odm2admin.models import CvAggregationstatistic
+from odm2admin.models import CvAnnotationtype
+from odm2admin.models import CvCensorcode
+from odm2admin.models import CvMedium
+from odm2admin.models import CvQualitycode
+from odm2admin.models import CvRelationshiptype
+from odm2admin.models import CvResulttype
+from odm2admin.models import CvStatus
+from odm2admin.models import Featureactions
+from odm2admin.models import Measurementresults
+from odm2admin.models import Measurementresultvalueannotations
+from odm2admin.models import Measurementresultvalues
+from odm2admin.models import People
+from odm2admin.models import Processinglevels
+from odm2admin.models import Profileresults
+from odm2admin.models import Profileresultvalues
+from odm2admin.models import Relatedfeatures
+from odm2admin.models import Results
+from odm2admin.models import Samplingfeatures
+from odm2admin.models import Units
+from odm2admin.models import Variables
 
 __author__ = 'leonmi'
 
