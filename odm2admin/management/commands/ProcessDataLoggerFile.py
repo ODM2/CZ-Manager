@@ -49,9 +49,7 @@ def updateStartDateEndDate(results, startdate, enddate):
     StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
     EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
     # result = results#.objects.get(resultid=results.resultid.resultid)
-    if Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
-            propertyid=StartDateProperty).exists() and Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
-            propertyid=EndDateProperty).exists():
+    try:
         # raise CommandError(" start date "str(startdate)))
         #
         Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
@@ -62,7 +60,7 @@ def updateStartDateEndDate(results, startdate, enddate):
             propertyid=EndDateProperty).update(propertyvalue=enddate)
         # repvend.propertyvalue = enddate
 
-    else:
+    except ObjectDoesNotExist:
         # raise CommandError("couldn't find extension property values " +str(repvstart) + "for " +
         # str(StartDateProperty + "for" + str(results))
         repvstart = Resultextensionpropertyvalues(resultid=results, propertyid=StartDateProperty,
