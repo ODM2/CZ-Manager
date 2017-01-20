@@ -232,14 +232,16 @@ class Command(BaseCommand):
                     # Timeseriesresults.objects.raw("SELECT odm2.\
                     # "TimeseriesresultValsToResultsCountvalue\"()")
             Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
+            bulktimeseriesvalues = None
+
         except IndexError:
             raise ValidationError('encountered a problem with row ' + str(i) for i in row)
         bulkpropertyvals = []
         for colnum in rowColumnMap:
             results = Timeseriesresults.objects.filter(resultid=colnum.resultid)
             for result in results:
-                mrvs_count = len(Timeseriesresultvalues.objects.filter(resultid=result))
-                if mrvs_count > 0:
+                mrvsexist = Timeseriesresultvalues.objects.filter(resultid=result).exists()
+                if mrvsexist:
                     startdate = Timeseriesresultvalues.objects.filter(resultid=result).annotate(
                         Min('valuedatetime')). \
                         order_by('valuedatetime')[0].valuedatetime.strftime(
