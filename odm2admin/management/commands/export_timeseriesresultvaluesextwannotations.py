@@ -11,9 +11,9 @@ import re
 from django.core.management.base import BaseCommand, CommandError
 from django.core.mail import EmailMessage
 from django.core import mail
-from ODM2CZOData.models import Timeseriesresultvaluesext
-from ODM2CZOData.models import Results
-from ODM2CZOData.models import Timeseriesresultvaluesextwannotations
+from odm2admin.models import Timeseriesresultvaluesext
+from odm2admin.models import Results
+from odm2admin.models import Timeseriesresultvaluesextwannotations
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
 
