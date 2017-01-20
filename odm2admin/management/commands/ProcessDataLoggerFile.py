@@ -49,32 +49,31 @@ def updateStartDateEndDate(results, startdate, enddate):
     StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
     EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
     # result = results#.objects.get(resultid=results.resultid.resultid)
+    repvstart = None
+    repvend = None
     try:
         # raise CommandError(" start date "str(startdate)))
         #
-        Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
-            propertyid=StartDateProperty).update(propertyvalue=startdate)
-        # repvstart = Resultextensionpropertyvalues.objects.filter(resultid=results.
-        # resultid).filter(propertyid=StartDateProperty).get()
-        # print(repvstart.propertyvalue)
-        Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
-            propertyid=EndDateProperty).update(propertyvalue=enddate)
-        # repvend = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).
-        # filter(propertyid=EndDateProperty).get()
-        # repvend, new = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).
-        # filter(propertyid=EndDateProperty).get()
-        # print(repvend.propertyvalue)
+        repvstart = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
+            propertyid=StartDateProperty) #.update(propertyvalue=startdate)
+        repvstart.propertyvalue=startdate
+
+        repvend = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
+            propertyid=EndDateProperty) #.update(propertyvalue=enddate)
+        repvend.prepertyvalue = enddate
+
     except ObjectDoesNotExist:
         # raise CommandError("couldn't find extension property values " +str(repvstart) + "for " +
         # str(StartDateProperty + "for" + str(results))
         repvstart = Resultextensionpropertyvalues(resultid=results, propertyid=StartDateProperty,
                                                   propertyvalue=startdate)
         # print(repvstart.propertyvalue)
-        repvstart.save()
+        #repvstart.save()
         repvend = Resultextensionpropertyvalues(resultid=results, propertyid=EndDateProperty,
                                                 propertyvalue=enddate)
         # print(repvend.propertyvalue)
-        repvend.save()
+        #repvend.save()
+    return repvstart, repvend
 
 
 class Command(BaseCommand):
@@ -97,6 +96,7 @@ class Command(BaseCommand):
         databeginson = int(options['databeginson'][0])  # int(databeginson[0])
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
         rowColumnMap = list()
+        bulktimeseriesvalues = []
         try:
             with io.open(file, 'rt', encoding='ascii') as f:
                 # reader = csv.reader(f)
@@ -199,7 +199,7 @@ class Command(BaseCommand):
                                             try:
                                                 pass
                                             except ObjectDoesNotExist:
-                                                Timeseriesresultvalues(
+                                                bulktimeseriesvalues.append(Timeseriesresultvalues(
                                                     resultid=mresults,
                                                     datavalue=row[colnum.columnnum],
                                                     valuedatetime=datestr,
@@ -210,10 +210,10 @@ class Command(BaseCommand):
                                                     .intendedtimespacing,
                                                     timeaggregationintervalunitsid=mresults
                                                     .intendedtimespacingunitsid
-                                                ).save()
+                                                ))
                                         else:
                                             # print(row[colnum.columnnum])
-                                            Timeseriesresultvalues(
+                                            bulktimeseriesvalues.append(Timeseriesresultvalues(
                                                 resultid=mresults,
                                                 datavalue=row[colnum.columnnum],
                                                 valuedatetime=datestr,
@@ -224,7 +224,7 @@ class Command(BaseCommand):
                                                 .intendedtimespacing,
                                                 timeaggregationintervalunitsid=mresults
                                                 .intendedtimespacingunitsid
-                                            ).save()
+                                            ))
                                             # print("saved value")
                                     except IntegrityError:
                                         pass
@@ -233,10 +233,10 @@ class Command(BaseCommand):
                     i += 1
                     # Timeseriesresults.objects.raw("SELECT odm2.\
                     # "TimeseriesresultValsToResultsCountvalue\"()")
-
+            Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
         except IndexError:
             raise ValidationError('encountered a problem with row ' + str(i) for i in row)
-
+        bulkpropertyvals = []
         for colnum in rowColumnMap:
             results = Timeseriesresults.objects.filter(resultid=colnum.resultid)
             for result in results:
@@ -249,4 +249,8 @@ class Command(BaseCommand):
                     enddate = Timeseriesresultvalues.objects.filter(resultid=result).annotate(
                         Max('valuedatetime')). \
                         order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-                    updateStartDateEndDate(result, startdate, enddate)
+                    repvstart, repvend = updateStartDateEndDate(result, startdate, enddate)
+                    bulkpropertyvals.append(repvstart)
+                    bulkpropertyvals.append(repvend)
+        #will bulk create or update the property values
+        Resultextensionpropertyvalues.objects.bulk_create(bulkpropertyvals)
