@@ -459,8 +459,11 @@ class VariablesAdminForm(ModelForm):
     # variablenamecv= TermModelChoiceField(CvVariablename.objects.all().order_by('term'))
     # speciationcv= TermModelChoiceField(CvSpeciation.objects.all().order_by('term'))
     # make these fields ajax type ahead fields with links to odm2 controlled vocabulary
-    variable_type = make_ajax_field(Variables, 'variable_type', 'cv_variable_type')
-    variable_name = make_ajax_field(Variables, 'variable_name', 'cv_variable_name')
+    variable_type = AutoCompleteSelectField('cv_variable_type', required=True, label='variable type')
+    #AutoCompleteSelectField('featureaction_lookup', required=True, help_text='',
+    #                                          label='Sampling feature action')
+    variable_name = AutoCompleteSelectField('cv_variable_name', required=True, label = 'variable name')
+    #make_ajax_field(Variables, 'variable_name', 'cv_variable_name')
     variabledefinition = forms.CharField(max_length=500, widget=forms.Textarea)
     # variable_type = make_ajax_field(Variables,'variable_type','cv_variable_type')
     speciation = make_ajax_field(Variables, 'speciation', 'cv_speciation')
