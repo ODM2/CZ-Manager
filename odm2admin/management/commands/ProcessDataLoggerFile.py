@@ -174,7 +174,7 @@ class Command(BaseCommand):
                         #         resultid__in=DataloggerfilecolumnSet.values("resultid"))
                         #     mrvs = Timeseriesresultvalues.objects.filter(resultid__in=mrs)
                         for colnum in rowColumnMap:
-                            dataqualitybool = False
+                            dataqualitybool = True
                             # this assumes that the first column is the date and time
                             if not colnum.columnnum == 0:
                                 # raise ValidationError("result: " + str(colnum.resultid) +
@@ -189,11 +189,11 @@ class Command(BaseCommand):
                                 try:
                                     resultsdataquality = Resultsdataquality.objects.filter(resultid=colnum.resultid)
                                     dataquality = Dataquality.objects.filter(
-                                        dataqualityid=resultsdataquality.values('dataqualityid'))
+                                        dataqualityid__in=resultsdataquality.values('dataqualityid'))
                                     #assumption only one upper bound and one lower bound per result
-                                    result_upper_bound = dataquality.filter(dataqualityid=dataquality).get(
+                                    result_upper_bound = dataquality.get(
                                         dataqualitytypecv=upper_bound_quality_type)
-                                    result_lower_bound = dataquality.filter(dataqualityid=dataquality).get(
+                                    result_lower_bound = dataquality.get(
                                         dataqualitytypecv=lower_bound_quality_type)
                                     annotationtypecv = CvAnnotationtype.objects.filter(
                                         name="Time series result value annotation").get()
@@ -245,8 +245,8 @@ class Command(BaseCommand):
                                             if dataqualitybool:
                                                 if newdatavalue > result_upper_bound.dataqualityvalue:
                                                     annotationtext = result_upper_bound.dataqualitycode + \
-                                                        " of " + result_upper_bound.dataqualityvalue \
-                                                        + " exceeded, raw value was " + newdatavalue
+                                                        " of " + str(result_upper_bound.dataqualityvalue) \
+                                                        + " exceeded, raw value was " + str(newdatavalue)
                                                     bulkannotations.append(
                                                         Annotations(annotationtypecv=annotationtypecv,
                                                             annotationcode="Value out of Range: High",
@@ -258,8 +258,8 @@ class Command(BaseCommand):
                                                 if newdatavalue < result_lower_bound.dataqualityvalue:
                                                     annotationtext = "value below " + \
                                                         result_lower_bound.dataqualitycode + \
-                                                        " of " + result_lower_bound.dataqualityvalue \
-                                                        + ", raw value was " + newdatavalue
+                                                        " of " + str(result_lower_bound.dataqualityvalue) \
+                                                        + ", raw value was " + str(newdatavalue)
                                                     bulkannotations.append(
                                                         Annotations(annotationtypecv=annotationtypecv,
                                                             annotationcode="Value out of Range: Low",
