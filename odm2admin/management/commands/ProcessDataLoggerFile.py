@@ -103,8 +103,8 @@ class Command(BaseCommand):
         rowColumnMap = list()
         bulktimeseriesvalues = []
         bulkannotations = []
-        upper_bound_quality_type = CvDataqualitytype.get(name = 'Physical limit upper bound')
-        lower_bound_quality_type = CvDataqualitytype.get(name = 'Physical limit lower bound')
+        upper_bound_quality_type = CvDataqualitytype.objects.get(name = 'Physical limit upper bound')
+        lower_bound_quality_type = CvDataqualitytype.objects.get(name = 'Physical limit lower bound')
         try:
             with io.open(file, 'rt', encoding='ascii') as f:
                 # reader = csv.reader(f)
@@ -191,8 +191,10 @@ class Command(BaseCommand):
                                     dataquality = Dataquality.objects.filter(
                                         dataqualityid=resultsdataquality.values('dataqualityid'))
                                     #assumption only one upper bound and one lower bound per result
-                                    result_upper_bound = dataquality.get(dataqualitytypecv=upper_bound_quality_type)
-                                    result_lower_bound = dataquality.get(dataqualitytypecv=lower_bound_quality_type)
+                                    result_upper_bound = dataquality.filter(dataqualityid=dataquality).get(
+                                        dataqualitytypecv=upper_bound_quality_type)
+                                    result_lower_bound = dataquality.filter(dataqualityid=dataquality).get(
+                                        dataqualitytypecv=lower_bound_quality_type)
                                     annotationtypecv = CvAnnotationtype.objects.filter(
                                         name="Time series result value annotation").get()
                                     annotationdatetime = datetime.now()
