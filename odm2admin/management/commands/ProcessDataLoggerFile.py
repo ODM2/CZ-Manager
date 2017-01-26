@@ -30,6 +30,7 @@ from odm2admin.models import People
 from odm2admin.models import CvDataqualitytype
 from odm2admin.models import CvAnnotationtype
 from odm2admin.models import Annotations
+from odm2admin.models import Timeseriesresultvalueannotations
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
 
@@ -103,6 +104,7 @@ class Command(BaseCommand):
         rowColumnMap = list()
         bulktimeseriesvalues = []
         bulkannotations = []
+        bulktimeseriesresultvalueannotations = []
         upper_bound_quality_type = CvDataqualitytype.objects.get(name = 'Physical limit upper bound')
         lower_bound_quality_type = CvDataqualitytype.objects.get(name = 'Physical limit lower bound')
         try:
@@ -240,38 +242,40 @@ class Command(BaseCommand):
                                                 #     .intendedtimespacingunitsid
                                                 # ))
                                         else:
-                                            newdatavalue = row[colnum.columnnum]
+                                            newdatavalue = float(row[colnum.columnnum])
                                             qualitycode = qualitycodegood
                                             if dataqualitybool:
                                                 if newdatavalue > result_upper_bound.dataqualityvalue:
                                                     annotationtext = result_upper_bound.dataqualitycode + \
                                                         " of " + str(result_upper_bound.dataqualityvalue) \
                                                         + " exceeded, raw value was " + str(newdatavalue)
-                                                    bulkannotations.append(
-                                                        Annotations(annotationtypecv=annotationtypecv,
+                                                    annotation= Annotations(annotationtypecv=annotationtypecv,
                                                             annotationcode="Value out of Range: High",
                                                             annotationtext=annotationtext,
                                                             annotationdatetime=annotationdatetime,
-                                                            annotationutcoffset=4, annotatorid=annotatorid))
+                                                            annotationutcoffset=4, annotatorid=annotatorid)
+                                                    bulkannotations.append(annotation)
                                                     newdatavalue =float('NaN')
                                                     qualitycode = qualitycodebad
-                                                if newdatavalue < result_lower_bound.dataqualityvalue:
+                                                elif newdatavalue < result_lower_bound.dataqualityvalue:
                                                     annotationtext = "value below " + \
                                                         result_lower_bound.dataqualitycode + \
                                                         " of " + str(result_lower_bound.dataqualityvalue) \
                                                         + ", raw value was " + str(newdatavalue)
-                                                    bulkannotations.append(
-                                                        Annotations(annotationtypecv=annotationtypecv,
+                                                    annotation= Annotations(annotationtypecv=annotationtypecv,
                                                             annotationcode="Value out of Range: Low",
                                                             annotationtext=annotationtext,
                                                             annotationdatetime=annotationdatetime,
-                                                            annotationutcoffset=4, annotatorid=annotatorid))
+                                                            annotationutcoffset=4, annotatorid=annotatorid)
+                                                    bulkannotations.append(annotation)
                                                     newdatavalue =float('NaN')
                                                     qualitycode = qualitycodebad
+                                                else:
+                                                    dataqualitybool = False
                                             # print(row[colnum.columnnum])
                                             # check if values are above or below quality bounds
                                             # create an annotation if they are.
-                                            bulktimeseriesvalues.append(Timeseriesresultvalues(
+                                            tsvr = Timeseriesresultvalues(
                                                 resultid=mresults,
                                                 datavalue=newdatavalue,
                                                 valuedatetime=datestr,
@@ -282,7 +286,13 @@ class Command(BaseCommand):
                                                 .intendedtimespacing,
                                                 timeaggregationintervalunitsid=mresults
                                                 .intendedtimespacingunitsid
-                                            ))
+                                            )
+                                            bulktimeseriesvalues.append(tsvr)
+                                            if dataqualitybool:
+                                                bulktimeseriesresultvalueannotations.append(
+                                                    Timeseriesresultvalueannotations(valueid=tsvr,
+                                                                                     annotationid=annotation)
+                                                )
                                             # print("saved value")
                                     except IntegrityError:
                                         pass
@@ -293,6 +303,7 @@ class Command(BaseCommand):
                     # "TimeseriesresultValsToResultsCountvalue\"()")
             Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
             Annotations.objects.bulk_create(bulkannotations)
+            Timeseriesresultvalueannotations.bulk_create(bulktimeseriesresultvalueannotations)
             bulktimeseriesvalues = None
 
         except IndexError:
