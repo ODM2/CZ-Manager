@@ -2670,6 +2670,7 @@ class Timeseriesresultvalues(models.Model):
     def __unicode__(self):
         s = u"%s " % self.resultid
         s += u"- %s" % self.datavalue
+        s += u"- %s" % self.qualitycodecv
         s += u"- %s" % self.valuedatetime
         return s
 
@@ -2705,16 +2706,18 @@ class Timeseriesresultvalues(models.Model):
         return s
 
     def csvheaderShort(self):
-        s = '\" {0} -unit-{1}-processing level-{2}\",annotation,'.format(
+        s = '\" {0} -unit-{1}-processing level-{2}\",data quality code,annotation,'.format(
             self.resultid.resultid.variableid.variablecode,
             self.resultid.resultid.unitsid.unitsname,
             self.resultid.resultid.processing_level)
+        s += 'quality code,'
         return s
 
     def csvoutputShort(self):
-        s = '{0}'.format(self.datavalue)
-        mrvannotation = Measurementresultvalueannotations.objects.filter(valueid=self.valueid)
-        annotations = Annotations.objects.filter(annotationid__in=mrvannotation)
+        s = '{0},'.format(self.datavalue)
+        s += '{0}'.format(self.qualitycodecv)
+        trvannotation = Timeseriesresultvalueannotations.objects.filter(valueid=self.valueid)
+        annotations = Annotations.objects.filter(annotationid__in=trvannotation)
         s += ',\"'
         for anno in annotations:
             s += '{0} '.format(anno)
@@ -2756,6 +2759,7 @@ class Timeseriesresultvaluesext(models.Model):
     def __unicode__(self):
         s = u"%s " % self.resultid
         s += u"- %s" % self.datavalue
+        s += u"- %s" % self.qualitycodecv
         s += u"- %s" % self.valuedatetime
         return s
 
@@ -2778,6 +2782,7 @@ class Timeseriesresultvaluesext(models.Model):
             self.variablecode,
             self.unitsabbreviation,
             self.processinglevelcode)
+        s += 'quality code,'
         return s
     def csvoutput(self):
         s = str(self.valueid)
@@ -2798,8 +2803,8 @@ class Timeseriesresultvaluesext(models.Model):
 
 
     def csvoutputShort(self):
-        s = '{0}'.format(self.datavalue)
-        s += ','
+        s = '{0},'.format(self.datavalue)
+        s += '{0},'.format(self.qualitycodecv)
         return s
 
     class Meta:
@@ -2837,6 +2842,7 @@ class Timeseriesresultvaluesextwannotations(models.Model):
     def __unicode__(self):
         s = u"%s " % self.resultid
         s += u"- %s" % self.datavalue
+        s += u"- %s" % self.qualitycodecv
         s += u"- %s" % self.valuedatetime
         return s
 
@@ -2875,16 +2881,14 @@ class Timeseriesresultvaluesextwannotations(models.Model):
             self.resultid.resultid.variableid.variablecode,
             self.resultid.resultid.unitsid.unitsname,
             self.resultid.resultid.processing_level)
+        s += 'quality code,'
+        s += 'quality annotation,'
         return s
 
     def csvoutputShort(self):
-        s = '{0}'.format(self.datavalue)
-        mrvannotation = Measurementresultvalueannotations.objects.filter(valueid=self.valueid)
-        annotations = Annotations.objects.filter(annotationid__in=mrvannotation)
-        s += ',\"'
-        for anno in annotations:
-            s += '{0} '.format(anno)
-        s += '\"'
+        s = '{0},'.format(self.datavalue)
+        s += '{0},'.format(self.qualitycodecv)
+        s += '\"{0} \",'.format(self.annotationtext)
         s += ','
         return s
 

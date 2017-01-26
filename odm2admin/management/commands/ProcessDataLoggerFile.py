@@ -14,6 +14,7 @@ from django.core.management import settings
 from django.db import IntegrityError
 from django.db import transaction
 from django.db.models import Min, Max
+from datetime import datetime
 
 from odm2admin.models import CvCensorcode
 from odm2admin.models import CvQualitycode
@@ -23,6 +24,12 @@ from odm2admin.models import Extensionproperties
 from odm2admin.models import Resultextensionpropertyvalues
 from odm2admin.models import Timeseriesresults
 from odm2admin.models import Timeseriesresultvalues
+from odm2admin.models import Dataquality
+from odm2admin.models import Resultsdataquality
+from odm2admin.models import People
+from odm2admin.models import CvDataqualitytype
+from odm2admin.models import CvAnnotationtype
+from odm2admin.models import Annotations
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
 
@@ -95,6 +102,9 @@ class Command(BaseCommand):
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
         rowColumnMap = list()
         bulktimeseriesvalues = []
+        bulkannotations = []
+        upper_bound_quality_type = CvDataqualitytype.get(name = 'Physical limit upper bound')
+        lower_bound_quality_type = CvDataqualitytype.get(name = 'Physical limit lower bound')
         try:
             with io.open(file, 'rt', encoding='ascii') as f:
                 # reader = csv.reader(f)
@@ -164,8 +174,8 @@ class Command(BaseCommand):
                         #         resultid__in=DataloggerfilecolumnSet.values("resultid"))
                         #     mrvs = Timeseriesresultvalues.objects.filter(resultid__in=mrs)
                         for colnum in rowColumnMap:
-                            # x[0] for x in my_tuples
-                            # colnum[0] = column number, colnum[1] = dataloggerfilecolumn object
+                            dataqualitybool = False
+                            # this assumes that the first column is the date and time
                             if not colnum.columnnum == 0:
                                 # raise ValidationError("result: " + str(colnum.resultid) +
                                 # " datavalue "+
@@ -174,6 +184,21 @@ class Command(BaseCommand):
 
                                 Timeseriesresult = Timeseriesresults.objects.filter(
                                     resultid=colnum.resultid)
+                                # try to get data quality upper and lower bounds if they don't exist
+                                # proceed without checking.
+                                try:
+                                    resultsdataquality = Resultsdataquality.objects.filter(resultid=colnum.resultid)
+                                    dataquality = Dataquality.objects.filter(
+                                        dataqualityid=resultsdataquality.values('dataqualityid'))
+                                    #assumption only one upper bound and one lower bound per result
+                                    result_upper_bound = dataquality.get(dataqualitytypecv=upper_bound_quality_type)
+                                    result_lower_bound = dataquality.get(dataqualitytypecv=lower_bound_quality_type)
+                                    annotationtypecv = CvAnnotationtype.objects.filter(
+                                        name="Time series result value annotation").get()
+                                    annotationdatetime = datetime.now()
+                                    annotatorid = People.objects.filter(personid=1).get()
+                                except ObjectDoesNotExist:
+                                    dataqualitybool = False
                                 if Timeseriesresult.count() == 0:
                                     raise CommandError(
                                         'No Measurement results for column ' + colnum.columnlabel +
@@ -185,7 +210,9 @@ class Command(BaseCommand):
                                 # print("value to save")
                                 # print(value)
                                 censorcode = CvCensorcode.objects.filter(name="Not censored").get()
-                                qualitycode = CvQualitycode.objects.filter(name="Good").get()
+                                qualitycodegood = CvQualitycode.objects.filter(name="Good").get()
+                                qualitycodebad = CvQualitycode.objects.filter(name='Bad').get()
+                                qualitycode = None
                                 for mresults in Timeseriesresult:
                                     try:
                                         if value == '':
@@ -197,23 +224,54 @@ class Command(BaseCommand):
                                             try:
                                                 pass
                                             except ObjectDoesNotExist:
-                                                bulktimeseriesvalues.append(Timeseriesresultvalues(
-                                                    resultid=mresults,
-                                                    datavalue=row[colnum.columnnum],
-                                                    valuedatetime=datestr,
-                                                    valuedatetimeutcoffset=4,
-                                                    censorcodecv=censorcode,
-                                                    qualitycodecv=qualitycode,
-                                                    timeaggregationinterval=mresults
-                                                    .intendedtimespacing,
-                                                    timeaggregationintervalunitsid=mresults
-                                                    .intendedtimespacingunitsid
-                                                ))
+                                                print('check dates not in effect this should not print')
+                                                # bulktimeseriesvalues.append(Timeseriesresultvalues(
+                                                #     resultid=mresults,
+                                                #     datavalue=row[colnum.columnnum],
+                                                #     valuedatetime=datestr,
+                                                #     valuedatetimeutcoffset=4,
+                                                #     censorcodecv=censorcode,
+                                                #     qualitycodecv=qualitycode,
+                                                #     timeaggregationinterval=mresults
+                                                #     .intendedtimespacing,
+                                                #     timeaggregationintervalunitsid=mresults
+                                                #     .intendedtimespacingunitsid
+                                                # ))
                                         else:
+                                            newdatavalue = row[colnum.columnnum]
+                                            qualitycode = qualitycodegood
+                                            if dataqualitybool:
+                                                if newdatavalue > result_upper_bound.dataqualityvalue:
+                                                    annotationtext = result_upper_bound.dataqualitycode + \
+                                                        " of " + result_upper_bound.dataqualityvalue \
+                                                        + " exceeded, raw value was " + newdatavalue
+                                                    bulkannotations.append(
+                                                        Annotations(annotationtypecv=annotationtypecv,
+                                                            annotationcode="Value out of Range: High",
+                                                            annotationtext=annotationtext,
+                                                            annotationdatetime=annotationdatetime,
+                                                            annotationutcoffset=4, annotatorid=annotatorid))
+                                                    newdatavalue =float('NaN')
+                                                    qualitycode = qualitycodebad
+                                                if newdatavalue < result_lower_bound.dataqualityvalue:
+                                                    annotationtext = "value below " + \
+                                                        result_lower_bound.dataqualitycode + \
+                                                        " of " + result_lower_bound.dataqualityvalue \
+                                                        + ", raw value was " + newdatavalue
+                                                    bulkannotations.append(
+                                                        Annotations(annotationtypecv=annotationtypecv,
+                                                            annotationcode="Value out of Range: Low",
+                                                            annotationtext=annotationtext,
+                                                            annotationdatetime=annotationdatetime,
+                                                            annotationutcoffset=4, annotatorid=annotatorid))
+                                                    newdatavalue =float('NaN')
+                                                    qualitycode = qualitycodebad
                                             # print(row[colnum.columnnum])
+                                            # check if values are above or below quality bounds
+                                            # create an annotation if they are.
                                             bulktimeseriesvalues.append(Timeseriesresultvalues(
                                                 resultid=mresults,
-                                                datavalue=row[colnum.columnnum],
+                                                datavalue=newdatavalue,
                                                 valuedatetime=datestr,
                                                 valuedatetimeutcoffset=4,
                                                 censorcodecv=censorcode,
@@ -232,6 +290,7 @@ class Command(BaseCommand):
                     # Timeseriesresults.objects.raw("SELECT odm2.\
                     # "TimeseriesresultValsToResultsCountvalue\"()")
             Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
+            Annotations.objects.bulk_create(bulkannotations)
             bulktimeseriesvalues = None
 
         except IndexError:
