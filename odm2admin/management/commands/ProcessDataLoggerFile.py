@@ -103,8 +103,6 @@ class Command(BaseCommand):
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
         rowColumnMap = list()
         bulktimeseriesvalues = []
-        bulkannotations = []
-        bulktimeseriesresultvalueannotations = []
         upper_bound_quality_type = CvDataqualitytype.objects.get(name = 'Physical limit upper bound')
         lower_bound_quality_type = CvDataqualitytype.objects.get(name = 'Physical limit lower bound')
         try:
@@ -254,7 +252,21 @@ class Command(BaseCommand):
                                                             annotationtext=annotationtext,
                                                             annotationdatetime=annotationdatetime,
                                                             annotationutcoffset=4, annotatorid=annotatorid)
-                                                    bulkannotations.append(annotation)
+                                                    annotation.save()
+                                                    tsvr = Timeseriesresultvalues(
+                                                        resultid=mresults,
+                                                        datavalue=newdatavalue,
+                                                        valuedatetime=datestr,
+                                                        valuedatetimeutcoffset=4,
+                                                        censorcodecv=censorcode,
+                                                        qualitycodecv=qualitycode,
+                                                        timeaggregationinterval=mresults
+                                                        .intendedtimespacing,
+                                                        timeaggregationintervalunitsid=mresults
+                                                        .intendedtimespacingunitsid
+                                                        ).save()
+                                                    tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
+                                                                                     annotationid=annotation).save()
                                                     newdatavalue =float('NaN')
                                                     qualitycode = qualitycodebad
                                                 elif newdatavalue < result_lower_bound.dataqualityvalue:
@@ -267,7 +279,21 @@ class Command(BaseCommand):
                                                             annotationtext=annotationtext,
                                                             annotationdatetime=annotationdatetime,
                                                             annotationutcoffset=4, annotatorid=annotatorid)
-                                                    bulkannotations.append(annotation)
+                                                    annotation.save()
+                                                    tsvr = Timeseriesresultvalues(
+                                                        resultid=mresults,
+                                                        datavalue=newdatavalue,
+                                                        valuedatetime=datestr,
+                                                        valuedatetimeutcoffset=4,
+                                                        censorcodecv=censorcode,
+                                                        qualitycodecv=qualitycode,
+                                                        timeaggregationinterval=mresults
+                                                        .intendedtimespacing,
+                                                        timeaggregationintervalunitsid=mresults
+                                                        .intendedtimespacingunitsid
+                                                        ).save()
+                                                    tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
+                                                                                     annotationid=annotation).save()
                                                     newdatavalue =float('NaN')
                                                     qualitycode = qualitycodebad
                                                 else:
@@ -275,24 +301,20 @@ class Command(BaseCommand):
                                             # print(row[colnum.columnnum])
                                             # check if values are above or below quality bounds
                                             # create an annotation if they are.
-                                            tsvr = Timeseriesresultvalues(
-                                                resultid=mresults,
-                                                datavalue=newdatavalue,
-                                                valuedatetime=datestr,
-                                                valuedatetimeutcoffset=4,
-                                                censorcodecv=censorcode,
-                                                qualitycodecv=qualitycode,
-                                                timeaggregationinterval=mresults
-                                                .intendedtimespacing,
-                                                timeaggregationintervalunitsid=mresults
-                                                .intendedtimespacingunitsid
-                                            )
-                                            bulktimeseriesvalues.append(tsvr)
-                                            if dataqualitybool:
-                                                bulktimeseriesresultvalueannotations.append(
-                                                    Timeseriesresultvalueannotations(valueid=tsvr,
-                                                                                     annotationid=annotation)
+                                            if not dataqualitybool:
+                                                tsvr = Timeseriesresultvalues(
+                                                    resultid=mresults,
+                                                    datavalue=newdatavalue,
+                                                    valuedatetime=datestr,
+                                                    valuedatetimeutcoffset=4,
+                                                    censorcodecv=censorcode,
+                                                    qualitycodecv=qualitycode,
+                                                    timeaggregationinterval=mresults
+                                                    .intendedtimespacing,
+                                                    timeaggregationintervalunitsid=mresults
+                                                    .intendedtimespacingunitsid
                                                 )
+                                                bulktimeseriesvalues.append(tsvr)
                                             # print("saved value")
                                     except IntegrityError:
                                         pass
@@ -302,8 +324,6 @@ class Command(BaseCommand):
                     # Timeseriesresults.objects.raw("SELECT odm2.\
                     # "TimeseriesresultValsToResultsCountvalue\"()")
             Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
-            Annotations.objects.bulk_create(bulkannotations)
-            Timeseriesresultvalueannotations.bulk_create(bulktimeseriesresultvalueannotations)
             bulktimeseriesvalues = None
 
         except IndexError:
