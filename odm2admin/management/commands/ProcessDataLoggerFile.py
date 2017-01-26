@@ -91,7 +91,6 @@ class Command(BaseCommand):
         parser.add_argument('check_dates', nargs=1, type=bool)
         parser.add_argument('cmdline', nargs=1, type=bool)
 
-    @transaction.atomic
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
         # cmdline = bool(options['cmdline'][0])
         filename = str(options['dataloggerfilelink'][0])
@@ -244,58 +243,64 @@ class Command(BaseCommand):
                                             qualitycode = qualitycodegood
                                             if dataqualitybool:
                                                 if newdatavalue > result_upper_bound.dataqualityvalue:
-                                                    annotationtext = result_upper_bound.dataqualitycode + \
-                                                        " of " + str(result_upper_bound.dataqualityvalue) \
-                                                        + " exceeded, raw value was " + str(newdatavalue)
-                                                    annotation= Annotations(annotationtypecv=annotationtypecv,
-                                                            annotationcode="Value out of Range: High",
-                                                            annotationtext=annotationtext,
-                                                            annotationdatetime=annotationdatetime,
-                                                            annotationutcoffset=4, annotatorid=annotatorid)
-                                                    annotation.save()
-                                                    tsvr = Timeseriesresultvalues(
-                                                        resultid=mresults,
-                                                        datavalue=newdatavalue,
-                                                        valuedatetime=datestr,
-                                                        valuedatetimeutcoffset=4,
-                                                        censorcodecv=censorcode,
-                                                        qualitycodecv=qualitycode,
-                                                        timeaggregationinterval=mresults
-                                                        .intendedtimespacing,
-                                                        timeaggregationintervalunitsid=mresults
-                                                        .intendedtimespacingunitsid
-                                                        ).save()
-                                                    tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
-                                                                                     annotationid=annotation).save()
-                                                    newdatavalue =float('NaN')
-                                                    qualitycode = qualitycodebad
+                                                    with transaction.atomic():
+                                                        annotationtext = result_upper_bound.dataqualitycode + \
+                                                            " of " + str(result_upper_bound.dataqualityvalue) \
+                                                            + " exceeded, raw value was " + str(newdatavalue)
+                                                        annotation= Annotations(annotationtypecv=annotationtypecv,
+                                                                annotationcode="Value out of Range: High",
+                                                                annotationtext=annotationtext,
+                                                                annotationdatetime=annotationdatetime,
+                                                                annotationutcoffset=4, annotatorid=annotatorid)
+                                                        newdatavalue =float('NaN')
+                                                        qualitycode = qualitycodebad
+                                                        tsvr = Timeseriesresultvalues(
+                                                            resultid=mresults,
+                                                            datavalue=newdatavalue,
+                                                            valuedatetime=datestr,
+                                                            valuedatetimeutcoffset=4,
+                                                            censorcodecv=censorcode,
+                                                            qualitycodecv=qualitycode,
+                                                            timeaggregationinterval=mresults
+                                                            .intendedtimespacing,
+                                                            timeaggregationintervalunitsid=mresults
+                                                            .intendedtimespacingunitsid
+                                                            )
+                                                        annotation.save()
+                                                        tsvr.save()
+                                                        tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
+                                                                                         annotationid=annotation).save()
+
                                                 elif newdatavalue < result_lower_bound.dataqualityvalue:
-                                                    annotationtext = "value below " + \
-                                                        result_lower_bound.dataqualitycode + \
-                                                        " of " + str(result_lower_bound.dataqualityvalue) \
-                                                        + ", raw value was " + str(newdatavalue)
-                                                    annotation= Annotations(annotationtypecv=annotationtypecv,
-                                                            annotationcode="Value out of Range: Low",
-                                                            annotationtext=annotationtext,
-                                                            annotationdatetime=annotationdatetime,
-                                                            annotationutcoffset=4, annotatorid=annotatorid)
-                                                    annotation.save()
-                                                    tsvr = Timeseriesresultvalues(
-                                                        resultid=mresults,
-                                                        datavalue=newdatavalue,
-                                                        valuedatetime=datestr,
-                                                        valuedatetimeutcoffset=4,
-                                                        censorcodecv=censorcode,
-                                                        qualitycodecv=qualitycode,
-                                                        timeaggregationinterval=mresults
-                                                        .intendedtimespacing,
-                                                        timeaggregationintervalunitsid=mresults
-                                                        .intendedtimespacingunitsid
-                                                        ).save()
-                                                    tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
-                                                                                     annotationid=annotation).save()
-                                                    newdatavalue =float('NaN')
-                                                    qualitycode = qualitycodebad
+                                                    with transaction.atomic():
+                                                        annotationtext = "value below " + \
+                                                            result_lower_bound.dataqualitycode + \
+                                                            " of " + str(result_lower_bound.dataqualityvalue) \
+                                                            + ", raw value was " + str(newdatavalue)
+                                                        annotation= Annotations(annotationtypecv=annotationtypecv,
+                                                                annotationcode="Value out of Range: Low",
+                                                                annotationtext=annotationtext,
+                                                                annotationdatetime=annotationdatetime,
+                                                                annotationutcoffset=4, annotatorid=annotatorid)
+
+                                                        newdatavalue =float('NaN')
+                                                        qualitycode = qualitycodebad
+                                                        tsvr = Timeseriesresultvalues(
+                                                            resultid=mresults,
+                                                            datavalue=newdatavalue,
+                                                            valuedatetime=datestr,
+                                                            valuedatetimeutcoffset=4,
+                                                            censorcodecv=censorcode,
+                                                            qualitycodecv=qualitycode,
+                                                            timeaggregationinterval=mresults
+                                                            .intendedtimespacing,
+                                                            timeaggregationintervalunitsid=mresults
+                                                            .intendedtimespacingunitsid
+                                                            )
+                                                        annotation.save()
+                                                        tsvr.save()
+                                                        tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
+                                                                                         annotationid=annotation).save()
                                                 else:
                                                     dataqualitybool = False
                                             # print(row[colnum.columnnum])
