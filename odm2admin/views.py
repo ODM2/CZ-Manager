@@ -1218,12 +1218,12 @@ def email_data_from_graph(request):
                 entered_end_date = request.POST['endDate']
             if 'startDate' in request.POST:
                 entered_start_date = request.POST['startDate']
-            myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
+            myresultSeriesExport = Timeseriesresultvaluesextwannotations.objects.all() \
                     .filter(valuedatetime__gte=entered_start_date) \
                     .filter(valuedatetime__lte=entered_end_date) \
                     .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
         else:
-            myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
+            myresultSeriesExport = Timeseriesresultvaluesextwannotations.objects.all() \
                     .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
         emailspreadsheet2(request, myresultSeriesExport, False) # for command str_selectedresultid_ids
         
