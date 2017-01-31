@@ -16,17 +16,16 @@ imported as long as data logger file columns and results are properly
 setup.
 ODM2 can be found here: https://github.com/ODM2
 
-In the folder templatesAndSettings you will find ``settings.py`` which
-contains all of the database and local file system settings which need
-to be configured to get a copy of this application working. This was
-developed using a postgresql version of ODM2 data model, additional
-modifications will be needed to make this work with MSSQL or another
-database.
+The file ``settings.yaml`` contains all of the database and local
+file system settings which need to be configured to get a copy of this
+application working. This was developed using a postgresql version of
+ODM2 data model, additional modifications will be needed to make this
+work with MSSQL or another database.
 
-An example postgresqldatabase named ODM2AdminExamplePostgresqlDB, this
-is a custom postgresql format backup which can be restored to an empty
-database. An extrasql.sql file contains some extra views used for 
-efficiently exporting data as emails. 
+An example postgresql database named ODM2AdminExamplePostgresqlDB is
+provided, this is a custom postgresql format backup which can be
+restored to an empty database. An extrasql.sql file contains some extra
+views used for efficiently exporting data as emails.
 
 
 **Primary Installation**

@@ -23,6 +23,9 @@ from odm2admin.models import CvQualitycode
 from odm2admin.models import CvRelationshiptype
 from odm2admin.models import CvResulttype
 from odm2admin.models import CvStatus
+from odm2admin.models import CvDataqualitytype
+from odm2admin.models import Dataquality
+from odm2admin.models import Timeseriesresults
 from odm2admin.models import Featureactions
 from odm2admin.models import Measurementresults
 from odm2admin.models import Measurementresultvalueannotations
@@ -33,11 +36,48 @@ from odm2admin.models import Profileresults
 from odm2admin.models import Profileresultvalues
 from odm2admin.models import Relatedfeatures
 from odm2admin.models import Results
+from odm2admin.models import Resultsdataquality
 from odm2admin.models import Samplingfeatures
 from odm2admin.models import Units
 from odm2admin.models import Variables
 
 __author__ = 'leonmi'
+
+
+def new_results_dataquality_upper_and_lower_bounds(unit, variable, upperbound, lowerbound, save=False):
+    upper_bound_quality_type = CvDataqualitytype.objects.get(name = 'Physical limit upper bound')
+    lower_bound_quality_type = CvDataqualitytype.objects.get(name = 'Physical limit lower bound')
+
+    lower_bound= Dataquality(dataqualitytypecv=lower_bound_quality_type,
+        dataqualitycode=str(variable.variablecode) + ' lower bound',
+        dataqualityvalue=lowerbound,dataqualityvalueunitsid=unit,
+        dataqualitydescription='lower bound for ' + str(variable.variablecode))
+    print(lower_bound)
+    if save:
+        lower_bound.save()
+    upper_bound= Dataquality(dataqualitytypecv=upper_bound_quality_type,
+        dataqualitycode=str(variable.variablecode) + ' upper bound',
+        dataqualityvalue=upperbound,dataqualityvalueunitsid=unit,
+        dataqualitydescription='lower bound for '+ str(variable.variablecode))
+    print(upper_bound)
+    if save:
+        upper_bound.save()
+
+    variables_results = Results.objects.filter(variableid=variable).filter(unitsid=unit).order_by('featureactionid')
+    print('number of series to add bounds for ' + str(variables_results.count()))
+    for variables_result in variables_results:
+        upper_bound_dq = Resultsdataquality(resultid=variables_result,dataqualityid=upper_bound)
+        lower_bound_dq = Resultsdataquality(resultid=variables_result,dataqualityid=lower_bound)
+        print(upper_bound_dq)
+        print(lower_bound_dq)
+        if save:
+            upper_bound_dq.save()
+            lower_bound_dq.save()
+
+    variable_data_quality=Resultsdataquality.objects.filter(resultid__in=variables_results)
+
+    for varq in variable_data_quality:
+        print(varq)
 
 
 # searchTextString = some string to search a models charField for
@@ -339,3 +379,5 @@ def importValues(file, variableFileIndex, variableDBID, variableUnitID, actionID
             print(presultvalue)
             if save:
                 presultvalue.save()
+
+

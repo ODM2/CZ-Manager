@@ -2706,11 +2706,12 @@ class Timeseriesresultvalues(models.Model):
         return s
 
     def csvheaderShort(self):
-        s = '\" {0} -unit-{1}-processing level-{2}\",data quality code,annotation,'.format(
+        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
             self.resultid.resultid.variableid.variablecode,
             self.resultid.resultid.unitsid.unitsname,
             self.resultid.resultid.processing_level)
         s += 'quality code,'
+        s += 'annotation,'
         return s
 
     def csvoutputShort(self):
@@ -2877,7 +2878,7 @@ class Timeseriesresultvaluesextwannotations(models.Model):
         return s
 
     def csvheaderShort(self):
-        s = '\" {0} -unit-{1}-processing level-{2}\",annotation,'.format(
+        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
             self.resultid.resultid.variableid.variablecode,
             self.resultid.resultid.unitsid.unitsname,
             self.resultid.resultid.processing_level)
