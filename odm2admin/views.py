@@ -1887,7 +1887,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
                     myfile.write(myresults.csvheader())
                     firstheader = False
                 myfile.write(myresults.csvheaderShort())
-                emailtext = emailtext + ' - ' + str(myresults)
+                emailtext = emailtext + ' - ' + str(myresults.email_text())
                 # elif not lastUnit==unit:
                 # myfile.write(myresults.csvheaderShortUnitOnly())
 
@@ -1917,7 +1917,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
                 "processinglevelcode"
             )
         # myfile.write(lastResult.csvheaderShort())
-        emailtext = emailtext + ' - ' + str(lastResult)
+        emailtext = emailtext + ' - ' + str(lastResult.email_text())
         myfile.write('\n')
 
         samplingfeaturename = ''
