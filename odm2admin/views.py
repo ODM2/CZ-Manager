@@ -1855,6 +1855,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
         unit = ''
         firstheader = True
         processingCode = None
+        lastResult = None
         resultValuesHeaders = resultValuesSeries.filter(
             ~Q(
                 sampling_feature_type="Ecological land classification"  # noqa
@@ -1869,6 +1870,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
         )
         # .distinct("resultid__resultid__variableid","resultid__resultid__unitsid")
         for myresults in resultValuesHeaders:
+            lastResult = myresults
             lastVariable = variable
             variable = myresults.variablecode
             lastUnit = unit
@@ -1885,9 +1887,10 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
                     myfile.write(myresults.csvheader())
                     firstheader = False
                 myfile.write(myresults.csvheaderShort())
-                emailtext = emailtext + ' - ' + myresults.csvheaderShort()
+                emailtext = emailtext + ' - ' + str(myresults)
                 # elif not lastUnit==unit:
                 # myfile.write(myresults.csvheaderShortUnitOnly())
+
         if profileResult:
             resultValuesSeries = resultValuesSeries.filter(
                 ~Q(
@@ -1914,6 +1917,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
                 "processinglevelcode"
             )
         # myfile.write(lastResult.csvheaderShort())
+        emailtext = emailtext + ' - ' + str(lastResult)
         myfile.write('\n')
 
         samplingfeaturename = ''
