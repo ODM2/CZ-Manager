@@ -1856,21 +1856,23 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
         firstheader = True
         processingCode = None
         lastResult = None
+        newResult = None
         resultValuesHeaders = resultValuesSeries.filter(
             ~Q(
-                sampling_feature_type="Ecological land classification"  # noqa
+                samplingfeaturetypecv="Ecological land classification"  # noqa
             )
         ).filter(
             ~Q(
-                sampling_feature_type="Field area"  # noqa
+                samplingfeaturetypecv="Field area"  # noqa
             )
         ).order_by(
-            "variablecode", "unitsabbreviation",
+             "resultid", "variablecode", "unitsabbreviation",
             "processinglevelcode"
         )
         # .distinct("resultid__resultid__variableid","resultid__resultid__unitsid")
         for myresults in resultValuesHeaders:
-            lastResult = myresults
+            lastResult = newResult
+            newResult = myresults
             lastVariable = variable
             variable = myresults.variablecode
             lastUnit = unit
@@ -1881,8 +1883,8 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
             # only add the first instance of each variable, once one repeats your done.
             # break
             if not lastVariable == variable or not lastUnit == unit or not lastProcessingCode == \
-                    processingCode:
-                variablesAndUnits.append(variable + unit + processingCode)
+                    processingCode or not newResult.resultid == lastResult.resultid:
+                variablesAndUnits.append(variable + unit + processingCode +str(newResult.resultid))
                 if firstheader:
                     myfile.write(myresults.csvheader())
                     firstheader = False
@@ -1906,12 +1908,13 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
             )
         else:
             resultValuesSeries = resultValuesSeries.filter(
-                ~Q(sampling_feature_type="Ecological land classification")  # noqa
+                ~Q(samplingfeaturetypecv="Ecological land classification")  # noqa
             ).filter(
-                ~Q(sampling_feature_type="Field area"  # noqa
+                ~Q(samplingfeaturetypecv="Field area"  # noqa
                 )
             ).order_by(
                 "valuedatetime",
+                "resultid",
                 "samplingfeaturename",
                 "variablecode", "unitsabbreviation",
                 "processinglevelcode"
@@ -1928,6 +1931,8 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
 
         # resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturename
         for myresults in resultValuesSeries:
+            lastResult = newResult
+            # #newResult = myresults
             variable = myresults.variablecode
             unit = myresults.unitsabbreviation
             lastsamplingfeaturename = samplingfeaturename
@@ -1964,7 +1969,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
                     position,
                     variablesAndUnits.index(variable +
                                             unit +
-                                            processingCode)
+                                            processingCode+str(myresults.resultid))
             ):
                 myfile.write(",")
                 position += 1
