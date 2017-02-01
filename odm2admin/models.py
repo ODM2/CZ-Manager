@@ -2184,6 +2184,14 @@ class Results(models.Model):
         #s += 'citation,'
 
         return s
+
+    def email_text(self):
+        s = '{0} -unit-{1}-processing level-{2} '.format(
+            self.variableid.variablecode,
+            self.unitsid.unitsname,
+            self.processing_level.processinglevelcode)
+        return s
+
     def csvheaderShort(self):
         s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
             self.variableid.variablecode,
@@ -2670,6 +2678,7 @@ class Timeseriesresultvalues(models.Model):
     def __unicode__(self):
         s = u"%s " % self.resultid
         s += u"- %s" % self.datavalue
+        s += u"- %s" % self.qualitycodecv
         s += u"- %s" % self.valuedatetime
         return s
 
@@ -2704,17 +2713,28 @@ class Timeseriesresultvalues(models.Model):
         # s += ' {0}\"'.format(citation.citationlink)
         return s
 
-    def csvheaderShort(self):
-        s = '\" {0} -unit-{1}-processing level-{2}\",annotation,'.format(
+
+    def email_text(self):
+        s = '{0} -unit-{1}-processing level-{2} '.format(
             self.resultid.resultid.variableid.variablecode,
             self.resultid.resultid.unitsid.unitsname,
-            self.resultid.resultid.processing_level)
+            self.resultid.resultid.processing_level.processinglevelcode)
+        return s
+
+    def csvheaderShort(self):
+        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
+            self.resultid.resultid.variableid.variablecode,
+            self.resultid.resultid.unitsid.unitsname,
+            self.resultid.resultid.processing_level.processinglevelcode)
+        s += 'quality code,'
+        s += 'annotation,'
         return s
 
     def csvoutputShort(self):
-        s = '{0}'.format(self.datavalue)
-        mrvannotation = Measurementresultvalueannotations.objects.filter(valueid=self.valueid)
-        annotations = Annotations.objects.filter(annotationid__in=mrvannotation)
+        s = '{0},'.format(self.datavalue)
+        s += '{0}'.format(self.qualitycodecv)
+        trvannotation = Timeseriesresultvalueannotations.objects.filter(valueid=self.valueid)
+        annotations = Annotations.objects.filter(annotationid__in=trvannotation)
         s += ',\"'
         for anno in annotations:
             s += '{0} '.format(anno)
@@ -2756,6 +2776,7 @@ class Timeseriesresultvaluesext(models.Model):
     def __unicode__(self):
         s = u"%s " % self.resultid
         s += u"- %s" % self.datavalue
+        s += u"- %s" % self.qualitycodecv
         s += u"- %s" % self.valuedatetime
         return s
 
@@ -2773,11 +2794,19 @@ class Timeseriesresultvaluesext(models.Model):
         #s += 'citation,'
 
         return s
+    def email_text(self):
+        s = '{0} -unit-{1}-processing level-{2} '.format(
+            self.variablecode,
+            self.unitsabbreviation,
+            self.processinglevelcode)
+        s += 'location- {0}'.format(self.samplingfeaturename)
+        return s
     def csvheaderShort(self):
         s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
             self.variablecode,
             self.unitsabbreviation,
             self.processinglevelcode)
+        s += 'quality code,'
         return s
     def csvoutput(self):
         s = str(self.valueid)
@@ -2798,8 +2827,8 @@ class Timeseriesresultvaluesext(models.Model):
 
 
     def csvoutputShort(self):
-        s = '{0}'.format(self.datavalue)
-        s += ','
+        s = '{0},'.format(self.datavalue)
+        s += '{0},'.format(self.qualitycodecv)
         return s
 
     class Meta:
@@ -2837,6 +2866,7 @@ class Timeseriesresultvaluesextwannotations(models.Model):
     def __unicode__(self):
         s = u"%s " % self.resultid
         s += u"- %s" % self.datavalue
+        s += u"- %s" % self.qualitycodecv
         s += u"- %s" % self.valuedatetime
         return s
 
@@ -2870,22 +2900,30 @@ class Timeseriesresultvaluesextwannotations(models.Model):
         # s += ' {0}\"'.format(citation.citationlink)
         return s
 
+    def email_text(self):
+        s = '{0} -unit-{1}-processing level-{2} '.format(
+            self.variablecode,
+            self.unitsabbreviation,
+            self.processinglevelcode)
+        s += 'location- {0}'.format(self.samplingfeaturename)
+        return s
+
     def csvheaderShort(self):
-        s = '\" {0} -unit-{1}-processing level-{2}\",annotation,'.format(
-            self.resultid.resultid.variableid.variablecode,
-            self.resultid.resultid.unitsid.unitsname,
-            self.resultid.resultid.processing_level)
+        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
+            self.variablecode,
+            self.unitsabbreviation,
+            self.processinglevelcode)
+        s += 'quality code,'
+        s += 'quality annotation,'
         return s
 
     def csvoutputShort(self):
-        s = '{0}'.format(self.datavalue)
-        mrvannotation = Measurementresultvalueannotations.objects.filter(valueid=self.valueid)
-        annotations = Annotations.objects.filter(annotationid__in=mrvannotation)
-        s += ',\"'
-        for anno in annotations:
-            s += '{0} '.format(anno)
-        s += '\"'
-        s += ','
+        s = '{0},'.format(self.datavalue)
+        s += '{0},'.format(self.qualitycodecv)
+        if self.annotationtext:
+            s += '\"{0} \",'.format(self.annotationtext)
+        else:
+             s += ','
         return s
 
     class Meta:

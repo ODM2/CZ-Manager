@@ -1218,12 +1218,12 @@ def email_data_from_graph(request):
                 entered_end_date = request.POST['endDate']
             if 'startDate' in request.POST:
                 entered_start_date = request.POST['startDate']
-            myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
+            myresultSeriesExport = Timeseriesresultvaluesextwannotations.objects.all() \
                     .filter(valuedatetime__gte=entered_start_date) \
                     .filter(valuedatetime__lte=entered_end_date) \
                     .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
         else:
-            myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
+            myresultSeriesExport = Timeseriesresultvaluesextwannotations.objects.all() \
                     .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
         emailspreadsheet2(request, myresultSeriesExport, False) # for command str_selectedresultid_ids
         
@@ -1855,6 +1855,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
         unit = ''
         firstheader = True
         processingCode = None
+        lastResult = None
         resultValuesHeaders = resultValuesSeries.filter(
             ~Q(
                 sampling_feature_type="Ecological land classification"  # noqa
@@ -1869,6 +1870,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
         )
         # .distinct("resultid__resultid__variableid","resultid__resultid__unitsid")
         for myresults in resultValuesHeaders:
+            lastResult = myresults
             lastVariable = variable
             variable = myresults.variablecode
             lastUnit = unit
@@ -1885,9 +1887,10 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
                     myfile.write(myresults.csvheader())
                     firstheader = False
                 myfile.write(myresults.csvheaderShort())
-                emailtext = emailtext + ' - ' + myresults.csvheaderShort()
+                emailtext = emailtext + ' - ' + str(myresults.email_text())
                 # elif not lastUnit==unit:
                 # myfile.write(myresults.csvheaderShortUnitOnly())
+
         if profileResult:
             resultValuesSeries = resultValuesSeries.filter(
                 ~Q(
@@ -1914,6 +1917,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
                 "processinglevelcode"
             )
         # myfile.write(lastResult.csvheaderShort())
+        emailtext = emailtext + ' - ' + str(lastResult.email_text())
         myfile.write('\n')
 
         samplingfeaturename = ''

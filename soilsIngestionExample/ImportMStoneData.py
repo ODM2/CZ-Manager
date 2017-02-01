@@ -4,8 +4,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
 
-import ODM2CZOData.modelHelpers as modelHelpers
-from ODM2CZOData.models import Actions, Units, Variables
+import odm2admin.modelHelpers as modelHelpers
+from odm2admin.models import Actions, Units, Variables
 
 __author__ = 'leonmi'
 

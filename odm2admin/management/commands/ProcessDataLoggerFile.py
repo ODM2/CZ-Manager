@@ -14,15 +14,23 @@ from django.core.management import settings
 from django.db import IntegrityError
 from django.db import transaction
 from django.db.models import Min, Max
+from datetime import datetime
 
-from ODM2CZOData.models import CvCensorcode
-from ODM2CZOData.models import CvQualitycode
-from ODM2CZOData.models import Dataloggerfilecolumns
-from ODM2CZOData.models import Dataloggerfiles
-from ODM2CZOData.models import Extensionproperties
-from ODM2CZOData.models import Resultextensionpropertyvalues
-from ODM2CZOData.models import Timeseriesresults
-from ODM2CZOData.models import Timeseriesresultvalues
+from odm2admin.models import CvCensorcode
+from odm2admin.models import CvQualitycode
+from odm2admin.models import Dataloggerfilecolumns
+from odm2admin.models import Dataloggerfiles
+from odm2admin.models import Extensionproperties
+from odm2admin.models import Resultextensionpropertyvalues
+from odm2admin.models import Timeseriesresults
+from odm2admin.models import Timeseriesresultvalues
+from odm2admin.models import Dataquality
+from odm2admin.models import Resultsdataquality
+from odm2admin.models import People
+from odm2admin.models import CvDataqualitytype
+from odm2admin.models import CvAnnotationtype
+from odm2admin.models import Annotations
+from odm2admin.models import Timeseriesresultvalueannotations
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
 
@@ -54,16 +62,12 @@ def updateStartDateEndDate(results, startdate, enddate):
         #
         Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
             propertyid=StartDateProperty).update(propertyvalue=startdate)
-        # repvstart = Resultextensionpropertyvalues.objects.filter(resultid=results.
-        # resultid).filter(propertyid=StartDateProperty).get()
-        # print(repvstart.propertyvalue)
+        # repvstart.propertyvalue=startdate
+
         Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
             propertyid=EndDateProperty).update(propertyvalue=enddate)
-        # repvend = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).
-        # filter(propertyid=EndDateProperty).get()
-        # repvend, new = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).
-        # filter(propertyid=EndDateProperty).get()
-        # print(repvend.propertyvalue)
+        # repvend.propertyvalue = enddate
+
     except ObjectDoesNotExist:
         # raise CommandError("couldn't find extension property values " +str(repvstart) + "for " +
         # str(StartDateProperty + "for" + str(results))
@@ -75,6 +79,7 @@ def updateStartDateEndDate(results, startdate, enddate):
                                                 propertyvalue=enddate)
         # print(repvend.propertyvalue)
         repvend.save()
+    # return repvstart, repvend
 
 
 class Command(BaseCommand):
@@ -86,7 +91,6 @@ class Command(BaseCommand):
         parser.add_argument('check_dates', nargs=1, type=bool)
         parser.add_argument('cmdline', nargs=1, type=bool)
 
-    @transaction.atomic
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
         # cmdline = bool(options['cmdline'][0])
         filename = str(options['dataloggerfilelink'][0])
@@ -97,6 +101,9 @@ class Command(BaseCommand):
         databeginson = int(options['databeginson'][0])  # int(databeginson[0])
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
         rowColumnMap = list()
+        bulktimeseriesvalues = []
+        upper_bound_quality_type = CvDataqualitytype.objects.get(name = 'Physical limit upper bound')
+        lower_bound_quality_type = CvDataqualitytype.objects.get(name = 'Physical limit lower bound')
         try:
             with io.open(file, 'rt', encoding='ascii') as f:
                 # reader = csv.reader(f)
@@ -166,8 +173,8 @@ class Command(BaseCommand):
                         #         resultid__in=DataloggerfilecolumnSet.values("resultid"))
                         #     mrvs = Timeseriesresultvalues.objects.filter(resultid__in=mrs)
                         for colnum in rowColumnMap:
-                            # x[0] for x in my_tuples
-                            # colnum[0] = column number, colnum[1] = dataloggerfilecolumn object
+                            dataqualitybool = True
+                            # this assumes that the first column is the date and time
                             if not colnum.columnnum == 0:
                                 # raise ValidationError("result: " + str(colnum.resultid) +
                                 # " datavalue "+
@@ -176,6 +183,23 @@ class Command(BaseCommand):
 
                                 Timeseriesresult = Timeseriesresults.objects.filter(
                                     resultid=colnum.resultid)
+                                # try to get data quality upper and lower bounds if they don't exist
+                                # proceed without checking.
+                                try:
+                                    resultsdataquality = Resultsdataquality.objects.filter(resultid=colnum.resultid)
+                                    dataquality = Dataquality.objects.filter(
+                                        dataqualityid__in=resultsdataquality.values('dataqualityid'))
+                                    #assumption only one upper bound and one lower bound per result
+                                    result_upper_bound = dataquality.get(
+                                        dataqualitytypecv=upper_bound_quality_type)
+                                    result_lower_bound = dataquality.get(
+                                        dataqualitytypecv=lower_bound_quality_type)
+                                    annotationtypecv = CvAnnotationtype.objects.filter(
+                                        name="Time series result value annotation").get()
+                                    annotationdatetime = datetime.now()
+                                    annotatorid = People.objects.filter(personid=1).get()
+                                except ObjectDoesNotExist:
+                                    dataqualitybool = False
                                 if Timeseriesresult.count() == 0:
                                     raise CommandError(
                                         'No Measurement results for column ' + colnum.columnlabel +
@@ -187,7 +211,9 @@ class Command(BaseCommand):
                                 # print("value to save")
                                 # print(value)
                                 censorcode = CvCensorcode.objects.filter(name="Not censored").get()
-                                qualitycode = CvQualitycode.objects.filter(name="Good").get()
+                                qualitycodegood = CvQualitycode.objects.filter(name="Good").get()
+                                qualitycodebad = CvQualitycode.objects.filter(name='Bad').get()
+                                qualitycode = None
                                 for mresults in Timeseriesresult:
                                     try:
                                         if value == '':
@@ -199,9 +225,91 @@ class Command(BaseCommand):
                                             try:
                                                 pass
                                             except ObjectDoesNotExist:
-                                                Timeseriesresultvalues(
+                                                print('check dates not in effect this should not print')
+                                                # bulktimeseriesvalues.append(Timeseriesresultvalues(
+                                                #     resultid=mresults,
+                                                #     datavalue=row[colnum.columnnum],
+                                                #     valuedatetime=datestr,
+                                                #     valuedatetimeutcoffset=4,
+                                                #     censorcodecv=censorcode,
+                                                #     qualitycodecv=qualitycode,
+                                                #     timeaggregationinterval=mresults
+                                                #     .intendedtimespacing,
+                                                #     timeaggregationintervalunitsid=mresults
+                                                #     .intendedtimespacingunitsid
+                                                # ))
+                                        else:
+                                            newdatavalue = float(row[colnum.columnnum])
+                                            qualitycode = qualitycodegood
+                                            if dataqualitybool:
+                                                if newdatavalue > result_upper_bound.dataqualityvalue:
+                                                    with transaction.atomic():
+                                                        annotationtext = result_upper_bound.dataqualitycode + \
+                                                            " of " + str(result_upper_bound.dataqualityvalue) \
+                                                            + " exceeded, raw value was " + str(newdatavalue)
+                                                        annotation= Annotations(annotationtypecv=annotationtypecv,
+                                                                annotationcode="Value out of Range: High",
+                                                                annotationtext=annotationtext,
+                                                                annotationdatetime=annotationdatetime,
+                                                                annotationutcoffset=4, annotatorid=annotatorid)
+                                                        newdatavalue =float('NaN')
+                                                        qualitycode = qualitycodebad
+                                                        tsvr = Timeseriesresultvalues(
+                                                            resultid=mresults,
+                                                            datavalue=newdatavalue,
+                                                            valuedatetime=datestr,
+                                                            valuedatetimeutcoffset=4,
+                                                            censorcodecv=censorcode,
+                                                            qualitycodecv=qualitycode,
+                                                            timeaggregationinterval=mresults
+                                                            .intendedtimespacing,
+                                                            timeaggregationintervalunitsid=mresults
+                                                            .intendedtimespacingunitsid
+                                                            )
+                                                        annotation.save()
+                                                        tsvr.save()
+                                                        tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
+                                                                                         annotationid=annotation).save()
+
+                                                elif newdatavalue < result_lower_bound.dataqualityvalue:
+                                                    with transaction.atomic():
+                                                        annotationtext = "value below " + \
+                                                            result_lower_bound.dataqualitycode + \
+                                                            " of " + str(result_lower_bound.dataqualityvalue) \
+                                                            + ", raw value was " + str(newdatavalue)
+                                                        annotation= Annotations(annotationtypecv=annotationtypecv,
+                                                                annotationcode="Value out of Range: Low",
+                                                                annotationtext=annotationtext,
+                                                                annotationdatetime=annotationdatetime,
+                                                                annotationutcoffset=4, annotatorid=annotatorid)
+
+                                                        newdatavalue =float('NaN')
+                                                        qualitycode = qualitycodebad
+                                                        tsvr = Timeseriesresultvalues(
+                                                            resultid=mresults,
+                                                            datavalue=newdatavalue,
+                                                            valuedatetime=datestr,
+                                                            valuedatetimeutcoffset=4,
+                                                            censorcodecv=censorcode,
+                                                            qualitycodecv=qualitycode,
+                                                            timeaggregationinterval=mresults
+                                                            .intendedtimespacing,
+                                                            timeaggregationintervalunitsid=mresults
+                                                            .intendedtimespacingunitsid
+                                                            )
+                                                        annotation.save()
+                                                        tsvr.save()
+                                                        tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
+                                                                                         annotationid=annotation).save()
+                                                else:
+                                                    dataqualitybool = False
+                                            # print(row[colnum.columnnum])
+                                            # check if values are above or below quality bounds
+                                            # create an annotation if they are.
+                                            if not dataqualitybool:
+                                                tsvr = Timeseriesresultvalues(
                                                     resultid=mresults,
-                                                    datavalue=row[colnum.columnnum],
+                                                    datavalue=newdatavalue,
                                                     valuedatetime=datestr,
                                                     valuedatetimeutcoffset=4,
                                                     censorcodecv=censorcode,
@@ -210,21 +318,8 @@ class Command(BaseCommand):
                                                     .intendedtimespacing,
                                                     timeaggregationintervalunitsid=mresults
                                                     .intendedtimespacingunitsid
-                                                ).save()
-                                        else:
-                                            # print(row[colnum.columnnum])
-                                            Timeseriesresultvalues(
-                                                resultid=mresults,
-                                                datavalue=row[colnum.columnnum],
-                                                valuedatetime=datestr,
-                                                valuedatetimeutcoffset=4,
-                                                censorcodecv=censorcode,
-                                                qualitycodecv=qualitycode,
-                                                timeaggregationinterval=mresults
-                                                .intendedtimespacing,
-                                                timeaggregationintervalunitsid=mresults
-                                                .intendedtimespacingunitsid
-                                            ).save()
+                                                )
+                                                bulktimeseriesvalues.append(tsvr)
                                             # print("saved value")
                                     except IntegrityError:
                                         pass
@@ -233,15 +328,17 @@ class Command(BaseCommand):
                     i += 1
                     # Timeseriesresults.objects.raw("SELECT odm2.\
                     # "TimeseriesresultValsToResultsCountvalue\"()")
+            Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
+            bulktimeseriesvalues = None
 
         except IndexError:
             raise ValidationError('encountered a problem with row ' + str(i) for i in row)
-
+        bulkpropertyvals = []
         for colnum in rowColumnMap:
             results = Timeseriesresults.objects.filter(resultid=colnum.resultid)
             for result in results:
-                mrvs_count = len(Timeseriesresultvalues.objects.filter(resultid=result))
-                if mrvs_count > 0:
+                mrvsexist = Timeseriesresultvalues.objects.filter(resultid=result).exists()
+                if mrvsexist:
                     startdate = Timeseriesresultvalues.objects.filter(resultid=result).annotate(
                         Min('valuedatetime')). \
                         order_by('valuedatetime')[0].valuedatetime.strftime(
@@ -249,4 +346,8 @@ class Command(BaseCommand):
                     enddate = Timeseriesresultvalues.objects.filter(resultid=result).annotate(
                         Max('valuedatetime')). \
                         order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-                    updateStartDateEndDate(result, startdate, enddate)
+                    updateStartDateEndDate(result, startdate, enddate) # repvstart, repvend =
+                    # bulkpropertyvals.append(repvstart)
+                    # bulkpropertyvals.append(repvend)
+        # will bulk create or update the property values
+        # Resultextensionpropertyvalues.objects.bulk_create(bulkpropertyvals)
