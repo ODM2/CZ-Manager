@@ -2849,7 +2849,7 @@ class Timeseriesresultvaluesextwannotations(models.Model):
     timeaggregationintervalunitsid = models.IntegerField()
     samplingfeaturename = models.CharField(verbose_name='sampling feature name',
                                            max_length=255, blank=True, null=True)
-    sampling_feature_type = models.CharField()
+    samplingfeaturetypecv = models.CharField()
     processinglevelcode = models.CharField(verbose_name='processing level code', max_length=50)
     variablecode = models.CharField(verbose_name='variable code', max_length=50)
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
