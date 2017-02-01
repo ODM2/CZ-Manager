@@ -1881,8 +1881,8 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
             # only add the first instance of each variable, once one repeats your done.
             # break
             if not lastVariable == variable or not lastUnit == unit or not lastProcessingCode == \
-                    processingCode:
-                variablesAndUnits.append(variable + unit + processingCode)
+                    processingCode or not myresults.resultid == lastResult.resultid:
+                variablesAndUnits.append(variable + unit + processingCode +myresults.resultid)
                 if firstheader:
                     myfile.write(myresults.csvheader())
                     firstheader = False
