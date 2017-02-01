@@ -2839,25 +2839,17 @@ class Timeseriesresultvaluesext(models.Model):
 
 class Timeseriesresultvaluesextwannotations(models.Model):
     valueid = models.AutoField(primary_key=True)
-    resultid = models.ForeignKey(Timeseriesresults, db_column='resultid',
-                                 on_delete=models.DO_NOTHING)
+    resultid = models.IntegerField()
     datavalue = models.FloatField()
     valuedatetime = models.DateTimeField()
     valuedatetimeutcoffset = models.IntegerField()
-    censorcodecv = models.ForeignKey(CvCensorcode, db_column='censorcodecv',
-                                     on_delete=models.DO_NOTHING)
-    qualitycodecv = models.ForeignKey(CvQualitycode, db_column='qualitycodecv',
-                                      on_delete=models.DO_NOTHING)
+    censorcodecv = models.CharField()
+    qualitycodecv = models.CharField()
     timeaggregationinterval = models.FloatField(verbose_name="Time Interval")
-    timeaggregationintervalunitsid = models.ForeignKey('Units', related_name='+',
-                                                       verbose_name="Time Units",
-                                                       db_column='timeaggregationintervalunitsid',
-                                                       on_delete=models.DO_NOTHING)
+    timeaggregationintervalunitsid = models.IntegerField()
     samplingfeaturename = models.CharField(verbose_name='sampling feature name',
                                            max_length=255, blank=True, null=True)
-    sampling_feature_type = models.ForeignKey(CvSamplingfeaturetype,
-                                              db_column='samplingfeaturetypecv',
-                                              on_delete=models.DO_NOTHING)
+    sampling_feature_type = models.CharField()
     processinglevelcode = models.CharField(verbose_name='processing level code', max_length=50)
     variablecode = models.CharField(verbose_name='variable code', max_length=50)
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
