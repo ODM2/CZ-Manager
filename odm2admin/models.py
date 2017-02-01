@@ -51,7 +51,12 @@ def handle_uploaded_file(f, id):
 
 
 def buildCitation(s, self):
-    datasetresults = Datasetsresults.objects.filter(resultid=self.resultid.resultid)
+    result = None
+    if hasattr(self.resultid, 'resultid'):
+        result = self.resultid.resultid
+    else:
+        result = Results.objects.get(resultid=self.resultid)
+    datasetresults = Datasetsresults.objects.filter(resultid=result)
     dsCitations = Datasetcitations.objects.filter(datasetid__in=datasetresults.values("datasetid"))
     citations = Citations.objects.filter(citationid__in=dsCitations.values("citationid"))
 
