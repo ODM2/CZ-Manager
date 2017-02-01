@@ -1,7 +1,7 @@
 import csv
 
 import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "odm2admin.templatesAndSettings.settings")
 
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()

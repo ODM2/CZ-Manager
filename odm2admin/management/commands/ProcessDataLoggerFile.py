@@ -24,7 +24,7 @@ from ODM2CZOData.models import Resultextensionpropertyvalues
 from ODM2CZOData.models import Timeseriesresults
 from ODM2CZOData.models import Timeseriesresultvalues
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "odm2admin.templatesAndSettings.settings")
 
 __author__ = 'leonmi'
 # using atomic transaction should improve the speed of loading the data.

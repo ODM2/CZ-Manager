@@ -23,10 +23,10 @@ from django.core import management
 # from oauth2_provider.views.generic import ProtectedResourceView
 from django.http import HttpResponse
 import requests
-# from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
-# from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DISCLAIMER
-# from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
-# from templatesAndSettings.settings import RECAPTCHA_PRIVATE_KEY
+# from odm2admin.templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
+# from odm2admin.templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DISCLAIMER
+# from odm2admin.templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
+# from odm2admin.templatesAndSettings.settings import RECAPTCHA_PRIVATE_KEY
 from .models import Actions
 from .models import Authorlists
 from .models import Citationextensionpropertyvalues
@@ -1226,8 +1226,8 @@ def email_data_from_graph(request):
             myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
                     .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
         emailspreadsheet2(request, myresultSeriesExport, False) # for command str_selectedresultid_ids
-        
-        # .after_response    
+
+        # .after_response
         emailsent=True
     return HttpResponse({'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'emailsent': emailsent,

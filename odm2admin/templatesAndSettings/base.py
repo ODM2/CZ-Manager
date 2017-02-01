@@ -185,9 +185,9 @@ MIDDLEWARE_CLASSES = (
     # 'admin_reorder.middleware.ModelAdminReorder',
 )
 
-ROOT_URLCONF = 'templatesAndSettings.urls'
+ROOT_URLCONF = 'odm2admin.templatesAndSettings.urls'
 
-WSGI_APPLICATION = 'templatesAndSettings.wsgi.application'
+WSGI_APPLICATION = 'odm2admin.templatesAndSettings.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases

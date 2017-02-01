@@ -5,10 +5,10 @@ import os
 from celery import Celery
 
 # set the default Django settings module for the 'celery' program.
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "odm2admin.templatesAndSettings.settings")
 from django.conf import settings  # noqa
 
-app = Celery('templatesAndSettings')
+app = Celery('odm2admin.templatesAndSettings')
 
 # Using a string here means the worker will not have to
 # pickle the object when using Windows.

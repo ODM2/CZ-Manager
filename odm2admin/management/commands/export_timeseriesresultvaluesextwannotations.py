@@ -15,7 +15,7 @@ from ODM2CZOData.models import Timeseriesresultvaluesext
 from ODM2CZOData.models import Results
 from ODM2CZOData.models import Timeseriesresultvaluesextwannotations
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "odm2admin.templatesAndSettings.settings")
 
 parser = argparse.ArgumentParser(description='export time series result values with annotations, if annotations exist.')
 
