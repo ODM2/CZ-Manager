@@ -53,7 +53,7 @@ def walk_subpkg(name):
             data_files.append(os.path.join(sub_dir, f))
     return data_files
 
-package_data = {'': walk_subpkg('templatesAndSettings')}
+pkg_data = {'': walk_subpkg('templatesAndSettings/templates')}
 
 setup(name='odm2admin',
       version=extract_version(),
@@ -77,8 +77,7 @@ setup(name='odm2admin',
       install_requires=install_requires,
       packages=find_packages(),
       tests_require=['pytest'],
-      package_data=package_data,
-      include_package_data=True,
+      package_data=pkg_data,
       zip_safe=False,
       cmdclass=dict(test=PyTest),
       author=['Miguel Leon'],
