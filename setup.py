@@ -43,6 +43,18 @@ with open('requirements.txt') as f:
     require = f.readlines()
 install_requires = [r.strip() for r in require]
 
+def walk_subpkg(name):
+    data_files = []
+    package_dir = 'odm2admin'
+    for parent, dirs, files in os.walk(os.path.join(package_dir, name)):
+        # Remove package_dir from the path.
+        sub_dir = os.sep.join(parent.split(os.sep)[1:])
+        for f in files:
+            data_files.append(os.path.join(sub_dir, f))
+    return data_files
+
+pkg_data = {'': walk_subpkg('templatesAndSettings/templates')}
+
 setup(name='odm2admin',
       version=extract_version(),
       license=LICENSE,
