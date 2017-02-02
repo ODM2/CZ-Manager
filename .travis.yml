@@ -2,6 +2,9 @@ language: python
 
 sudo: false
 
+services:
+  - postgresql
+
 matrix:
   fast_finish: true
   include:
@@ -31,6 +34,7 @@ install:
 
 before_script:
   # We can add more tests that uses this later on.
+  - python manage.py migrate
   - python manage.py runserver &
 
 script:
