@@ -1,6 +1,6 @@
 import os
 import sys
-from setuptools import setup
+from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
 
@@ -63,7 +63,8 @@ setup(name='odm2admin',
       platforms='any',
       keywords=['ODM2', 'Django'],
       install_requires=install_requires,
-      packages=['odm2admin',],
+      packages=find_packages(),
+      zip_safe=False,
       tests_require=['pytest'],
       cmdclass=dict(test=PyTest),
       author=['Miguel Leon'],

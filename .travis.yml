@@ -17,7 +17,6 @@ matrix:
   - python: 3.5
     env: TEST_TARGET=coding_standards
 
-
 before_install:
     - wget http://bit.ly/miniconda -O miniconda.sh
     - bash miniconda.sh -b -p $HOME/miniconda
@@ -27,9 +26,12 @@ before_install:
     - conda create --yes -n TEST python=$TRAVIS_PYTHON_VERSION --file requirements.txt --file requirements-dev.txt
     - source activate TEST
 
-
 install:
   - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2admin-${version}.tar.gz && popd
+
+before_script:
+  # We can add more tests that uses this later on.
+  - python manage.py runserver &
 
 script:
   - if [[ $TEST_TARGET == 'default' ]]; then
