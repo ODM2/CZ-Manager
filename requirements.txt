@@ -1,5 +1,6 @@
 django-admin-shortcuts
-django-ajax-selects
+# See https://github.com/miguelcleon/ODM2-Admin/issues/104
+django-ajax-selects==1.4.3
 django-apptemplates
 django-daterange-filter
 django-import-export
