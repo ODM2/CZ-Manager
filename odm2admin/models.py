@@ -857,7 +857,7 @@ class CvSpecimenmedium(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_specimenmedium'
+        db_table = r'odm2"."cv_medium'
         ordering = ['term', 'name']
 
 
