@@ -9,7 +9,6 @@ from django.contrib import admin
 from django.db.models import Max
 from django.db.models import Min
 from django.db.models import Q
-from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import StreamingHttpResponse
 from django.shortcuts import render
@@ -477,26 +476,7 @@ def web_map(request, dataset='NotSet'):
     # annotate(Max('valuedatetime'))\
     #             .order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
 
-    legend_ref = [
-        dict(feature_type="CZO", icon="fa fa-flag-o", color="purple",
-             style_class="awesome-marker-icon-purple"),
-        dict(feature_type="Excavation", icon="fa-spoon", color="darkred",
-             style_class="awesome-marker-icon-darkred"),
-        dict(feature_type="Field area", icon="fa-map-o", color="darkblue",
-             style_class="awesome-marker-icon-darkblue"),
-        dict(feature_type="Weather station", icon="fa-cloud", color="darkblue",
-             style_class="awesome-marker-icon-darkblue"),
-        dict(feature_type="Ecological land classification", icon="fa-bar-chart", color="darkpurple",
-             style_class="awesome-marker-icon-darkpurple"),
-        dict(feature_type="Observation well", icon="fa-eye", color="orange",
-             style_class="awesome-marker-icon-orange"),
-        dict(feature_type="Site", icon="fa-dot-circle-o", color="green",
-             style_class="awesome-marker-icon-green"),
-        dict(feature_type="Stream gage", icon="fa-tint", color="blue",
-             style_class="awesome-marker-icon-blue"),
-        dict(feature_type="Transect", icon="fa-area-chart", color="cadetblue",
-             style_class="awesome-marker-icon-cadetblue")
-    ]
+    legend_ref = [ settings.LEGEND_MAP[sftype] for sftype in map_config['feature_types']]
 
     base_maps = [
         {

@@ -43,6 +43,7 @@ from .models import Relatedactions
 from .models import Relatedfeatures
 from .models import Results
 from .models import Resultsdataquality
+from .models import Samplingfeatureextensionpropertyvalues
 from .models import Samplingfeatureexternalidentifiers
 from .models import Samplingfeatures
 from .models import Taxonomicclassifiers
@@ -678,6 +679,29 @@ class ReadOnlyIGSNInline(IGSNInline):
     def has_add_permission(self, request):
         return False
 
+class SamplingfeatureextensionpropertiesInline(admin.StackedInline):
+    model = Samplingfeatureextensionpropertyvalues
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('bridgeid',
+                       'samplingfeatureid',
+                       'propertyid',
+                       'propertyvalue',
+                       )
+        }),
+    )
+    max_num = 2
+    extra = 0
+
+
+class ReadOnlySamplingfeatureextensionpropertiesInline(IGSNInline):
+    readonly_fields = SamplingfeatureextensionpropertiesInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
 
 class SamplingfeaturesAdmin(ReadOnlyAdmin):
     # For readonly usergroup
@@ -685,7 +709,7 @@ class SamplingfeaturesAdmin(ReadOnlyAdmin):
     user_readonly_inlines = [ReadOnlyFeatureActionsInline, ReadOnlyIGSNInline]
 
     form = SamplingfeaturesAdminForm
-    inlines_list = [FeatureActionsInline, IGSNInline]
+    inlines_list = [FeatureActionsInline, IGSNInline, SamplingfeatureextensionpropertiesInline]
 
     search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name',
                      'samplingfeaturename',
@@ -1154,9 +1178,16 @@ class ActionsAdmin(ReadOnlyAdmin):
     form = ActionsAdminForm
     inlines_list = [FeatureActionsInline]
 
-    list_display = ('action_type', 'method', 'begindatetime', 'enddatetime')
+    def method_link(self, obj):
+        return u'<a href="{0}methods/{1}/">{2}</a>'.format(settings.CUSTOM_TEMPLATE_PATH,
+                                                            obj.method.methodid, obj.method.methodname)
+
+    list_display = ('action_type', 'method_link', 'begindatetime', 'enddatetime')
     list_display_links = ('action_type',)
     search_fields = ['action_type__name', 'method__methodname']  # ,
+
+    method_link.short_description = 'Method'
+    method_link.allow_tags = True
 
 
 class ActionByAdminForm(ModelForm):

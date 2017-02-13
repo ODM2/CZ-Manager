@@ -14,7 +14,8 @@ class ReadOnlyAdmin(admin.OSMGeoAdmin):
         if 'featuregeometrywkt' in form.declared_fields and self.__user_is_readonly(request):
             form.declared_fields['featuregeometrywkt'].widget.attrs['readonly'] = True
 
-        autoselect_fields_check_can_add(form, self.model, request.user)
+        # This is commented since django ajax selects doesn't seem to work with it
+        # autoselect_fields_check_can_add(form, self.model, request.user)
 
         return form
 
