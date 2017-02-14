@@ -34,7 +34,11 @@ pip install -r requirements.txt
 or
 
 # creates an env with the depepencies
-conda create --yes -n ENVNAME python=3.5 --file requirements.txt
+conda config --add channels conda-forge --force
+conda create -n ENVNAME python=2.7 --file requirements.txt
+
+or create the conda environment with the developement requirements as well:
+conda create -n ENVNAME python=2.7 --file requirements.txt --file requirements-dev.txt
 
 # install the dependencies in the current env similar to the pip command above
 conda install --file requirements.txt
