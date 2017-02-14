@@ -28,9 +28,12 @@ import requests
 # from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
 # from templatesAndSettings.settings import RECAPTCHA_PRIVATE_KEY
 from .models import Actions
+from .models import Annotations
 from .models import Authorlists
 from .models import Citationextensionpropertyvalues
 from .models import Citations
+from .models import CvQualitycode
+from .models import CvAnnotationtype
 from .models import Datasets
 from .models import Datasetsresults
 from .models import Featureactions
@@ -45,6 +48,7 @@ from .models import Samplingfeatures
 from .models import Timeseriesresultvalues
 from .models import Timeseriesresultvaluesext
 from .models import Timeseriesresultvaluesextwannotations
+from .models import Timeseriesresultvalueannotations
 from .models import Units
 from .models import Variables
 from .models import Timeseriesresults
@@ -1203,6 +1207,84 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                                                 'authenticated': authenticated, 'methods': methods,
                                                 'resultList': resultList}, )
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+def add_annotation(request):
+    print('annotate')
+    resultid = None
+    annotationvals = None
+    annotation = None
+    setNaNstr = None
+    setNaN = False
+    cvqualitycode = None
+    if 'resultidu[]' in request.POST:
+        resultid = request.POST.getlist('resultidu[]')
+        # print(resultid)
+    if 'annotation' in request.POST:
+        annotation = str(request.POST['annotation'])
+        # print(annotation)
+    # annotationtype
+    if 'cvqualitycode' in request.POST:
+        cvqualitycode = str(request.POST['cvqualitycode'])
+    if 'setNaN' in request.POST:
+        setNaNstr = str(request.POST['setNaN'])
+        if setNaNstr == 'false':
+            setNaN = False
+        if setNaNstr == 'true':
+            setNaN = True
+        # print(setNaN)
+    if 'annotationvals[]' in request.POST:
+        annotationvals = request.POST.getlist('annotationvals[]')
+        # print(annotationvals)
+    annotationtype = CvAnnotationtype.objects.get(name='Time series result value annotation')
+    if cvqualitycode:
+        qualitycode = CvQualitycode.objects.get(name=cvqualitycode)
+    # annotator = People.objects.filter(personfirstname='Miguel').filter(personlastname='Leon')
+    annotationobj = Annotations(annotationtypecv= annotationtype, annotationcode='',
+                                annotationtext=annotation, annotationdatetime=datetime.now(),
+                                annotationutcoffset=4)
+    annotationobj.save()
+    lastannotationval = None
+    for rid in resultid:
+        intrid = int(rid)
+        for annotationval in annotationvals:
+            if is_number(annotationval):
+                floatval = float(annotationval)
+                try:
+                    tsrvquery = Timeseriesresultvalues.objects.filter(resultid=intrid).filter(
+                        valuedatetime=lastannotationval).filter(datavalue=floatval)
+                    # print(tsrvquery.query)
+                    tsrv = tsrvquery.get()
+                    if setNaN:
+                        annotation += ' original value was ' + str(tsrv.datavalue)
+                        annotationobj = Annotations(annotationtypecv= annotationtype, annotationcode='',
+                                                    annotationtext=annotation,
+                                                    annotationdatetime=datetime.now(),
+                                                    annotationutcoffset=4)
+                        annotationobj.save()
+                        tsrv.datavalue = float('nan')
+                        tsrv.qualitycodecv = qualitycode
+                        tsrv.save()
+                    elif cvqualitycode:
+                        tsrv.qualitycodecv = qualitycode
+                        tsrv.save()
+                    tsrvanno = Timeseriesresultvalueannotations(valueid=tsrv,
+                                                                annotationid=annotationobj)
+                except ObjectDoesNotExist:
+                    print('no matching time series result value for query')
+                    print(tsrvquery.query)
+                # tsrvanno.save()
+                # print(tsrvanno.valueid)
+            lastannotationval = annotationval
+    # if resultidu != 'NotSet':
+    #    resultidu = int(resultidu)
+    return HttpResponse({'prefixpath': settings.CUSTOM_TEMPLATE_PATH, },content_type='application/json')
+
 def email_data_from_graph(request):
     emailsent = False
     outEmail = ''
@@ -1243,6 +1325,10 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         authenticated = False
     if popup == 'NotSet':
         template = loader.get_template('chart2.html')
+    elif popup == 'Anno':
+        if not authenticated:
+            return HttpResponseRedirect(settings.CUSTOM_TEMPLATE_PATH)
+        template = loader.get_template('chartAnnotation.html')
     else:
         template = loader.get_template('chartpopup.html')
     data_disclaimer = settings.DATA_DISCLAIMER
@@ -1406,7 +1492,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             else:
                 dataval = result.datavalue
             data['datavalue' + str(i)].append(
-                [mills, dataval])  # dumptoMillis(result.valuedatetime)
+                [mills,dataval])
+               #{"x": mills, "y": dataval, "z": str(result.valueid)})  # dumptoMillis(result.valuedatetime)
             # data['datavalue'].extend(tmplist )
             # data['valuedatetime'].append(dumptoMillis(result.valuedatetime))
 
@@ -1437,7 +1524,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             seriesStr += ' - ' + str(unit)
             name_of_units.append(str(unit))
         series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
-                      str(aggStatistic) + ' - ' + str(location), "yAxis": str(unit),
+                      str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
                       "data": data['datavalue' + str(i)]})
     i = 0
     titleStr = ''
@@ -1465,7 +1552,9 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         int_selectedresultid_ids.append(int(int_selectedresultid))
         str_selectedresultid_ids.append(str(int_selectedresultid))
     csvexport = False
-
+    cvqualitycode = None
+    if popup == 'Anno':
+        cvqualitycode = CvQualitycode.objects.all()
 
         # csvexport = True
         # k=0
@@ -1492,6 +1581,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                                                 'useSamplingFeature': useSamplingFeature,
                                                 'featureActionMethod': featureActionMethod,
                                                 'featureActionLocation': featureActionLocation,
+                                                'cvqualitycode': cvqualitycode,
                                                 'data_disclaimer': data_disclaimer,
                                                 'datasetTitle': datasetTitle,
                                                 'datasetAbstract': datasetAbstract,
@@ -2326,6 +2416,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         key = 'datavalue' + unitAndVariable
         if lastUnitAndVariable != unitAndVariable and update and key in data:
             series.append({"name": tmpUnit + ' - ' + tmpVariableName, "yAxis": tmpUnit,
+                           #"area": {"cropThreshold": 50000},
                            "data": data[
                                'datavalue' + unitAndVariable]})
             # removewd from name +' - '+ tmpLocName

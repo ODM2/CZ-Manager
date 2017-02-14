@@ -1,0 +1,290 @@
+<!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/
+
+
+
+
+-->
+
+{% extends "admin/base_site.html" %}
+{% load admin_extras %}
+{% load static %}
+{% load i18n admin_static admin_shortcuts_tags %}
+
+{# django-admin-shortcuts changes these blocks #}
+
+
+
+ {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}
+</style>
+{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+{% block title %}
+    Time Series | {{ "site_title"|get_title:6 }}
+{% endblock %}
+
+{% block branding%}
+    <h1>{{ "site_header"|get_title:6 }}</h1>
+{% endblock %}
+
+{% block nav-global %}
+    {% if authenticated %}
+        {% include 'user-tools.html' %}
+    {% endif %}
+{% endblock %}
+{% block breadcrumbs %}
+{% if authenticated %}
+	<div class="admin_shortcuts">
+		{% admin_shortcuts %}
+	</div>
+	{% endif %}
+{% endblock %}
+{% block extrahead %}
+{{ block.super }}
+ <script src='https://www.google.com/recaptcha/api.js'></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+
+{% admin_shortcuts_js %}{% endblock %}
+
+{# end changes #}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+
+
+
+{% block content %}
+
+	<script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/highcharts-more.js"></script>
+	<script src="http://code.highcharts.com/modules/exporting.js"></script>
+	 <script src="https://rawgithub.com/RolandBanguiran/highcharts-scalable-yaxis/master/scalable-yaxis.js"></script>
+	 <script src="http://highcharts.github.io/export-csv/export-csv.js"></script>
+	 
+	<script>
+    var chart_id = 'chartid';
+    var chart = {{ chart|safe }};
+    var title2 = {{ title2|safe }};
+    var xAxis = {{ xAxis|safe }};
+    var yAxis = {{ yAxis|safe }};
+    var series = {{ series|safe }};
+	var graphType =   '{{graphType|safe }}';
+	var name_of_units = {{name_of_units|safe}};
+	var annotationvals = [];
+
+	//alert(name_of_units.length);
+
+	//http://jsfiddle.net/gh/get/jquery/1.7.2/highslide-software/highcharts.com/tree/master/samples/highcharts/chart/events-selection-points/
+	 function toast(chart, text) {
+		chart.toast = chart.renderer.label(text, 100, 120)
+			.attr({
+				fill: Highcharts.getOptions().colors[0],
+				padding: 10,
+				r: 5,
+				zIndex: 8
+			})
+			.css({
+				color: '#FFFFFF'
+			})
+			.add();
+
+		setTimeout(function () {
+			chart.toast.fadeOut();
+		}, 2000);
+		setTimeout(function () {
+			chart.toast = chart.toast.destroy();
+		}, 2500);
+	}
+	function selectPointsByDrag(e) {
+
+    // Select points
+    Highcharts.each(this.series, function (series) {
+        Highcharts.each(series.points, function (point) {
+            if (point.x >= e.xAxis[0].min && point.x <= e.xAxis[0].max &&
+                    point.y >= e.yAxis[0].min && point.y <= e.yAxis[0].max) {
+                point.select(true, true);
+				annotationvals.push(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',point.x),point.y); 
+            }
+        });
+    });
+
+    // Fire a custom event
+    Highcharts.fireEvent(this, 'selectedpoints', { points: this.getSelectedPoints() });
+
+    return false; // Don't zoom
+	}
+
+	/**
+	 * The handler for a custom event, fired from selection event
+	 */
+	function selectedPoints(e) {
+		// Show a label
+		toast(this, '<b>' + e.points.length + ' points selected.</b>' +
+			'<br>Click on empty space to deselect.');
+	}
+
+	/**
+	 * On click, unselect all points
+	 */
+	function unselectByClick() {
+		var points = this.getSelectedPoints();
+		if (points.length > 0) {
+			Highcharts.each(points, function (point) {
+				point.select(false);
+			});
+		}
+	}
+	
+$(document).ready(function() {
+	$('#annotationButton').click(function () {
+		//console.log('hello');
+		var $report= $('#report');
+		var annotation = $("#annotation").val();
+		var cvqualitycode = $("#SelectedQualityCode").val();
+		var setNaN = document.getElementById('setNaN').checked //$("#setNaN").checked;
+		//console.log(setNaN);
+		var selectedResult = {{SelectedResults|safe}};
+		$report.html('annotation \'' + annotation + '\' saved.');
+		//console.log(cvqualitycode);
+		//var annotationButton = document.getElementById("annotationButton"); //$("#email_data");
+		//annotationButton.firstChild.data = "annotation saved";
+		$.ajax({
+				url: "{{prefixpath}}../addannotation/",
+				type: "POST",
+				data: {
+					'resultidu': selectedResult,
+					'annotationvals': annotationvals,
+					'cvqualitycode': cvqualitycode,
+					'annotation': annotation,
+					'setNaN': setNaN,
+					'csrfmiddlewaretoken': '{{ csrf_token }}', 
+				},
+				cache:false,
+		});
+	});
+
+	var $report= $('#report');
+	var opposite2 = false;
+	yaxes = [];
+	
+
+
+	for (var i=0; i<series.length; i++){
+	data = series[i].data;
+		for(var j=0; j<data.length; j++){
+			if(data[j][1]=='null'){
+				data[j][1] = null;
+			}
+			}
+	data.sort();
+	//data = sortOnKeys(data);
+	}
+	
+	for (var i=0; i<name_of_units.length; i++) {
+		name = name_of_units[i];
+		//alert(name);
+		   
+		axi = {id: name,
+		scrollbar: {
+        enabled: true
+    },
+		labels: {
+                format: '{value}',
+                style: {
+                    color: Highcharts.getOptions().colors[i]
+                }
+            },
+		title: {
+			text: name
+		},
+		//lineWidth: 2,
+        //lineColor: Highcharts.getOptions().colors[i],
+		opposite: opposite2
+		};
+		yaxes.push(axi);
+		opposite2 = !opposite2;
+	}
+	//yAxis[1] = yAxis2.replace('"','');
+	//var chart =$('#chartid').Highcharts.stockChart({
+	Highcharts.stockChart('chartid', {
+		chart: {renderTo: chart_id, type:'scatter',
+		zoomType: 'xy',
+		events: {
+			selection: selectPointsByDrag,
+            selectedpoints: selectedPoints,
+            click: unselectByClick
+		},
+		},
+		//type:graphType,
+		rangeSelector: {
+            allButtonsEnabled: false,
+            selected: 2
+        },
+        title: title2,
+        xAxis: xAxis,
+        yAxis:yaxes,
+        series: series,
+		tooltip: {
+    formatter: function() {
+        return ''+
+                 ' Value: ' + this.y + //' id: ' + this.point.z + 
+                '-- Date: '+ Highcharts.dateFormat(' %e-%b-%Y %I:%M %p', this.x);
+    }
+},
+    });
+	//Highcharts.charts[0].xAxis[0].setExtremes(Highcharts.charts[0].xAxis[0].min, Highcharts.charts[0].xAxis[0].max);
+	//Highcharts.charts[0].yAxis[0].setExtremes(Highcharts.charts[0].yAxis[0].min, Highcharts.charts[0].yAxis[0].max);
+	
+	
+	});
+	 
+</script>
+
+<p><h1>
+{% if useDataset %}
+{{datasetTitle}}
+{% else %}
+Location - {{featureActionLocation}}<br>
+{% endif %}
+{% if not useSamplingFeature and not useDataset %}
+Method- {{featureActionMethod}}
+{% endif %}
+</h1>
+    <div id='content-main'> {% csrf_token %}
+	 </div>
+	<div id='chartid' class="chart" style="height:75%; width:100%; margin: 0 auto;"></div>
+	
+<br>
+{% if useDataset %}
+{{datasetAbstract}}
+{% endif %}
+<div id="report"  ></div>
+<table>
+<th>Add an annotation for the selected points</th>
+<tr><td colspan="3" style="vertical-align:middle"><textarea rows="5" cols="100" id="annotation"   name=" Add Annotation"></textarea> Annotation
+</td></tr>
+<tr><td><select class="form-control" id="SelectedQualityCode" name="SelectedQualityCode">
+              <option value="Select"><b>Select</b></option>
+			  {% for qualitycode in cvqualitycode %}
+					<option  value="{{ qualitycode.name }}">{{ qualitycode.name }}</option>
+              {% endfor %}
+            </select></td>
+<td>
+<input id="setNaN" type="checkbox" name="setNaN">set values to NaN (Not a Number)?</input></td><td><button id="annotationButton">Save Annotation</button></td></tr>
+
+</table>
+{% include 'StartEndDateAnnotation.html' %}
+<br><br>
+
+<p>{{data_disclaimer.text}} <a href={{data_disclaimer.link}} target="_blank"> {{data_disclaimer.linktext}}</a></p>
+{% endblock %}
+
+
+{% block overwrite %}
+<!-- Overwrite the base.html jQuery load and put in head for Highcharts to work -->
+{% endblock %}
+{% block extrajs %}
+<!-- Maps the Python template context variables from views.py to the Highchart js variables -->
+
+{% endblock %}

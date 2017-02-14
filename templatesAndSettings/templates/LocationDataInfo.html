@@ -74,7 +74,8 @@ option {
 					<th scope="col"  class="sortable column-resultid">id</th>
 					<th scope="col"  class="sortable column-resultid">Variable</th>
 					<th scope="col"  class="sortable column-resultid">Units</th>
-					<th scope="col"  class="sortable column-resultid">Location</th>
+					<th scope="col"  class="sortable column-resultid">Graph Data</th>
+					<th scope="col"  class="sortable column-resultid">Annotate Data</th>
 					<th scope="col"  class="sortable column-resultid">Processing Level</th></tr>
 						{% endif %}
 						{% assign donut 1 %}
@@ -85,6 +86,7 @@ option {
 									<td >{{Result.variableid.variablecode}}</td>
 									<td >{{Result.unitsid}}</td>
 									<td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}"> View Time Series </a></td>
+									<td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}/popup=Anno/"> View Time Series </a></td>
 									<td > {{Result.processing_level}}</td>
 									</tr>
 					{% endif %} 
