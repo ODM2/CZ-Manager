@@ -1215,7 +1215,7 @@ def is_number(s):
         return False
 
 def add_annotation(request):
-    print('annotate')
+    # print('annotate')
     resultid = None
     annotationvals = None
     annotation = None
@@ -1275,6 +1275,7 @@ def add_annotation(request):
                         tsrv.save()
                     tsrvanno = Timeseriesresultvalueannotations(valueid=tsrv,
                                                                 annotationid=annotationobj)
+                    tsrvanno.save()
                 except ObjectDoesNotExist:
                     print('no matching time series result value for query')
                     print(tsrvquery.query)
