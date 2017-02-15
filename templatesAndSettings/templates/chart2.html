@@ -92,7 +92,7 @@ $(document).ready(function() {
 		   
 		axi = {id: name,
 		scrollbar: {
-        enabled: true
+        enabled: false
     },
 		labels: {
                 format: '{value}',
@@ -108,12 +108,21 @@ $(document).ready(function() {
 		opposite: opposite2
 		};
 		yaxes.push(axi);
-		opposite2 = !opposite2;
+		//opposite2 = !opposite2;
 	}
 	//yAxis[1] = yAxis2.replace('"','');
 	var chart =Highcharts.stockChart('chartid', {
 		chart: {renderTo: chart_id, 
 		type: graphType,  zoomType: 'x',},
+		legend: {
+                            enabled: true,
+                            layout: 'vertical',
+                            align: 'center',
+                            verticalAlign: 'top',
+                            x: 0,
+                            y: 10,
+                            borderWidth: 0
+                        },
         title: title2,
 		rangeSelector: {
             allButtonsEnabled: false,
@@ -168,7 +177,7 @@ Method- {{featureActionMethod}}
 </h1>
     <div id='content-main'> {% csrf_token %}
 	 </div>
-	<div id='chartid' class="chart" style="height:75%; width:100%; margin: 0 auto;"></div>
+	<div id='chartid' class="chart" style="height:100%; width:100%; margin: 0 auto;"></div>
 	
 <br>
 {% if useDataset %}
