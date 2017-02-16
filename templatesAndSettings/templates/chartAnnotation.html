@@ -163,7 +163,56 @@ $(document).ready(function() {
 				cache:false,
 		});
 	});
-
+	//createL1
+	$('#createL1').click(function () {
+		var selectedResult = {{SelectedResults|safe}};
+		$("#createL1").attr("disabled", true);
+		$.ajax({
+				url: "{{prefixpath}}../addL1timeseries/",
+				type: "POST",
+				data: {
+					'resultidu': selectedResult,
+					'createorupdateL1': 'create',
+					'csrfmiddlewaretoken': '{{ csrf_token }}', 
+				},
+				success : function(json) {
+					//$('#post-text').val(''); // remove the value from the input
+					console.log(json); // log the returned json to the console
+					//console.log("success"); // another sanity check
+					var createL1Button = document.getElementById("createL1"); //$("#email_data");
+					createL1Button.firstChild.data = "L1 time series created: "+json.newresultid;
+					$("#createL1").attr("disabled", false);
+					//location.reload();
+        },
+		});
+	});
+	//createL1
+	//updateL1
+	$('#updateL1').click(function () {
+		var selectedResult = {{SelectedResults|safe}};
+		var updateL1Button = $("updateL1");
+		updateL1Button.prop("disabled", true);
+		$.ajax({
+				url: "{{prefixpath}}../addL1timeseries/",
+				type: "POST",
+				data: {
+					'resultidu': selectedResult,
+					'createorupdateL1': 'update',
+					'csrfmiddlewaretoken': '{{ csrf_token }}', 
+				},
+				success : function(json) {
+					//$('#post-text').val(''); // remove the value from the input
+					console.log(json); // log the returned json to the console
+					//console.log("success"); // another sanity check
+					var updateL1Button = $("updateL1"); //$("#email_data");
+					updateL1Button.firstChild.data = json.valuesadded +" values added to L1 from L0";
+					updateL1Button.prop("disabled", false);
+					//location.reload();
+        },
+		});
+	});
+	//updateL1
+	
 	var $report= $('#report');
 	var opposite2 = false;
 	yaxes = [];
@@ -264,14 +313,30 @@ Method- {{featureActionMethod}}
 <th>Add an annotation for the selected points</th>
 <tr><td colspan="3" style="vertical-align:middle"><textarea rows="5" cols="100" id="annotation"   name=" Add Annotation"></textarea> Annotation
 </td></tr>
-<tr><td><select class="form-control" id="SelectedQualityCode" name="SelectedQualityCode">
+<tr><td>Data quality code: <select class="form-control" id="SelectedQualityCode" name="SelectedQualityCode">
               <option value="Select"><b>Select</b></option>
 			  {% for qualitycode in cvqualitycode %}
 					<option  value="{{ qualitycode.name }}">{{ qualitycode.name }}</option>
               {% endfor %}
             </select></td>
 <td>
-<input id="setNaN" type="checkbox" name="setNaN">set values to NaN (Not a Number)?</input></td><td><button id="annotationButton">Save Annotation</button></td></tr>
+{% for result in resultList %}
+	{% for selectedresult in SelectedResults %}
+		{% if result.resultid == selectedresult %}
+			{% if "L0" in result.processing_level|stringformat:"s" %}
+				<input id="setNaN" type="checkbox" name="setNaN" disabled>set values to NaN (Not a Number)?</input></td>
+				{% if not L1exists %}
+					<td><button id="createL1">create new Level 1 QA/QC'd time series</button>
+				{% else %}
+					<td><button id="updateL1">add new values to Level 1 QA/QC'd series</button> Add values from the beginning or the end of the L0 that don't yet exist in L1. 
+				{% endif %} 	
+			{% else %}
+				<input id="setNaN" type="checkbox" name="setNaN">set values to NaN (Not a Number)?</input>
+			{% endif %} 
+		{% endif %}
+	{% endfor %}
+{% endfor %}
+</td><td><button id="annotationButton">Save Annotation</button></td></tr>
 
 </table>
 {% include 'StartEndDateAnnotation.html' %}

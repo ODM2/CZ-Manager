@@ -44,7 +44,10 @@ $(document).ready(function(){
 					'myresultSeriesExport[]': myresultSeriesExport,
 					'csrfmiddlewaretoken': '{{ csrf_token }}', 
 				},
-				cache:false,
+				success : function(json) {
+					var emailbutton = document.getElementById("email_data"); //$("#email_data");
+					emailbutton.firstChild.data = "email sent";
+        },
 		});
 		});
 //	});
@@ -67,7 +70,7 @@ $(document).ready(function(){
 {% endfor %}
 </table>
 	<table ><tr><td>
-	<tr><td>		<input id="startDate" maxlength="100" value= "{{ startDate }}" name="startDate" type="text">
+	<tr><td>	Reload graph using this date range:	<input id="startDate" maxlength="100" value= "{{ startDate }}" name="startDate" type="text">
 			Start Date (format YYYY-MM-DD HH:MM) </input>
 			<input id="endDate" maxlength="100" value= "{{ endDate }}" name="endDate" type="text"/>
 			End Date (format YYYY-MM-DD HH:MM) </input>

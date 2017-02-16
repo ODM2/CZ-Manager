@@ -39,7 +39,8 @@ urlpatterns = [url(r'^' + settings.URL_PATH + '', include(admin.site.urls)),
                # (?:featureaction-(?P<featureaction>\d+)/)?$  (?P<variable_a>(\d+)
                # (?P<feature_action>(\d+))
                url(r'^' + settings.URL_PATH + 'emaildata/$', views.email_data_from_graph),
-                url(r'^' + settings.URL_PATH + 'addannotation/$', views.add_annotation),
+               url(r'^' + settings.URL_PATH + 'addannotation/$', views.add_annotation),
+               url(r'^' + settings.URL_PATH + 'addL1timeseries/$', views.addL1timeseries),
                url(r'^' + settings.URL_PATH + 'graphfa/featureaction=(?P<feature_action>(\d+))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(

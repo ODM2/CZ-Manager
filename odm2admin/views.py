@@ -39,6 +39,7 @@ from .models import Datasetsresults
 from .models import Featureactions
 from .models import Methods
 from .models import People
+from .models import Processinglevels
 from .models import Profileresults
 from .models import Profileresultvalues
 from .models import Relatedfeatures
@@ -1286,6 +1287,84 @@ def add_annotation(request):
     #    resultidu = int(resultidu)
     return HttpResponse({'prefixpath': settings.CUSTOM_TEMPLATE_PATH, },content_type='application/json')
 
+def addL1timeseries(request):
+    resultid = None
+    response_data = {}
+    createorupdateL1 = None
+    pl1 = Processinglevels.objects.get(processinglevelid=2)
+    valuesadded = 0
+    tsresultTocopyBulk = []
+    if 'createorupdateL1' in request.POST:
+        createorupdateL1 = str(request.POST['createorupdateL1'])
+    if 'resultidu[]' in request.POST:
+        resultid = request.POST.getlist('resultidu[]')
+        for result in resultid:
+            if createorupdateL1 == "create":
+                resultTocopy = Results.objects.get(resultid=result)
+                tsresultTocopy = Timeseriesresults.objects.get(resultid=result)
+                resultTocopy.resultid = None
+                resultTocopy.processing_level = pl1
+                resultTocopy.save()
+                tsrvToCopy = Timeseriesresultvalues.objects.filter(resultid=tsresultTocopy)
+                tsresultTocopy.resultid = resultTocopy
+                tsresultTocopy.save()
+                newresult = tsresultTocopy.resultid
+                #tsrvToCopy.update(resultid=tsresultTocopy)
+                for tsrv in tsrvToCopy:
+                    tsrv.resultid = tsresultTocopy
+                    tsrv.valueid = None
+                    tsresultTocopyBulk.append(tsrv)
+                newtsrv = Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
+            elif createorupdateL1 == "update":
+                tsresultL0 = Timeseriesresults.objects.get(resultid=result)
+                resultL0 = Results.objects.get(resultid=result)
+                tsrvL0 = Timeseriesresultvalues.objects.filter(resultid=tsresultL0)
+                tsrvAddToL1Bulk = []
+                relatedL1result = Results.objects.filter(
+                        featureactionid = resultL0.featureactionid).filter(
+                        variableid = resultL0.variableid
+                    ).filter(unitsid = resultL0.unitsid).get(
+                    processing_level=pl1)
+                newresult = relatedL1result.resultid
+                relateL1tsresult = Timeseriesresults.objects.filter(resultid= relatedL1result)
+                #maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
+                #        Max('valuedatetime')). \
+                #        order_by('-valuedatetime')
+                #print(relateL1tsresult)
+                #for r in maxtsrvL1:
+                #    print(r)
+
+                maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
+                        Max('valuedatetime')). \
+                        order_by('-valuedatetime')[0].valuedatetime
+                maxtsrvL0=Timeseriesresultvalues.objects.filter(resultid=tsresultL0).annotate(
+                        Max('valuedatetime')). \
+                        order_by('-valuedatetime')[0].valuedatetime
+                mintsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
+                        Min('valuedatetime')). \
+                        order_by('valuedatetime')[0].valuedatetime
+                mintsrvL0=Timeseriesresultvalues.objects.filter(resultid=tsresultL0).annotate(
+                        Min('valuedatetime')). \
+                        order_by('valuedatetime')[0].valuedatetime
+                if maxtsrvL1 < maxtsrvL0:
+                    tsrvAddToL1 = tsrvL0.filter(valuedatetime__gt=maxtsrvL1)
+                    for tsrv in tsrvAddToL1:
+                        tsrv.resultid = relatedL1result
+                        tsrv.valueid = None
+                        tsrvAddToL1Bulk.append(tsrv)
+                if mintsrvL1 > mintsrvL0:
+                    tsrvAddToL1 = tsrvL0.filter(valuedatetime__lt=mintsrvL1)
+                    for tsrv in tsrvAddToL1:
+                        tsrv.resultid = relatedL1result
+                        tsrv.valueid = None
+                        tsrvAddToL1Bulk.append(tsrv)
+                newtsrv = Timeseriesresultvalues.objects.bulk_create(tsrvAddToL1Bulk)
+            valuesadded = newtsrv.__len__()
+            response_data['valuesadded'] = valuesadded
+            response_data['newresultid'] = newresult
+            print(result)
+    return HttpResponse(json.dumps(response_data),content_type='application/json')
+
 def email_data_from_graph(request):
     emailsent = False
     outEmail = ''
@@ -1397,12 +1476,18 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     selectedMResultSeries = []
     for i in range(0, numresults):
         selectionStr = str('selection' + str(i))
+        # when annotating you can only select a single time series
+        # with a radio button
+        if popup == 'Anno':
+            selectionStr = str('selection')
         if selectionStr in request.POST:
             # raise ValidationError(request.POST[selectionStr])
             for result in resultList:
                 if int(request.POST[selectionStr]) == result.resultid:
                     selectedMResultSeries.append(int(request.POST[selectionStr]))
-
+        # if we are annotating we only have a single selection to find
+        if popup == 'Anno':
+            break
     # selectedMResultSeries = Results.objects.filter(featureactionid=feature_action)
     i = 0
     if selectedMResultSeries.__len__() == 0:
@@ -1509,8 +1594,10 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     series = []
     r = Results.objects.filter(resultid__in=selectedMResultSeries)\
         .order_by("featureactionid","resultid")  # .order_by("unitsid")
+
     tsrs = Timeseriesresults.objects.filter(resultid__in=selectedMResultSeries)\
         .order_by("resultid__resultid__featureactionid","resultid")
+    L1exists = False
     for selectedMResult in r:
         i += 1
         tsr = tsrs.get(resultid=selectedMResult)
@@ -1527,6 +1614,14 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
                       str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
                       "data": data['datavalue' + str(i)]})
+        if popup == 'Anno':
+            relatedresults = Results.objects.filter(
+                featureactionid = selectedMResult.featureactionid).filter(
+                variableid = selectedMResult.variableid
+            ).filter(unitsid = selectedMResult.unitsid)
+            for rr in relatedresults:
+                if rr.processing_level.processinglevelid ==2:
+                    L1exists = True
     i = 0
     titleStr = ''
 
@@ -1589,6 +1684,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                                                 'useDataset': useDataset,
                                                 'startdate': startdate,
                                                 'enddate': enddate,
+                                                'L1exists': L1exists,
                                                 'SelectedResults': int_selectedresultid_ids,
                                                 'authenticated': authenticated,
                                                 'methods': methods,
