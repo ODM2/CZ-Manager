@@ -167,6 +167,9 @@ $(document).ready(function() {
 	$('#createL1').click(function () {
 		var selectedResult = {{SelectedResults|safe}};
 		$("#createL1").attr("disabled", true);
+		var createL1Button = document.getElementById("createL1");
+		createL1Button.disabled = true;
+		createL1Button.firstChild.data = "adding values";
 		$.ajax({
 				url: "{{prefixpath}}../addL1timeseries/",
 				type: "POST",
@@ -177,11 +180,11 @@ $(document).ready(function() {
 				},
 				success : function(json) {
 					//$('#post-text').val(''); // remove the value from the input
-					console.log(json); // log the returned json to the console
+					//console.log(json); // log the returned json to the console
 					//console.log("success"); // another sanity check
 					var createL1Button = document.getElementById("createL1"); //$("#email_data");
 					createL1Button.firstChild.data = "L1 time series created: "+json.newresultid;
-					$("#createL1").attr("disabled", false);
+					createL1Button.disabled = false;
 					//location.reload();
         },
 		});
@@ -190,8 +193,10 @@ $(document).ready(function() {
 	//updateL1
 	$('#updateL1').click(function () {
 		var selectedResult = {{SelectedResults|safe}};
-		var updateL1Button = $("updateL1");
-		updateL1Button.prop("disabled", true);
+		var updateL1Button = document.getElementById("updateL1");
+		updateL1Button.disabled = true;
+		updateL1Button.firstChild.data = "adding values";
+		//console.log(updateL1Button);
 		$.ajax({
 				url: "{{prefixpath}}../addL1timeseries/",
 				type: "POST",
@@ -202,11 +207,11 @@ $(document).ready(function() {
 				},
 				success : function(json) {
 					//$('#post-text').val(''); // remove the value from the input
-					console.log(json); // log the returned json to the console
+					//console.log(json); // log the returned json to the console
 					//console.log("success"); // another sanity check
-					var updateL1Button = $("updateL1"); //$("#email_data");
+					var updateL1Button = document.getElementById("updateL1"); //$("#email_data");
 					updateL1Button.firstChild.data = json.valuesadded +" values added to L1 from L0";
-					updateL1Button.prop("disabled", false);
+					updateL1Button.disabled = false;
 					//location.reload();
         },
 		});

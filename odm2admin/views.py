@@ -1309,7 +1309,7 @@ def addL1timeseries(request):
                 tsresultTocopy.resultid = resultTocopy
                 tsresultTocopy.save()
                 newresult = tsresultTocopy.resultid
-                #tsrvToCopy.update(resultid=tsresultTocopy)
+                # tsrvToCopy.update(resultid=tsresultTocopy)
                 for tsrv in tsrvToCopy:
                     tsrv.resultid = tsresultTocopy
                     tsrv.valueid = None
@@ -1326,13 +1326,14 @@ def addL1timeseries(request):
                     ).filter(unitsid = resultL0.unitsid).get(
                     processing_level=pl1)
                 newresult = relatedL1result.resultid
-                relateL1tsresult = Timeseriesresults.objects.filter(resultid= relatedL1result)
-                #maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
+                relateL1tsresult = Timeseriesresults.objects.filter(resultid= relatedL1result).get()
+                # print(relateL1tsresult)
+                # maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
                 #        Max('valuedatetime')). \
                 #        order_by('-valuedatetime')
-                #print(relateL1tsresult)
-                #for r in maxtsrvL1:
-                #    print(r)
+                # print(relateL1tsresult)
+                # for r in maxtsrvL1:
+                #     print(r)
 
                 maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
                         Max('valuedatetime')). \
@@ -1349,20 +1350,20 @@ def addL1timeseries(request):
                 if maxtsrvL1 < maxtsrvL0:
                     tsrvAddToL1 = tsrvL0.filter(valuedatetime__gt=maxtsrvL1)
                     for tsrv in tsrvAddToL1:
-                        tsrv.resultid = relatedL1result
+                        tsrv.resultid = relateL1tsresult
                         tsrv.valueid = None
                         tsrvAddToL1Bulk.append(tsrv)
                 if mintsrvL1 > mintsrvL0:
                     tsrvAddToL1 = tsrvL0.filter(valuedatetime__lt=mintsrvL1)
                     for tsrv in tsrvAddToL1:
-                        tsrv.resultid = relatedL1result
+                        tsrv.resultid = relateL1tsresult
                         tsrv.valueid = None
                         tsrvAddToL1Bulk.append(tsrv)
                 newtsrv = Timeseriesresultvalues.objects.bulk_create(tsrvAddToL1Bulk)
             valuesadded = newtsrv.__len__()
             response_data['valuesadded'] = valuesadded
             response_data['newresultid'] = newresult
-            print(result)
+            # print(result)
     return HttpResponse(json.dumps(response_data),content_type='application/json')
 
 def email_data_from_graph(request):
