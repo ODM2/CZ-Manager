@@ -1605,7 +1605,6 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             # data['datavalue'].extend(tmplist )
             # data['valuedatetime'].append(dumptoMillis(result.valuedatetime))
 
-    print(data['datavalueannotated'])
     timeseriesresults = Timeseriesresults.objects.\
         filter(resultid__in=resultList.values("resultid")).\
         order_by("resultid__variableid", "aggregationstatisticcv")
@@ -1632,13 +1631,11 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         variable = selectedMResult.variableid.variable_name
         location = selectedMResult.featureactionid.samplingfeatureid.samplingfeaturename
         if i == 1 and not unit == '':
-            print(unit)
             seriesStr += str(unit)
             name_of_units.append(str(unit))
         elif not unit == '':
             seriesStr += ' - ' + str(unit)
             name_of_units.append(str(unit))
-            print(variable)
         series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
                       str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
                       "data": data['datavalue' + str(i)]})
