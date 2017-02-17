@@ -2254,7 +2254,7 @@ class Samplingfeatureextensionpropertyvalues(models.Model):
     def __unicode__(self):
         s = u"%s" % self.samplingfeatureid
         if self.propertyvalue:
-            s += u"- %s" % self.propertyvalue
+            s += u"- %s - %s%s" % (self.propertyid.propertyname, self.propertyvalue, self.propertyid.propertyunitsid.unitsabbreviation)
         return s
 
     class Meta:
