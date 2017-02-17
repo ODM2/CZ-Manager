@@ -1567,9 +1567,20 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     #     emailsent=True
 
     i = 0
-
+    annotationsexist = False
+    print(selectedMResultSeries)
+    if popup == 'Anno':
+        tsrvas = Timeseriesresultvalueannotations.objects.filter(
+            valueid__resultid__in=selectedMResultSeries).filter(
+            valueid__valuedatetime__gt=entered_start_date).filter(
+            valueid__valuedatetime__lt=entered_end_date)
+        if tsrvas.count() > 0:
+            print('time series result value annotation count ' + str(tsrvas.count()))
+            print(tsrvas.query)
+            annotationsexist = True
     for myresults in myresultSeries:
         i += 1
+        resultannotationsexist = False
         for result in myresults:
             start = datetime(1970, 1, 1)
             delta = result.valuedatetime - start
@@ -1580,10 +1591,21 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                 dataval = result.datavalue
             data['datavalue' + str(i)].append(
                 [mills,dataval])
+            if popup == 'Anno':
+                for tsrva in tsrvas:
+                    if tsrva.valueid == result:
+                        print('tsrv annotation value id ' + str(tsrva.valueid))
+                        if not resultannotationsexist:
+                            print('resultannotationsexist')
+                            resultannotationsexist = True
+                            data.update({'datavalueannotated' : []})
+                        data['datavalueannotated'].append(
+                        [mills,dataval])
                #{"x": mills, "y": dataval, "z": str(result.valueid)})  # dumptoMillis(result.valuedatetime)
             # data['datavalue'].extend(tmplist )
             # data['valuedatetime'].append(dumptoMillis(result.valuedatetime))
 
+    print(data['datavalueannotated'])
     timeseriesresults = Timeseriesresults.objects.\
         filter(resultid__in=resultList.values("resultid")).\
         order_by("resultid__variableid", "aggregationstatisticcv")
@@ -1592,6 +1614,9 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     i = 0
     seriesStr = ''
     unit = ''
+    location = ''
+    variable = ''
+    aggStatistic = ''
     series = []
     r = Results.objects.filter(resultid__in=selectedMResultSeries)\
         .order_by("featureactionid","resultid")  # .order_by("unitsid")
@@ -1607,14 +1632,17 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         variable = selectedMResult.variableid.variable_name
         location = selectedMResult.featureactionid.samplingfeatureid.samplingfeaturename
         if i == 1 and not unit == '':
+            print(unit)
             seriesStr += str(unit)
             name_of_units.append(str(unit))
         elif not unit == '':
             seriesStr += ' - ' + str(unit)
             name_of_units.append(str(unit))
+            print(variable)
         series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
                       str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
                       "data": data['datavalue' + str(i)]})
+
         if popup == 'Anno':
             relatedresults = Results.objects.filter(
                 featureactionid = selectedMResult.featureactionid).filter(
@@ -1623,9 +1651,13 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             for rr in relatedresults:
                 if rr.processing_level.processinglevelid ==2:
                     L1exists = True
+            if annotationsexist:
+                series.append({"name": 'Annotated ' + str(unit) + ' - ' + str(variable) + ' - ' +
+                                str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "false", "yAxis": str(unit),
+                                "data": data['datavalueannotated']})
     i = 0
     titleStr = ''
-
+    print(series)
     i = 0
     name_of_sampling_features = set(name_of_sampling_features)
 

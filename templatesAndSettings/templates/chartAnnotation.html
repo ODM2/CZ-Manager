@@ -103,8 +103,12 @@
         Highcharts.each(series.points, function (point) {
             if (point.x >= e.xAxis[0].min && point.x <= e.xAxis[0].max &&
                     point.y >= e.yAxis[0].min && point.y <= e.yAxis[0].max) {
-                point.select(true, true);
-				annotationvals.push(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',point.x),point.y); 
+                //console.log(series.options);
+				//console.log(series.options.allowPointSelect);
+				//if(series.options.allowPointSelect){
+					point.select(true, true);
+					annotationvals.push(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',point.x),point.y); 
+				//}
             }
         });
     });
@@ -274,6 +278,15 @@ $(document).ready(function() {
 		rangeSelector: {
             allButtonsEnabled: false,
             selected: 2
+        },
+		legend: {
+			enabled: true,
+			layout: 'vertical',
+			align: 'center',
+			verticalAlign: 'top',
+			x: 0,
+			y: 10,
+			borderWidth: 0
         },
         title: title2,
         xAxis: xAxis,
