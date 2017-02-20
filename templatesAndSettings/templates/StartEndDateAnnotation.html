@@ -105,13 +105,13 @@ $(document).ready(function(){
 					{% for Result in resultList %}
 						{% if tsr.resultid.resultid == Result.resultid %}
 							<tr class="row1">
-									<td ><input type="checkbox" class="action-checkbox-column" id="s1" 
+									<td ><input type="radio" 
 									{% for SelectedResult in SelectedResults %}
 										{% if Result.resultid == SelectedResult %}
 											checked  
 										{% endif %}
 									{% endfor %}
-									name="selection{{ forloop.counter0 }}" value="{{ Result.resultid }}">{{ Result.feature_action }} </input><br></td>
+									name="selection" value="{{ Result.resultid }}">{{ Result.feature_action }}<br></td>
 										
 										<td >{{Result.resultid}}</td>
 										<td >{{Result.variableid.variablecode}}</td>

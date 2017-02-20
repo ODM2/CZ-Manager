@@ -27,14 +27,18 @@ import requests
 # from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
 # from templatesAndSettings.settings import RECAPTCHA_PRIVATE_KEY
 from .models import Actions
+from .models import Annotations
 from .models import Authorlists
 from .models import Citationextensionpropertyvalues
 from .models import Citations
+from .models import CvQualitycode
+from .models import CvAnnotationtype
 from .models import Datasets
 from .models import Datasetsresults
 from .models import Featureactions
 from .models import Methods
 from .models import People
+from .models import Processinglevels
 from .models import Profileresults
 from .models import Profileresultvalues
 from .models import Relatedfeatures
@@ -44,6 +48,7 @@ from .models import Samplingfeatures
 from .models import Timeseriesresultvalues
 from .models import Timeseriesresultvaluesext
 from .models import Timeseriesresultvaluesextwannotations
+from .models import Timeseriesresultvalueannotations
 from .models import Units
 from .models import Variables
 from .models import Timeseriesresults
@@ -1183,6 +1188,164 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                                                 'authenticated': authenticated, 'methods': methods,
                                                 'resultList': resultList}, )
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+def add_annotation(request):
+    # print('annotate')
+    resultid = None
+    annotationvals = None
+    annotation = None
+    setNaNstr = None
+    setNaN = False
+    cvqualitycode = None
+    if 'resultidu[]' in request.POST:
+        resultid = request.POST.getlist('resultidu[]')
+        # print(resultid)
+    if 'annotation' in request.POST:
+        annotation = str(request.POST['annotation'])
+        # print(annotation)
+    # annotationtype
+    if 'cvqualitycode' in request.POST:
+        cvqualitycode = str(request.POST['cvqualitycode'])
+    if 'setNaN' in request.POST:
+        setNaNstr = str(request.POST['setNaN'])
+        if setNaNstr == 'false':
+            setNaN = False
+        if setNaNstr == 'true':
+            setNaN = True
+        # print(setNaN)
+    if 'annotationvals[]' in request.POST:
+        annotationvals = request.POST.getlist('annotationvals[]')
+        # print(annotationvals)
+    annotationtype = CvAnnotationtype.objects.get(name='Time series result value annotation')
+    if cvqualitycode:
+        qualitycode = CvQualitycode.objects.get(name=cvqualitycode)
+    # annotator = People.objects.filter(personfirstname='Miguel').filter(personlastname='Leon')
+    annotationobj = Annotations(annotationtypecv= annotationtype, annotationcode='',
+                                annotationtext=annotation, annotationdatetime=datetime.now(),
+                                annotationutcoffset=4)
+    annotationobj.save()
+    lastannotationval = None
+    for rid in resultid:
+        intrid = int(rid)
+        for annotationval in annotationvals:
+            if is_number(annotationval):
+                floatval = float(annotationval)
+                try:
+                    tsrvquery = Timeseriesresultvalues.objects.filter(resultid=intrid).filter(
+                        valuedatetime=lastannotationval).filter(datavalue=floatval)
+                    # print(tsrvquery.query)
+                    tsrv = tsrvquery.get()
+                    if setNaN:
+                        annotation += ' original value was ' + str(tsrv.datavalue)
+                        annotationobj = Annotations(annotationtypecv= annotationtype, annotationcode='',
+                                                    annotationtext=annotation,
+                                                    annotationdatetime=datetime.now(),
+                                                    annotationutcoffset=4)
+                        annotationobj.save()
+                        tsrv.datavalue = float('nan')
+                        tsrv.qualitycodecv = qualitycode
+                        tsrv.save()
+                    elif cvqualitycode:
+                        tsrv.qualitycodecv = qualitycode
+                        tsrv.save()
+                    tsrvanno = Timeseriesresultvalueannotations(valueid=tsrv,
+                                                                annotationid=annotationobj)
+                    tsrvanno.save()
+                except ObjectDoesNotExist:
+                    print('no matching time series result value for query')
+                    print(tsrvquery.query)
+                # tsrvanno.save()
+                # print(tsrvanno.valueid)
+            lastannotationval = annotationval
+    # if resultidu != 'NotSet':
+    #    resultidu = int(resultidu)
+    return HttpResponse({'prefixpath': settings.CUSTOM_TEMPLATE_PATH, },content_type='application/json')
+
+def addL1timeseries(request):
+    resultid = None
+    response_data = {}
+    createorupdateL1 = None
+    pl1 = Processinglevels.objects.get(processinglevelid=2)
+    valuesadded = 0
+    tsresultTocopyBulk = []
+    if 'createorupdateL1' in request.POST:
+        createorupdateL1 = str(request.POST['createorupdateL1'])
+    if 'resultidu[]' in request.POST:
+        resultid = request.POST.getlist('resultidu[]')
+        for result in resultid:
+            if createorupdateL1 == "create":
+                resultTocopy = Results.objects.get(resultid=result)
+                tsresultTocopy = Timeseriesresults.objects.get(resultid=result)
+                resultTocopy.resultid = None
+                resultTocopy.processing_level = pl1
+                resultTocopy.save()
+                tsrvToCopy = Timeseriesresultvalues.objects.filter(resultid=tsresultTocopy)
+                tsresultTocopy.resultid = resultTocopy
+                tsresultTocopy.save()
+                newresult = tsresultTocopy.resultid
+                # tsrvToCopy.update(resultid=tsresultTocopy)
+                for tsrv in tsrvToCopy:
+                    tsrv.resultid = tsresultTocopy
+                    tsrv.valueid = None
+                    tsresultTocopyBulk.append(tsrv)
+                newtsrv = Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
+            elif createorupdateL1 == "update":
+                tsresultL0 = Timeseriesresults.objects.get(resultid=result)
+                resultL0 = Results.objects.get(resultid=result)
+                tsrvL0 = Timeseriesresultvalues.objects.filter(resultid=tsresultL0)
+                tsrvAddToL1Bulk = []
+                relatedL1result = Results.objects.filter(
+                        featureactionid = resultL0.featureactionid).filter(
+                        variableid = resultL0.variableid
+                    ).filter(unitsid = resultL0.unitsid).get(
+                    processing_level=pl1)
+                newresult = relatedL1result.resultid
+                relateL1tsresult = Timeseriesresults.objects.filter(resultid= relatedL1result).get()
+                # print(relateL1tsresult)
+                # maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
+                #        Max('valuedatetime')). \
+                #        order_by('-valuedatetime')
+                # print(relateL1tsresult)
+                # for r in maxtsrvL1:
+                #     print(r)
+
+                maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
+                        Max('valuedatetime')). \
+                        order_by('-valuedatetime')[0].valuedatetime
+                maxtsrvL0=Timeseriesresultvalues.objects.filter(resultid=tsresultL0).annotate(
+                        Max('valuedatetime')). \
+                        order_by('-valuedatetime')[0].valuedatetime
+                mintsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
+                        Min('valuedatetime')). \
+                        order_by('valuedatetime')[0].valuedatetime
+                mintsrvL0=Timeseriesresultvalues.objects.filter(resultid=tsresultL0).annotate(
+                        Min('valuedatetime')). \
+                        order_by('valuedatetime')[0].valuedatetime
+                if maxtsrvL1 < maxtsrvL0:
+                    tsrvAddToL1 = tsrvL0.filter(valuedatetime__gt=maxtsrvL1)
+                    for tsrv in tsrvAddToL1:
+                        tsrv.resultid = relateL1tsresult
+                        tsrv.valueid = None
+                        tsrvAddToL1Bulk.append(tsrv)
+                if mintsrvL1 > mintsrvL0:
+                    tsrvAddToL1 = tsrvL0.filter(valuedatetime__lt=mintsrvL1)
+                    for tsrv in tsrvAddToL1:
+                        tsrv.resultid = relateL1tsresult
+                        tsrv.valueid = None
+                        tsrvAddToL1Bulk.append(tsrv)
+                newtsrv = Timeseriesresultvalues.objects.bulk_create(tsrvAddToL1Bulk)
+            valuesadded = newtsrv.__len__()
+            response_data['valuesadded'] = valuesadded
+            response_data['newresultid'] = newresult
+            # print(result)
+    return HttpResponse(json.dumps(response_data),content_type='application/json')
+
 def email_data_from_graph(request):
     emailsent = False
     outEmail = ''
@@ -1223,6 +1386,10 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         authenticated = False
     if popup == 'NotSet':
         template = loader.get_template('chart2.html')
+    elif popup == 'Anno':
+        if not authenticated:
+            return HttpResponseRedirect(settings.CUSTOM_TEMPLATE_PATH)
+        template = loader.get_template('chartAnnotation.html')
     else:
         template = loader.get_template('chartpopup.html')
     data_disclaimer = settings.DATA_DISCLAIMER
@@ -1290,12 +1457,18 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     selectedMResultSeries = []
     for i in range(0, numresults):
         selectionStr = str('selection' + str(i))
+        # when annotating you can only select a single time series
+        # with a radio button
+        if popup == 'Anno':
+            selectionStr = str('selection')
         if selectionStr in request.POST:
             # raise ValidationError(request.POST[selectionStr])
             for result in resultList:
                 if int(request.POST[selectionStr]) == result.resultid:
                     selectedMResultSeries.append(int(request.POST[selectionStr]))
-
+        # if we are annotating we only have a single selection to find
+        if popup == 'Anno':
+            break
     # selectedMResultSeries = Results.objects.filter(featureactionid=feature_action)
     i = 0
     if selectedMResultSeries.__len__() == 0:
@@ -1374,9 +1547,20 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     #     emailsent=True
 
     i = 0
-
+    annotationsexist = False
+    print(selectedMResultSeries)
+    if popup == 'Anno':
+        tsrvas = Timeseriesresultvalueannotations.objects.filter(
+            valueid__resultid__in=selectedMResultSeries).filter(
+            valueid__valuedatetime__gt=entered_start_date).filter(
+            valueid__valuedatetime__lt=entered_end_date)
+        if tsrvas.count() > 0:
+            print('time series result value annotation count ' + str(tsrvas.count()))
+            print(tsrvas.query)
+            annotationsexist = True
     for myresults in myresultSeries:
         i += 1
+        resultannotationsexist = False
         for result in myresults:
             start = datetime(1970, 1, 1)
             delta = result.valuedatetime - start
@@ -1386,7 +1570,18 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             else:
                 dataval = result.datavalue
             data['datavalue' + str(i)].append(
-                [mills, dataval])  # dumptoMillis(result.valuedatetime)
+                [mills,dataval])
+            if popup == 'Anno':
+                for tsrva in tsrvas:
+                    if tsrva.valueid == result:
+                        print('tsrv annotation value id ' + str(tsrva.valueid))
+                        if not resultannotationsexist:
+                            print('resultannotationsexist')
+                            resultannotationsexist = True
+                            data.update({'datavalueannotated' : []})
+                        data['datavalueannotated'].append(
+                        [mills,dataval])
+               #{"x": mills, "y": dataval, "z": str(result.valueid)})  # dumptoMillis(result.valuedatetime)
             # data['datavalue'].extend(tmplist )
             # data['valuedatetime'].append(dumptoMillis(result.valuedatetime))
 
@@ -1398,11 +1593,16 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     i = 0
     seriesStr = ''
     unit = ''
+    location = ''
+    variable = ''
+    aggStatistic = ''
     series = []
     r = Results.objects.filter(resultid__in=selectedMResultSeries)\
         .order_by("featureactionid","resultid")  # .order_by("unitsid")
+
     tsrs = Timeseriesresults.objects.filter(resultid__in=selectedMResultSeries)\
         .order_by("resultid__resultid__featureactionid","resultid")
+    L1exists = False
     for selectedMResult in r:
         i += 1
         tsr = tsrs.get(resultid=selectedMResult)
@@ -1417,11 +1617,24 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             seriesStr += ' - ' + str(unit)
             name_of_units.append(str(unit))
         series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
-                      str(aggStatistic) + ' - ' + str(location), "yAxis": str(unit),
+                      str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
                       "data": data['datavalue' + str(i)]})
+
+        if popup == 'Anno':
+            relatedresults = Results.objects.filter(
+                featureactionid = selectedMResult.featureactionid).filter(
+                variableid = selectedMResult.variableid
+            ).filter(unitsid = selectedMResult.unitsid)
+            for rr in relatedresults:
+                if rr.processing_level.processinglevelid ==2:
+                    L1exists = True
+            if annotationsexist:
+                series.append({"name": 'Annotated ' + str(unit) + ' - ' + str(variable) + ' - ' +
+                                str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "false", "yAxis": str(unit),
+                                "data": data['datavalueannotated']})
     i = 0
     titleStr = ''
-
+    print(series)
     i = 0
     name_of_sampling_features = set(name_of_sampling_features)
 
@@ -1445,7 +1658,9 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         int_selectedresultid_ids.append(int(int_selectedresultid))
         str_selectedresultid_ids.append(str(int_selectedresultid))
     csvexport = False
-
+    cvqualitycode = None
+    if popup == 'Anno':
+        cvqualitycode = CvQualitycode.objects.all()
 
         # csvexport = True
         # k=0
@@ -1472,12 +1687,14 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                                                 'useSamplingFeature': useSamplingFeature,
                                                 'featureActionMethod': featureActionMethod,
                                                 'featureActionLocation': featureActionLocation,
+                                                'cvqualitycode': cvqualitycode,
                                                 'data_disclaimer': data_disclaimer,
                                                 'datasetTitle': datasetTitle,
                                                 'datasetAbstract': datasetAbstract,
                                                 'useDataset': useDataset,
                                                 'startdate': startdate,
                                                 'enddate': enddate,
+                                                'L1exists': L1exists,
                                                 'SelectedResults': int_selectedresultid_ids,
                                                 'authenticated': authenticated,
                                                 'methods': methods,
@@ -2306,6 +2523,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         key = 'datavalue' + unitAndVariable
         if lastUnitAndVariable != unitAndVariable and update and key in data:
             series.append({"name": tmpUnit + ' - ' + tmpVariableName, "yAxis": tmpUnit,
+                           #"area": {"cropThreshold": 50000},
                            "data": data[
                                'datavalue' + unitAndVariable]})
             # removewd from name +' - '+ tmpLocName

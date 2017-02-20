@@ -39,6 +39,8 @@ urlpatterns = [url(r'^' + settings.URL_PATH + '', include(admin.site.urls)),
                # (?:featureaction-(?P<featureaction>\d+)/)?$  (?P<variable_a>(\d+)
                # (?P<feature_action>(\d+))
                url(r'^' + settings.URL_PATH + 'emaildata/$', views.email_data_from_graph),
+               url(r'^' + settings.URL_PATH + 'addannotation/$', views.add_annotation),
+               url(r'^' + settings.URL_PATH + 'addL1timeseries/$', views.addL1timeseries),
                url(r'^' + settings.URL_PATH + 'graphfa/featureaction=(?P<feature_action>(\d+))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
@@ -83,35 +85,30 @@ urlpatterns = [url(r'^' + settings.URL_PATH + '', include(admin.site.urls)),
                    name="mappopuploader"),
                url(
                    r'^' + settings.URL_PATH + 'mappopup/samplingfeature=(?P<samplingfeature>(\d+))/'
-                                     'popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff]'
-                                     '[Aa][Ll][Ss][Ee])))/$',
+                                     'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.mappopuploader, name="mappopuploader"),
 
                url(
                    r'^' + settings.URL_PATH + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
-                                     'popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff]'
-                                     '[Aa][Ll][Ss][Ee])))/$',
+                                     'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
                    r'^' + settings.URL_PATH + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/'
                                      'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/'
-                                     'popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff]'
-                                     '[Aa][Ll][Ss][Ee])))/$',
+                                     'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
                    r'^' + settings.URL_PATH + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'resultidu=(?P<resultidu>(\d+))/'
-                                     'popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff]'
-                                     '[Aa][Ll][Ss][Ee])))/$',
+                                     'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
                    r'^' + settings.URL_PATH + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'resultidu=(?P<resultidu>(\d+))/'
                                      'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/'
                                      'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/'
-                                     'popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff]'
-                                     '[Aa][Ll][Ss][Ee])))/$',
+                                     'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
 
                url(r'^' + settings.URL_PATH + 'graphfa/dataset=(?P<dataset>(\d+))/$',
@@ -140,23 +137,20 @@ urlpatterns = [url(r'^' + settings.URL_PATH + '', include(admin.site.urls)),
                url(
                    r'^' + settings.URL_PATH + 'profilegraph/'
                                      'samplingfeature=(?P<samplingfeature>(\d+))/'
-                                     'popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff]'
-                                     '[Aa][Ll][Ss][Ee])))/$',
+                                     'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.graph_data, name="graph_data"),
                url(
                    r'^' + settings.URL_PATH + 'profilegraph/'
                                      'selectedrelatedfeature='
                                      '(?P<selectedrelatedfeature>(\d+))/'
-                                     'popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff]'
-                                     '[Aa][Ll][Ss][Ee])))/$',
+                                     'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.graph_data, name="graph_data"),
                url(
                    r'^' + settings.URL_PATH + 'profilegraph/'
                                      'selectedrelatedfeature='
                                      '(?P<selectedrelatedfeature>(\d+))/'
                                      'samplingfeature=(?P<samplingfeature>(\d+))/'
-                                     'popup=(?P<popup>(([Tt][Rr][Uu][Ee]|[Ff]'
-                                     '[Aa][Ll][Ss][Ee])))/$',
+                                     'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.graph_data, name="graph_data"),
 
                # /(?P<startdate>(\d+))/(?P<enddate>(\d+))
