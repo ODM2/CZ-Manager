@@ -1568,15 +1568,15 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
 
     i = 0
     annotationsexist = False
-    print(selectedMResultSeries)
+    # print(selectedMResultSeries)
     if popup == 'Anno':
         tsrvas = Timeseriesresultvalueannotations.objects.filter(
             valueid__resultid__in=selectedMResultSeries).filter(
             valueid__valuedatetime__gt=entered_start_date).filter(
             valueid__valuedatetime__lt=entered_end_date)
         if tsrvas.count() > 0:
-            print('time series result value annotation count ' + str(tsrvas.count()))
-            print(tsrvas.query)
+            # print('time series result value annotation count ' + str(tsrvas.count()))
+            # (tsrvas.query)
             annotationsexist = True
     for myresults in myresultSeries:
         i += 1
@@ -1594,9 +1594,9 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             if popup == 'Anno':
                 for tsrva in tsrvas:
                     if tsrva.valueid == result:
-                        print('tsrv annotation value id ' + str(tsrva.valueid))
+                        # print('tsrv annotation value id ' + str(tsrva.valueid))
                         if not resultannotationsexist:
-                            print('resultannotationsexist')
+                            # print('resultannotationsexist')
                             resultannotationsexist = True
                             data.update({'datavalueannotated' : []})
                         data['datavalueannotated'].append(
@@ -1654,7 +1654,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                                 "data": data['datavalueannotated']})
     i = 0
     titleStr = ''
-    print(series)
+    # print(series)
     i = 0
     name_of_sampling_features = set(name_of_sampling_features)
 
