@@ -1362,7 +1362,7 @@ def addL1timeseries(request):
                 newtsrv = Timeseriesresultvalues.objects.bulk_create(tsrvAddToL1Bulk)
             valuesadded = newtsrv.__len__()
             response_data['valuesadded'] = valuesadded
-            response_data['newresultid'] = newresult
+            # response_data['newresultid'] = newresult
             # print(result)
     return HttpResponse(json.dumps(response_data),content_type='application/json')
 
