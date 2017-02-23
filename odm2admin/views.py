@@ -1670,7 +1670,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     title2 = {"text": titleStr}
     xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
     yAxis = {"title": {"text": seriesStr}}
-    graphType = 'line'
+    graphType = 'scatter'
 
     int_selectedresultid_ids = []
     str_selectedresultid_ids = []
