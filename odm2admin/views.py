@@ -1041,7 +1041,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
     title2 = {"text": titleStr}
     xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
     yAxis = {"title": {"text": seriesStr}}
-    graphType = 'line'
+    graphType = 'scatter'
     actionList = Actions.objects.filter(
         action_type="Observation")  # where the action is not of type estimation
     # assuming an estimate is a single value.
