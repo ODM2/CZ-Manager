@@ -783,7 +783,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
     title2 = {"text": titleStr}
     xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
     yAxis = {"title": {"text": seriesStr}}
-    graphType = 'line'
+    graphType = 'scatter'
 
     actionList = Actions.objects.filter(
         action_type="Observation")  # where the action is not of type estimation
@@ -1021,7 +1021,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
     title2 = {"text": titleStr}
     xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
     yAxis = {"title": {"text": seriesStr}}
-    graphType = 'line'
+    graphType = 'scatter'
     actionList = Actions.objects.filter(
         action_type="Observation")  # where the action is not of type estimation
     # assuming an estimate is a single value.
@@ -1292,8 +1292,16 @@ def addL1timeseries(request):
                 # tsrvToCopy.update(resultid=tsresultTocopy)
                 for tsrv in tsrvToCopy:
                     tsrv.resultid = tsresultTocopy
-                    tsrv.valueid = None
-                    tsresultTocopyBulk.append(tsrv)
+                    try:
+                        tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
+                        tsrv.valueid = None
+                        tsrv.save()
+                        tsrva.valueid = tsrv
+                        print(tsrv.valueid)
+                        tsrva.save()
+                    except ObjectDoesNotExist:
+                        tsrv.valueid = None
+                        tsresultTocopyBulk.append(tsrv)
                 newtsrv = Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
             elif createorupdateL1 == "update":
                 tsresultL0 = Timeseriesresults.objects.get(resultid=result)
@@ -1331,18 +1339,34 @@ def addL1timeseries(request):
                     tsrvAddToL1 = tsrvL0.filter(valuedatetime__gt=maxtsrvL1)
                     for tsrv in tsrvAddToL1:
                         tsrv.resultid = relateL1tsresult
-                        tsrv.valueid = None
-                        tsrvAddToL1Bulk.append(tsrv)
+                        try:
+                            tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
+                            tsrv.valueid = None
+                            tsrv.save()
+                            tsrva.valueid = tsrv
+                            print(tsrv.valueid)
+                            tsrva.save()
+                        except ObjectDoesNotExist:
+                            tsrv.valueid = None
+                            tsresultTocopyBulk.append(tsrv)
                 if mintsrvL1 > mintsrvL0:
                     tsrvAddToL1 = tsrvL0.filter(valuedatetime__lt=mintsrvL1)
                     for tsrv in tsrvAddToL1:
                         tsrv.resultid = relateL1tsresult
-                        tsrv.valueid = None
-                        tsrvAddToL1Bulk.append(tsrv)
+                        try:
+                            tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
+                            tsrv.valueid = None
+                            tsrv.save()
+                            tsrva.valueid = tsrv
+                            print(tsrv.valueid)
+                            tsrva.save()
+                        except ObjectDoesNotExist:
+                            tsrv.valueid = None
+                            tsresultTocopyBulk.append(tsrv)
                 newtsrv = Timeseriesresultvalues.objects.bulk_create(tsrvAddToL1Bulk)
             valuesadded = newtsrv.__len__()
             response_data['valuesadded'] = valuesadded
-            response_data['newresultid'] = newresult
+            # response_data['newresultid'] = newresult
             # print(result)
     return HttpResponse(json.dumps(response_data),content_type='application/json')
 
@@ -1548,15 +1572,15 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
 
     i = 0
     annotationsexist = False
-    print(selectedMResultSeries)
+    # print(selectedMResultSeries)
     if popup == 'Anno':
         tsrvas = Timeseriesresultvalueannotations.objects.filter(
             valueid__resultid__in=selectedMResultSeries).filter(
             valueid__valuedatetime__gt=entered_start_date).filter(
             valueid__valuedatetime__lt=entered_end_date)
         if tsrvas.count() > 0:
-            print('time series result value annotation count ' + str(tsrvas.count()))
-            print(tsrvas.query)
+            # print('time series result value annotation count ' + str(tsrvas.count()))
+            # (tsrvas.query)
             annotationsexist = True
     for myresults in myresultSeries:
         i += 1
@@ -1574,9 +1598,9 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             if popup == 'Anno':
                 for tsrva in tsrvas:
                     if tsrva.valueid == result:
-                        print('tsrv annotation value id ' + str(tsrva.valueid))
+                        # print('tsrv annotation value id ' + str(tsrva.valueid))
                         if not resultannotationsexist:
-                            print('resultannotationsexist')
+                            # print('resultannotationsexist')
                             resultannotationsexist = True
                             data.update({'datavalueannotated' : []})
                         data['datavalueannotated'].append(
@@ -1634,7 +1658,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                                 "data": data['datavalueannotated']})
     i = 0
     titleStr = ''
-    print(series)
+    # print(series)
     i = 0
     name_of_sampling_features = set(name_of_sampling_features)
 
@@ -1650,7 +1674,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     title2 = {"text": titleStr}
     xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
     yAxis = {"title": {"text": seriesStr}}
-    graphType = 'line'
+    graphType = 'scatter'
 
     int_selectedresultid_ids = []
     str_selectedresultid_ids = []

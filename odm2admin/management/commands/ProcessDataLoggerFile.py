@@ -52,7 +52,11 @@ parser = argparse.ArgumentParser(description='process datalogger file.')
 # process_datalogger_file(args.dataloggerfilelink,args
 # .dataloggerfileid,args.databeginson,args.columnheaderson , True)
 
-
+def getEndDate(results):
+     EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
+     enddate = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
+            propertyid=EndDateProperty).get()
+     return enddate.propertyvalue
 def updateStartDateEndDate(results, startdate, enddate):
     StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
     EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
@@ -97,7 +101,7 @@ class Command(BaseCommand):
         file = str(settings.MEDIA_ROOT) + filename  #args[0].name
         fileid = int(options['dataloggerfileid'][0])
         fileid = Dataloggerfiles.objects.filter(dataloggerfileid=fileid).get()
-        check_dates = False  # bool(args[4]) for some reason this arg is not working
+        check_dates = bool(options['check_dates'][0]) #for some reason this arg is not working
         databeginson = int(options['databeginson'][0])  # int(databeginson[0])
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
         rowColumnMap = list()
@@ -166,6 +170,7 @@ class Command(BaseCommand):
                                     dateT = time.strptime(row[0],
                                                           "%Y-%m-%d %H:%M:%S.%f")  # '1/1/2013 0:10
                                     datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
+
                         # for each column in the data table
                         # raise ValidationError("".join(str(rowColumnMap)))
                         # if check_dates:
@@ -220,24 +225,13 @@ class Command(BaseCommand):
                                             print("error")
                                             raise IntegrityError
                                         if check_dates:
-                                            # this check is really slowing down
-                                            # ingestion so I added a flag to turn it off
                                             try:
-                                                pass
+                                                enddatestr = getEndDate(mresults)
+                                                enddate = time.strptime(enddatestr, '%Y-%m-%d %H:%M')
+                                                if enddate >= dateT: #.valuedatetime.strftime('%Y-%m-%d %H:%M')
+                                                    break
                                             except ObjectDoesNotExist:
-                                                print('check dates not in effect this should not print')
-                                                # bulktimeseriesvalues.append(Timeseriesresultvalues(
-                                                #     resultid=mresults,
-                                                #     datavalue=row[colnum.columnnum],
-                                                #     valuedatetime=datestr,
-                                                #     valuedatetimeutcoffset=4,
-                                                #     censorcodecv=censorcode,
-                                                #     qualitycodecv=qualitycode,
-                                                #     timeaggregationinterval=mresults
-                                                #     .intendedtimespacing,
-                                                #     timeaggregationintervalunitsid=mresults
-                                                #     .intendedtimespacingunitsid
-                                                # ))
+                                                pass
                                         else:
                                             newdatavalue = float(row[colnum.columnnum])
                                             qualitycode = qualitycodegood

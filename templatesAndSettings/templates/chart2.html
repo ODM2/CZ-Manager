@@ -113,7 +113,7 @@ $(document).ready(function() {
 	//yAxis[1] = yAxis2.replace('"','');
 	var chart =Highcharts.stockChart('chartid', {
 		chart: {renderTo: chart_id, 
-		type: graphType,  zoomType: 'x',},
+		type: graphType,  zoomType: 'xy',},
 		legend: {
                             enabled: true,
                             layout: 'vertical',
@@ -141,24 +141,7 @@ $(document).ready(function() {
     });
 	
 	//alert(name_of_units.length);
-	$('#extremesButton').click(function () {
-        var chart = $('#chartid').highcharts(),
-            yAxis = chart.yAxis[0];
-		if (yaxes.length <= 2){
-        yAxis.options.startOnTick = false;
-        yAxis.options.endOnTick = false;
-		var miny = Number(document.getElementById("miny").value);
-		var maxy = Number(document.getElementById("maxy").value);
-        if(!isNaN(miny) && !isNaN(maxy)){
-			chart.yAxis[0].setExtremes(miny, maxy);
-		}
-		var miny2 = Number(document.getElementById("miny2").value);
-		var maxy2 = Number(document.getElementById("maxy2").value);
-		if(!isNaN(miny2) && !isNaN(maxy2)){
-			chart.yAxis[1].setExtremes(miny2, maxy2);
-		}
-		}
-    });
+
 	
 	
 	});
@@ -183,12 +166,6 @@ Method- {{featureActionMethod}}
 {% if useDataset %}
 {{datasetAbstract}}
 {% endif %}
-<table><tr><td>
-<input id="miny"   name="new Minimum of left y-axis" type="number" value=0>new minimum of left y-axis</td>
-<td><input id="maxy"   name="new Maximum of left y-axis" type="number">new maximum of left y-axis</td></tr>
-<tr><td><input id="miny2"   name="new Minimum of left y-axis" type="number" value=0>new minimum of right y-axis</td>
-<td><input id="maxy2"   name="new Maximum of left y-axis" type="number">new maximum of right y-axis</td>
-<td><button id="extremesButton" class="autocompare">Set extremes y-axis</button></td></tr></table>
 {% include 'StartEndDate.html' %}
 <br><br>
 <p>{{data_disclaimer.text}} <a href={{data_disclaimer.link}} target="_blank"> {{data_disclaimer.linktext}}</a></p>
