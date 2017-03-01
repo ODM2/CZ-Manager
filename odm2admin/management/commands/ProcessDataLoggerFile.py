@@ -52,7 +52,11 @@ parser = argparse.ArgumentParser(description='process datalogger file.')
 # process_datalogger_file(args.dataloggerfilelink,args
 # .dataloggerfileid,args.databeginson,args.columnheaderson , True)
 
-
+def getEndDate(results):
+     EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
+     enddate = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
+            propertyid=EndDateProperty).get()
+     return enddate
 def updateStartDateEndDate(results, startdate, enddate):
     StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
     EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
@@ -166,6 +170,7 @@ class Command(BaseCommand):
                                     dateT = time.strptime(row[0],
                                                           "%Y-%m-%d %H:%M:%S.%f")  # '1/1/2013 0:10
                                     datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
+
                         # for each column in the data table
                         # raise ValidationError("".join(str(rowColumnMap)))
                         # if check_dates:
@@ -220,24 +225,10 @@ class Command(BaseCommand):
                                             print("error")
                                             raise IntegrityError
                                         if check_dates:
-                                            # this check is really slowing down
-                                            # ingestion so I added a flag to turn it off
-                                            try:
-                                                pass
-                                            except ObjectDoesNotExist:
-                                                print('check dates not in effect this should not print')
-                                                # bulktimeseriesvalues.append(Timeseriesresultvalues(
-                                                #     resultid=mresults,
-                                                #     datavalue=row[colnum.columnnum],
-                                                #     valuedatetime=datestr,
-                                                #     valuedatetimeutcoffset=4,
-                                                #     censorcodecv=censorcode,
-                                                #     qualitycodecv=qualitycode,
-                                                #     timeaggregationinterval=mresults
-                                                #     .intendedtimespacing,
-                                                #     timeaggregationintervalunitsid=mresults
-                                                #     .intendedtimespacingunitsid
-                                                # ))
+                                            enddatestr = getEndDate(mresults)
+                                            enddate = time.strptime(enddatestr, "%m/%d/%Y %H:%M")
+                                            if enddate >= dateT: #.valuedatetime.strftime('%Y-%m-%d %H:%M')
+                                                continue
                                         else:
                                             newdatavalue = float(row[colnum.columnnum])
                                             qualitycode = qualitycodegood
