@@ -225,10 +225,13 @@ class Command(BaseCommand):
                                             print("error")
                                             raise IntegrityError
                                         if check_dates:
-                                            enddatestr = getEndDate(mresults)
-                                            enddate = time.strptime(enddatestr, '%Y-%m-%d %H:%M')
-                                            if enddate >= dateT: #.valuedatetime.strftime('%Y-%m-%d %H:%M')
-                                                break
+                                            try:
+                                                enddatestr = getEndDate(mresults)
+                                                enddate = time.strptime(enddatestr, '%Y-%m-%d %H:%M')
+                                                if enddate >= dateT: #.valuedatetime.strftime('%Y-%m-%d %H:%M')
+                                                    break
+                                            except ObjectDoesNotExist:
+                                                pass
                                         else:
                                             newdatavalue = float(row[colnum.columnnum])
                                             qualitycode = qualitycodegood
