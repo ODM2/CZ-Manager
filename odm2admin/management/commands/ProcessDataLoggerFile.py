@@ -56,7 +56,7 @@ def getEndDate(results):
      EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
      enddate = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
             propertyid=EndDateProperty).get()
-     return enddate
+     return enddate.propertyvalue
 def updateStartDateEndDate(results, startdate, enddate):
     StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
     EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
@@ -101,7 +101,7 @@ class Command(BaseCommand):
         file = str(settings.MEDIA_ROOT) + filename  #args[0].name
         fileid = int(options['dataloggerfileid'][0])
         fileid = Dataloggerfiles.objects.filter(dataloggerfileid=fileid).get()
-        check_dates = False  # bool(args[4]) for some reason this arg is not working
+        check_dates = bool(options['check_dates'][0]) #for some reason this arg is not working
         databeginson = int(options['databeginson'][0])  # int(databeginson[0])
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
         rowColumnMap = list()
@@ -226,9 +226,9 @@ class Command(BaseCommand):
                                             raise IntegrityError
                                         if check_dates:
                                             enddatestr = getEndDate(mresults)
-                                            enddate = time.strptime(enddatestr, "%m/%d/%Y %H:%M")
+                                            enddate = time.strptime(enddatestr, '%Y-%m-%d %H:%M')
                                             if enddate >= dateT: #.valuedatetime.strftime('%Y-%m-%d %H:%M')
-                                                continue
+                                                break
                                         else:
                                             newdatavalue = float(row[colnum.columnnum])
                                             qualitycode = qualitycodegood
