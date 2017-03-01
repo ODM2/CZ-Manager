@@ -148,7 +148,7 @@ $(document).ready(function() {
 		var annotation = $("#annotation").val();
 		var cvqualitycode = $("#SelectedQualityCode").val();
 		var setNaN = document.getElementById('setNaN').checked //$("#setNaN").checked;
-		console.log('annotate');
+		//console.log('annotate');
 		var selectedResult = {{SelectedResults|safe}};
 		$report.html('annotation \'' + annotation + '\' saved.');
 		//console.log(cvqualitycode);
@@ -341,23 +341,21 @@ Method- {{featureActionMethod}}
 {% if not L1exists %}
 					<td><button id="createL1">create new Level 1 QA/QC'd time series</button></td>
 				{% else %}
-					<td><button id="updateL1">add new values to Level 1 QA/QC'd series</button> Add values from the beginning or the end of the L0 that don't yet exist in L1. </td>
+					<td><button id="updateL1">add new values to Level 1 QA/QC'd series</button> Add values from start or the end of the L0 that don't yet exist in L1. </td>
 {% endif %}
 <td> 
 {% for result in resultList %}
 	{% for selectedresult in SelectedResults %}
 		{% if result.resultid == selectedresult %}
 			{% if "L0" in result.processing_level|stringformat:"s" %}
-				<input id="setNaN" type="checkbox" name="setNaN" disabled>set values to NaN (Not a Number)?</input></td>
-				</td><td><button id="annotationButton" class="disabledButton" disabled>Annotation unavaible for L0</button></td></tr>				
+				<input id="setNaN" type="checkbox" name="setNaN" disabled>set values to NaN (Not a Number)?</input></td>				
 			{% else %}
 				<input id="setNaN" type="checkbox" name="setNaN">set values to NaN (Not a Number)?</input>
-				</td><td><button id="annotationButton">Save Annotation</button></td></tr>
 			{% endif %} 
 		{% endif %}
 	{% endfor %}
 {% endfor %}
-
+</td><td><button id="annotationButton">Save Annotation</button></td></tr>
 
 </table>
 {% include 'StartEndDateAnnotation.html' %}

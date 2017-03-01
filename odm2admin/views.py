@@ -1312,8 +1312,16 @@ def addL1timeseries(request):
                 # tsrvToCopy.update(resultid=tsresultTocopy)
                 for tsrv in tsrvToCopy:
                     tsrv.resultid = tsresultTocopy
-                    tsrv.valueid = None
-                    tsresultTocopyBulk.append(tsrv)
+                    try:
+                        tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
+                        tsrv.valueid = None
+                        tsrv.save()
+                        tsrva.valueid = tsrv
+                        print(tsrv.valueid)
+                        tsrva.save()
+                    except ObjectDoesNotExist:
+                        tsrv.valueid = None
+                        tsresultTocopyBulk.append(tsrv)
                 newtsrv = Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
             elif createorupdateL1 == "update":
                 tsresultL0 = Timeseriesresults.objects.get(resultid=result)
@@ -1351,14 +1359,30 @@ def addL1timeseries(request):
                     tsrvAddToL1 = tsrvL0.filter(valuedatetime__gt=maxtsrvL1)
                     for tsrv in tsrvAddToL1:
                         tsrv.resultid = relateL1tsresult
-                        tsrv.valueid = None
-                        tsrvAddToL1Bulk.append(tsrv)
+                        try:
+                            tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
+                            tsrv.valueid = None
+                            tsrv.save()
+                            tsrva.valueid = tsrv
+                            print(tsrv.valueid)
+                            tsrva.save()
+                        except ObjectDoesNotExist:
+                            tsrv.valueid = None
+                            tsresultTocopyBulk.append(tsrv)
                 if mintsrvL1 > mintsrvL0:
                     tsrvAddToL1 = tsrvL0.filter(valuedatetime__lt=mintsrvL1)
                     for tsrv in tsrvAddToL1:
                         tsrv.resultid = relateL1tsresult
-                        tsrv.valueid = None
-                        tsrvAddToL1Bulk.append(tsrv)
+                        try:
+                            tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
+                            tsrv.valueid = None
+                            tsrv.save()
+                            tsrva.valueid = tsrv
+                            print(tsrv.valueid)
+                            tsrva.save()
+                        except ObjectDoesNotExist:
+                            tsrv.valueid = None
+                            tsresultTocopyBulk.append(tsrv)
                 newtsrv = Timeseriesresultvalues.objects.bulk_create(tsrvAddToL1Bulk)
             valuesadded = newtsrv.__len__()
             response_data['valuesadded'] = valuesadded
