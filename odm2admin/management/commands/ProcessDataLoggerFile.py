@@ -286,16 +286,16 @@ class Command(BaseCommand):
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                      annotationid=annotation).save()
                                                     emailtext += "Alarm value of "+ \
-                                                                 result_upper_bound_alarm.dataqualityvalue \
+                                                                 str(result_upper_bound_alarm.dataqualityvalue) \
                                                                  + "  exceeded for " + str(mresults
-                                                            ) + "\n " + "data value " + newdatavalue + " on " \
+                                                            ) + "\n " + "data value " + str(newdatavalue) + " on " \
                                                             + datestr+ "\n "
 
                                         if dataqualityLowerAlarm:
                                             if newdatavalue > result_lower_bound_alarm.dataqualityvalue:
                                                 with transaction.atomic():
                                                     annotationtext = "value below "
-                                                    annotationtext += result_lower_bound_alarm.dataqualitycode + \
+                                                    annotationtext += str(result_lower_bound_alarm.dataqualitycode) + \
                                                         " of " + str(result_lower_bound_alarm.dataqualityvalue) \
                                                         + ", raw value was " + str(newdatavalue)
                                                     annotation= Annotations(annotationtypecv=annotationtypecv,
@@ -321,9 +321,9 @@ class Command(BaseCommand):
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                      annotationid=annotation).save()
                                                     emailtext += "Alarm value fell below treshold of " \
-                                                                 + result_lower_bound_alarm.dataqualityvalue + \
+                                                                 + str(result_lower_bound_alarm.dataqualityvalue) + \
                                                                  " for time series " + str(mresults
-                                                            ) + "\n " + "data value " + newdatavalue + " on " \
+                                                            ) + "\n " + "data value " + str(newdatavalue) + " on " \
                                                             + datestr + "\n "
                                         if dataqualitybool:
                                             if newdatavalue > result_upper_bound.dataqualityvalue:
