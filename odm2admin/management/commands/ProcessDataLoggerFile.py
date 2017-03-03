@@ -11,6 +11,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from django.core.management import settings
+from django.core.mail import EmailMessage
+
 from django.db import IntegrityError
 from django.db import transaction
 from django.db.models import Min, Max
@@ -108,6 +110,10 @@ class Command(BaseCommand):
         bulktimeseriesvalues = []
         upper_bound_quality_type = CvDataqualitytype.objects.get(name = 'Physical limit upper bound')
         lower_bound_quality_type = CvDataqualitytype.objects.get(name = 'Physical limit lower bound')
+        emailtitle = "ODM2 Admin Alarm"
+        tolist = []
+        for admin in settings.ADMINS:
+            tolist.append(admin['email'])
         try:
             with io.open(file, 'rt', encoding='ascii') as f:
                 # reader = csv.reader(f)
@@ -179,6 +185,8 @@ class Command(BaseCommand):
                         #     mrvs = Timeseriesresultvalues.objects.filter(resultid__in=mrs)
                         for colnum in rowColumnMap:
                             dataqualitybool = True
+                            dataqualityUpperAlarm = True
+                            dataqualityLowerAlarm = True
                             # this assumes that the first column is the date and time
                             if not colnum.columnnum == 0:
                                 # raise ValidationError("result: " + str(colnum.resultid) +
@@ -188,6 +196,10 @@ class Command(BaseCommand):
 
                                 Timeseriesresult = Timeseriesresults.objects.filter(
                                     resultid=colnum.resultid)
+                                annotationtypecv = CvAnnotationtype.objects.filter(
+                                        name="Time series result value annotation").get()
+                                annotationdatetime = datetime.now()
+                                annotatorid = People.objects.filter(personid=1).get()
                                 # try to get data quality upper and lower bounds if they don't exist
                                 # proceed without checking.
                                 try:
@@ -196,15 +208,23 @@ class Command(BaseCommand):
                                         dataqualityid__in=resultsdataquality.values('dataqualityid'))
                                     #assumption only one upper bound and one lower bound per result
                                     result_upper_bound = dataquality.get(
-                                        dataqualitytypecv=upper_bound_quality_type)
+                                        dataqualitytypecv=upper_bound_quality_type, dataqualitycode__icontains='bound')
                                     result_lower_bound = dataquality.get(
-                                        dataqualitytypecv=lower_bound_quality_type)
-                                    annotationtypecv = CvAnnotationtype.objects.filter(
-                                        name="Time series result value annotation").get()
-                                    annotationdatetime = datetime.now()
-                                    annotatorid = People.objects.filter(personid=1).get()
+                                        dataqualitytypecv=lower_bound_quality_type, dataqualitycode__icontains='bound')
                                 except ObjectDoesNotExist:
                                     dataqualitybool = False
+                                try:
+                                    result_upper_bound_alarm = dataquality.get(
+                                            dataqualitytypecv=upper_bound_quality_type,
+                                            dataqualitycode__icontains='alarm')
+                                except ObjectDoesNotExist:
+                                    dataqualityUpperAlarm =False
+                                try:
+                                    result_lower_bound_alarm = dataquality.get(
+                                            dataqualitytypecv=lower_bound_quality_type,
+                                            dataqualitycode__icontains='alarm')
+                                except ObjectDoesNotExist:
+                                    dataqualityLowerAlarm = False
                                 if Timeseriesresult.count() == 0:
                                     raise CommandError(
                                         'No Measurement results for column ' + colnum.columnlabel +
@@ -219,6 +239,8 @@ class Command(BaseCommand):
                                 qualitycodegood = CvQualitycode.objects.filter(name="Good").get()
                                 qualitycodebad = CvQualitycode.objects.filter(name='Bad').get()
                                 qualitycode = None
+                                emailtitle = ""
+                                emailtext = ""
                                 for mresults in Timeseriesresult:
                                     try:
                                         if value == '':
@@ -235,6 +257,74 @@ class Command(BaseCommand):
                                         else:
                                             newdatavalue = float(row[colnum.columnnum])
                                             qualitycode = qualitycodegood
+                                            if dataqualityUpperAlarm:
+                                                if newdatavalue > result_upper_bound_alarm.dataqualityvalue:
+                                                    with transaction.atomic():
+                                                        annotationtext = result_upper_bound_alarm.dataqualitycode + \
+                                                            " of " + str(result_upper_bound_alarm.dataqualityvalue) \
+                                                            + " exceeded, raw value was " + str(newdatavalue)
+                                                        annotation= Annotations(annotationtypecv=annotationtypecv,
+                                                                annotationcode="Alarm level exceeded ",
+                                                                annotationtext=annotationtext,
+                                                                annotationdatetime=annotationdatetime,
+                                                                annotationutcoffset=4, annotatorid=annotatorid)
+                                                        #qualitycode = qualitycodebad
+                                                        tsvr = Timeseriesresultvalues(
+                                                            resultid=mresults,
+                                                            datavalue=newdatavalue,
+                                                            valuedatetime=datestr,
+                                                            valuedatetimeutcoffset=4,
+                                                            censorcodecv=censorcode,
+                                                            qualitycodecv=qualitycode,
+                                                            timeaggregationinterval=mresults
+                                                            .intendedtimespacing,
+                                                            timeaggregationintervalunitsid=mresults
+                                                            .intendedtimespacingunitsid
+                                                            )
+                                                        annotation.save()
+                                                        tsvr.save()
+                                                        tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
+                                                                                         annotationid=annotation).save()
+                                                        emailtext += "Alarm value of "+ \
+                                                                     result_upper_bound_alarm.dataqualityvalue \
+                                                                     + "  exceeded for " + str(mresults
+                                                                ) + "\n " + "data value " + newdatavalue + " on " \
+                                                                + datestr+ "\n "
+
+                                            if dataqualityLowerAlarm:
+                                                if newdatavalue > result_lower_bound_alarm.dataqualityvalue:
+                                                    with transaction.atomic():
+                                                        annotationtext = "value below "
+                                                        annotationtext += result_lower_bound_alarm.dataqualitycode + \
+                                                            " of " + str(result_lower_bound_alarm.dataqualityvalue) \
+                                                            + ", raw value was " + str(newdatavalue)
+                                                        annotation= Annotations(annotationtypecv=annotationtypecv,
+                                                                annotationcode="Data value fell below Alarm level",
+                                                                annotationtext=annotationtext,
+                                                                annotationdatetime=annotationdatetime,
+                                                                annotationutcoffset=4, annotatorid=annotatorid)
+                                                        #qualitycode = qualitycodebad
+                                                        tsvr = Timeseriesresultvalues(
+                                                            resultid=mresults,
+                                                            datavalue=newdatavalue,
+                                                            valuedatetime=datestr,
+                                                            valuedatetimeutcoffset=4,
+                                                            censorcodecv=censorcode,
+                                                            qualitycodecv=qualitycode,
+                                                            timeaggregationinterval=mresults
+                                                            .intendedtimespacing,
+                                                            timeaggregationintervalunitsid=mresults
+                                                            .intendedtimespacingunitsid
+                                                            )
+                                                        annotation.save()
+                                                        tsvr.save()
+                                                        tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
+                                                                                         annotationid=annotation).save()
+                                                        emailtext += "Alarm value fell below treshold of " \
+                                                                     + result_lower_bound_alarm.dataqualityvalue + \
+                                                                     " for time series " + str(mresults
+                                                                ) + "\n " + "data value " + newdatavalue + " on " \
+                                                                + datestr + "\n "
                                             if dataqualitybool:
                                                 if newdatavalue > result_upper_bound.dataqualityvalue:
                                                     with transaction.atomic():
@@ -345,3 +435,6 @@ class Command(BaseCommand):
                     # bulkpropertyvals.append(repvend)
         # will bulk create or update the property values
         # Resultextensionpropertyvalues.objects.bulk_create(bulkpropertyvals)
+        if dataqualityUpperAlarm or dataqualityLowerAlarm:
+            email = EmailMessage(emailtitle,emailtext,settings.EMAIL_FROM_ADDRESS, tolist)
+            email.send()
