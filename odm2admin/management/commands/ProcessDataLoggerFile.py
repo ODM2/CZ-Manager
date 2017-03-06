@@ -373,6 +373,8 @@ class Command(BaseCommand):
                                                                  + "  exceeded for " + str(mresults
                                                     ) + "\n " + "data value " + str(newdatavalue) + " on " \
                                                                  + datestr + "\n "
+                                            else:
+                                                dataqualityUpperAlarm = False
 
                                         if dataqualityLowerAlarm:
                                             sendemail=True
@@ -415,6 +417,8 @@ class Command(BaseCommand):
                                                                  " for time series " + str(mresults
                                                     ) + "\n " + "data value " + str(newdatavalue) + " on " \
                                                                  + datestr + "\n "
+                                            else:
+                                                dataqualityLowerAlarm = False
 
                                         # print(row[colnum.columnnum])
                                         # check if values are above or below quality bounds
