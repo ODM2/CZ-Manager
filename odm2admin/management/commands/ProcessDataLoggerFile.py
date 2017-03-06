@@ -207,6 +207,7 @@ class Command(BaseCommand):
                                 # try to get data quality upper and lower bounds if they don't exist
                                 # proceed without checking.
                                 try:
+                                    print(colnum.resultid)
                                     resultsdataquality = Resultsdataquality.objects.filter(resultid=colnum.resultid)
                                     dataquality = Dataquality.objects.filter(
                                         dataqualityid__in=resultsdataquality.values('dataqualityid'))
