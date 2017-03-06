@@ -244,6 +244,7 @@ class Command(BaseCommand):
                                 qualitycode = None
                                 emailtitle = ""
                                 emailtext = ""
+                                tsvr = None
                                 for mresults in Timeseriesresult:
                                     try:
                                         if value == '':
