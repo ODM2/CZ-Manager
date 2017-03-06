@@ -356,8 +356,7 @@ class Command(BaseCommand):
                                                     print('upper bound')
                                                     print(result_upper_bound.dataqualityvalue)
                                                     print(dataqualitybool)
-                                                    if newdatavalue > result_upper_bound.dataqualityvalue \
-                                                            and dataqualitybool:
+                                                    if newdatavalue > result_upper_bound.dataqualityvalue:
                                                         print("upper alarm bound triggered")
                                                         print(annotationtext)
                                                         annotation.save()
@@ -405,8 +404,7 @@ class Command(BaseCommand):
                                                                              annotationutcoffset=4,
                                                                              annotatorid=annotatorid)
                                                     #qualitycode = qualitycodebad
-                                                    if newdatavalue < result_lower_bound.dataqualityvalue and \
-                                                            dataqualitybool:
+                                                    if newdatavalue < result_lower_bound.dataqualityvalue:
                                                         print("lower alarm bound triggered")
                                                         print(annotationtext)
                                                         annotation.save()
