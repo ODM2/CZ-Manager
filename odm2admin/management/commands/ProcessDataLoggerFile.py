@@ -369,6 +369,7 @@ class Command(BaseCommand):
                                                         print("upper alarm bound triggered")
                                                         print(annotationtext)
                                                         annotation.save()
+                                                    print(tsvr)
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                             annotationid=annotation).save()
                                                     emailtext += "Alarm value of " + \
@@ -416,6 +417,7 @@ class Command(BaseCommand):
                                                         print("lower alarm bound triggered")
                                                         print(annotationtext)
                                                         annotation.save()
+                                                    print(tsvr)
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                              annotationid=annotation).save()
                                                     emailtext += "Alarm value fell below treshold of " \
