@@ -293,6 +293,9 @@ class Command(BaseCommand):
                                                     )
                                                     print("upper bound")
                                                     print(annotationtext)
+                                                    print("alarm?")
+                                                    print(dataqualityUpperAlarm)
+                                                    print(result_upper_bound_alarm.dataqualityvalue)
                                                     annotation.save()
                                                     tsvr.save()
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
