@@ -247,6 +247,7 @@ class Command(BaseCommand):
 
                                 tsvr = None
                                 for mresults in Timeseriesresult:
+                                    print(mresults)
                                     try:
                                         if value == '':
                                             print("error")
