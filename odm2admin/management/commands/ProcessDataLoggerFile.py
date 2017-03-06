@@ -336,7 +336,7 @@ class Command(BaseCommand):
                                                                                              annotationid=annotation).save()
                                             else:
                                                 dataqualitybool = False
-
+                                        newdatavalue = float(row[colnum.columnnum])
                                         if dataqualityUpperAlarm:
                                             print('newdatavalue')
                                             print(newdatavalue)
