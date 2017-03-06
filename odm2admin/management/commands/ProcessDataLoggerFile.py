@@ -207,7 +207,6 @@ class Command(BaseCommand):
                                 # try to get data quality upper and lower bounds if they don't exist
                                 # proceed without checking.
                                 try:
-                                    print(colnum.resultid)
                                     resultsdataquality = Resultsdataquality.objects.filter(resultid=colnum.resultid)
                                     dataquality = Dataquality.objects.filter(
                                         dataqualityid__in=resultsdataquality.values('dataqualityid'))
@@ -216,8 +215,7 @@ class Command(BaseCommand):
                                         dataqualitytypecv=upper_bound_quality_type, dataqualitycode__icontains='bound')
                                     result_lower_bound = dataquality.get(
                                         dataqualitytypecv=lower_bound_quality_type, dataqualitycode__icontains='bound')
-                                except Exception as e:
-                                    print '%s (%s)' % (e.message, type(e))
+                                except ObjectDoesNotExist:
                                     dataqualitybool = False
 
                                 try:
@@ -291,11 +289,6 @@ class Command(BaseCommand):
                                                         timeaggregationintervalunitsid=mresults
                                                         .intendedtimespacingunitsid
                                                     )
-                                                    print("upper bound")
-                                                    print(annotationtext)
-                                                    print("alarm?")
-                                                    print(dataqualityUpperAlarm)
-                                                    print(result_upper_bound_alarm.dataqualityvalue)
                                                     annotation.save()
                                                     tsvr.save()
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
@@ -328,8 +321,6 @@ class Command(BaseCommand):
                                                         timeaggregationintervalunitsid=mresults
                                                         .intendedtimespacingunitsid
                                                     )
-                                                    print("lower bound")
-                                                    print(annotationtext)
                                                     annotation.save()
                                                     tsvr.save()
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
@@ -338,10 +329,6 @@ class Command(BaseCommand):
                                                 dataqualitybool = False
                                         newdatavalue = float(row[colnum.columnnum])
                                         if dataqualityUpperAlarm:
-                                            print('newdatavalue')
-                                            print(newdatavalue)
-                                            print('upper bound')
-                                            print(result_upper_bound.dataqualityvalue)
                                             sendemail = True
                                             if newdatavalue > result_upper_bound_alarm.dataqualityvalue:
                                                 with transaction.atomic():
@@ -361,8 +348,6 @@ class Command(BaseCommand):
 
                                                     print(dataqualitybool)
                                                     if newdatavalue > result_upper_bound.dataqualityvalue:
-                                                        print("upper alarm bound triggered")
-                                                        print(annotationtext)
                                                         annotation.save()
                                                     else: # already created time series result values in
                                                           # result upper bound check
@@ -378,12 +363,9 @@ class Command(BaseCommand):
                                                             timeaggregationintervalunitsid=mresults
                                                             .intendedtimespacingunitsid
                                                         )
-                                                        print("upper alarm ")
-                                                        print(annotationtext)
                                                         annotation.save()
                                                         tsvr.save()
 
-                                                    print(tsvr)
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                             annotationid=annotation).save()
                                                     emailtext += "Alarm value of " + \
@@ -409,8 +391,6 @@ class Command(BaseCommand):
                                                                              annotatorid=annotatorid)
                                                     #qualitycode = qualitycodebad
                                                     if newdatavalue < result_lower_bound.dataqualityvalue:
-                                                        print("lower alarm bound triggered")
-                                                        print(annotationtext)
                                                         annotation.save()
                                                     else:
                                                         tsvr = Timeseriesresultvalues(
@@ -425,8 +405,6 @@ class Command(BaseCommand):
                                                             timeaggregationintervalunitsid=mresults
                                                             .intendedtimespacingunitsid
                                                         )
-                                                        print("lower alarm ")
-                                                        print(annotationtext)
                                                         annotation.save()
                                                         tsvr.save()
                                                     print(tsvr)
@@ -441,7 +419,8 @@ class Command(BaseCommand):
                                         # print(row[colnum.columnnum])
                                         # check if values are above or below quality bounds
                                         # create an annotation if they are.
-                                        if not dataqualitybool:
+                                        if not dataqualitybool and not dataqualityUpperAlarm \
+                                                and not dataqualityLowerAlarm:
                                             tsvr = Timeseriesresultvalues(
                                                 resultid=mresults,
                                                 datavalue=newdatavalue,
