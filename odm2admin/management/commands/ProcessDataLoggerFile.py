@@ -263,7 +263,7 @@ class Command(BaseCommand):
 
                                         newdatavalue = float(row[colnum.columnnum])
                                         qualitycode = qualitycodegood
-                                        print(newdatavalue)
+                                        # print(newdatavalue)
                                         if dataqualitybool:
                                             if newdatavalue > result_upper_bound.dataqualityvalue:
                                                 with transaction.atomic():
@@ -347,7 +347,7 @@ class Command(BaseCommand):
                                                     # already created time series result values in
                                                     # result upper bound check
 
-                                                    print(dataqualitybool)
+                                                    # print(dataqualitybool)
                                                     if newdatavalue > result_upper_bound.dataqualityvalue:
                                                         annotation.save()
                                                     else: # already created time series result values in
@@ -409,7 +409,7 @@ class Command(BaseCommand):
                                                         )
                                                         annotation.save()
                                                         tsvr.save()
-                                                    print(tsvr)
+                                                    # print(tsvr)
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                              annotationid=annotation).save()
                                                     emailtext += "Alarm value fell below treshold of " \
@@ -423,9 +423,9 @@ class Command(BaseCommand):
                                         # print(row[colnum.columnnum])
                                         # check if values are above or below quality bounds
                                         # create an annotation if they are.
-                                        print(dataqualitybool)
-                                        print(dataqualityUpperAlarm)
-                                        print(dataqualityLowerAlarm)
+                                        # print(dataqualitybool)
+                                        # print(dataqualityUpperAlarm)
+                                         #print(dataqualityLowerAlarm)
                                         if not dataqualitybool and not dataqualityUpperAlarm \
                                                 and not dataqualityLowerAlarm:
                                             tsvr = Timeseriesresultvalues(
