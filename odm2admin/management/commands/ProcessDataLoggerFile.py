@@ -115,6 +115,7 @@ class Command(BaseCommand):
         emailtitle = "ODM2 Admin Alarm"
         tolist = []
         sendemail = False
+        emailtext = ""
         for admin in settings.ADMINS:
             tolist.append(admin['email'])
         try:
@@ -242,8 +243,7 @@ class Command(BaseCommand):
                                 qualitycodegood = CvQualitycode.objects.filter(name="Good").get()
                                 qualitycodebad = CvQualitycode.objects.filter(name='Bad').get()
                                 qualitycode = None
-                                emailtitle = ""
-                                emailtext = ""
+
                                 tsvr = None
                                 for mresults in Timeseriesresult:
                                     try:
