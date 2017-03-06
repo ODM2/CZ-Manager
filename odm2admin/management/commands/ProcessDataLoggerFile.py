@@ -287,6 +287,8 @@ class Command(BaseCommand):
                                                         timeaggregationintervalunitsid=mresults
                                                         .intendedtimespacingunitsid
                                                     )
+                                                    print("upper bound")
+                                                    print(annotationtext)
                                                     annotation.save()
                                                     tsvr.save()
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
@@ -319,6 +321,8 @@ class Command(BaseCommand):
                                                         timeaggregationintervalunitsid=mresults
                                                         .intendedtimespacingunitsid
                                                     )
+                                                    print("lower bound")
+                                                    print(annotationtext)
                                                     annotation.save()
                                                     tsvr.save()
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
@@ -341,7 +345,8 @@ class Command(BaseCommand):
                                                                              annotationutcoffset=4,
                                                                              annotatorid=annotatorid)
                                                     #qualitycode = qualitycodebad
-                                                    if not (newdatavalue > result_upper_bound.dataqualityvalue):
+                                                    if not newdatavalue > result_upper_bound.dataqualityvalue \
+                                                            and dataqualitybool:
                                                         tsvr = Timeseriesresultvalues(
                                                             resultid=mresults,
                                                             datavalue=newdatavalue,
@@ -354,10 +359,14 @@ class Command(BaseCommand):
                                                             timeaggregationintervalunitsid=mresults
                                                             .intendedtimespacingunitsid
                                                         )
+                                                        print("upper alarm ")
+                                                        print(annotationtext)
                                                         annotation.save()
                                                         tsvr.save()
                                                     else: # already created time series result values in
                                                           # result upper bound check
+                                                        print("upper alarm bound triggered")
+                                                        print(annotationtext)
                                                         annotation.save()
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                             annotationid=annotation).save()
@@ -369,7 +378,7 @@ class Command(BaseCommand):
 
                                         if dataqualityLowerAlarm:
                                             sendemail=True
-                                            if newdatavalue > result_lower_bound_alarm.dataqualityvalue:
+                                            if newdatavalue < result_lower_bound_alarm.dataqualityvalue:
                                                 with transaction.atomic():
                                                     annotationtext = "value below "
                                                     annotationtext += str(result_lower_bound_alarm.dataqualitycode) + \
@@ -383,7 +392,8 @@ class Command(BaseCommand):
                                                                              annotationutcoffset=4,
                                                                              annotatorid=annotatorid)
                                                     #qualitycode = qualitycodebad
-                                                    if not newdatavalue < result_lower_bound.dataqualityvalue:
+                                                    if not newdatavalue < result_lower_bound.dataqualityvalue and \
+                                                            dataqualitybool:
                                                         tsvr = Timeseriesresultvalues(
                                                             resultid=mresults,
                                                             datavalue=newdatavalue,
@@ -396,9 +406,14 @@ class Command(BaseCommand):
                                                             timeaggregationintervalunitsid=mresults
                                                             .intendedtimespacingunitsid
                                                         )
+                                                        print("lower alarm ")
+                                                        print(annotationtext)
                                                         annotation.save()
                                                         tsvr.save()
-                                                    else:
+                                                    else: # already created time series result values in
+                                                          # result upper bound check
+                                                        print("lower alarm bound triggered")
+                                                        print(annotationtext)
                                                         annotation.save()
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                              annotationid=annotation).save()
@@ -433,6 +448,7 @@ class Command(BaseCommand):
                     i += 1
                     # Timeseriesresults.objects.raw("SELECT odm2.\
                     # "TimeseriesresultValsToResultsCountvalue\"()")
+            print(bulktimeseriesvalues)
             Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
             bulktimeseriesvalues = None
 
@@ -458,4 +474,5 @@ class Command(BaseCommand):
         # Resultextensionpropertyvalues.objects.bulk_create(bulkpropertyvals)
         if sendemail:
             email = EmailMessage(emailtitle, emailtext, settings.EMAIL_FROM_ADDRESS, tolist)
+            print(emailtext)
             email.send()
