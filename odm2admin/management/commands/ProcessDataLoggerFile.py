@@ -346,8 +346,15 @@ class Command(BaseCommand):
                                                                              annotationutcoffset=4,
                                                                              annotatorid=annotatorid)
                                                     #qualitycode = qualitycodebad
-                                                    if not newdatavalue > result_upper_bound.dataqualityvalue \
+                                                    # already created time series result values in
+                                                    # result upper bound check
+                                                    if newdatavalue > result_upper_bound.dataqualityvalue \
                                                             and dataqualitybool:
+                                                        print("upper alarm bound triggered")
+                                                        print(annotationtext)
+                                                        annotation.save()    
+                                                    else: # already created time series result values in
+                                                          # result upper bound check
                                                         tsvr = Timeseriesresultvalues(
                                                             resultid=mresults,
                                                             datavalue=newdatavalue,
@@ -364,11 +371,7 @@ class Command(BaseCommand):
                                                         print(annotationtext)
                                                         annotation.save()
                                                         tsvr.save()
-                                                    else: # already created time series result values in
-                                                          # result upper bound check
-                                                        print("upper alarm bound triggered")
-                                                        print(annotationtext)
-                                                        annotation.save()
+
                                                     print(tsvr)
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                             annotationid=annotation).save()
@@ -394,8 +397,12 @@ class Command(BaseCommand):
                                                                              annotationutcoffset=4,
                                                                              annotatorid=annotatorid)
                                                     #qualitycode = qualitycodebad
-                                                    if not newdatavalue < result_lower_bound.dataqualityvalue and \
+                                                    if newdatavalue < result_lower_bound.dataqualityvalue and \
                                                             dataqualitybool:
+                                                        print("lower alarm bound triggered")
+                                                        print(annotationtext)
+                                                        annotation.save()
+                                                    else:
                                                         tsvr = Timeseriesresultvalues(
                                                             resultid=mresults,
                                                             datavalue=newdatavalue,
@@ -412,11 +419,6 @@ class Command(BaseCommand):
                                                         print(annotationtext)
                                                         annotation.save()
                                                         tsvr.save()
-                                                    else: # already created time series result values in
-                                                          # result upper bound check
-                                                        print("lower alarm bound triggered")
-                                                        print(annotationtext)
-                                                        annotation.save()
                                                     print(tsvr)
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                              annotationid=annotation).save()
