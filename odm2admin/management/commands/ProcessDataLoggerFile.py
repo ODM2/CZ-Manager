@@ -262,7 +262,7 @@ class Command(BaseCommand):
 
                                         newdatavalue = float(row[colnum.columnnum])
                                         qualitycode = qualitycodegood
-
+                                        print(newdatavalue)
                                         if dataqualitybool:
                                             if newdatavalue > result_upper_bound.dataqualityvalue:
                                                 with transaction.atomic():
@@ -375,7 +375,6 @@ class Command(BaseCommand):
                                                                  + datestr + "\n "
                                             else:
                                                 dataqualityUpperAlarm = False
-
                                         if dataqualityLowerAlarm:
                                             sendemail=True
                                             if newdatavalue < result_lower_bound_alarm.dataqualityvalue:
@@ -423,6 +422,9 @@ class Command(BaseCommand):
                                         # print(row[colnum.columnnum])
                                         # check if values are above or below quality bounds
                                         # create an annotation if they are.
+                                        print(dataqualitybool)
+                                        print(dataqualityUpperAlarm)
+                                        print(dataqualityLowerAlarm)
                                         if not dataqualitybool and not dataqualityUpperAlarm \
                                                 and not dataqualityLowerAlarm:
                                             tsvr = Timeseriesresultvalues(
@@ -446,7 +448,6 @@ class Command(BaseCommand):
                     i += 1
                     # Timeseriesresults.objects.raw("SELECT odm2.\
                     # "TimeseriesresultValsToResultsCountvalue\"()")
-            print(bulktimeseriesvalues)
             Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
             bulktimeseriesvalues = None
 
