@@ -348,11 +348,16 @@ class Command(BaseCommand):
                                                     #qualitycode = qualitycodebad
                                                     # already created time series result values in
                                                     # result upper bound check
+                                                    print('newdatavalue')
+                                                    print(newdatavalue)
+                                                    print('upper bound')
+                                                    print(result_upper_bound.dataqualityvalue)
+                                                    print(dataqualitybool)
                                                     if newdatavalue > result_upper_bound.dataqualityvalue \
                                                             and dataqualitybool:
                                                         print("upper alarm bound triggered")
                                                         print(annotationtext)
-                                                        annotation.save()    
+                                                        annotation.save()
                                                     else: # already created time series result values in
                                                           # result upper bound check
                                                         tsvr = Timeseriesresultvalues(
@@ -477,7 +482,9 @@ class Command(BaseCommand):
                     # bulkpropertyvals.append(repvend)
         # will bulk create or update the property values
         # Resultextensionpropertyvalues.objects.bulk_create(bulkpropertyvals)
+        print('email?')
         if sendemail:
             email = EmailMessage(emailtitle, emailtext, settings.EMAIL_FROM_ADDRESS, tolist)
+            print('email')
             print(emailtext)
             email.send()
