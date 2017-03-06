@@ -215,8 +215,10 @@ class Command(BaseCommand):
                                         dataqualitytypecv=upper_bound_quality_type, dataqualitycode__icontains='bound')
                                     result_lower_bound = dataquality.get(
                                         dataqualitytypecv=lower_bound_quality_type, dataqualitycode__icontains='bound')
-                                except ObjectDoesNotExist:
+                                except Exception as e:
+                                    print '%s (%s)' % (e.message, type(e))
                                     dataqualitybool = False
+
                                 try:
                                     result_upper_bound_alarm = dataquality.get(
                                         dataqualitytypecv=upper_bound_quality_type,
