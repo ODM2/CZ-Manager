@@ -338,6 +338,10 @@ class Command(BaseCommand):
                                                 dataqualitybool = False
 
                                         if dataqualityUpperAlarm:
+                                            print('newdatavalue')
+                                            print(newdatavalue)
+                                            print('upper bound')
+                                            print(result_upper_bound.dataqualityvalue)
                                             sendemail = True
                                             if newdatavalue > result_upper_bound_alarm.dataqualityvalue:
                                                 with transaction.atomic():
@@ -354,10 +358,7 @@ class Command(BaseCommand):
                                                     #qualitycode = qualitycodebad
                                                     # already created time series result values in
                                                     # result upper bound check
-                                                    print('newdatavalue')
-                                                    print(newdatavalue)
-                                                    print('upper bound')
-                                                    print(result_upper_bound.dataqualityvalue)
+
                                                     print(dataqualitybool)
                                                     if newdatavalue > result_upper_bound.dataqualityvalue:
                                                         print("upper alarm bound triggered")
