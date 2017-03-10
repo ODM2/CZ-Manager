@@ -1,0 +1,28 @@
+<div id="sftype-form" style="display: none;">
+<form action="" method="post">
+    {% csrf_token %}
+    <div id="" style="min-height:50px;">
+        <table>
+            <tr>
+                <th scope="col" class="section">Sampling Feature Type Name</th>
+                <th scope="col" class="section">Sampling Feature Type Definition</th>
+            </tr>
+
+            {% for sf_type in sf_types %}
+                <tr class="row1">
+                    <td><input title="samplingfeaturetype-list" type="checkbox" class="action-checkbox-column" id="s2" name="sftypeselection"
+                               value="{{ sf_type.name }}"
+                            {% for selection in selectedterms %}
+								{% if sf_type.name == selection %}
+									checked
+								{% endif %}
+							{% endfor %}
+                    />{{ sf_type.name }}<br></td>
+                    <td> {{ sf_type.definition }}</td>
+
+                </tr>
+            {% endfor %}
+        </table>
+     <input type="submit" name="update_sampling_features_on_type" value="Select Sampling Features by Type" />
+    </div>
+</form></div>

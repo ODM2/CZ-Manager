@@ -234,8 +234,6 @@ AJAX_LOOKUP_CHANNELS = dict(
 
 """ SAMPLING FEATURE TYPE LEGEND MAPPING """
 LEGEND_MAP = {
-        'CZO': dict(feature_type="CZO", icon="fa fa-flag-o", color="purple",
-                    style_class="awesome-marker-icon-purple"),
         'Excavation': dict(feature_type="Excavation", icon="fa-spoon", color="darkred",
                            style_class="awesome-marker-icon-darkred"),
         'Field area': dict(feature_type="Field area", icon="fa-map-o", color="darkblue",
@@ -253,7 +251,9 @@ LEGEND_MAP = {
                             style_class="awesome-marker-icon-blue"),
         'Transect': dict(feature_type="Transect", icon="fa-area-chart", color="cadetblue",
                          style_class="awesome-marker-icon-cadetblue"),
-        'Profile': dict(feature_type="Profile", icon="fa fa-database", color="purple",
-             style_class="awesome-marker-icon-purple")
+        'Profile': dict(feature_type="Profile", icon="fa-database", color="purple",
+             style_class="awesome-marker-icon-purple"),
+        'Specimen': dict(feature_type="Specimen", icon="fa-flask", color="cadetblue",
+                         style_class="awesome-marker-icon-cadetblue")
     }
 """ END SAMPLING FEATURE TYPE LEGEND MAPPING """
