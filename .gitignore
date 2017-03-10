@@ -27,7 +27,6 @@ __pycache__
 templatesAndSettings/settings.py
 odm2djangoadmin.git
 omit
-static
 migrations
 upfiles
 backup migrations

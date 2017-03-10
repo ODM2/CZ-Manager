@@ -1,0 +1,152 @@
+/* CUSTOM STYLE FOR MAP */
+.leaflet-google-layer {
+    z-index: 0;
+}
+.leaflet-map-pane {
+    z-index: 100;
+}
+.legend {
+    line-height: 18px;
+    color: #555;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: -1px 3px 10px -1px rgba(0, 0, 0, 0.4);
+    opacity: 0.9;
+}
+/*.datasets-listing{
+    color: #555;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: -1px 3px 10px -1px rgba(0, 0, 0, 0.4);
+    opacity: 0.9;
+    padding:20px;
+}*/
+#legend{
+    padding:20px;
+}
+.legend-icon {
+    background-image: url(../leaflet-awesome-marker/img/markers-soft.png);
+    background-repeat: no-repeat;
+    width: 35px;
+    height: 46px;
+    text-align: center;
+    float: left;
+}
+.legend-icon > i {
+    color: #fff;
+    margin-top: 10px;
+    display: inline-block;
+    font-size: 14px;
+}
+.legend-item {
+    clear: both;
+}
+.legend-text {
+    float: left;
+    padding-top: 10px;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+#container {
+    height: 100%;
+}
+
+.panel-header {
+    background-color: #474C51;
+    color: #ffffff;
+    height: 5%;
+    padding: 10px 0 10px 20px;
+}
+
+.panel-header h3 {
+    font-size: 20px;
+    color: #ffffff;
+}
+.panel-header p, .panel-header p > span{
+    font-size: 15px;
+}
+
+#content {
+    padding: 0;
+    height: 100%;
+}
+.container-fluid {
+    width: 100%;
+    height: 100%;
+    margin: auto;
+}
+
+.map-panel {
+    position: relative;
+    float: left;
+    width: 100%;
+    height: 100%;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+#webmap {
+    width: 100%;
+    height: 100%;
+    float: left;
+}
+
+#latlng {
+
+}
+#map-container {
+    width: 100%;
+    height: 100%;
+    float: left;
+}
+
+
+
+td.title {
+    font-weight: bold;
+}
+
+
+select {
+        width: 85%;
+        overflow: hidden;
+        white-space: pre;
+        text-overflow: ellipsis;
+}
+option {
+    border: solid 1px #DDDDDD;
+}
+
+#close-filter, #minimize-toggle {
+    float: right;
+    padding-left: 10px;
+}
+
+.legend-container #dataset-filter {
+    background-color: rgba(255, 255, 255, 1.0);
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
+}
+
+div.legend-container.leaflet-control {
+    z-index: 9999999;
+}
+
+.legend-collapsed #dataset-filter {
+  display: none;
+}
+
+#dataset-filter {
+    padding: 20px;
+}
