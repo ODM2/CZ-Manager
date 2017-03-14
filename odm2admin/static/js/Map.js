@@ -51,7 +51,7 @@ MAP.prototype.makeBaseMap = function (basemap) {
 };
 
 makeURL = function (parameters) {
-    var baseurl = '/admin/features';
+    var baseurl = '/' + url_path +'features';
     var params_arr = [];
     params_arr.push('type=' + parameters.type);
     params_arr.push('datasets=' + parameters.datasets);
@@ -131,12 +131,12 @@ makeMarkerPopup = function (marker, obs) {
         obs.sampling_feature_type == "Weather station") {
         markerpopup = popup
             + "<iframe width=900, height=300px, "
-            + "src='/admin/" + api + "/samplingfeature=" + obs.samplingfeatureid
+            + "src='/" + url_path + api + "/samplingfeature=" + obs.samplingfeatureid
             + "/popup=true/' name='iframe_A'></iframe>";
     } else if (obs.sampling_feature_type == "Excavation") {
         api = 'profilegraph';
 
-        link = "/admin/" + api + "/samplingfeature=" + obs.samplingfeatureid
+        link = "/" + url_path + api + "/samplingfeature=" + obs.samplingfeatureid
             + "/popup=true/";
 
         markerpopup = popup
@@ -148,7 +148,7 @@ makeMarkerPopup = function (marker, obs) {
     } else if (obs.sampling_feature_type == "Field area") {
         api = 'profilegraph';
 
-        link = "/admin/" + api + "/selectedrelatedfeature=" + obs.samplingfeatureid
+        link = "/" + url_path + api + "/selectedrelatedfeature=" + obs.samplingfeatureid
             + "/popup=true/";
 
         markerpopup = popup

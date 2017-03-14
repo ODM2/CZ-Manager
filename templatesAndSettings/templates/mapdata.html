@@ -84,6 +84,8 @@
         <div id="webmap"></div>
     </div>
     <script type="application/javascript">
+        var url_path = "{{ urlpath }}";
+        console.log(url_path);
         var myApp = new App;
         myApp.init({{ basemaps|safe }});
 

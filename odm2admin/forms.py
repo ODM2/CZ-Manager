@@ -74,11 +74,15 @@ from .readonlyadmin import ReadOnlyAdmin
 # dropdown lists can be populated with useful information
 
 def link_list_display_DOI(link):
-    match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])\S)+", link)
-    if not match:
-        match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])[[:graph:]])+", link)
-    if match:
-        return u'<a href="http://dx.doi.org/%s" target="_blank">%s</a>' % (link, link)
+    if link:
+        match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])\S)+", link)
+        if not match:
+            match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])[[:graph:]])+", link)
+
+        if match:
+            return u'<a href="http://dx.doi.org/%s" target="_blank">%s</a>' % (link, link)
+        else:
+            return u'<a href="%s" target="_blank">%s</a>' % (link, link)
     else:
         return u'<a href="%s" target="_blank">%s</a>' % (link, link)
 
