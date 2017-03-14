@@ -69,7 +69,11 @@ MAP.prototype.getData = function (url) {
         samplingFeatures.forEach(function (sf) {
             var marker = _this.drawMarker(sf);
             makeMarkerPopup(marker, sf);
-            _this.markers.addLayer(marker);
+            if(!clustersites && sf['sampling_feature_type'] == 'Site'){
+                marker.addTo(_this.webmap);
+            } else {
+                _this.markers.addLayer(marker);
+            }
         });
         _this.markers.addTo(_this.webmap);
     })
@@ -86,19 +90,20 @@ createMarker = function (markerIcon, color) {
 MAP.prototype.drawMarker = function(obs) {
     var latlng = [obs.featuregeometry.lat, obs.featuregeometry.lng];
     var featType = obs.sampling_feature_type;
+    var sfname = obs.samplingfeaturename;
     //console.log(obs);
 
-    return this.getMarker(latlng, featType);
+    return this.getMarker(latlng, featType, sfname);
 };
 
-MAP.prototype.getMarker = function (latlng, featType) {
+MAP.prototype.getMarker = function (latlng, featType, sfname) {
     var markerIcon = null;
     this.legends.forEach(function (l) {
         if (l.feature_type == featType){
             markerIcon = createMarker(l.icon, l.color);
         }
     });
-    return L.marker(latlng, { icon: markerIcon });
+    return L.marker(latlng, { icon: markerIcon, title: sfname });
 };
 
 makeMarkerPopup = function (marker, obs) {

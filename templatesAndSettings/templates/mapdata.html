@@ -85,7 +85,10 @@
     </div>
     <script type="application/javascript">
         var url_path = "{{ urlpath }}";
-        console.log(url_path);
+        var clustersites = false;
+        {% if map_config.cluster_sites %}
+            clustersites = true;
+        {% endif %}
         var myApp = new App;
         myApp.init({{ basemaps|safe }});
 
