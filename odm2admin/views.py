@@ -2323,15 +2323,12 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
             .samplingfeaturecode
         lastDepth = depth
         processingCode = myresults.resultid.resultid.processing_level.processinglevelcode
-        # print(unit)
-        # print(processingCode)
         if profileResult:
             depth = myresults.resultid.intendedzspacing
             if not k == 0 and (not lastSamplingFeatureCode == samplingFeatureCode or
                                not depth == lastDepth):
                 myfile.write('\n')
                 temp = myresults.csvoutput()
-                print(temp)
                 myfile.write(temp)
                 position = 0
             elif k == 0:
