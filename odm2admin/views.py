@@ -1138,13 +1138,17 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                     filter(samplingfeatureid=samplefeature).\
                     order_by("action__method")
                 resultList = Results.objects.filter(featureactionid__in=featureActions)\
-                    .order_by("featureactionid__action__method")
+                     .filter(
+                 processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
+                 ).order_by("featureactionid__action__method")
                 actions = Actions.objects.filter(actionid__in=featureActions.values("action"))
                 methods = Methods.objects.filter(methodid__in=actions.values("method"))
                 featureActionLocation = samplefeature.samplingfeaturename
             else:
                 resultList = Results.objects.filter(featureactionid=feature_action)\
-                    .order_by("featureactionid__action__method")
+                    .filter(
+                 processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
+                 ).order_by("featureactionid__action__method")
                 featureActions = Featureactions.objects.filter(featureactionid=feature_action).get()
                 featureActionLocation = featureActions.samplingfeatureid.samplingfeaturename
                 featureActionMethod = featureActions.action.method.methodname
@@ -1153,7 +1157,9 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         else:
             datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
             resultList = Results.objects.filter(resultid__in=datasetResults.values(
-                "resultid")).order_by("featureactionid__action__method")
+                "resultid")).filter(
+                 processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
+                 ).order_by("featureactionid__action__method")
             datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
             datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
     except(ObjectDoesNotExist) as e:
@@ -2317,13 +2323,15 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
             .samplingfeaturecode
         lastDepth = depth
         processingCode = myresults.resultid.resultid.processing_level.processinglevelcode
+        # print(unit)
+        # print(processingCode)
         if profileResult:
             depth = myresults.resultid.intendedzspacing
-
             if not k == 0 and (not lastSamplingFeatureCode == samplingFeatureCode or
                                not depth == lastDepth):
                 myfile.write('\n')
                 temp = myresults.csvoutput()
+                print(temp)
                 myfile.write(temp)
                 position = 0
             elif k == 0:
