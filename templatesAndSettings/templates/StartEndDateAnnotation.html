@@ -68,19 +68,18 @@ $(document).ready(function(){
 {% endif %}
 </td></tr>
 {% endfor %}
-</table>
-	<table ><tr><td>
-	<tr><td>	Reload graph using this date range:	<input id="startDate" maxlength="100" value= "{{ startDate }}" name="startDate" type="text">
-			Start Date (format YYYY-MM-DD HH:MM) </input>
+<table ><tr><td>
+	<tr><td>	Reload graph with date range:	<input id="startDate" maxlength="100" value= "{{ startDate }}" name="startDate" type="text">
+			Start Date (format YYYY-MM-DD HH:MM) </input><
 			<input id="endDate" maxlength="100" value= "{{ endDate }}" name="endDate" type="text"/>
-			End Date (format YYYY-MM-DD HH:MM) </input>
+			End Date (format YYYY-MM-DD HH:MM) </input></td>
 			
 			<input type="submit" name="update_chart" value="Update Chart" />
-			
 			</td></tr>
-			<tr><td><div class="g-recaptcha" data-sitekey="6LdYnQ8UAAAAAI38kvlrKy4kF28VMYWnGO4dDjPA"></div></td></tr>
-			<tr><td><input id="useDates" type="checkbox" name="useDates" checked>use dates to filter data in email</input>
-			<input id="outEmail" maxlength="100" name="outEmail" type="text">Email data to:</input><button type="button" id="email_data" name="email_data">Email Data</button>
+			<tr><td><div class="g-recaptcha" data-sitekey="6LdYnQ8UAAAAAI38kvlrKy4kF28VMYWnGO4dDjPA"></div>
+			<input id="useDates" type="checkbox" name="useDates" checked>use dates to filter data in email</input>
+			&nbsp; &nbsp; Send data to this email address: <input id="outEmail" maxlength="100" name="outEmail" type="text"> </input>
+			<button type="button" id="email_data" name="email_data">Email Data</button>
 			
 			</td></tr>
 	
