@@ -85,6 +85,27 @@ def link_list_display_DOI(link):
 class variablesInLine(admin.StackedInline):
     model = Variables
 
+class actionByInLine(admin.StackedInline):
+    model = Actionby
+    extra = 0
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('actionid',
+                       'affiliationid',
+                       'isactionlead',
+                       'roledescription',
+                       )
+
+        }),
+    )
+
+class ReadOnlyActionByInLine(actionByInLine):
+    readonly_fields = actionByInLine.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
 
 class unitsInLine(admin.StackedInline):
     model = Units
@@ -1152,7 +1173,7 @@ class ActionsAdmin(ReadOnlyAdmin):
 
     # For admin users
     form = ActionsAdminForm
-    inlines_list = [FeatureActionsInline]
+    inlines_list = [FeatureActionsInline, actionByInLine]
 
     list_display = ('action_type', 'method', 'begindatetime', 'enddatetime')
     list_display_links = ('action_type',)
