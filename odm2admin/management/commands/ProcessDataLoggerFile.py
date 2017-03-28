@@ -98,6 +98,7 @@ class Command(BaseCommand):
         parser.add_argument('columnheaderson', nargs=1, type=str)
         parser.add_argument('check_dates', nargs=1, type=bool)
         parser.add_argument('cmdline', nargs=1, type=bool)
+        parser.add_argument('reversed', nargs=1, type=bool, default=False)
 
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
         # cmdline = bool(options['cmdline'][0])
@@ -105,7 +106,9 @@ class Command(BaseCommand):
         file = str(settings.MEDIA_ROOT) + filename  # args[0].name
         fileid = int(options['dataloggerfileid'][0])
         fileid = Dataloggerfiles.objects.filter(dataloggerfileid=fileid).get()
-        check_dates = bool(options['check_dates'][0])  # for some reason this arg is not working
+        check_dates = bool(options['check_dates'][0])
+        reversed = bool(options['reversed'][0])
+        stop_reading_reversed = False
         databeginson = int(options['databeginson'][0])  # int(databeginson[0])
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
         rowColumnMap = list()
@@ -247,7 +250,7 @@ class Command(BaseCommand):
 
                                 tsvr = None
                                 for mresults in Timeseriesresult:
-                                    print(mresults)
+                                    # print(mresults)
                                     try:
                                         if value == '':
                                             print("error")
@@ -257,6 +260,8 @@ class Command(BaseCommand):
                                                 enddatestr = getEndDate(mresults)
                                                 enddate = time.strptime(enddatestr, '%Y-%m-%d %H:%M')
                                                 if enddate >= dateT:  #.valuedatetime.strftime('%Y-%m-%d %H:%M')
+                                                    if reversed:
+                                                        stop_reading_reversed = True
                                                     break
                                             except ObjectDoesNotExist:
                                                 pass
@@ -446,7 +451,10 @@ class Command(BaseCommand):
                                         pass
                                         # Timeseriesresultvalues.delete()
                                         # row[0] is this column object
+
                     i += 1
+                    if stop_reading_reversed:
+                        break
                     # Timeseriesresults.objects.raw("SELECT odm2.\
                     # "TimeseriesresultValsToResultsCountvalue\"()")
             Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
@@ -472,7 +480,7 @@ class Command(BaseCommand):
                     # bulkpropertyvals.append(repvend)
         # will bulk create or update the property values
         # Resultextensionpropertyvalues.objects.bulk_create(bulkpropertyvals)
-        print('email?')
+        #print('email?')
         if sendemail:
             email = EmailMessage(emailtitle, emailtext, settings.EMAIL_FROM_ADDRESS, tolist)
             print('email')
