@@ -103,7 +103,18 @@ MAP.prototype.getMarker = function (latlng, featType, sfname) {
             markerIcon = createMarker(l.icon, l.color);
         }
     });
-    return L.marker(latlng, { icon: markerIcon, title: sfname });
+
+    var markerProps = {
+        icon: markerIcon
+    };
+
+    var tooltipProps = {
+        interactive: true,
+        offset: L.point(15, -25),
+        direction: 'right'
+    };
+
+    return L.marker(latlng, markerProps).bindTooltip(sfname, tooltipProps);
 };
 
 makeMarkerPopup = function (marker, obs) {
