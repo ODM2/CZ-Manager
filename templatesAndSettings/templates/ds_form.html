@@ -1,0 +1,30 @@
+<div id="dataset-form" style="display: none;">
+<form action="" method="post">
+    {% csrf_token %}
+    <div id="" style="min-height:50px;">
+        <table>
+            <tr>
+                <th scope="col" class="section">Dataset Code</th>
+                <th scope="col" class="section">Dataset Name</th>
+                <th scope="col" class="section">Dataset Type</th>
+            </tr>
+
+            {% for dataset in datasets %}
+                <tr class="row1">
+                    <td><input title="dataset-list" type="checkbox" class="action-checkbox-column s1" id="dataset-{{ dataset.datasetid }}" name="datasetselection"
+                               value="{{ dataset.datasetid }}"
+                            {% for selection in selecteddatasets %}
+								{% if dataset.datasetid == selection %}
+									checked
+								{% endif %}
+							{% endfor %}
+                    />{{ dataset.datasetcode }}<br></td>
+                    <td> {{ dataset.datasettitle }}</td>
+                    <td>{{ dataset.datasettypecv }}</td>
+
+                </tr>
+            {% endfor %}
+        </table>
+     <input type="submit" name="update_sampling_features_on_datasetid" value="Select Sampling Features by Datasets" />
+    </div>
+</form></div>

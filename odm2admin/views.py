@@ -21,6 +21,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core import management
 # from oauth2_provider.views.generic import ProtectedResourceView
 from django.http import HttpResponse
+from django.forms.models import model_to_dict
+from django.contrib.gis.geos import GEOSGeometry
 import requests
 # from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
 # from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DISCLAIMER
@@ -434,7 +436,7 @@ def relatedFeaturesFilter(request, done, selected_resultid, featureaction,
     return selected_relatedfeatid, done, resultList, selected_resultid
 
 
-def web_map(request, dataset='NotSet'):
+def web_map(request):
     if request.user.is_authenticated():
         authenticated = True
     else:
@@ -442,44 +444,32 @@ def web_map(request, dataset='NotSet'):
     map_config = settings.MAP_CONFIG
     data_disclaimer = settings.DATA_DISCLAIMER
 
+    features = Samplingfeatures.objects.all()
+
     datasets = Datasets.objects.all()
     externalidentifiers = None
     ids = [ds.datasetid for ds in datasets]
 
-    selections = request.POST.getlist('datasetselection')
-    if dataset != 'NotSet':
-        selections = list()
-        selections.append(int(dataset))
-    if selections:
-        dataset_ids = []
+    sf_type_list = [sf.sampling_feature_type for sf in features]
+    sf_types = set(sf_type_list)
+    terms = [sf_type.name for sf_type in sf_types]
 
-        selected = []
-        for selection in selections:
-            dataset_ids.append(int(selection))
-            selected.append(int(selection))
-        datasetresults = Datasetsresults.objects.filter(datasetid__in=dataset_ids)
-        results = Results.objects.filter(resultid__in=datasetresults.values("resultid"))
+    ds_selections = request.POST.getlist('datasetselection')
 
-        fa = Featureactions.objects.filter(featureactionid__in=results.values("featureactionid"))
-        features1 = Samplingfeatures.objects.filter(
-            samplingfeatureid__in=fa.values("samplingfeatureid"))
-        relatedfeatures = Relatedfeatures.objects.filter(
-            samplingfeatureid__in=features1.values("samplingfeatureid"))
-        features2 = Samplingfeatures.objects.filter(
-            samplingfeatureid__in=relatedfeatures.values("relatedfeatureid"))
-        features = features1 | features2
+    if ds_selections != []:
+        selected_ds = []
+        for ds in ds_selections:
+            selected_ds.append(int(ds))
     else:
-        selected = ids
+        selected_ds = ids
 
-        features = Samplingfeatures.objects.all()
-        results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
-        externalidentifiers = Samplingfeatureexternalidentifiers.objects.all()
-    # start_date= Measurementresultvalues.objects.filter(resultid__in=results.values("resultid")).
-    # annotate(Min('valuedatetime'))\
-    #             .order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-    # end_date= Measurementresultvalues.objects.filter(resultid__in=results.values("resultid")).
-    # annotate(Max('valuedatetime'))\
-    #             .order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+    sftype_selections = request.POST.getlist('sftypeselection')
+    if sftype_selections != []:
+        selected_type = []
+        for sf in sftype_selections:
+            selected_type.append(sf)
+    else:
+        selected_type = terms
 
     legend_ref = [ settings.LEGEND_MAP[sftype] for sftype in map_config['feature_types']]
 
@@ -540,58 +530,56 @@ def web_map(request, dataset='NotSet'):
     context = {
         'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'legends': json.dumps(legend_ref),
         'features': features,
-        'results': results,
         'externalidentifiers': externalidentifiers,
-        'datasets': datasets, 'selecteddatasets': selected, 'authenticated': authenticated,
+        'datasets': datasets, 'selecteddatasets': selected_ds, 'authenticated': authenticated,
         'map_config': map_config,
         'data_disclaimer': data_disclaimer, 'name': request.user,
         'site_title': admin.site.site_title,
         'site_header': admin.site.site_header, 'short_title': 'Map Locations',
-        'basemaps': base_maps}
+        'basemaps': base_maps, 'sf_types': sf_types, 'selectedterms': selected_type,
+        'selectedds': json.dumps(ds_selections), 'selectedtype': json.dumps(sftype_selections),
+        'urlpath': settings.URL_PATH
+    }
     return render(request, 'mapdata.html', context)
 
 
-#
-# def web_map(request,dataset='NotSet'):
-#     if request.user.is_authenticated():
-#         authenticated=True
-#     else:
-#         authenticated=False
-#     if dataset=='NotSet':
-#         features = Samplingfeatures.objects.all()
-#         results = Results.objects.filter(featureactionid__in=features.values("featureactions"))
-#     else:
-#         dataset = int(dataset)
-#         datasetresults = Datasetsresults.objects.filter(datasetid=dataset)
-#         results = Results.objects.filter(resultid__in=datasetresults.values("resultid"))
-#         fa = Featureactions.objects.filter(featureactionid__in=results.values("featureactionid"))
-#         features = Samplingfeatures.objects.filter(samplingfeatureid__in=
-# fa.values("samplingfeatureid"))
-#
-#     legend_ref = [
-#         dict(feature_type="Excavation", icon="fa-spoon", color="darkred", html="duck",
-#              style_class="awesome-marker-icon-darkred"),
-#         dict(feature_type="Field area", icon="fa-map-o", color="darkblue",
-#              style_class="awesome-marker-icon-darkblue"),
-#         dict(feature_type="Ecological land classification", icon="fa-bar-chart",
-# color="darkpurple",
-#              style_class="awesome-marker-icon-darkpurple"),
-#         dict(feature_type="Observation well", icon="fa-eye", color="orange",
-#              style_class="awesome-marker-icon-orange"),
-#         dict(feature_type="Site", icon="fa-dot-circle-o", color="green", style_class=
-# "awesome-marker-icon-green"),
-#         dict(feature_type="Stream gage", icon="fa-tint", color="blue", style_class=
-# "awesome-marker-icon-blue"),
-#         dict(feature_type="Transect", icon="fa-area-chart", color="cadetblue",
-#              style_class="awesome-marker-icon-cadetblue")
-#     ]
-#
-#
-#
-#     context = {
-#         'prefixpath': CUSTOM_TEMPLATE_PATH,'legends':legend_ref, 'features':features,
-# 'results':results,'authenticated':authenticated}
-#     return render(request, 'mapdata.html', context)
+def get_features(request, sf_type="all", ds_ids="all"):
+    if ds_ids == "all" or sf_type == "all":
+        features = Samplingfeatures.objects.all()
+    elif sf_type == 'filtered':
+        dataset_ids = list(ds_ids.split(','))
+        datasetresults = Datasetsresults.objects.filter(datasetid__in=dataset_ids)
+        results = Results.objects.filter(resultid__in=datasetresults.values("resultid"))
+
+        fa = Featureactions.objects.filter(featureactionid__in=results.values("featureactionid"))
+        features1 = Samplingfeatures.objects.filter(
+            samplingfeatureid__in=fa.values("samplingfeatureid"))
+        relatedfeatures = Relatedfeatures.objects.filter(
+            samplingfeatureid__in=features1.values("samplingfeatureid"))
+        features2 = Samplingfeatures.objects.filter(
+            samplingfeatureid__in=relatedfeatures.values("relatedfeatureid"))
+        features = features1 | features2
+    elif ds_ids == 'filtered':
+        samplingfeature_types = list(sf_type.split(','))
+        if 'Site' in samplingfeature_types:
+            pass
+        features = Samplingfeatures.objects.filter(sampling_feature_type__in=samplingfeature_types)
+    else:
+        features = []
+
+    feats = [model_to_dict(f) for f in features]
+    feats_filtered = list()
+    for feat in feats:
+        lat = GEOSGeometry(feat['featuregeometry']).coords[1]
+        lon = GEOSGeometry(feat['featuregeometry']).coords[0]
+        if lat != 0 and lon != 0:
+            feat['featuregeometry'] = {
+                'lat': lat,
+                'lng': lon
+            }
+            feats_filtered.append(feat)
+
+    return HttpResponse(json.dumps(feats_filtered))
 
 
 def TimeSeriesGraphing(request, feature_action='All'):

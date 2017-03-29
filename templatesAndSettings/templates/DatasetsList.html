@@ -1,41 +1,24 @@
-<style>
-    select {
-        width: 85%;
-        overflow: hidden;
-        white-space: pre;
-        text-overflow: ellipsis;
-    }
-    option {
-        border: solid 1px #DDDDDD;
-    }
-</style>
-<h2>Filter Sampling Features by Dataset</h2>
-<form action="" method="post">
-    {% csrf_token %}
-    <div id="" style="min-height:50px;">
-        <table>
-            <tr>
-                <th scope="col" class="section">Dataset Code</th>
-                <th scope="col" class="section">Dataset Name</th>
-                <th scope="col" class="section">Dataset Type</th>
-            </tr>
-
-            {% for dataset in datasets %}
-                <tr class="row1">
-                    <td><input type="checkbox" class="action-checkbox-column" id="s1" name="datasetselection"
-                               value="{{ dataset.datasetid }}"
-                            {% for selection in selecteddatasets %}
-								{% if dataset.datasetid == selection %}
-									checked
-								{% endif %}
-							{% endfor %}
-                    />{{ dataset.datasetcode }}<br></td>
-                    <td> {{ dataset.datasettitle }}</td>
-                    <td>{{ dataset.datasettypecv }}</td>
-
-                </tr>
-            {% endfor %}
-        </table>
-     <input type="submit" name="update_sampling_features_on_datasetid" value="Select Sampling Features by Datasets" />
-    </div>
-</form>
+<button id="close-filter">Close</button>
+<h2>Filter Sampling Features</h2>
+<p>Filter by:
+    <select id="filter-name" title="filter-list">
+        <option value="none" selected="selected">Select Filter Below</option>
+        <option value="dataset">Dataset</option>
+        <option value="sftype">Sampling Feature Type</option>
+    </select>
+</p>
+<div id="filter-table"></div>
+<script>
+    var filterby = null;
+    $( "#filter-name" ).change(function () {
+        $( "select option:selected" ).each(function() {
+            if ($( this ).val() == "dataset"){
+                document.getElementById('filter-table').innerHTML = document.getElementById('dataset-form').innerHTML;
+            } else if ($( this ).val() == "sftype") {
+                document.getElementById('filter-table').innerHTML = document.getElementById('sftype-form').innerHTML;
+            } else {
+                document.getElementById('filter-table').innerHTML = '';
+            }
+         });
+    });
+</script>

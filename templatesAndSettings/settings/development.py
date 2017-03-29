@@ -54,7 +54,7 @@ MAP_CONFIG = {
       "access_token": 'mapbox accessToken'
     },
     "result_value_processing_levels_to_display": [1, 2, 3],
-    "feature_types": ['Site', 'Profile']
+    "feature_types": ['Site','Profile','Specimen']
 }
 """ END MAP CONFIGURATION """
 

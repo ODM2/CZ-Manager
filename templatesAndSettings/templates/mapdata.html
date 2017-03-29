@@ -55,97 +55,7 @@
 
 {% block extrahead %}<script src="https://use.fontawesome.com/57b6c04fb7.js"></script>
     {{ block.super }}
-    <script
-			  src="https://code.jquery.com/jquery-1.12.4.min.js"
-			  integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
-			  crossorigin="anonymous"></script>
-    <script src="https://use.fontawesome.com/eb9894ac79.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0/leaflet.css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0/leaflet.js"></script>
-
-    <link rel="stylesheet" href="http://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.Default.css" />
-	<link rel="stylesheet" href="http://leaflet.github.io/Leaflet.markercluster/dist/MarkerCluster.css" />
-	
-	<script src="http://leaflet.github.io/Leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
-    <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/1.5.2/css/ionicons.min.css">
-
-    <link rel="stylesheet"
-          href="http://nile.apl.washington.edu/files/cz/czimea/odm2admin/leaflet-awesome-marker/css/leaflet.awesome-markers.css">
-    <script src="http://nile.apl.washington.edu/files/cz/czimea/odm2admin/leaflet-awesome-marker/js/leaflet.awesome-markers.js"></script>
-    <link rel="stylesheet" href="http://nile.apl.washington.edu/files/cz/czimea/odm2admin/leaflet-legend/leaflet-legend.css">
-    <script src="http://nile.apl.washington.edu/files/cz/czimea/odm2admin/leaflet-legend/leaflet-legend.js"></script>
-    <link rel="stylesheet" href="https://cdn.rawgit.com/ismyrnow/Leaflet.groupedlayercontrol/gh-pages/src/leaflet.groupedlayercontrol.css" />
-    <script src="https://cdn.rawgit.com/ismyrnow/Leaflet.groupedlayercontrol/gh-pages/src/leaflet.groupedlayercontrol.js"></script>
-
-	<style type="text/css">
-        .leaflet-google-layer {
-            z-index: 0;
-        }
-        .leaflet-map-pane {
-            z-index: 100;
-        }
-        .legend {
-            line-height: 18px;
-            color: #555;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: -1px 3px 10px -1px rgba(0, 0, 0, 0.4);
-            opacity: 0.9;
-        }
-        /*.datasets-listing{
-            color: #555;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: -1px 3px 10px -1px rgba(0, 0, 0, 0.4);
-            opacity: 0.9;
-            padding:20px;
-        }*/
-        #legend{
-            padding:20px;
-        }
-        .legend-icon {
-            background-image: url(http://nile.apl.washington.edu/files/cz/czimea/odm2admin/leaflet-awesome-marker/img/markers-soft.png);
-            background-repeat: no-repeat;
-            width: 35px;
-            height: 46px;
-            text-align: center;
-            float: left;
-        }
-        .legend-icon > i {
-            color: #fff;
-            margin-top: 10px;
-            display: inline-block;
-            font-size: 14px;
-        }
-        .legend-item {
-            clear: both;
-        }
-        .legend-text {
-            float: left;
-            padding-top: 10px;
-        }
-        .awesome-marker {
-            background-image: url("http://nile.apl.washington.edu/files/cz/czimea/odm2admin/leaflet-awesome-marker/img/markers-soft.png") !important;
-            background-repeat: no-repeat !important;
-            height: 46px !important;
-            width: 35px !important;
-        }
-        html, body {
-            width: 100%;
-            height: 100%;
-        }
-
-        #latlng {
-            background-color: #595F65;
-            color: #ffffff;
-            padding: 10px 0 10px 20px;
-        }
-
-        #latlng p, #latlng p > span {
-            font-size: 15px;
-        }
-    </style>
+    {% include 'mapdata_head.html' %}
     {% admin_shortcuts_js %}{% endblock %}
 
 {# end changes #}
@@ -160,185 +70,36 @@
 {% block content %}
 
     <div id='content-main'> {% csrf_token %}</div>
-    <div id="latlng">
-        <p>
-            Lat: <span id="lat">0</span>, Lon: <span id="lng">0</span>
-        </p>
-    </div>
-    <div style="width:100%; height:900px;" id="map"></div>
-    <div id="legend">
+    {% include 'ds_form.html' %}
+    {% include 'sf_form.html' %}
+    <div id="dataset-filter">
        {% include 'DatasetsList.html' %}
     </div>
-    {% comment %}
-    <script type="text/template" id="datasetsList">
-        {% include 'DatasetsList.html' %}
+    <div id="map-container">
+        <div id="latlng" class="panel-header">
+            <p>
+                Lat: <span id="lat">0</span>, Lon: <span id="lng">0</span>
+            </p>
+        </div>
+        <div id="webmap"></div>
+    </div>
+    <script type="application/javascript">
+        var url_path = "{{ urlpath }}";
+        var clustersites = false;
+        {% if map_config.cluster_sites %}
+            clustersites = true;
+        {% endif %}
+        var myApp = new App;
+        myApp.init({{ basemaps|safe }});
+
+        var myMap = new MAP;
+        myMap.initMap("webmap", [{{ map_config.lat }}, {{ map_config.lon }}], {{ map_config.zoom }}, {{ legends|safe }});
+        myMap.addBaseMap(myApp.PARAMS.basemaps);
+
+        var url = myMap.getUrl(JSON.parse('{{ selectedds|safe }}'), JSON.parse('{{ selectedtype|safe }}'));
+        myMap.getData(url);
+        myMap.makeFilter();
     </script>
-    {% endcomment %}
-    <script type='text/javascript'>
-        var mapFeatures = {};
-        var baseMaps = {};
-        var overlays = {};
-        var featureList = {{ legends|safe }};
-        var mapCenter = [{{ map_config.lat }}, {{ map_config.lon }}];
-        var initZoom = {{ map_config.zoom }};
 
-        // Initalize map
-        var mapOptions = {
-            worldCopyJump:true
-        };
-        var myMap = L.map('map',mapOptions).setView(mapCenter, initZoom);
-
-        function displayCoords(e){
-            document.getElementById("lat").innerHTML = e.latlng['lat'].toFixed(4);
-            document.getElementById('lng').innerHTML = e.latlng['lng'].toFixed(4);
-        }
-        myMap.on({
-            mousemove: displayCoords
-        });
-
-        myMap.attributionControl.setPrefix('');
-        // Make Basemaps
-        function makeBaseMaps(basemaps) {
-            for (var i = 0; i < basemaps.length; i++) {
-                if (basemaps[i]['name'] == 'MapBox_RunBikeHike') {
-                    baseMaps[basemaps[i]['name']] = L.tileLayer(basemaps[i]
-                        ['url'],basemaps[i]['options']).addTo(myMap);
-                } else {
-                    baseMaps[basemaps[i]['name']] = L.tileLayer(basemaps[i]
-                        ['url'],basemaps[i]['options']);
-                }
-            }
-        }
-
-        makeBaseMaps({{ basemaps|safe }});
-
-        // Initialize marker cluster groupings
-        var markerClusters = L.markerClusterGroup(
-                singleMarkerMode=true
-        ); //,maxClusterRadius=1
-        {% for site in features|filter_coords %}
-            var feat_obj = featureList.filter(
-                    function( obj ){
-                        return obj['feature_type'] == '{{ site.sampling_feature_type.name }}'
-                    });
-            var popup = '';
-			done = false;
-			{% for externalidentifier in externalidentifiers %}
-				{% if  site.sampling_feature_type.name == "Site" and site.samplingfeatureid == externalidentifier.samplingfeatureid.samplingfeatureid and externalidentifier.externalidentifiersystemid.externalidentifiersystemname == "NSF" %}
-				 popup = '<br><h2>CZO: <a href="{{ externalidentifier.samplingfeatureexternalidentifieruri }}">{{ site.samplingfeaturename }}</a></h2>'
-                        + '<hr />'
-                        + '<br> <iframe  width=600, height=600, src="{{prefixpath}}../mappopup/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
-						done= true;
-						{% endif %}
-			{% endfor %}
-			if (done == false){
-				{% if not done == 1 and site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" or site.sampling_feature_type.name == "Stream gage" or site.sampling_feature_type.name == "Transect" or site.sampling_feature_type.name == "Weather station" %}
-                         popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
-							+ '<hr />'
-							+ '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
-							+ '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
-							+ '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
-							+ '<br> {{ site.sampling_feature_type.name}}'
-							+ '<br> </p><iframe  width=600, height=600, src="{{prefixpath}}../mappopup/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
-				{% elif  site.sampling_feature_type.name == "Excavation" %}
-					popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
-							+ '<hr />'
-							+ '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
-							+ '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
-							+ '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
-							+ '<br> {{ site.sampling_feature_type.name}}'
-							+ '<br><a  target="_blank" href="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true"> View soil profile data in new page</a></p><iframe  width=600, height=500, src="{{prefixpath}}../profilegraph/samplingfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
-				{% elif  site.sampling_feature_type.name == "Field area" %}
-					popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
-							+ '<hr />'
-							+ '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
-							+ '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
-							+ '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]'
-							+ '<br> {{ site.sampling_feature_type.name}}'
-							+ '<br><a  target="_blank" href="{{prefixpath}}../profilegraph/selectedrelatedfeature&#61;{{site.samplingfeatureid}}/popup=true"> View data for this field area in new page</a></p><iframe  width=600, height=500, src="{{prefixpath}}../profilegraph/selectedrelatedfeature&#61;{{site.samplingfeatureid}}/popup=true" name="iframe_A"></iframe></p>';
-				{% else %}
-					popup = '<br><h2>Sampling Feature: {{ site.samplingfeaturename }}</h2>'
-							+ '<hr />'
-							+ '<p>Sampling Feature Code: {{ site.samplingfeaturecode }}'
-							+ '<br>Sampling Feature Type: {{ site.sampling_feature_type.name }}'
-							+ '<br>Coordinates: [{{ site.featuregeometry|get_lat_lng:'lat' }},{{ site.featuregeometry|get_lat_lng:'lon' }}]</p>';
-				{% endif %}
-			}
-			if (done ==true){
-            var iconDiv = new L.DivIcon({
-                className: 'awesome-marker-icon-purple awesome-marker leaflet-zoom-animated leaflet-interactive',
-                html: '<i class="fa fa fa-flag-o icon-white" aria-hidden="true"></i><p style="margin-top:20px;font-weight:bold;">{{ site.samplingfeaturecode }}</p>'
-            });
-			}else{
-			 var iconDiv = new L.DivIcon({
-                className: feat_obj[0].style_class + ' awesome-marker leaflet-zoom-animated leaflet-interactive',
-                html: '<i class="fa '+  feat_obj[0].icon +' icon-white" aria-hidden="true"></i><p style="margin-top:20px;font-weight:bold;">{{ site.samplingfeaturecode }}</p>'
-            });
-			}
-			{% if  site.sampling_feature_type.name == "Site" or site.sampling_feature_type.name == "Observation well" or site.sampling_feature_type.name == "Field area" or site.sampling_feature_type.name == "Stream gage" or site.sampling_feature_type.name == "Transect" or site.sampling_feature_type.name == "Weather station"  %}
-                m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
-                    icon: iconDiv, title: '{{ site.samplingfeaturename }}'
-                }).bindPopup( popup,{minWidth: 600, minHeight: 500,autoPanPadding: [10, 50],  autoPan: true, closeButton: true,offset: [0, 5]} );
-			    {% if map_config.cluster_sites and  site.sampling_feature_type.name == "Site" %}
-					markerClusters.addLayer(m);
-				{% else %}
-				    m.addTo(myMap);
-				{% endif %}
-			{% else %}
-                m = L.marker([{{ site.featuregeometry|get_lat_lng:'lat' }}, {{ site.featuregeometry|get_lat_lng:'lon' }}], {
-                    icon: iconDiv, title: '{{ site.samplingfeaturename }}'
-                }).bindPopup( popup,{minWidth: 600, minHeight: 500, autoPanPadding: [10, 50], autoPan: true, closeButton: true,offset: [0, 5]} );
-				markerClusters.addLayer(m);
-			{% endif %}
-        {% endfor %}
-
-
-        // Make legend
-        var legend = L.control({
-            position: 'bottomright'
-        });
-        legend.onAdd = function (myMap) {
-            var div = L.DomUtil.create('div', 'info legend');
-            div.innerHTML += '<h2>Sample Feature Types</h2>';
-            // loop through our density intervals and generate a label with a colored square for each interval
-            for (var i = 0; i < featureList.length; i++) {
-                div.innerHTML +=
-                        '<div class="legend-item">' +
-                        '      <div class="legend-icon ' + featureList[i]['style_class'] + '">' +
-                        '           <i class="fa ' + featureList[i]['icon'] + '" aria-hidden="true"></i>' +
-                        '      </div>' +
-                        '      <div class="legend-text">' + featureList[i]['feature_type'] + '</div>' +
-                        '</div>'
-            }
-                return div;
-        };
-
-
-        // https://github.com/mikeskaug/Leaflet.Legend
-        var legend2 = new L.Control.Legend({
-                        position: 'topleft',
-                        collapsed: true,
-                        controlButton: {
-                            title: "Legend"
-                        }});
-        myMap.addControl( legend2 );
-
-        $(".legend-container").append( $("#legend") );
-        $(".legend-toggle").append( "<i class='legend-toggle-icon fa fa-filter fa-2x' style='color: #000;margin-left:5px;'></i>" );
-
-        //legend2.addTo(myMap);
-        legend.addTo(myMap);
-        // Basemaps Choices
-
-        myMap.addLayer(markerClusters);
-
-        // Overlay Choices
-        overlayMaps = {};
-        // Put Control on map
-        L.control.groupedLayers(baseMaps, overlayMaps).addTo(myMap);
-        L.control.scale({
-            position:'bottomleft'
-}       ).addTo(myMap);
-    </script>
 
 {% endblock %}
