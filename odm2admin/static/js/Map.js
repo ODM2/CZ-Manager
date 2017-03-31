@@ -3,13 +3,14 @@
  */
 function MAP() {}
 
-MAP.prototype.initMap = function (map_id, initCenter, initZoom, legends){
+MAP.prototype.initMap = function (map_id, initCenter, initZoom, legends, display_titles){
 	this.map_id = map_id;
 	this.initCenter = initCenter;
 	this.initZoom = initZoom;
 	this.markers = L.markerClusterGroup();
 	this.basemaps = {};
 	this.legends = legends;
+	this.display_titles = display_titles;
 
 
 
@@ -63,11 +64,21 @@ makeURL = function (parameters) {
 MAP.prototype.getData = function (url) {
     _this = this;
     var Ajax = new AjaxRequest;
-    Ajax.initRequest();
+	var featureList = this.legends;
+	console.log(featureList);
+    var style_class = '';
+	Ajax.initRequest();
     Ajax.sendAndLoad(url, function (response) {
         var samplingFeatures = JSON.parse(response);
         samplingFeatures.forEach(function (sf) {
-            var marker = _this.drawMarker(sf);
+			for (var i = 0; i < featureList.length; i++) {
+				console.log(featureList['feature_type']);
+				if(featureList[i]['feature_type'] ==  sf['sampling_feature_type']){
+					style_class = featureList[i]['style_class'];
+				}
+			}
+			console.log(sf['sampling_feature_type']);
+            var marker = _this.drawMarker(sf,style_class);
             makeMarkerPopup(marker, sf);
             if(!clustersites && sf['sampling_feature_type'] == 'Site'){
                 marker.addTo(_this.webmap);
@@ -79,29 +90,42 @@ MAP.prototype.getData = function (url) {
     })
 };
 
-createMarker = function (markerIcon, color) {
-    return L.AwesomeMarkers.icon({
+createMarker = function (markerIcon, color, sfname,style_class) {
+    if(this.display_titles){
+			var iconDiv = new L.DivIcon({
+			className: style_class + ' awesome-marker leaflet-zoom-animated leaflet-interactive',
+			html: '<i class="fa fa fa-flag-o icon-white" aria-hidden="true"></i><p style="margin-top:20px;font-weight:bold;">'+sfname + '</p>'
+            });
+		return L.AwesomeMarkers.icon({
+        icon: iconDiv,
+        markerColor: color,
+        prefix: 'fa'
+    });
+	}else{
+	return L.AwesomeMarkers.icon({
         icon: markerIcon,
         markerColor: color,
         prefix: 'fa'
-    })
+    });
+	}
 };
 
-MAP.prototype.drawMarker = function(obs) {
+MAP.prototype.drawMarker = function(obs,style_class) {
     var latlng = [obs.featuregeometry.lat, obs.featuregeometry.lng];
     var featType = obs.sampling_feature_type;
-    var sfname = obs.samplingfeaturename;
+    var sfname = obs.samplingfeaturecode;
     //console.log(obs);
 
-    return this.getMarker(latlng, featType, sfname);
+    return this.getMarker(latlng, featType, sfname,style_class);
 };
 
-MAP.prototype.getMarker = function (latlng, featType, sfname) {
+MAP.prototype.getMarker = function (latlng, featType, sfname,style_class) {
     var markerIcon = null;
     this.legends.forEach(function (l) {
         if (l.feature_type == featType){
-            markerIcon = createMarker(l.icon, l.color);
-        }
+            markerIcon = createMarker(l.icon, l.color, sfname,style_class);
+			
+		}
     });
 
     var markerProps = {

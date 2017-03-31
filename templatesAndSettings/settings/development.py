@@ -50,6 +50,7 @@ MAP_CONFIG = {
     "zoom": 2,
     "cluster_sites": False,
     "time_series_months": 3,
+    "display_titles": True,
     "MapBox": {
       "access_token": 'mapbox accessToken'
     },

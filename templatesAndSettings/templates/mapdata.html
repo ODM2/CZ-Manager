@@ -89,11 +89,15 @@
         {% if map_config.cluster_sites %}
             clustersites = true;
         {% endif %}
+		var display_titles = false;
+        {% if map_config.display_titles %}
+            display_titles = true;
+        {% endif %}
         var myApp = new App;
         myApp.init({{ basemaps|safe }});
 
         var myMap = new MAP;
-        myMap.initMap("webmap", [{{ map_config.lat }}, {{ map_config.lon }}], {{ map_config.zoom }}, {{ legends|safe }});
+        myMap.initMap("webmap", [{{ map_config.lat }}, {{ map_config.lon }}], {{ map_config.zoom }}, {{ legends|safe }}, display_titles);
         myMap.addBaseMap(myApp.PARAMS.basemaps);
 
         var url = myMap.getUrl(JSON.parse('{{ selectedds|safe }}'), JSON.parse('{{ selectedtype|safe }}'));
