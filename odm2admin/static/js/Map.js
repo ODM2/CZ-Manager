@@ -3,11 +3,12 @@
  */
 function MAP() {}
 
-MAP.prototype.initMap = function (map_id, initCenter, initZoom, legends, display_titles){
+MAP.prototype.initMap = function (map_id, initCenter, initZoom, legends,cluster_feature_types, display_titles){
 	this.map_id = map_id;
 	this.initCenter = initCenter;
 	this.initZoom = initZoom;
 	this.markers = L.markerClusterGroup();
+	this.cluster_feature_types = cluster_feature_types;
 	this.basemaps = {};
 	this.legends = legends;
 	this.display_titles = display_titles;
@@ -65,42 +66,52 @@ MAP.prototype.getData = function (url) {
     _this = this;
     var Ajax = new AjaxRequest;
 	var featureList = this.legends;
-	console.log(featureList);
+    var cluster_feature_types = this.cluster_feature_types;
     var style_class = '';
+	var icon_str = '';
+	var done = false;
 	Ajax.initRequest();
     Ajax.sendAndLoad(url, function (response) {
         var samplingFeatures = JSON.parse(response);
         samplingFeatures.forEach(function (sf) {
 			for (var i = 0; i < featureList.length; i++) {
-				console.log(featureList['feature_type']);
+				
 				if(featureList[i]['feature_type'] ==  sf['sampling_feature_type']){
 					style_class = featureList[i]['style_class'];
+
+					icon_str =  featureList[i]['icon'];
 				}
 			}
-			console.log(sf['sampling_feature_type']);
-            var marker = _this.drawMarker(sf,style_class);
+
+            var marker = _this.drawMarker(sf,style_class,icon_str);
             makeMarkerPopup(marker, sf);
-            if(!clustersites && sf['sampling_feature_type'] == 'Site'){
-                marker.addTo(_this.webmap);
-            } else {
-                _this.markers.addLayer(marker);
-            }
+            done = false;
+			for (var i=0; i< cluster_feature_types.length; i++){
+				if(sf['sampling_feature_type'] == cluster_feature_types[i]){
+					_this.markers.addLayer(marker);
+					done = true;
+				} 
+			}
+			if(!done){
+				marker.addTo(_this.webmap);
+			}
         });
         _this.markers.addTo(_this.webmap);
     })
 };
 
-createMarker = function (markerIcon, color, sfname,style_class) {
-    if(this.display_titles){
-			var iconDiv = new L.DivIcon({
-			className: style_class + ' awesome-marker leaflet-zoom-animated leaflet-interactive',
-			html: '<i class="fa fa fa-flag-o icon-white" aria-hidden="true"></i><p style="margin-top:20px;font-weight:bold;">'+sfname + '</p>'
-            });
-		return L.AwesomeMarkers.icon({
+createMarker = function (latlng, markerIcon, color, sfname,style_class,icon_str) {
+	if(this.display_titles){
+		var iconDiv = new L.DivIcon({
+		className: style_class + ' awesome-marker leaflet-zoom-animated leaflet-interactive',
+		html: '<i class="fa '+ icon_str +' icon-white" aria-hidden="true"></i><p style="margin-top:20px;font-weight:bold;">'+sfname + '</p>',
+		});
+		marker = L.marker([latlng[0],latlng[1]], {
         icon: iconDiv,
         markerColor: color,
         prefix: 'fa'
-    });
+		});
+		return marker; 
 	}else{
 	return L.AwesomeMarkers.icon({
         icon: markerIcon,
@@ -110,24 +121,23 @@ createMarker = function (markerIcon, color, sfname,style_class) {
 	}
 };
 
-MAP.prototype.drawMarker = function(obs,style_class) {
+MAP.prototype.drawMarker = function(obs,style_class,icon_str) {
     var latlng = [obs.featuregeometry.lat, obs.featuregeometry.lng];
     var featType = obs.sampling_feature_type;
     var sfname = obs.samplingfeaturecode;
     //console.log(obs);
 
-    return this.getMarker(latlng, featType, sfname,style_class);
+    return this.getMarker(latlng, featType, sfname,style_class,icon_str);
 };
 
-MAP.prototype.getMarker = function (latlng, featType, sfname,style_class) {
+MAP.prototype.getMarker = function (latlng, featType, sfname,style_class,icon_str) {
     var markerIcon = null;
     this.legends.forEach(function (l) {
         if (l.feature_type == featType){
-            markerIcon = createMarker(l.icon, l.color, sfname,style_class);
+            markerIcon = createMarker(latlng, l.icon, l.color, sfname,style_class,icon_str);
 			
 		}
     });
-
     var markerProps = {
         icon: markerIcon
     };
@@ -137,8 +147,12 @@ MAP.prototype.getMarker = function (latlng, featType, sfname,style_class) {
         offset: L.point(15, -25),
         direction: 'right'
     };
-
+    if(this.display_titles){
+		
+		return markerIcon.bindTooltip(sfname, tooltipProps);
+	}else{
     return L.marker(latlng, markerProps).bindTooltip(sfname, tooltipProps);
+	}
 };
 
 makeMarkerPopup = function (marker, obs) {
