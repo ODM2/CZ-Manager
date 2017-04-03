@@ -68,17 +68,16 @@ $(document).ready(function(){
 {% endif %}
 </td></tr>
 {% endfor %}
-</table>
-	<table ><tr><td>
+<table ><tr><td>
 	<tr><td>	Reload graph with date range:	<input id="startDate" maxlength="100" value= "{{ startDate }}" name="startDate" type="text">
-			Start Date (format YYYY-MM-DD HH:MM) </input>
+			Start Date (format YYYY-MM-DD HH:MM) </input><
 			<input id="endDate" maxlength="100" value= "{{ endDate }}" name="endDate" type="text"/>
-			End Date (format YYYY-MM-DD HH:MM) </input>
+			End Date (format YYYY-MM-DD HH:MM) </input></td>
 			
 			<input type="submit" name="update_chart" value="Update Chart" />
 			</td></tr>
 			<tr><td><div class="g-recaptcha" data-sitekey="6LdYnQ8UAAAAAI38kvlrKy4kF28VMYWnGO4dDjPA"></div>
-			use dates to filter data in email: <input id="useDates" type="checkbox" name="useDates" checked></input>
+			<input id="useDates" type="checkbox" name="useDates" checked>use dates to filter data in email</input>
 			&nbsp; &nbsp; Send data to this email address: <input id="outEmail" maxlength="100" name="outEmail" type="text"> </input>
 			<button type="button" id="email_data" name="email_data">Email Data</button>
 			
@@ -105,13 +104,13 @@ $(document).ready(function(){
 					{% for Result in resultList %}
 						{% if tsr.resultid.resultid == Result.resultid %}
 							<tr class="row1">
-									<td ><input type="checkbox" class="action-checkbox-column" id="s1" 
+									<td ><input type="radio" 
 									{% for SelectedResult in SelectedResults %}
 										{% if Result.resultid == SelectedResult %}
 											checked  
 										{% endif %}
 									{% endfor %}
-									name="selection{{ forloop.counter0 }}" value="{{ Result.resultid }}">{{ Result.feature_action }} </input><br></td>
+									name="selection" value="{{ Result.resultid }}">{{ Result.feature_action }}<br></td>
 										
 										<td >{{Result.resultid}}</td>
 										<td >{{Result.variableid.variablecode}}</td>
