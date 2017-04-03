@@ -5,14 +5,6 @@
 .leaflet-map-pane {
     z-index: 100;
 }
-.awesome-marker {
-            background-repeat: no-repeat !important;
-            height: 46px !important;
-            width: 35px !important;
-			margin-top: -40px !important;
-			margin-left: -19px !important; 
-			
-}
 .legend {
     line-height: 18px;
     color: #555;
