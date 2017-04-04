@@ -152,7 +152,8 @@ class Command(BaseCommand):
                             for j in range(numCols):
                                 # raise ValidationError(" in file " + row[j] + "
                                 # in obj column label "+dloggerfileColumns.columnlabel)
-                                if row[j] == dloggerfileColumns.columnlabel:
+                                if row[j] == dloggerfileColumns.columnlabel \
+                                        and dloggerfileColumns.columndescription !="skip":
                                     foundColumn = True
                                     dloggerfileColumns.columnnum = j
                                     rowColumnMap += [dloggerfileColumns]
