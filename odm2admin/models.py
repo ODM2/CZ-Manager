@@ -1056,7 +1056,7 @@ class ProcessDataloggerfile(models.Model):
         fileid = self.dataloggerfileid.dataloggerfileid
         management.call_command('ProcessDataLoggerFile', linkname,str(fileid)
                                 , str(self.databeginson), str(self.columnheaderson),
-                                False, False)
+                                False, False, False)
         super(ProcessDataloggerfile, self).save(*args, **kwargs)
         # def get_actions(self, request):
         #     #Disable delete
