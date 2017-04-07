@@ -50,6 +50,9 @@ MAP_CONFIG = {
     "zoom": 2,
     "cluster_sites": False,
     "time_series_months": 3,
+    "cluster_feature_types": ['Profile','Specimen','Excavation','Field area',
+                             'Ecological land classification','Transect'],
+    "display_titles": True,
     "MapBox": {
       "access_token": 'mapbox accessToken'
     },

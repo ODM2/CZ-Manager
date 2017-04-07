@@ -90,6 +90,27 @@ def link_list_display_DOI(link):
 class variablesInLine(admin.StackedInline):
     model = Variables
 
+class actionByInLine(admin.StackedInline):
+    model = Actionby
+    extra = 0
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('actionid',
+                       'affiliationid',
+                       'isactionlead',
+                       'roledescription',
+                       )
+
+        }),
+    )
+
+class ReadOnlyActionByInLine(actionByInLine):
+    readonly_fields = actionByInLine.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
 
 class unitsInLine(admin.StackedInline):
     model = Units
@@ -1180,7 +1201,7 @@ class ActionsAdmin(ReadOnlyAdmin):
 
     # For admin users
     form = ActionsAdminForm
-    inlines_list = [FeatureActionsInline]
+    inlines_list = [FeatureActionsInline, actionByInLine]
 
     def method_link(self, obj):
         return u'<a href="{0}methods/{1}/">{2}</a>'.format(settings.CUSTOM_TEMPLATE_PATH,
@@ -2193,3 +2214,4 @@ class ExternalidentifiersystemAdmin(ReadOnlyAdmin):
     user_readonly = [p.name for p in Externalidentifiersystems._meta.get_fields() if
                      not p.one_to_many]
     user_readonly_inlines = list()
+    
