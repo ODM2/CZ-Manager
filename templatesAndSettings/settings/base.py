@@ -23,9 +23,9 @@ ROOT = os.path.dirname(BASE_DIR)# '/Volumes/Landung_2TB/Work/ODM2-Admin/'
 # SECRET_KEY.
 SECRET_KEY = 'myRanDom_Secret_Key'
 # Application definition
-CUSTOM_TEMPLATE_PATH = '/admin/{}/'.format(APP_NAME)
+BASE_URL = '' # Enter the base url in your APACHE SETTINGS. e.g. 'ODM2ADMIN/'
 
-URL_PATH = 'admin/'
+CUSTOM_TEMPLATE_PATH = '/{}{}/'.format(BASE_URL, APP_NAME)
 """ END PATH CONFIGURATION """
 
 
@@ -112,7 +112,9 @@ MEDIA_URL = '/{}/{}/media/'.format(os.path.basename(BASE_DIR), APP_NAME)
 # Absolute path to the directory static files should be collected to. Don't put
 # anything in this directory yourself; store your static files in apps' static/
 # subdirectories and in STATICFILES_DIRS.
-STATIC_ROOT = '{}/{}/static'.format(BASE_DIR, APP_NAME)
+# STATIC_ROOT = '{}/{}/static'.format(BASE_DIR, APP_NAME)
+STATIC_DIR = '{}/{}/static'.format(BASE_DIR, APP_NAME)
+STATICFILES_DIRS = [STATIC_DIR]
 # URL prefix for static files.
 STATIC_URL = '/static/'
 """ END STATIC FILE CONFIGURATION """
@@ -174,31 +176,31 @@ ADMIN_SHORTCUTS = [
                 'class': 'config',
             },
             {
-                'url': '/' + URL_PATH + 'AddSensor.html',
+                'url': '/' + BASE_URL + 'AddSensor.html',
                 'app_name': '{}'.format(APP_NAME),
                 'title': 'Add Sensor Data',
                 'class': 'tool',
             },
             {
-                'url': '/' + URL_PATH + 'AddProfile.html',
+                'url': '/' + BASE_URL + 'AddProfile.html',
                 'app_name': '{}'.format(APP_NAME),
                 'title': 'Add Soil Profile Data',
                 'class': 'flag',
             },
             {
-                'url': '/' + URL_PATH + 'RecordAction.html',
+                'url': '/' + BASE_URL + 'RecordAction.html',
                 'app_name': '{}'.format(APP_NAME),
                 'title': 'Record an Action',
                 'class': 'notepad',
             },
             {
-                'url': '/' + URL_PATH + 'ManageCitations.html',
+                'url': '/' + BASE_URL + 'ManageCitations.html',
                 'app_name': '{}'.format(APP_NAME),
                 'title': 'Manage Citations',
                 'class': 'pencil',
             },
             {
-                'url': '/' + URL_PATH + 'chartIndex.html',
+                'url': '/' + BASE_URL + 'chartIndex.html',
                 'app_name': '{}'.format(APP_NAME),
                 'title': 'Graph My Data',
                 'class': 'monitor',
