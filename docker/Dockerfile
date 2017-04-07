@@ -1,4 +1,4 @@
-FROM debian:latest
+FROM miniconda:latest
 
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
@@ -18,17 +18,6 @@ EXPOSE 8010
 EXPOSE 5432
 
 VOLUME /db
-
-# Setup System tools
-RUN apt-get update --fix-missing && apt-get install -y apt-utils wget git curl tar vim sed grep bzip2 ca-certificates
-
-# Setting up Miniconda
-RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
-    wget --quiet https://repo.continuum.io/miniconda/Miniconda2-4.1.11-Linux-x86_64.sh -O ~/miniconda.sh && \
-    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
-    rm ~/miniconda.sh
-
-ENV PATH /opt/conda/bin:$PATH
 
 # Setting up postgresql database
 RUN apt-get update --fix-missing && apt-get install -y postgresql postgresql-client postgresql-contrib postgis
