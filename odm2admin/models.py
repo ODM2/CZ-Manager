@@ -2924,8 +2924,9 @@ class Timeseriesresultvaluesextwannotations(models.Model):
         return s
 
     def csvoutputShort(self):
+        result = Results.objects.get(resultid=self.resultid)
         s = '\" {0}\",'.format(
-            self.resultid.resultid.featureactionid.action.method.methodcode)
+            result.featureactionid.action.method.methodcode)
         s += '{0},'.format(self.datavalue)
         s += '{0},'.format(self.qualitycodecv)
         if self.annotationtext:
