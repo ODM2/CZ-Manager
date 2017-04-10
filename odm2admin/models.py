@@ -2697,7 +2697,6 @@ class Timeseriesresultvalues(models.Model):
         # s += 'Variable Name,'
         # s += 'Unit Name,'
         # s += 'processing level,'
-        s += 'method,'
         s += 'sampling feature/location,'
         s += 'time aggregation interval,'
         s += 'time aggregation unit,'
@@ -2712,8 +2711,6 @@ class Timeseriesresultvalues(models.Model):
         # s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
         # s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
         # s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
-        s += ',\" {0}\"'.format(
-            self.resultid.resultid.featureactionid.action.method.methodcode)
         s += ',\" {0}\"'.format(
             self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)
         s += ', {0}'.format(self.timeaggregationinterval)
@@ -2732,7 +2729,8 @@ class Timeseriesresultvalues(models.Model):
         return s
 
     def csvheaderShort(self):
-        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
+        s = 'method,'
+        s += '\" {0} -unit-{1}-processing level-{2}\",'.format(
             self.resultid.resultid.variableid.variablecode,
             self.resultid.resultid.unitsid.unitsname,
             self.resultid.resultid.processing_level.processinglevelcode)
@@ -2741,6 +2739,8 @@ class Timeseriesresultvalues(models.Model):
         return s
 
     def csvoutputShort(self):
+        s = '\" {0}\",'.format(
+            self.resultid.resultid.featureactionid.action.method.methodcode)
         s = '{0},'.format(self.datavalue)
         s += '{0}'.format(self.qualitycodecv)
         trvannotation = Timeseriesresultvalueannotations.objects.filter(valueid=self.valueid)
