@@ -2812,7 +2812,8 @@ class Timeseriesresultvaluesext(models.Model):
         s += 'location- {0}'.format(self.samplingfeaturename)
         return s
     def csvheaderShort(self):
-        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
+        s = 'method,'
+        s += '\" {0} -unit-{1}-processing level-{2}\",'.format(
             self.variablecode,
             self.unitsabbreviation,
             self.processinglevelcode)
@@ -2837,7 +2838,9 @@ class Timeseriesresultvaluesext(models.Model):
 
 
     def csvoutputShort(self):
-        s = '{0},'.format(self.datavalue)
+        s = '\" {0}\",'.format(
+            self.resultid.resultid.featureactionid.action.method.methodcode)
+        s += '{0},'.format(self.datavalue)
         s += '{0},'.format(self.qualitycodecv)
         return s
 
@@ -2911,7 +2914,8 @@ class Timeseriesresultvaluesextwannotations(models.Model):
         return s
 
     def csvheaderShort(self):
-        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
+        s = 'method,'
+        s += '\" {0} -unit-{1}-processing level-{2}\",'.format(
             self.variablecode,
             self.unitsabbreviation,
             self.processinglevelcode)
@@ -2920,7 +2924,9 @@ class Timeseriesresultvaluesextwannotations(models.Model):
         return s
 
     def csvoutputShort(self):
-        s = '{0},'.format(self.datavalue)
+        s = '\" {0}\",'.format(
+            self.resultid.resultid.featureactionid.action.method.methodcode)
+        s += '{0},'.format(self.datavalue)
         s += '{0},'.format(self.qualitycodecv)
         if self.annotationtext:
             s += '\"{0} \",'.format(self.annotationtext)
