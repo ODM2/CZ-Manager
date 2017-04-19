@@ -22,7 +22,7 @@ VOLUME /db
 # Setting up postgresql database
 RUN apt-get update --fix-missing && apt-get install -y postgresql postgresql-client postgresql-contrib postgis
 
-RUN git clone "https://github.com/lsetiawan/ODM2-Admin"
+RUN git clone -b miguelworking "https://github.com/miguelcleon/ODM2-Admin"
 
 RUN cd ODM2-Admin && latest=$(git describe --tags) && git checkout ${latest}
 
