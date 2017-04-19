@@ -538,7 +538,7 @@ def web_map(request):
         'site_header': admin.site.site_header, 'short_title': 'Map Locations',
         'basemaps': base_maps, 'sf_types': sf_types, 'selectedterms': selected_type,
         'selectedds': json.dumps(ds_selections), 'selectedtype': json.dumps(sftype_selections),
-        'urlpath': settings.URL_PATH
+        'urlpath': settings.BASE_URL
     }
     return render(request, 'mapdata.html', context)
 

@@ -15,136 +15,136 @@ admin.site.site_header = settings.SITE_HEADER
 admin.site.site_title = settings.SITE_TITLE
 
 # admin_site.admin_view()
-urlpatterns = [url(r'^' + settings.URL_PATH + '', include(admin.site.urls)),
-               url(r'^' + settings.URL_PATH + 'lookups/', include(ajax_select_urls)),
-               url(r'^$', lambda r: HttpResponseRedirect(settings.URL_PATH + '{}/'.format(settings.APP_NAME))),
-               url(r'^' + settings.URL_PATH + 'AddSensor', views.AddSensor, name="AddSensor"),
-               url(r'^' + settings.URL_PATH + 'chartIndex', views.chartIndex,
+urlpatterns = [url(r'^' + '', include(admin.site.urls)),
+               url(r'^' + 'lookups/', include(ajax_select_urls)),
+               url(r'^$', lambda r: HttpResponseRedirect('{}/'.format(settings.APP_NAME))),
+               url(r'^' + 'AddSensor', views.AddSensor, name="AddSensor"),
+               url(r'^' + 'chartIndex', views.chartIndex,
                    name="chartIndex"),
-               url(r'^' + settings.URL_PATH + 'AddProfile', views.AddProfile,
+               url(r'^' + 'AddProfile', views.AddProfile,
                    name="AddProfile"),
-               url(r'^' + settings.URL_PATH + 'RecordAction', views.RecordAction,
+               url(r'^' + 'RecordAction', views.RecordAction,
                    name="RecordAction"),
-               url(r'^' + settings.URL_PATH + 'ManageCitations', views.ManageCitations,
+               url(r'^' + 'ManageCitations', views.ManageCitations,
                    name="ManageCitations"),
-               url(r'^' + settings.URL_PATH + 'chart', views.TimeSeriesGraphing,
+               url(r'^' + 'chart', views.TimeSeriesGraphing,
                    name="TimeSeriesGraphing"),
-               url(r'^' + settings.URL_PATH + 'mapdata', views.web_map, name="WebMap"),
-               #  url(r'^' + settings.URL_PATH +'^login/$', login, {'template_name': 'login.html'}),
-               url(r'^' + settings.URL_PATH + 'graph/$', views.TimeSeriesGraphing),
-               url(r'^' + settings.URL_PATH + 'graph/featureaction=(?P<feature_action>(\d+))/$',
+               url(r'^' + 'mapdata', views.web_map, name="WebMap"),
+               #  url(r'^' + ^login/$', login, {'template_name': 'login.html'}),
+               url(r'^' + 'graph/$', views.TimeSeriesGraphing),
+               url(r'^' + 'graph/featureaction=(?P<feature_action>(\d+))/$',
                    views.TimeSeriesGraphing, name="TimeSeriesGraphing"),
                # (?:featureaction-(?P<featureaction>\d+)/)?$  (?P<variable_a>(\d+)
                # (?P<feature_action>(\d+))
-               url(r'^' + settings.URL_PATH + 'emaildata/$', views.email_data_from_graph),
-               url(r'^' + settings.URL_PATH + 'addannotation/$', views.add_annotation),
-               url(r'^' + settings.URL_PATH + 'addL1timeseries/$', views.addL1timeseries),
-               url(r'^' + settings.URL_PATH + 'graphfa/featureaction=(?P<feature_action>(\d+))/$',
+               url(r'^' + 'emaildata/$', views.email_data_from_graph),
+               url(r'^' + 'addannotation/$', views.add_annotation),
+               url(r'^' + 'addL1timeseries/$', views.addL1timeseries),
+               url(r'^' + 'graphfa/featureaction=(?P<feature_action>(\d+))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
-                   r'^' + settings.URL_PATH + 'graphfa/featureaction=(?P<feature_action>(\d+))/'
+                   r'^' + 'graphfa/featureaction=(?P<feature_action>(\d+))/'
                                      'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/'
                                      'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
-                   r'^' + settings.URL_PATH + 'graphfa/featureaction=(?P<feature_action>(\d+))/'
+                   r'^' + 'graphfa/featureaction=(?P<feature_action>(\d+))/'
                                      'resultidu=(?P<resultidu>(\d+))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
-                   r'^' + settings.URL_PATH + 'graphfa/featureaction=(?P<feature_action>(\d+))/'
+                   r'^' + 'graphfa/featureaction=(?P<feature_action>(\d+))/'
                                      'resultidu=(?P<resultidu>(\d+))/'
                                      'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/'
                                      'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
-               url(r'^' + settings.URL_PATH + 'graph/samplingfeature=(?P<samplingfeature>(\d+))/$',
+               url(r'^' + 'graph/samplingfeature=(?P<samplingfeature>(\d+))/$',
                    views.TimeSeriesGraphing, name="TimeSeriesGraphing"),
                # (?:featureaction-(?P<featureaction>\d+)/)?$  (?P<variable_a>(\d+)
                # (?P<feature_action>(\d+))
-               url(r'^' + settings.URL_PATH + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/$',
+               url(r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
-                   r'^' + settings.URL_PATH + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
+                   r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/'
                                      'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
-                   r'^' + settings.URL_PATH + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
+                   r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'resultidu=(?P<resultidu>(\d+))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
-                   r'^' + settings.URL_PATH + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
+                   r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'resultidu=(?P<resultidu>(\d+))/'
                                      'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/'
                                      'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
 
-               url(r'^' + settings.URL_PATH + 'mappopup/featureaction=(?P<feature_action>(\d+))/$',
+               url(r'^' + 'mappopup/featureaction=(?P<feature_action>(\d+))/$',
                    views.mappopuploader,
                    name="mappopuploader"),
                url(
-                   r'^' + settings.URL_PATH + 'mappopup/samplingfeature=(?P<samplingfeature>(\d+))/'
+                   r'^' + 'mappopup/samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.mappopuploader, name="mappopuploader"),
 
                url(
-                   r'^' + settings.URL_PATH + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
+                   r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
-                   r'^' + settings.URL_PATH + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
+                   r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/'
                                      'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/'
                                      'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
-                   r'^' + settings.URL_PATH + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
+                   r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'resultidu=(?P<resultidu>(\d+))/'
                                      'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
-                   r'^' + settings.URL_PATH + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
+                   r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'resultidu=(?P<resultidu>(\d+))/'
                                      'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/'
                                      'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/'
                                      'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
 
-               url(r'^' + settings.URL_PATH + 'graphfa/dataset=(?P<dataset>(\d+))/$',
+               url(r'^' + 'graphfa/dataset=(?P<dataset>(\d+))/$',
                    views.TimeSeriesGraphingShort,
                    name="TimeSeriesGraphingShort"),
                url(
-                   r'^' + settings.URL_PATH + 'graphfa/dataset=(?P<dataset>(\d+))/'
+                   r'^' + 'graphfa/dataset=(?P<dataset>(\d+))/'
                                      'resultidu=(?P<resultidu>(\d+))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
-                   r'^' + settings.URL_PATH + 'graphfa/dataset=(?P<dataset>(\d+))/'
+                   r'^' + 'graphfa/dataset=(?P<dataset>(\d+))/'
                                      'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/'
                                      'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(
-                   r'^' + settings.URL_PATH + 'graphfa/dataset=(?P<dataset>(\d+))/'
+                   r'^' + 'graphfa/dataset=(?P<dataset>(\d+))/'
                                      'resultidu=(?P<resultidu>(\d+))/'
                                      'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/'
                                      'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
 
                url(
-                   r'^' + settings.URL_PATH + 'profilegraph/'
+                   r'^' + 'profilegraph/'
                                      'samplingfeature=(?P<samplingfeature>(\d+))/$',
                    views.graph_data, name="graph_data"),
                url(
-                   r'^' + settings.URL_PATH + 'profilegraph/'
+                   r'^' + 'profilegraph/'
                                      'samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.graph_data, name="graph_data"),
                url(
-                   r'^' + settings.URL_PATH + 'profilegraph/'
+                   r'^' + 'profilegraph/'
                                      'selectedrelatedfeature='
                                      '(?P<selectedrelatedfeature>(\d+))/'
                                      'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.graph_data, name="graph_data"),
                url(
-                   r'^' + settings.URL_PATH + 'profilegraph/'
+                   r'^' + 'profilegraph/'
                                      'selectedrelatedfeature='
                                      '(?P<selectedrelatedfeature>(\d+))/'
                                      'samplingfeature=(?P<samplingfeature>(\d+))/'
@@ -152,23 +152,23 @@ urlpatterns = [url(r'^' + settings.URL_PATH + '', include(admin.site.urls)),
                    views.graph_data, name="graph_data"),
 
                # /(?P<startdate>(\d+))/(?P<enddate>(\d+))
-               url(r'^' + settings.URL_PATH + 'chartVariableAndFeature.html', views.graph_data,
+               url(r'^' + 'chartVariableAndFeature.html', views.graph_data,
                    name="graph_data"),
-               url(r'^' + settings.URL_PATH + 'soilsscatterplot.html', views.scatter_plot,
+               url(r'^' + 'soilsscatterplot.html', views.scatter_plot,
                    name="scatter_plot"),
-               url(r'^' + settings.URL_PATH + 'publications.html', views.publications,
+               url(r'^' + 'publications.html', views.publications,
                    name="publications"),
-               url(r'^' + settings.URL_PATH + 'features/type=(?P<sf_type>([\w\s]+,?)+)&'
+               url(r'^' + 'features/type=(?P<sf_type>([\w\s]+,?)+)&'
                                               'datasets=(?P<ds_ids>([a-zA-Z]+)?(([0-9]+,?)+)?)', views.get_features),
-               # url(r'^' + settings.URL_PATH + 'pubview/citationid=(?P<citationid>(\d+))/$',
+               # url(r'^' + 'pubview/citationid=(?P<citationid>(\d+))/$',
                # views.add_pub,
                #    name="add_pub"),
-               # url(r'^' + settings.URL_PATH + 'pubview', views.add_pub),
+               # url(r'^' + 'pubview', views.add_pub),
                # for uploaded files like dataloggerfiles
                # url(r'^' + MEDIA_URL +'(?P<path>.*)$', 'django.views.static.serve', {
                #        'document_root': MEDIA_ROOT,
                #    }),
-               # url(r'^' + settings.URL_PATH + 'upfiles/(?P<path>.*)$', 'django.views.static.serve',
+               # url(r'^' + 'upfiles/(?P<path>.*)$', 'django.views.static.serve',
                #    {'document_root': MEDIA_ROOT}),
                # url(r'^admin/DataloggerfilecolumnsDisplay.html',
                # views.dataloggercolumnView,
