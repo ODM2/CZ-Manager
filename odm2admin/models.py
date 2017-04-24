@@ -968,7 +968,9 @@ class Dataloggerfilecolumns(models.Model):
                                                    verbose_name="instrument output variable",
                                                    db_column='instrumentoutputvariableid')
     columnlabel = models.CharField(verbose_name="column label", max_length=50)
-    columndescription = models.CharField(verbose_name="column description", max_length=5000,
+    columndescription = models.CharField(verbose_name="column description",
+                                         help_text="To disble ingestion of a column type 'skip'",
+                                         max_length=5000,
                                          blank=True)
     measurementequation = models.CharField(verbose_name="measurement equation", max_length=255,
                                            blank=True)
@@ -1054,7 +1056,7 @@ class ProcessDataloggerfile(models.Model):
         fileid = self.dataloggerfileid.dataloggerfileid
         management.call_command('ProcessDataLoggerFile', linkname,str(fileid)
                                 , str(self.databeginson), str(self.columnheaderson),
-                                False, False)
+                                False, False, False)
         super(ProcessDataloggerfile, self).save(*args, **kwargs)
         # def get_actions(self, request):
         #     #Disable delete
@@ -2727,7 +2729,8 @@ class Timeseriesresultvalues(models.Model):
         return s
 
     def csvheaderShort(self):
-        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
+        s = 'method,'
+        s += '\" {0} -unit-{1}-processing level-{2}\",'.format(
             self.resultid.resultid.variableid.variablecode,
             self.resultid.resultid.unitsid.unitsname,
             self.resultid.resultid.processing_level.processinglevelcode)
@@ -2736,6 +2739,8 @@ class Timeseriesresultvalues(models.Model):
         return s
 
     def csvoutputShort(self):
+        s = '\" {0}\",'.format(
+            self.resultid.resultid.featureactionid.action.method.methodcode)
         s = '{0},'.format(self.datavalue)
         s += '{0}'.format(self.qualitycodecv)
         trvannotation = Timeseriesresultvalueannotations.objects.filter(valueid=self.valueid)
@@ -2807,7 +2812,8 @@ class Timeseriesresultvaluesext(models.Model):
         s += 'location- {0}'.format(self.samplingfeaturename)
         return s
     def csvheaderShort(self):
-        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
+        s = 'method,'
+        s += '\" {0} -unit-{1}-processing level-{2}\",'.format(
             self.variablecode,
             self.unitsabbreviation,
             self.processinglevelcode)
@@ -2832,7 +2838,9 @@ class Timeseriesresultvaluesext(models.Model):
 
 
     def csvoutputShort(self):
-        s = '{0},'.format(self.datavalue)
+        s = '\" {0}\",'.format(
+            self.resultid.resultid.featureactionid.action.method.methodcode)
+        s += '{0},'.format(self.datavalue)
         s += '{0},'.format(self.qualitycodecv)
         return s
 
@@ -2906,7 +2914,8 @@ class Timeseriesresultvaluesextwannotations(models.Model):
         return s
 
     def csvheaderShort(self):
-        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
+        s = 'method,'
+        s += '\" {0} -unit-{1}-processing level-{2}\",'.format(
             self.variablecode,
             self.unitsabbreviation,
             self.processinglevelcode)
@@ -2915,7 +2924,10 @@ class Timeseriesresultvaluesextwannotations(models.Model):
         return s
 
     def csvoutputShort(self):
-        s = '{0},'.format(self.datavalue)
+        result = Results.objects.get(resultid=self.resultid)
+        s = '\" {0}\",'.format(
+            result.featureactionid.action.method.methodcode)
+        s += '{0},'.format(self.datavalue)
         s += '{0},'.format(self.qualitycodecv)
         if self.annotationtext:
             s += '\"{0} \",'.format(self.annotationtext)

@@ -24,6 +24,7 @@ RUN apt-get update --fix-missing && apt-get install -y postgresql postgresql-cli
 
 RUN git clone "https://github.com/miguelcleon/ODM2-Admin"
 
+
 RUN cd ODM2-Admin && latest=$(git describe --tags) && git checkout ${latest}
 
 RUN service postgresql start && su - postgres -c 'psql -U postgres -c "create database odm2_db"'
