@@ -1,4 +1,4 @@
-FROM miniconda:latest
+FROM continuumio/miniconda:latest
 
 ENV LANG=C.UTF-8 LC_ALL=C.UTF-8
 
@@ -22,7 +22,7 @@ VOLUME /db
 # Setting up postgresql database
 RUN apt-get update --fix-missing && apt-get install -y postgresql postgresql-client postgresql-contrib postgis
 
-RUN git clone "https://github.com/lsetiawan/ODM2-Admin"
+RUN git clone "https://github.com/miguelcleon/ODM2-Admin"
 
 RUN cd ODM2-Admin && latest=$(git describe --tags) && git checkout ${latest}
 
@@ -33,7 +33,7 @@ RUN service postgresql start && su - postgres -c 'psql -U postgres -c "create da
 #    su - postgres -c "psql -U postgres -d postgres -c \"alter user postgres with password 'test';\"" 
 
 # creates an env with the depepencies
-RUN conda create --yes -n odm2adminenv -c conda-forge python=2.7 --file /ODM2-Admin/requirements.txt
+RUN conda create --yes -n odm2adminenv -c conda-forge python=2.7 pytz gdal --file /ODM2-Admin/requirements.txt
 RUN update-rc.d postgresql enable
 
 COPY development.py /ODM2-Admin/templatesAndSettings/settings/
