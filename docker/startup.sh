@@ -2,7 +2,6 @@
 
 echo "Activating environment..."
 source activate odm2adminenv
-conda install --yes -c conda-forge pytz
 
 echo "Building database..."
 su - postgres -c 'pg_restore -d odm2_db -1 -v "/ODM2-Admin/ODM2AdminDBBlank"'
