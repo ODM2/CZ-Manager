@@ -181,10 +181,12 @@ class Command(BaseCommand):
                                                           "%Y-%m-%d %H:%M:%S")  # '1/1/2013 0:10
                                     datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                                 except ValueError:
-                                    dateT = time.strptime(row[0],
-                                                          "%Y-%m-%d %H:%M:%S.%f")  # '1/1/2013 0:10
-                                    datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
-                                    continue
+                                    try:
+                                        dateT = time.strptime(row[0],
+                                                              "%Y-%m-%d %H:%M:%S.%f")  # '1/1/2013 0:10
+                                        datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
+                                    except ValueError:
+                                        continue
                         # for each column in the data table
                         # raise ValidationError("".join(str(rowColumnMap)))
                         # if check_dates:
