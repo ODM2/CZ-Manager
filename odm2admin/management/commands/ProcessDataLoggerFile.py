@@ -184,7 +184,7 @@ class Command(BaseCommand):
                                     dateT = time.strptime(row[0],
                                                           "%Y-%m-%d %H:%M:%S.%f")  # '1/1/2013 0:10
                                     datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
-
+                                    continue
                         # for each column in the data table
                         # raise ValidationError("".join(str(rowColumnMap)))
                         # if check_dates:
