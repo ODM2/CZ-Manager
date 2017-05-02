@@ -157,6 +157,8 @@ class Command(BaseCommand):
                                     foundColumn = True
                                     dloggerfileColumns.columnnum = j
                                     rowColumnMap += [dloggerfileColumns]
+                                if dloggerfileColumns.columndescription =="skip":
+                                    foundColumn = True
                             if not foundColumn:
                                 raise CommandError(
                                     u'Cannot find a column in the CSV matching the '
@@ -238,9 +240,9 @@ class Command(BaseCommand):
                                     dataqualityLowerAlarm = False
                                 if Timeseriesresult.count() == 0:
                                     raise CommandError(
-                                        'No Measurement results for column ' + colnum.columnlabel +
-                                        ' Add measurement results for' +
-                                        'each column. Both results and measurement ' +
+                                        'No time series results for column ' + colnum.columnlabel +
+                                        ' Add time series results for' +
+                                        'each column. Both results and time series ' +
                                         'results are needed.')
                                 # only one measurement result is allowed per result
                                 value = row[colnum.columnnum]
@@ -256,7 +258,7 @@ class Command(BaseCommand):
                                     # print(mresults)
                                     try:
                                         if value == '':
-                                            print("error")
+                                            # print("error")
                                             raise IntegrityError
                                         if check_dates:
                                             try:

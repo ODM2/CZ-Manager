@@ -2141,7 +2141,7 @@ class Resultnormalizationvalues(models.Model):
 
 
 class Results(models.Model):
-    resultid = models.AutoField(primary_key=True, verbose_name="result")
+    resultid = models.AutoField(primary_key=True, verbose_name="data result")
     resultuuid = UUIDField(default=uuid.uuid4, editable=False)
     featureactionid = models.ForeignKey(Featureactions, related_name="feature_actions",
                                         verbose_name="sampling feature action",
@@ -2211,7 +2211,7 @@ class Results(models.Model):
     class Meta:
         managed = False
         db_table = r'odm2"."results'
-        verbose_name = 'result'
+        verbose_name = 'data result'
         ordering = ["variableid"]
 
 
