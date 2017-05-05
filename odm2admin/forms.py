@@ -778,7 +778,7 @@ class SamplingfeaturesAdmin(ReadOnlyAdmin):
                    u'target="_blank">{1}</a>'.format(obj.sampling_feature_type.term,
                                                      obj.sampling_feature_type.name)
 
-    sampling_feature_type_linked.short_description = 'Sampling Feature Type'
+    sampling_feature_type_linked.short_description = 'Sampling feature / site type'
     sampling_feature_type_linked.allow_tags = True
 
     @staticmethod
@@ -961,7 +961,7 @@ class ResultsAdminForm(ModelForm):
     # featureactionid = make_ajax_field(Featureactions,'featureactionid','featureaction_lookup',
     # max_length=500)
     featureactionid = AutoCompleteSelectField('featureaction_lookup', required=True, help_text='',
-                                              label='Sampling feature action')
+                                              label='Sampling feature / site action')
 
     def clean_featureactionid(self):
         featureactioniduni = self.data['featureactionid']
@@ -1693,7 +1693,7 @@ class MeasurementresultsAdmin(ReadOnlyAdmin):
             settings.CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid,
             obj.resultid.featureactionid)
 
-    data_link.short_description = 'sampling feature action'
+    data_link.short_description = 'sampling feature /site action'
     data_link.allow_tags = True
 
     # resultValues = Measurementresultvalues.objects.filter(resultid=)
@@ -1763,7 +1763,7 @@ class TimeseriesresultsAdmin(ReadOnlyAdmin):
             settings.CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid,
             obj.resultid.featureactionid)
 
-    data_link.short_description = 'sampling feature action'
+    data_link.short_description = 'sampling feature / site action'
     data_link.allow_tags = True
 
 
