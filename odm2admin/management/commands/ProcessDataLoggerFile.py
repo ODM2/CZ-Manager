@@ -157,6 +157,8 @@ class Command(BaseCommand):
                                     foundColumn = True
                                     dloggerfileColumns.columnnum = j
                                     rowColumnMap += [dloggerfileColumns]
+                                if dloggerfileColumns.columndescription =="skip":
+                                    foundColumn = True
                             if not foundColumn:
                                 raise CommandError(
                                     u'Cannot find a column in the CSV matching the '
@@ -181,10 +183,12 @@ class Command(BaseCommand):
                                                           "%Y-%m-%d %H:%M:%S")  # '1/1/2013 0:10
                                     datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                                 except ValueError:
-                                    dateT = time.strptime(row[0],
-                                                          "%Y-%m-%d %H:%M:%S.%f")  # '1/1/2013 0:10
-                                    datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
-
+                                    try:
+                                        dateT = time.strptime(row[0],
+                                                              "%Y-%m-%d %H:%M:%S.%f")  # '1/1/2013 0:10
+                                        datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
+                                    except ValueError:
+                                        continue
                         # for each column in the data table
                         # raise ValidationError("".join(str(rowColumnMap)))
                         # if check_dates:
@@ -236,9 +240,9 @@ class Command(BaseCommand):
                                     dataqualityLowerAlarm = False
                                 if Timeseriesresult.count() == 0:
                                     raise CommandError(
-                                        'No Measurement results for column ' + colnum.columnlabel +
-                                        ' Add measurement results for' +
-                                        'each column. Both results and measurement ' +
+                                        'No time series results for column ' + colnum.columnlabel +
+                                        ' Add time series results for' +
+                                        'each column. Both results and time series ' +
                                         'results are needed.')
                                 # only one measurement result is allowed per result
                                 value = row[colnum.columnnum]
@@ -254,7 +258,7 @@ class Command(BaseCommand):
                                     # print(mresults)
                                     try:
                                         if value == '':
-                                            print("error")
+                                            # print("error")
                                             raise IntegrityError
                                         if check_dates:
                                             try:

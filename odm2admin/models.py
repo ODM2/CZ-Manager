@@ -2141,7 +2141,7 @@ class Resultnormalizationvalues(models.Model):
 
 
 class Results(models.Model):
-    resultid = models.AutoField(primary_key=True, verbose_name="result")
+    resultid = models.AutoField(primary_key=True, verbose_name="data result")
     resultuuid = UUIDField(default=uuid.uuid4, editable=False)
     featureactionid = models.ForeignKey(Featureactions, related_name="feature_actions",
                                         verbose_name="sampling feature action",
@@ -2211,7 +2211,7 @@ class Results(models.Model):
     class Meta:
         managed = False
         db_table = r'odm2"."results'
-        verbose_name = 'result'
+        verbose_name = 'data result'
         ordering = ["variableid"]
 
 
@@ -2289,10 +2289,10 @@ class Samplingfeatures(models.Model):
     samplingfeatureuuid = UUIDField(default=uuid.uuid4, editable=False)
     sampling_feature_type = models.ForeignKey(CvSamplingfeaturetype,
                                               db_column='samplingfeaturetypecv')
-    samplingfeaturecode = models.CharField(verbose_name='sampling feature code', max_length=50)
-    samplingfeaturename = models.CharField(verbose_name='sampling feature name', max_length=255,
+    samplingfeaturecode = models.CharField(verbose_name='sampling feature / site code', max_length=50)
+    samplingfeaturename = models.CharField(verbose_name='site name', max_length=255,
                                            blank=True, null=True)
-    samplingfeaturedescription = models.CharField(verbose_name='sampling feature description',
+    samplingfeaturedescription = models.CharField(verbose_name='sampling feature / site description',
                                                   max_length=5000,
                                                   blank=True)
     sampling_feature_geo_type = models.ForeignKey(CvSamplingfeaturegeotype,
@@ -2320,7 +2320,7 @@ class Samplingfeatures(models.Model):
         managed = False
         db_table = r'odm2"."samplingfeatures'
         ordering = ('sampling_feature_type', 'samplingfeaturename',)
-        verbose_name = 'sampling feature'
+        verbose_name = 'sampling feature / site'
 
 
 class Sectionresults(models.Model):
