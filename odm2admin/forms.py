@@ -529,7 +529,7 @@ class VariablesAdmin(ReadOnlyAdmin):
                      'variable_name__name',
                      'variablecode',
                      'speciation__name']
-
+    save_as = True
     def variable_name_linked(self, obj):
         if obj.variable_name:
             return u'<a href="http://vocabulary.odm2.org/variablename/{0}" target=' \
