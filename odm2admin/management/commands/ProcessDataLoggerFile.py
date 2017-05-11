@@ -160,7 +160,8 @@ class Command(BaseCommand):
                                     rowColumnMap += [dloggerfileColumns]
                                 if dloggerfileColumns.columndescription =="skip":
                                     foundColumn = True
-                                if dloggerfileColumns.columndescription == "datetime":
+                                if row[j] == dloggerfileColumns.columnlabel \
+                                        and dloggerfileColumns.columndescription == "datetime":
                                     dateTimeColNum = j
                             if not foundColumn:
                                 raise CommandError(
@@ -202,8 +203,8 @@ class Command(BaseCommand):
                             dataqualitybool = True
                             dataqualityUpperAlarm = True
                             dataqualityLowerAlarm = True
-                            # this assumes that the first column is the date and time
-                            if not colnum.columnnum == 0:
+                            # don't do this if this is the datetime column
+                            if not colnum.columnnum == dateTimeColNum:
                                 # raise ValidationError("result: " + str(colnum.resultid) +
                                 # " datavalue "+
                                 # str(row[colnum.columnnum])+ " dateTime " + datestr)
