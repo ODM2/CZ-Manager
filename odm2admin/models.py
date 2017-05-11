@@ -969,7 +969,8 @@ class Dataloggerfilecolumns(models.Model):
                                                    db_column='instrumentoutputvariableid')
     columnlabel = models.CharField(verbose_name="column label", max_length=50)
     columndescription = models.CharField(verbose_name="column description",
-                                         help_text="To disble ingestion of a column type 'skip'",
+                                         help_text="To disble ingestion of a column type skip, " +
+                                                "or to specify a column as the datetime enter datetime",
                                          max_length=5000,
                                          blank=True)
     measurementequation = models.CharField(verbose_name="measurement equation", max_length=255,

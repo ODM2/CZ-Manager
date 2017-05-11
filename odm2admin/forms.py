@@ -619,8 +619,8 @@ class SamplingfeaturesAdminForm(ModelForm):
         super(SamplingfeaturesAdminForm, self).__init__(*args, **kwargs)
 
     featuregeometrywkt = forms.CharField(
-        help_text="feature geometry (to add a point format is POINT(lat, lon)" +
-                  " where long and lat are in decimal degrees. If you don't want to add a "
+        help_text="feature geometry (to add a point format is POINT(lon lat)" +
+                  " where lon and lat are in decimal degrees. If you don't want to add a "
                   "location" + " leave default value of POINT(0 0).", label='Featuregeometrywkt',
         widget=forms.Textarea, required=False)
     featuregeometrywkt.initial = GEOSGeometry("POINT(0 0)")
