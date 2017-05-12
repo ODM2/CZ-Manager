@@ -274,13 +274,13 @@ class Command(BaseCommand):
                                                     break
                                             except ObjectDoesNotExist:
                                                 pass
-                                        try:
-                                            newdatavalue = float(row[colnum.columnnum])
-                                        except ValueError:
-                                            if row[colnum.columnnum] == "":
-                                                newdatavalue = float('NaN')
-                                            else:
-                                                raise
+                                        # try:
+                                        newdatavalue = float(row[colnum.columnnum])
+                                        # except ValueError:
+                                        #    if row[colnum.columnnum] == "":
+                                        #        newdatavalue = float('NaN')
+                                        #    else:
+                                        #        raise
                                         qualitycode = qualitycodegood
                                         # print(newdatavalue)
                                         if dataqualitybool:
