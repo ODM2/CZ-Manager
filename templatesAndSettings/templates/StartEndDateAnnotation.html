@@ -26,7 +26,8 @@ $(document).ready(function(){
 		var startDate = $("#startDate").val();
 		var email_data = true;
 		var endDate = $("#endDate").val();
-		var useDates = $("#useDates").val();
+		var useDateselm =  document.getElementById("useDates"); //$("#useDates").val();
+		var useDates = useDateselm.checked;
 		var g_recaptcha_response = $("#g-recaptcha-response").val();
 		var myresultSeriesExport = {{SelectedResults|safe}};
 		var emailbutton = document.getElementById("email_data"); //$("#email_data");
