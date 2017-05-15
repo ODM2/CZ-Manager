@@ -1373,7 +1373,11 @@ def email_data_from_graph(request):
     if 'email_data' in request.POST and 'myresultSeriesExport[]' in request.POST:
         selectedMResultSeries = request.POST.getlist('myresultSeriesExport[]')
         myresultSeriesExport = None
-        if 'useDates' in request.POST:
+        if request.POST['useDates'] == 'true':
+            useDates = True
+        else:
+            useDates = False
+        if useDates:
             if 'endDate' in request.POST:
                 # print(entered_end_date)
                 entered_end_date = request.POST['endDate']
