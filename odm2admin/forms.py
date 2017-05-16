@@ -1,6 +1,8 @@
 # from __future__ import unicode_literals
+import compiler
 from django.contrib.gis import forms, admin
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib import messages
 from django.core.management import settings
 from django.forms import CharField
 from django.forms import ModelForm
@@ -10,7 +12,8 @@ from django.shortcuts import render
 from import_export import resources
 from import_export.admin import ExportMixin
 from import_export.admin import ImportExportActionModelAdmin
-
+from django.db.models import Max
+from .management.commands.ProcessDataLoggerFile import updateStartDateEndDate
 from .models import Actionby
 from .models import Actions
 from .models import Affiliations
@@ -18,6 +21,7 @@ from .models import Authorlists
 from .models import Citationextensionpropertyvalues
 from .models import Citationexternalidentifiers
 from .models import Citations
+from .models import CvQualitycode
 from .models import Dataloggerfilecolumns
 from .models import Dataloggerfiles
 from .models import Dataloggerprogramfiles
@@ -41,7 +45,9 @@ from .models import Processinglevels
 from .models import ProcessDataloggerfile
 from .models import Relatedactions
 from .models import Relatedfeatures
+from .models import Relatedresults
 from .models import Results
+from .models import Resultextensionpropertyvalues
 from .models import Resultsdataquality
 from .models import Samplingfeatureextensionpropertyvalues
 from .models import Samplingfeatureexternalidentifiers
@@ -51,7 +57,9 @@ from .models import Timeseriesresults
 from .models import Timeseriesresultvalues
 from .models import Units
 from .models import Variables
-
+from .models import Resultderivationequations
+from .models import Derivationequations
+from .models import CvCensorcode
 # from io import StringIO
 from ajax_select import make_ajax_field
 from ajax_select.fields import AutoCompleteSelectField
@@ -485,10 +493,12 @@ class VariablesAdminForm(ModelForm):
     # variablenamecv= TermModelChoiceField(CvVariablename.objects.all().order_by('term'))
     # speciationcv= TermModelChoiceField(CvSpeciation.objects.all().order_by('term'))
     # make these fields ajax type ahead fields with links to odm2 controlled vocabulary
-    variable_type = AutoCompleteSelectField('cv_variable_type', required=True, label='variable type')
+    variable_type = AutoCompleteSelectField('cv_variable_type', required=True,
+                                            label='variable type')
     #AutoCompleteSelectField('featureaction_lookup', required=True, help_text='',
     #                                          label='Sampling feature action')
-    variable_name = AutoCompleteSelectField('cv_variable_name', required=True, label = 'variable name')
+    variable_name = AutoCompleteSelectField('cv_variable_name', required=True,
+                                            label = 'variable name')
     #make_ajax_field(Variables, 'variable_name', 'cv_variable_name')
     variabledefinition = forms.CharField(max_length=500, widget=forms.Textarea)
     # variable_type = make_ajax_field(Variables,'variable_type','cv_variable_type')
@@ -557,7 +567,7 @@ class VariablesAdmin(ReadOnlyAdmin):
 
 class TaxonomicclassifiersAdminForm(ModelForm):
     taxonomic_classifier_type = make_ajax_field(Taxonomicclassifiers, 'taxonomic_classifier_type',
-                                                'cv_taxonomic_classifier_type')
+                                                'cv_taxonomic_classifier_type',show_help_text =None)
     taxonomic_classifier_type.help_text = u'A vocabulary for describing types of taxonomies ' \
                                           u'from which descriptive terms used ' \
                                           u'in an ODM2 database have been drawn. ' \
@@ -961,7 +971,7 @@ class ResultsAdminForm(ModelForm):
     # featureactionid = make_ajax_field(Featureactions,'featureactionid','featureaction_lookup',
     # max_length=500)
     featureactionid = AutoCompleteSelectField('featureaction_lookup', required=True, help_text='',
-                                              label='Sampling feature / site action')
+                                              label='Sampling feature / site action',show_help_text =None)
 
     def clean_featureactionid(self):
         featureactioniduni = self.data['featureactionid']
@@ -1103,6 +1113,135 @@ class ReadOnlyActionsInline(ActionsInline):
         return False
 
 
+class DerivationequationsAdminForm(ModelForm):
+    derivationequation = CharField(max_length=255, label="derivation equation",
+                                   widget=forms.Textarea,
+                                   help_text='use python snytax if you are using this equation to derive new' +
+                            'values in ODM2 Admin as shown here' +
+                            ' https://en.wikibooks.org/wiki/Python_Programming/Basic_Math' +
+                            'this currently supports 1 derived from field which should be x in the equation.')
+    class Meta:
+        model = Derivationequations
+        fields = '__all__'
+
+class DerivationequationsAdmin(ReadOnlyAdmin):
+    user_readonly = [p.name for p in Derivationequations._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+    inlines_list = list()
+    # For admin users
+    form = DerivationequationsAdminForm
+    list_display = ['derivationequation', ]
+    save_as = True
+    search_fields = ['derivationequationid','derivationequation']
+
+class ResultderivationequationsAdminForm(ModelForm):
+    resultid = AutoCompleteSelectField('result_lookup', required=True,
+                                       help_text='result that is a product of this derivation equation',
+                                       label='Result',show_help_text =None)
+    class Meta:
+        model = Resultderivationequations
+        fields = '__all__'
+
+class ResultderivationequationsAdmin(ReadOnlyAdmin):
+    user_readonly = [p.name for p in Resultderivationequations._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+    inlines_list = list()
+    # For admin users
+    form = ResultderivationequationsAdminForm
+    list_display = ['resultid', 'derivationequationid', ]
+    save_as = True
+    search_fields = [ 'resultid__variableid__variable_name__name',
+                     'resultid__variableid__variablecode',
+                     'resultid__variableid__variabledefinition',
+                     'resultid__featureactionid__samplingfeatureid__samplingfeaturename',
+                     'derivationequationid__derivationequation']
+
+
+def create_derived_values_event(ModelAdmin, request, queryset):
+     StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
+     EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
+     qualitycode = CvQualitycode.objects.filter(name="Good").get()
+     censorcode = CvCensorcode.objects.filter(name="Not censored").get()
+     bulktimeseriesvalues = []
+     for relatedresults in queryset:
+        resultidtoderive = relatedresults.resultid #16678
+        tsrtoderive = Timeseriesresults.objects.get(resultid=resultidtoderive.resultid)
+        relatedresult = relatedresults.relatedresultid
+        relationshipType = relatedresults.relationshiptypecv
+        if not relationshipType.name == 'Is derived from':
+            raise forms.ValidationError("relationship type is not \'Is derived from\'")
+        fromenddate = Resultextensionpropertyvalues.objects.filter(resultid=relatedresult.resultid).filter(
+            propertyid=EndDateProperty).get()
+        derivedenddate = Resultextensionpropertyvalues.objects.filter(resultid=resultidtoderive.resultid).filter(
+            propertyid=EndDateProperty).get()
+        derivedstartdate = Resultextensionpropertyvalues.objects.filter(resultid=resultidtoderive.resultid).filter(
+            propertyid=StartDateProperty).get()
+        # values to derive from more recent then last derived value
+        fromvalues = Timeseriesresultvalues.objects.filter(resultid=relatedresult.resultid
+                            ).filter(valuedatetime__gt=derivedenddate.propertyvalue)
+        # raise forms.ValidationError("derived end date: " + derivedenddate.propertyvalue +
+        #                            " derived resultid: " + str(resultidtoderive.resultid))
+        resultequation = Resultderivationequations.objects.filter(resultid=resultidtoderive.resultid).get()
+        equation = Derivationequations.objects.filter(derivationequationid=resultequation.derivationequationid.derivationequationid).get()
+        equationvalue = equation.derivationequation
+        for vals in fromvalues:
+            x = vals.datavalue
+            derivedvalue = eval(equationvalue)
+            tsrv = Timeseriesresultvalues(
+                resultid=tsrtoderive,
+                datavalue=derivedvalue,
+                valuedatetime=vals.valuedatetime,
+                valuedatetimeutcoffset=4,
+                censorcodecv=censorcode,
+                qualitycodecv=qualitycode,
+                timeaggregationinterval=tsrtoderive
+                .intendedtimespacing,
+                timeaggregationintervalunitsid=tsrtoderive
+                .intendedtimespacingunitsid)
+            bulktimeseriesvalues.append(tsrv)
+        Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
+        tsrvb = len(bulktimeseriesvalues)
+        newenddate = Timeseriesresultvalues.objects.filter(resultid=resultidtoderive.resultid).annotate(
+                        Max('valuedatetime')). \
+                        order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+        updateStartDateEndDate(resultidtoderive, derivedstartdate.propertyvalue, newenddate)
+        messages.info(request,str(tsrvb) + " Derived time series values succesfully created, ending on "+str(newenddate))
+
+create_derived_values_event.short_description = "create derived values based " \
+                                                    " on this relationship."
+class RelatedresultsAdminForm(ModelForm):
+    resultid = AutoCompleteSelectField('result_lookup', required=True,
+                                       help_text='result',
+                                       label='Result' ,show_help_text =None)
+    relatedresultid = AutoCompleteSelectField('result_lookup', required=True,
+                                              help_text='resulted related to first result',
+                                              label='Related result' ,show_help_text =None)
+    class Meta:
+        model = Relatedresults
+        fields = '__all__'
+
+class RelatedresultsAdmin(ReadOnlyAdmin):
+    # For readonly usergroup
+
+    user_readonly = [p.name for p in Relatedresults._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = list()
+
+    # For admin users
+    form = RelatedresultsAdminForm
+    inlines_list = list()
+    actions = [create_derived_values_event]
+    list_display = ['resultid', 'relationshiptypecv', 'relatedresultid',  'versioncode',
+                    'relatedresultsequencenumber']
+    save_as = True
+    search_fields = ['resultid__variableid__variable_name__name',
+                     'resultid__variableid__variablecode',
+                     'resultid__variableid__variabledefinition',
+                     'resultid__featureactionid__samplingfeatureid__samplingfeaturename',
+                     'relatedresultid__variableid__variable_name__name',
+                     'relatedresultid__variableid__variablecode',
+                     'relatedresultid__variableid__variabledefinition',
+                     'relatedresultid__featureactionid__samplingfeatureid__samplingfeaturename']
+
 class FeatureactionsAdminForm(ModelForm):
     class Meta:
         model = Featureactions
@@ -1213,7 +1352,7 @@ class ActionsAdmin(ReadOnlyAdmin):
 
     method_link.short_description = 'Method'
     method_link.allow_tags = True
-
+    save_as = True
 
 class ActionByAdminForm(ModelForm):
     class Meta:
@@ -1307,7 +1446,7 @@ duplicate_Dataloggerfiles_event.short_description = "Duplicate selected datalogg
 class DataLoggerFileColumnsInlineAdminForm(ModelForm):
     resultid = AutoCompleteSelectField('result_lookup', required=True,
                                        help_text='result to extend as a soil profile result',
-                                       label='Result')
+                                       label='Result',show_help_text =None)
 
     class Meta:
         model = Dataloggerfilecolumns
@@ -1390,8 +1529,8 @@ duplicate_Dataloggerfilecolumns_event.short_description = "Duplicate selected " 
 
 class DataloggerfilecolumnsAdminForm(ModelForm):
     resultid = AutoCompleteSelectField('result_lookup', required=True,
-                                       help_text='result to extend as a soil profile result',
-                                       label='Result')
+                                       help_text='result related to this column',
+                                       label='Result',show_help_text =None)
 
     def clean_resultid(self):
         resultiduni = self.data['resultid']
@@ -1649,7 +1788,8 @@ class ProcessingLevelsAdmin(ReadOnlyAdmin):
 
 class MeasurementresultsAdminForm(ModelForm):
     # resultid = make_ajax_field(Results,'resultid','result_lookup')
-    resultid = AutoCompleteSelectField('result_lookup', required=True, help_text='', label='Result')
+    resultid = AutoCompleteSelectField('result_lookup', required=True, help_text='',
+                                       label='Result')
 
     # this processes the user input into the form.
     def clean_resultid(self):
@@ -1719,7 +1859,8 @@ class MeasurementresultvaluesResource(resources.ModelResource):
 
 class TimeseriesresultsAdminForm(ModelForm):
     # resultid = make_ajax_field(Results,'resultid','result_lookup')
-    resultid = AutoCompleteSelectField('result_lookup', required=True, help_text='', label='Result')
+    resultid = AutoCompleteSelectField('result_lookup', required=True, help_text='',
+                                       label='Result')
 
     # this processes the user input into the form.
     def clean_resultid(self):

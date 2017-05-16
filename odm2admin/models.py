@@ -1095,7 +1095,11 @@ class Dataquality(models.Model):
     dataqualityid = models.AutoField(primary_key=True)
     dataqualitytypecv = models.ForeignKey(CvDataqualitytype, db_column='dataqualitytypecv',
                                           verbose_name="data quality type")
-    dataqualitycode = models.CharField(max_length=255, verbose_name="data quality code")
+    dataqualitycode = models.CharField(max_length=255, verbose_name="data quality code",
+                                       help_text="for an alarm test include the word alarm." +
+                                       " for a hard bounds check include the word bound (if a value" +
+                                       " falls below a lower limit, or exceeds a lower limit the " +
+                                       "value will be set to NaN (not a number). ")
     dataqualityvalue = models.FloatField(blank=True, null=True, verbose_name="data quality value")
     dataqualityvalueunitsid = models.ForeignKey('Units', related_name='+',
                                                 db_column='dataqualityvalueunitsid',
@@ -1170,12 +1174,15 @@ class Datasetsresults(models.Model):
 
 class Derivationequations(models.Model):
     derivationequationid = models.AutoField(primary_key=True)
-    derivationequation = models.CharField(max_length=255)
+    derivationequation = models.CharField(max_length=255, verbose_name='derivation equation')
 
+    def __unicode__(self):
+        s = u"%s" % self.derivationequation
+        return s
     class Meta:
         managed = False
         db_table = r'odm2"."derivationequations'
-
+        verbose_name='derivation equation'
 
 class Directives(models.Model):
     directiveid = models.AutoField(primary_key=True)
@@ -2086,15 +2093,21 @@ class Relatedmodels(models.Model):
 class Relatedresults(models.Model):
     relationid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey('Results', db_column='resultid')
-    relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
+    relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv',
+                                           verbose_name='relationship type')
     relatedresultid = models.ForeignKey('Results', related_name='RelatedResult',
                                         db_column='relatedresultid')
-    versioncode = models.CharField(max_length=50, blank=True)
-    relatedresultsequencenumber = models.IntegerField(blank=True, null=True)
+    versioncode = models.CharField(max_length=50, blank=True, verbose_name='version code')
+    relatedresultsequencenumber = models.IntegerField(blank=True, null=True,
+                                                      verbose_name='related result sequence number')
 
+    def __unicode__(self):
+        return u"%s - %s - %s" % (
+            self.resultid, self.relationshiptypecv, self.relatedresultid)
     class Meta:
         managed = False
         db_table = r'odm2"."relatedresults'
+        verbose_name = 'related result'
 
 
 class Resultannotations(models.Model):
@@ -2116,6 +2129,7 @@ class Resultderivationequations(models.Model):
     class Meta:
         managed = False
         db_table = r'odm2"."resultderivationequations'
+        verbose_name='result derivation equation'
 
 
 class Resultextensionpropertyvalues(models.Model):
