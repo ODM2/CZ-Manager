@@ -4,6 +4,7 @@ from django.contrib.gis import forms, admin
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib import messages
 from django.core.management import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.forms import CharField
 from django.forms import ModelForm
 from django.forms import TypedChoiceField
@@ -1119,7 +1120,8 @@ class DerivationequationsAdminForm(ModelForm):
                                    help_text='use python snytax if you are using this equation to derive new' +
                             'values in ODM2 Admin as shown here' +
                             ' https://en.wikibooks.org/wiki/Python_Programming/Basic_Math' +
-                            ' this currently supports 1 derived from field which should be x in the equation.')
+                            ' this currently supports 1 derived from field which should be x in the equation.' +
+                            ' the derived value must be stored in a variable y')
 
     class Meta:
         model = Derivationequations
@@ -1173,21 +1175,32 @@ def create_derived_values_event(ModelAdmin, request, queryset):
         relationshipType = relatedresults.relationshiptypecv
         if not relationshipType.name == 'Is derived from':
             raise forms.ValidationError("relationship type is not \'Is derived from\'")
-        derivedenddate = Resultextensionpropertyvalues.objects.filter(resultid=resultidtoderive.resultid).filter(
-            propertyid=EndDateProperty).get()
-        derivedstartdate = Resultextensionpropertyvalues.objects.filter(resultid=resultidtoderive.resultid).filter(
+        try:
+            derivedenddaterepv = Resultextensionpropertyvalues.objects.filter(resultid=resultidtoderive.resultid).filter(
+                propertyid=EndDateProperty).get()
+            derivedenddate= derivedenddaterepv.propertyvalue
+            derivedstartdaterepv = Resultextensionpropertyvalues.objects.filter(resultid=resultidtoderive.resultid).filter(
             propertyid=StartDateProperty).get()
+            derivedstartdate = derivedstartdate.propertyvalue
+        except ObjectDoesNotExist:
+            derivedenddate='1800-01-01 00:00'
+            derivedstartdate='1800-01-01 00:00'
         # values to derive from more recent then last derived value
         fromvalues = Timeseriesresultvalues.objects.filter(resultid=relatedresult.resultid
-                            ).filter(valuedatetime__gt=derivedenddate.propertyvalue)
+                            ).filter(valuedatetime__gt=derivedenddate)
         # raise forms.ValidationError("derived end date: " + derivedenddate.propertyvalue +
         #                            " derived resultid: " + str(resultidtoderive.resultid))
         resultequation = Resultderivationequations.objects.filter(resultid=resultidtoderive.resultid).get()
         equation = Derivationequations.objects.filter(derivationequationid=resultequation.derivationequationid.derivationequationid).get()
         equationvalue = equation.derivationequation
+        y = 0
         for vals in fromvalues:
             x = vals.datavalue
-            derivedvalue = eval(equationvalue)
+            d = dict(locals(), **globals())
+            # exec equationvalue in d
+            exec(equationvalue, d,d)
+            derivedvalue =  d["y"]
+            # raise forms.ValidationError('original value: ' + str(x) + ' new value: ' + str(derivedvalue))
             tsrv = Timeseriesresultvalues(
                 resultid=tsrtoderive,
                 datavalue=derivedvalue,
@@ -1205,7 +1218,7 @@ def create_derived_values_event(ModelAdmin, request, queryset):
         newenddate = Timeseriesresultvalues.objects.filter(resultid=resultidtoderive.resultid).annotate(
                         Max('valuedatetime')). \
                         order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-        updateStartDateEndDate(resultidtoderive, derivedstartdate.propertyvalue, newenddate)
+        updateStartDateEndDate(resultidtoderive, derivedstartdate, newenddate)
         messages.info(request,str(tsrvb) + " Derived time series values succesfully created, ending on "+str(newenddate))
 
 create_derived_values_event.short_description = "create derived values based " \
