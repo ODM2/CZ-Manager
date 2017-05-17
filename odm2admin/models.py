@@ -2092,11 +2092,12 @@ class Relatedmodels(models.Model):
 
 class Relatedresults(models.Model):
     relationid = models.AutoField(primary_key=True)
-    resultid = models.ForeignKey('Results', db_column='resultid')
+    resultid = models.ForeignKey('Results', db_column='resultid', verbose_name='data result')
     relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv',
                                            verbose_name='relationship type')
     relatedresultid = models.ForeignKey('Results', related_name='RelatedResult',
-                                        db_column='relatedresultid')
+                                        db_column='relatedresultid',
+                                        verbose_name='related data result')
     versioncode = models.CharField(max_length=50, blank=True, verbose_name='version code')
     relatedresultsequencenumber = models.IntegerField(blank=True, null=True,
                                                       verbose_name='related result sequence number')
@@ -2123,7 +2124,8 @@ class Resultannotations(models.Model):
 
 
 class Resultderivationequations(models.Model):
-    resultid = models.OneToOneField('Results', db_column='resultid', primary_key=True)
+    resultid = models.OneToOneField('Results', db_column='resultid',
+                                    verbose_name='data result', primary_key=True)
     derivationequationid = models.ForeignKey(Derivationequations, db_column='derivationequationid')
 
     def __unicode__(self):

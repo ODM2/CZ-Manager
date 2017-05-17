@@ -1142,7 +1142,7 @@ class DerivationequationsAdmin(ReadOnlyAdmin):
 class ResultderivationequationsAdminForm(ModelForm):
     resultid = AutoCompleteSelectField('result_lookup', required=True,
                                        help_text='result that is a product of this derivation equation',
-                                       label='data result',show_help_text =None)
+                                       label='Data result',show_help_text =None)
     class Meta:
         model = Resultderivationequations
         fields = '__all__'
@@ -1228,10 +1228,10 @@ create_derived_values_event.short_description = "create derived values based " \
 class RelatedresultsAdminForm(ModelForm):
     resultid = AutoCompleteSelectField('result_lookup', required=True,
                                        help_text='result',
-                                       label='data result' ,show_help_text =None)
+                                       label='Data result' ,show_help_text =None)
     relatedresultid = AutoCompleteSelectField('result_lookup', required=True,
                                               help_text='resulted related to first result',
-                                              label='related data result' ,show_help_text =None)
+                                              label='Related data result' ,show_help_text =None)
     class Meta:
         model = Relatedresults
         fields = '__all__'
@@ -1461,7 +1461,7 @@ duplicate_Dataloggerfiles_event.short_description = "Duplicate selected datalogg
 class DataLoggerFileColumnsInlineAdminForm(ModelForm):
     resultid = AutoCompleteSelectField('result_lookup', required=True,
                                        help_text='result to extend as a soil profile result',
-                                       label='data result',show_help_text =None)
+                                       label='Data result',show_help_text =None)
 
     class Meta:
         model = Dataloggerfilecolumns
@@ -1545,7 +1545,7 @@ duplicate_Dataloggerfilecolumns_event.short_description = "Duplicate selected " 
 class DataloggerfilecolumnsAdminForm(ModelForm):
     resultid = AutoCompleteSelectField('result_lookup', required=True,
                                        help_text='result related to this column',
-                                       label='data result',show_help_text =None)
+                                       label='Data result',show_help_text =None)
 
     def clean_resultid(self):
         resultiduni = self.data['resultid']
@@ -1659,7 +1659,7 @@ class ProfileresultsAdminForm(ModelForm):
     # resultid = make_ajax_field(Results,'resultid','result_lookup')
     resultid = AutoCompleteSelectField('result_lookup', required=True,
                                        help_text='result to extend as a soil profile result',
-                                       label='data result')
+                                       label='Data result')
 
     # this processes the user input into the form.
     def clean_resultid(self):
@@ -1804,7 +1804,7 @@ class ProcessingLevelsAdmin(ReadOnlyAdmin):
 class MeasurementresultsAdminForm(ModelForm):
     # resultid = make_ajax_field(Results,'resultid','result_lookup')
     resultid = AutoCompleteSelectField('result_lookup', required=True, help_text='',
-                                       label='data result')
+                                       label='Data result')
 
     # this processes the user input into the form.
     def clean_resultid(self):
@@ -1875,7 +1875,7 @@ class MeasurementresultvaluesResource(resources.ModelResource):
 class TimeseriesresultsAdminForm(ModelForm):
     # resultid = make_ajax_field(Results,'resultid','result_lookup')
     resultid = AutoCompleteSelectField('result_lookup', required=True, help_text='',
-                                       label='data result')
+                                       label='Data result')
 
     # this processes the user input into the form.
     def clean_resultid(self):
