@@ -2126,6 +2126,9 @@ class Resultderivationequations(models.Model):
     resultid = models.OneToOneField('Results', db_column='resultid', primary_key=True)
     derivationequationid = models.ForeignKey(Derivationequations, db_column='derivationequationid')
 
+    def __unicode__(self):
+        return u"%s - %s" % (self.resultid, self.derivationequationid)
+
     class Meta:
         managed = False
         db_table = r'odm2"."resultderivationequations'

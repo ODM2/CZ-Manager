@@ -274,13 +274,13 @@ class Command(BaseCommand):
                                                     break
                                             except ObjectDoesNotExist:
                                                 pass
-                                        # try:
-                                        newdatavalue = float(row[colnum.columnnum])
-                                        # except ValueError:
-                                        #    if row[colnum.columnnum] == "":
-                                        #        newdatavalue = float('NaN')
-                                        #    else:
-                                        #        raise
+                                        try:
+                                            newdatavalue = float(row[colnum.columnnum])
+                                        except ValueError:
+                                            if row[colnum.columnnum].strip() == "":
+                                                newdatavalue = float('NaN')
+                                            else:
+                                                raise
                                         qualitycode = qualitycodegood
                                         # print(newdatavalue)
                                         if dataqualitybool:
@@ -347,7 +347,7 @@ class Command(BaseCommand):
                                                                                              annotationid=annotation).save()
                                             else:
                                                 dataqualitybool = False
-                                        newdatavalue = float(row[colnum.columnnum])
+                                        # newdatavalue = float(row[colnum.columnnum])
                                         if dataqualityUpperAlarm:
                                             sendemail = True
                                             if newdatavalue > result_upper_bound_alarm.dataqualityvalue:

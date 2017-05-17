@@ -1119,7 +1119,8 @@ class DerivationequationsAdminForm(ModelForm):
                                    help_text='use python snytax if you are using this equation to derive new' +
                             'values in ODM2 Admin as shown here' +
                             ' https://en.wikibooks.org/wiki/Python_Programming/Basic_Math' +
-                            'this currently supports 1 derived from field which should be x in the equation.')
+                            ' this currently supports 1 derived from field which should be x in the equation.')
+
     class Meta:
         model = Derivationequations
         fields = '__all__'
@@ -1131,8 +1132,10 @@ class DerivationequationsAdmin(ReadOnlyAdmin):
     # For admin users
     form = DerivationequationsAdminForm
     list_display = ['derivationequation', ]
+    # list_display_links = None
     save_as = True
     search_fields = ['derivationequationid','derivationequation']
+
 
 class ResultderivationequationsAdminForm(ModelForm):
     resultid = AutoCompleteSelectField('result_lookup', required=True,
@@ -1170,8 +1173,6 @@ def create_derived_values_event(ModelAdmin, request, queryset):
         relationshipType = relatedresults.relationshiptypecv
         if not relationshipType.name == 'Is derived from':
             raise forms.ValidationError("relationship type is not \'Is derived from\'")
-        fromenddate = Resultextensionpropertyvalues.objects.filter(resultid=relatedresult.resultid).filter(
-            propertyid=EndDateProperty).get()
         derivedenddate = Resultextensionpropertyvalues.objects.filter(resultid=resultidtoderive.resultid).filter(
             propertyid=EndDateProperty).get()
         derivedstartdate = Resultextensionpropertyvalues.objects.filter(resultid=resultidtoderive.resultid).filter(
@@ -1208,7 +1209,9 @@ def create_derived_values_event(ModelAdmin, request, queryset):
         messages.info(request,str(tsrvb) + " Derived time series values succesfully created, ending on "+str(newenddate))
 
 create_derived_values_event.short_description = "create derived values based " \
-                                                    " on this relationship."
+                                                    " on this relationship"
+
+
 class RelatedresultsAdminForm(ModelForm):
     resultid = AutoCompleteSelectField('result_lookup', required=True,
                                        help_text='result',
@@ -1225,7 +1228,6 @@ class RelatedresultsAdmin(ReadOnlyAdmin):
 
     user_readonly = [p.name for p in Relatedresults._meta.get_fields() if not p.one_to_many]
     user_readonly_inlines = list()
-
     # For admin users
     form = RelatedresultsAdminForm
     inlines_list = list()
