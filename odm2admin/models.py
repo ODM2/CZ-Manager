@@ -969,7 +969,8 @@ class Dataloggerfilecolumns(models.Model):
                                                    db_column='instrumentoutputvariableid')
     columnlabel = models.CharField(verbose_name="column label", max_length=50)
     columndescription = models.CharField(verbose_name="column description",
-                                         help_text="To disble ingestion of a column type 'skip'",
+                                         help_text="To disble ingestion of a column type skip, " +
+                                                "or to specify a column as the date time enter datetime",
                                          max_length=5000,
                                          blank=True)
     measurementequation = models.CharField(verbose_name="measurement equation", max_length=255,
@@ -1094,7 +1095,11 @@ class Dataquality(models.Model):
     dataqualityid = models.AutoField(primary_key=True)
     dataqualitytypecv = models.ForeignKey(CvDataqualitytype, db_column='dataqualitytypecv',
                                           verbose_name="data quality type")
-    dataqualitycode = models.CharField(max_length=255, verbose_name="data quality code")
+    dataqualitycode = models.CharField(max_length=255, verbose_name="data quality code",
+                                       help_text="for an alarm test include the word alarm." +
+                                       " for a hard bounds check include the word bound (if a value" +
+                                       " falls below a lower limit, or exceeds a lower limit the " +
+                                       "value will be set to NaN (not a number). ")
     dataqualityvalue = models.FloatField(blank=True, null=True, verbose_name="data quality value")
     dataqualityvalueunitsid = models.ForeignKey('Units', related_name='+',
                                                 db_column='dataqualityvalueunitsid',
@@ -1169,12 +1174,15 @@ class Datasetsresults(models.Model):
 
 class Derivationequations(models.Model):
     derivationequationid = models.AutoField(primary_key=True)
-    derivationequation = models.CharField(max_length=255)
+    derivationequation = models.CharField(max_length=255, verbose_name='derivation equation')
 
+    def __unicode__(self):
+        s = u"%s" % self.derivationequation
+        return s
     class Meta:
         managed = False
         db_table = r'odm2"."derivationequations'
-
+        verbose_name='derivation equation'
 
 class Directives(models.Model):
     directiveid = models.AutoField(primary_key=True)
@@ -2084,16 +2092,23 @@ class Relatedmodels(models.Model):
 
 class Relatedresults(models.Model):
     relationid = models.AutoField(primary_key=True)
-    resultid = models.ForeignKey('Results', db_column='resultid')
-    relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv')
+    resultid = models.ForeignKey('Results', db_column='resultid', verbose_name='data result')
+    relationshiptypecv = models.ForeignKey(CvRelationshiptype, db_column='relationshiptypecv',
+                                           verbose_name='relationship type')
     relatedresultid = models.ForeignKey('Results', related_name='RelatedResult',
-                                        db_column='relatedresultid')
-    versioncode = models.CharField(max_length=50, blank=True)
-    relatedresultsequencenumber = models.IntegerField(blank=True, null=True)
+                                        db_column='relatedresultid',
+                                        verbose_name='related data result')
+    versioncode = models.CharField(max_length=50, blank=True, verbose_name='version code')
+    relatedresultsequencenumber = models.IntegerField(blank=True, null=True,
+                                                      verbose_name='related result sequence number')
 
+    def __unicode__(self):
+        return u"%s - %s - %s" % (
+            self.resultid, self.relationshiptypecv, self.relatedresultid)
     class Meta:
         managed = False
         db_table = r'odm2"."relatedresults'
+        verbose_name = 'related result'
 
 
 class Resultannotations(models.Model):
@@ -2109,12 +2124,17 @@ class Resultannotations(models.Model):
 
 
 class Resultderivationequations(models.Model):
-    resultid = models.OneToOneField('Results', db_column='resultid', primary_key=True)
+    resultid = models.OneToOneField('Results', db_column='resultid',
+                                    verbose_name='data result', primary_key=True)
     derivationequationid = models.ForeignKey(Derivationequations, db_column='derivationequationid')
+
+    def __unicode__(self):
+        return u"%s - %s" % (self.resultid, self.derivationequationid)
 
     class Meta:
         managed = False
         db_table = r'odm2"."resultderivationequations'
+        verbose_name='result derivation equation'
 
 
 class Resultextensionpropertyvalues(models.Model):
@@ -2289,10 +2309,10 @@ class Samplingfeatures(models.Model):
     samplingfeatureuuid = UUIDField(default=uuid.uuid4, editable=False)
     sampling_feature_type = models.ForeignKey(CvSamplingfeaturetype,
                                               db_column='samplingfeaturetypecv')
-    samplingfeaturecode = models.CharField(verbose_name='sampling feature / site code', max_length=50)
-    samplingfeaturename = models.CharField(verbose_name='site name', max_length=255,
+    samplingfeaturecode = models.CharField(verbose_name='sampling feature or site code', max_length=50)
+    samplingfeaturename = models.CharField(verbose_name='sampling feature or site name', max_length=255,
                                            blank=True, null=True)
-    samplingfeaturedescription = models.CharField(verbose_name='sampling feature / site description',
+    samplingfeaturedescription = models.CharField(verbose_name='sampling feature or site description',
                                                   max_length=5000,
                                                   blank=True)
     sampling_feature_geo_type = models.ForeignKey(CvSamplingfeaturegeotype,
@@ -2320,7 +2340,7 @@ class Samplingfeatures(models.Model):
         managed = False
         db_table = r'odm2"."samplingfeatures'
         ordering = ('sampling_feature_type', 'samplingfeaturename',)
-        verbose_name = 'sampling feature / site'
+        verbose_name = 'sampling feature or site'
 
 
 class Sectionresults(models.Model):

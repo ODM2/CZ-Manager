@@ -119,6 +119,7 @@ class Command(BaseCommand):
         tolist = []
         sendemail = False
         emailtext = ""
+        dateTimeColNum = 0
         for admin in settings.ADMINS:
             tolist.append(admin['email'])
         try:
@@ -159,6 +160,9 @@ class Command(BaseCommand):
                                     rowColumnMap += [dloggerfileColumns]
                                 if dloggerfileColumns.columndescription =="skip":
                                     foundColumn = True
+                                if row[j] == dloggerfileColumns.columnlabel \
+                                        and dloggerfileColumns.columndescription == "datetime":
+                                    dateTimeColNum = j
                             if not foundColumn:
                                 raise CommandError(
                                     u'Cannot find a column in the CSV matching the '
@@ -171,20 +175,20 @@ class Command(BaseCommand):
 
                         # assume date is first column for the moment
                         try:
-                            dateT = time.strptime(row[0], "%m/%d/%Y %H:%M")  # '1/1/2013 0:10
+                            dateT = time.strptime(row[dateTimeColNum], "%m/%d/%Y %H:%M")  # '1/1/2013 0:10
                             datestr = time.strftime("%Y-%m-%d %H:%M", dateT)
                         except ValueError:
                             try:
-                                dateT = time.strptime(row[0], "%m/%d/%Y %H:%M:%S")  # '1/1/2013 0:10
+                                dateT = time.strptime(row[dateTimeColNum], "%m/%d/%Y %H:%M:%S")  # '1/1/2013 0:10
                                 datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                             except ValueError:
                                 try:
-                                    dateT = time.strptime(row[0],
+                                    dateT = time.strptime(row[dateTimeColNum],
                                                           "%Y-%m-%d %H:%M:%S")  # '1/1/2013 0:10
                                     datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                                 except ValueError:
                                     try:
-                                        dateT = time.strptime(row[0],
+                                        dateT = time.strptime(row[dateTimeColNum],
                                                               "%Y-%m-%d %H:%M:%S.%f")  # '1/1/2013 0:10
                                         datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                                     except ValueError:
@@ -199,8 +203,8 @@ class Command(BaseCommand):
                             dataqualitybool = True
                             dataqualityUpperAlarm = True
                             dataqualityLowerAlarm = True
-                            # this assumes that the first column is the date and time
-                            if not colnum.columnnum == 0:
+                            # don't do this if this is the datetime column
+                            if not colnum.columnnum == dateTimeColNum:
                                 # raise ValidationError("result: " + str(colnum.resultid) +
                                 # " datavalue "+
                                 # str(row[colnum.columnnum])+ " dateTime " + datestr)
@@ -270,8 +274,13 @@ class Command(BaseCommand):
                                                     break
                                             except ObjectDoesNotExist:
                                                 pass
-
-                                        newdatavalue = float(row[colnum.columnnum])
+                                        try:
+                                            newdatavalue = float(row[colnum.columnnum])
+                                        except ValueError:
+                                            if row[colnum.columnnum].strip() == "":
+                                                newdatavalue = float('NaN')
+                                            else:
+                                                raise
                                         qualitycode = qualitycodegood
                                         # print(newdatavalue)
                                         if dataqualitybool:
@@ -338,7 +347,7 @@ class Command(BaseCommand):
                                                                                              annotationid=annotation).save()
                                             else:
                                                 dataqualitybool = False
-                                        newdatavalue = float(row[colnum.columnnum])
+                                        # newdatavalue = float(row[colnum.columnnum])
                                         if dataqualityUpperAlarm:
                                             sendemail = True
                                             if newdatavalue > result_upper_bound_alarm.dataqualityvalue:

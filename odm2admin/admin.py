@@ -13,6 +13,7 @@ from .forms import DataqualityAdmin
 from .forms import DatasetcitationsAdmin
 from .forms import DatasetsAdmin
 from .forms import DatasetsresultsAdmin
+from .forms import DerivationequationsAdmin
 from .forms import EquipmentmodelsAdmin
 from .forms import ExtensionpropertiesAdmin
 from .forms import ExternalidentifiersystemAdmin
@@ -31,8 +32,10 @@ from .forms import ProcessingLevelsAdmin
 from .forms import ProcessDataloggerfileAdmin
 from .forms import RelatedactionsAdmin
 from .forms import RelatedfeaturesAdmin
+from .forms import RelatedresultsAdmin
 from .forms import ResultsAdmin
 from .forms import ResultsdataqualityAdmin
+from .forms import ResultderivationequationsAdmin
 from .forms import SamplingfeatureexternalidentifiersAdmin
 from .forms import SamplingfeaturesAdmin
 from .forms import TaxonomicclassifiersAdmin
@@ -53,6 +56,7 @@ from .models import Dataquality
 from .models import Datasetcitations
 from .models import Datasets
 from .models import Datasetsresults
+from .models import Derivationequations
 from .models import Equipmentmodels
 from .models import Extensionproperties
 from .models import Externalidentifiersystems
@@ -72,8 +76,10 @@ from .models import Profileresults
 from .models import Profileresultvalues
 from .models import Relatedactions
 from .models import Relatedfeatures
+from .models import Relatedresults
 from .models import Results
 from .models import Resultsdataquality
+from .models import Resultderivationequations
 from .models import Samplingfeatureexternalidentifiers
 from .models import Samplingfeatures
 from .models import Taxonomicclassifiers
@@ -84,8 +90,8 @@ from .models import Variables
 
 admin.site.register(Dataquality, DataqualityAdmin)
 admin.site.register(Resultsdataquality, ResultsdataqualityAdmin)
-
 admin.site.register(Datasetcitations, DatasetcitationsAdmin)
+admin.site.register(Derivationequations, DerivationequationsAdmin)
 admin.site.register(Citations, CitationsAdmin)
 admin.site.register(Authorlists, AuthorlistsAdmin)
 admin.site.register(Methodcitations, MethodcitationsAdmin)
@@ -112,6 +118,8 @@ admin.site.register(Featureactions, FeatureactionsAdmin)
 admin.site.register(Actions, ActionsAdmin)
 admin.site.register(Results, ResultsAdmin)
 admin.site.register(Relatedactions, RelatedactionsAdmin)
+admin.site.register(Relatedresults, RelatedresultsAdmin)
+admin.site.register(Resultderivationequations, ResultderivationequationsAdmin)
 admin.site.register(Variables, VariablesAdmin)
 admin.site.register(ProcessDataloggerfile, ProcessDataloggerfileAdmin)
 admin.site.register(Externalidentifiersystems, ExternalidentifiersystemAdmin)
