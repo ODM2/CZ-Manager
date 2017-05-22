@@ -6,6 +6,7 @@ import io
 import itertools
 import os
 import time
+import xlrd
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
@@ -192,7 +193,13 @@ class Command(BaseCommand):
                                                               "%Y-%m-%d %H:%M:%S.%f")  # '1/1/2013 0:10
                                         datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                                     except ValueError:
-                                        continue
+                                        try:
+                                            # deal with excel formatted datetimes
+                                            dateTuple = xlrd.xldate_as_tuple(row[dateTimeColNum], 0)
+                                            dt_obj = datetime(*dateTuple[0:6])
+                                            datestr= dt_obj.strftime("%Y-%m-%d %H:%M")
+                                        except ValueError:
+                                            continue
                         # for each column in the data table
                         # raise ValidationError("".join(str(rowColumnMap)))
                         # if check_dates:

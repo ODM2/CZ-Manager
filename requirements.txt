@@ -12,3 +12,4 @@ psycopg2
 requests
 django-recaptcha
 pyyaml
+xlrd
