@@ -582,7 +582,7 @@ class CvDatasettypecv(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_datasettypecv'
+        db_table = r'odm2"."cv_datasettype'
         ordering = ['term', 'name']
 
 
