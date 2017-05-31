@@ -1,7 +1,7 @@
 # from __future__ import unicode_literals
 import compiler
 from django.contrib.gis import forms, admin
-from django.contrib.gis.geos import GEOSGeometry
+# from django.contrib.gis.geos import GEOSGeometry
 from django.contrib import messages
 from django.core.management import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -620,21 +620,21 @@ class SamplingfeaturesAdminForm(ModelForm):
                   'featuregeometry',
                   'elevation_m', 'elevation_datum']
 
-    def __init__(self, *args, **kwargs):
-        instance = kwargs.get('instance')
-        if instance:
-            feat = instance.featuregeometrywkt()
-            initial = kwargs.get('initial', {})
-            initial['featuregeometrywkt'] = '{}'.format(feat)
-            kwargs['initial'] = initial
-        super(SamplingfeaturesAdminForm, self).__init__(*args, **kwargs)
+    #def __init__(self, *args, **kwargs):
+    #    instance = kwargs.get('instance')
+    #    if instance:
+            # feat = instance.featuregeometrywkt()
+    #        initial = kwargs.get('initial', {})
+            #initial['featuregeometrywkt'] = '{}'.format(feat)
+    #        kwargs['initial'] = initial
+    #    super(SamplingfeaturesAdminForm, self).__init__(*args, **kwargs)
 
     featuregeometrywkt = forms.CharField(
         help_text="feature geometry (to add a point format is POINT(lon lat)" +
                   " where lon and lat are in decimal degrees. If you don't want to add a "
                   "location" + " leave default value of POINT(0 0).", label='Featuregeometrywkt',
         widget=forms.Textarea, required=False)
-    featuregeometrywkt.initial = GEOSGeometry("POINT(0 0)")
+    # featuregeometrywkt.initial = GEOSGeometry("POINT(0 0)")
 
     sampling_feature_type = make_ajax_field(Samplingfeatures, 'sampling_feature_type',
                                             'cv_sampling_feature_type')
@@ -688,7 +688,7 @@ class SamplingfeaturesAdminForm(ModelForm):
     featuregeometry = forms.PointField(label='Featuregeometry',
                                        widget=forms.OpenLayersWidget(), required=False)
 
-    featuregeometry.initial = GEOSGeometry("POINT(0 0)")
+    # featuregeometry.initial = GEOSGeometry("POINT(0 0)")
 
 
 class IGSNInline(admin.StackedInline):

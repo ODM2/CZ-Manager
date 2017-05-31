@@ -13,8 +13,8 @@ from __future__ import unicode_literals
 
 import time
 
-from django.contrib.gis.db import models as gis_models
-from django.contrib.gis.geos import GEOSGeometry
+# from django.contrib.gis.db import models as gis_models
+# from django.contrib.gis.geos import GEOSGeometry
 from django.db import models
 # from django.forms import ModelFormWithFileField
 # from .forms import DataloggerprogramfilesAdminForm
@@ -2324,10 +2324,10 @@ class Samplingfeatures(models.Model):
     elevation_datum = models.ForeignKey(CvElevationdatum, db_column='elevationdatumcv', blank=True,
                                         null=True)
 
-    objects = gis_models.GeoManager()
+    #objects = gis_models.GeoManager()
 
-    def featuregeometrywkt(self):
-        return GEOSGeometry(self.featuregeometry)
+    #def featuregeometrywkt(self):
+    #    return GEOSGeometry(self.featuregeometry)
 
     def __unicode__(self):
         s = u"%s - %s- %s" % (
