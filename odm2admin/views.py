@@ -47,6 +47,8 @@ from .models import Relatedfeatures
 from .models import Results
 from .models import Samplingfeatureexternalidentifiers
 from .models import Samplingfeatures
+from .models import Sites
+from .models import Specimens
 from .models import Timeseriesresultvalues
 from .models import Timeseriesresultvaluesext
 from .models import Timeseriesresultvaluesextwannotations
@@ -570,6 +572,45 @@ def get_features(request, sf_type="all", ds_ids="all"):
     feats = [model_to_dict(f) for f in features]
     feats_filtered = list()
     for feat in feats:
+        sf = Samplingfeatures.objects.get(samplingfeatureid=feat['samplingfeatureid'])
+
+        # Get Site Attr
+        if sf.sampling_feature_type.name == 'Site':
+            site = Sites.objects.get(samplingfeatureid=sf.samplingfeatureid)
+            feat.update({
+                'sitetype': site.sitetypecv.name
+            })
+
+        # Get Specimen Attr
+        if sf.sampling_feature_type.name == 'Specimen':
+            specimen = Specimens.objects.get(samplingfeatureid=sf.samplingfeatureid)
+            feat.update({
+                'specimentype': specimen.specimentypecv.name,
+                'specimenmedium': specimen.specimenmediumcv.name
+            })
+        # Get Relations
+        feat.update({
+            'relationships': get_relations(sf)
+        })
+
+        # Get IGSN's
+        igsn = sf.samplingfeatureexternalidentifiers_set.get()
+        feat.update({
+            'igsn': igsn.samplingfeatureexternalidentifier,
+            'igsnurl': igsn.samplingfeatureexternalidentifieruri
+        })
+
+        # Get Soil top and bottom depth
+        sfep = sf.samplingfeatureextensionpropertyvalues_set.get_queryset()
+        if len(sfep) == 2:
+            feat.update({
+                'soil_top_depth': sfep[0].propertyvalue,
+                'top_units': sfep[0].propertyid.propertyunitsid.unitsabbreviation,
+                'soil_bottom_depth': sfep[1].propertyvalue,
+                'bottom_units': sfep[1].propertyid.propertyunitsid.unitsabbreviation
+            })
+
+        # Get lat, lon
         lat = GEOSGeometry(feat['featuregeometry']).coords[1]
         lon = GEOSGeometry(feat['featuregeometry']).coords[0]
         if lat != 0 and lon != 0:
@@ -580,6 +621,50 @@ def get_features(request, sf_type="all", ds_ids="all"):
             feats_filtered.append(feat)
 
     return HttpResponse(json.dumps(feats_filtered))
+
+
+def get_relations(s):
+    pf = Relatedfeatures.objects.filter(samplingfeatureid_id=s.samplingfeatureid)
+    cf = Relatedfeatures.objects.filter(relatedfeatureid_id=s.samplingfeatureid)
+    sibsf = None
+    parents = None
+    children = None
+    if pf.first() is not None:
+        sib = Relatedfeatures.objects.filter(relationshiptypecv_id='Is child of',
+                                             relatedfeatureid_id=pf.first().relatedfeatureid_id). \
+            exclude(samplingfeatureid_id=s.samplingfeatureid)
+        if sib.first() is not None:
+            sibsf = list(Samplingfeatureexternalidentifiers.objects.\
+                         filter(samplingfeatureid__in=sib.\
+                                values_list('samplingfeatureid_id', flat=True)). \
+                         values('samplingfeatureexternalidentifieruri',
+                                'samplingfeatureid__samplingfeaturecode',
+                                'samplingfeatureid__samplingfeatureid'
+                                ))
+        parents = list(Samplingfeatureexternalidentifiers.objects.\
+                       filter(samplingfeatureid__in=pf.\
+                              values_list('relatedfeatureid_id',
+                                          flat=True)).\
+                       values('samplingfeatureexternalidentifieruri',
+                              'samplingfeatureid__samplingfeaturecode',
+                              'samplingfeatureid__samplingfeatureid'
+                              ))
+
+    if cf.first() is not None:
+        children = list(Samplingfeatureexternalidentifiers.objects.\
+                        filter(samplingfeatureid__in=cf.\
+                               values_list('samplingfeatureid_id', flat=True)). \
+                        values('samplingfeatureexternalidentifieruri',
+                               'samplingfeatureid__samplingfeaturecode',
+                               'samplingfeatureid__samplingfeatureid'
+                               ))
+
+
+    return {
+        'parents': parents,
+        'siblings': sibsf,
+        'children': children
+    }
 
 
 def TimeSeriesGraphing(request, feature_action='All'):

@@ -9,9 +9,12 @@
             background-repeat: no-repeat !important;
             height: 46px !important;
             width: 35px !important;
-			margin-top: -40px !important;
-			margin-left: -19px !important; 
 			
+}
+
+.awesome-marker-labeled {
+    margin-top: -40px !important;
+    margin-left: -19px !important;
 }
 .legend {
     line-height: 18px;
@@ -157,4 +160,25 @@ div.legend-container.leaflet-control {
 
 #dataset-filter {
     padding: 20px;
+}
+
+/* Tree */
+.node {
+    cursor: pointer;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 3px;
+}
+
+.node text {
+  font: 12px sans-serif;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 2px;
 }

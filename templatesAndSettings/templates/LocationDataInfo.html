@@ -37,7 +37,13 @@ option {
 					<tr class="row1">
 				<td width="20%">{{ featureAction.action.method.methodname }} </td>
 				<td width="60%" >{{featureAction.action.method.methoddescription}}</td>
-				<td width="20%"><a target="_blank", href='{{featureAction.action.method.methodlink}}'> All Data For this Method </a></td>
+				<td width="20%">
+                    {% if featureAction.action.method.methodlink is None or featureAction.action.method.methodlink == '' %}
+                        N/A
+                    {% else %}
+                        <a target="_blank" href='{{featureAction.action.method.methodlink}}'> All Data For this Method </a>
+                    {% endif %}
+                </td>
 				</tr>
 				{% endif %}
 				{% if not done == 1 %}
@@ -52,7 +58,14 @@ option {
 				<tr class="row1">
 				<td width="20%" >{{featureAction.action.begindatetime.date}}</td>
 				<td width="60%" >{{featureAction.action.actiondescription}}</td>
-				<td width="20%"><a target="_blank", href='{{featureAction.action.actionfilelink}}'> link </a></td></tr>
+				<td width="20%">
+                    {% if featureAction.action.actionfilelink is None or  featureAction.action.actionfilelink is '' %}
+                        N/A
+                    {% else %}
+                        <a target="_blank" href='{{featureAction.action.actionfilelink}}'> link </a>
+                    {% endif %}
+                </td>
+                </tr>
 				
 			
 			{% else %}
