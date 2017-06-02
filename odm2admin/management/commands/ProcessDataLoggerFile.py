@@ -198,6 +198,8 @@ class Command(BaseCommand):
                                             tmpdate = float(row[dateTimeColNum])
                                             dateTuple = xlrd.xldate_as_tuple(tmpdate, 0)
                                             dt_obj = datetime(*dateTuple[0:6])
+                                            dateT = dt_obj.strptime(row[dateTimeColNum],
+                                                              "%Y-%m-%d %H:%M:%S.%f")
                                             datestr= dt_obj.strftime("%Y-%m-%d %H:%M")
                                         except ValueError:
                                             continue
