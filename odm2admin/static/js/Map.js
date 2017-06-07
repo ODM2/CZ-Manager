@@ -33,6 +33,24 @@ MAP.prototype.initMap = function (map_id, initCenter, initZoom, legends, cluster
         mousemove: displayCoords
     });
 
+	this.webmap.on('popupopen', function (e) {
+	    console.log(e.popup);
+        var acc = document.getElementsByClassName("accordion");
+        var i;
+
+        for (i = 0; i < acc.length; i++) {
+          acc[i].onclick = function() {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight){
+              panel.style.maxHeight = null;
+            } else {
+              panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+          }
+        }
+    });
+
 	this.makeLegend(legends);
 
 };
@@ -159,47 +177,53 @@ MAP.prototype.getMarker = function (latlng, featType, sfname,style_class,icon_st
 
 
 makerelation = function(relationobs) {
-        var c = '<tr><td class="title">Children </td>';
-        var p = '<tr><td class="title">Parent </td>';
-        var s = '<tr><td class="title">Siblings </td>';
+        var c = '<button class="accordion">Children</button>';
+        var p = '<button class="accordion">Parent</button>';
+        var s = '<button class="accordion">Siblings</button>';
         if (relationobs.children) {
-            c = c + "<td>" + "<ul>";
+            c = c + "<div class='panel'>" + "<p><ul>";
             relationobs.children.forEach(function (child) {
                 c = c + "<li><a href='/odm2admin/samplingfeatures/" +
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
-                    "</a></li>";
+                    "</a>, IGSN: <a target='_blank' href='" +
+                    child['samplingfeatureexternalidentifieruri'] + "'>" +
+                    child['samplingfeatureexternalidentifier'] +"</a></li>";
             });
-            c = c + "</ul></td></tr>";
+            c = c + "</ul></p></div>";
         } else {
-            c = c + "<td>No Children</td></tr>";
+            c = c + "<div class='panel'><p>No Children</p></div>";
         }
         if (relationobs.parents) {
-            p = p + "<td>" + "<ul>";
+            p = p + "<div class='panel'>" + "<p><ul>";
             relationobs.parents.forEach(function (child) {
                 p = p + "<li><a href='/odm2admin/samplingfeatures/" +
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
-                    "</a></li>";
+                    "</a>, IGSN: <a target='_blank' href='" +
+                    child['samplingfeatureexternalidentifieruri'] + "'>" +
+                    child['samplingfeatureexternalidentifier'] +"</a></li>";
             });
-            p = p + "</ul></td></tr>";
+            p = p + "</ul></p></div>";
         } else {
-            p = p + "<td>No Parent</td></tr>";
+            p = p + "<div class='panel'><p>No Parent</p></div>";
         }
         if (relationobs.siblings) {
-            s = s + "<td>" + "<ul>";
+            s = s + "<div class='panel'>" + "<p><ul>";
             relationobs.siblings.forEach(function (child) {
                 s = s + "<li><a href='/odm2admin/samplingfeatures/" +
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
-                    "</a></li>";
+                    "</a>, IGSN: <a target='_blank' href='" +
+                    child['samplingfeatureexternalidentifieruri'] + "'>" +
+                    child['samplingfeatureexternalidentifier'] +"</a></li>";
             });
-            s = s + "</ul></td></tr>";
+            s = s + "</ul></p></div>";
         } else {
-            s = s + "<td>No Siblings</td></tr>";
+            s = s + "<div class='panel'><p>No Siblings</p></div>";
         }
 
         return p + s + c;
@@ -216,24 +240,25 @@ maketablecontent = function (obs) {
         sitetype = '',
         sptype = '',
         spmed = '';
-    console.log(obs);
 
     if (obs.samplingfeaturecode) {
         sfcode = "<tr>"
             + "<td class='title'>Sampling Feature Code</td>"
-            + "<td>" + obs.samplingfeaturecode + "</td>"
+            + "<td><a href='" + obs.samplingfeatureurl + "'>" + obs.samplingfeaturecode + "</a></td>"
             + "</tr>";
     }
     if (obs.sampling_feature_type) {
         sftype = "<tr>"
             + "<td class='title'>Sampling Feature Type</td>"
-            + "<td>" + obs.sampling_feature_type + "</td>"
+            + "<td><a target='_blank' href='" + obs.samplingfeaturetypeurl + "'>" + obs.sampling_feature_type + "</a></td>"
             + "</tr>";
     }
     if (obs.featuregeometry) {
         sfcoords = "<tr>"
             + "<td class='title'>Coordinates</td>"
-            + "<td>" + obs.featuregeometry.lat + ", " + obs.featuregeometry.lng + "</td>"
+            + "<td>" + obs.featuregeometry.lat + ", " + obs.featuregeometry.lng
+            + " (EPSG:<a target='_blank' href='http://epsg.io/" + obs.featuregeometry.crs + "'>"
+            + obs.featuregeometry.crs + "</a>)</td>"
             + "</tr>";
     }
     if (obs.samplingfeaturedescription) {
@@ -245,7 +270,7 @@ maketablecontent = function (obs) {
     if (obs.igsn && obs.igsnurl) {
         sfigsn = "<tr>"
             + "<td class='title'>IGSN</td>"
-            + "<td><a href='" + obs.igsnurl + "'>" + obs.igsn + "</a></td>"
+            + "<td><a target='_blank' href='" + obs.igsnurl + "'>" + obs.igsn + "</a></td>"
             + "</tr>";
     }
     if (obs.soil_top_depth && obs.soil_bottom_depth && obs.top_units && obs.bottom_units) {
@@ -261,13 +286,13 @@ maketablecontent = function (obs) {
     if (obs.sitetype) {
         sitetype = "<tr>"
             + "<td class='title'>Site Type</td>"
-            + "<td>" + obs.sitetype + "</td>"
+            + "<td><a target='_blank' href='" + obs.sitetypeurl + "'>" + obs.sitetype + "</a></td>"
             + "</tr>";
     }
     if (obs.specimentype) {
         sptype = "<tr>"
             + "<td class='title'>Specimen Type</td>"
-            + "<td>" + obs.specimentype + "</td>"
+            + "<td><a target='_blank' href='" + obs.specimentypeurl + "'>" + obs.specimentype + "</a></td>"
             + "</tr>";
     }
     if (obs.specimenmedium) {
@@ -277,7 +302,12 @@ maketablecontent = function (obs) {
             + "</tr>";
     }
 
-    return sfcode + sftype + sitetype + sptype + spmed + sfcoords + sfdesc + sfigsn + sfsdr + sfrel;
+    var tablecontent = sfcode + sftype + sitetype + sptype + spmed + sfcoords + sfdesc + sfigsn + sfsdr;
+    var relationshiptree = sfrel;
+    return {
+        'tablecontent': tablecontent,
+        'relationshiptree': sfrel
+    };
 };
 
 makeMarkerPopup = function (marker, obs) {
@@ -287,13 +317,15 @@ makeMarkerPopup = function (marker, obs) {
     var tablestart = "<table class='table table-bordered table-hover'>"
             + "<tbody>";
 
-    var tablecontent = maketablecontent(obs);
+    var content = maketablecontent(obs);
+    var tablecontent = content.tablecontent;
+    var reltree = content.relationshiptree;
 
 
     var tableend = "</tbody>"
             + "</table>";
 
-    var popup = tablestart + tablecontent + tableend;
+    var popup = tablestart + tablecontent + tableend + reltree;
 
     var api = 'mappopup';
     var link = null;
@@ -302,7 +334,7 @@ makeMarkerPopup = function (marker, obs) {
         obs.sampling_feature_type == "Weather station" || obs.sampling_feature_type == "Profile" ||
         obs.sampling_feature_type == "Specimen") {
         markerpopup = header + "<div style='height: 500px; overflow: scroll;'>" + popup
-            + "<iframe width=900, height=300px, "
+            + "<iframe width=600 height=400 "
             + "src='/" + url_path + api + "/samplingfeature=" + obs.samplingfeatureid
             + "/popup=true/' name='iframe_A'></iframe>" + "</div>";
     } else if (obs.sampling_feature_type == "Excavation") {
@@ -315,7 +347,7 @@ makeMarkerPopup = function (marker, obs) {
             + popup
             + "<a  target='_blank' "
             + "href='" + link + "'> View soil profile data in new page</a>"
-            + "<iframe width=900, height=300px, "
+            + "<iframe width=600 height=400 "
             + "src='" + link + "' name='iframe_A'></iframe>" + "</div>";
 
     } else if (obs.sampling_feature_type == "Field area") {
@@ -328,7 +360,7 @@ makeMarkerPopup = function (marker, obs) {
             + popup
             + "<a  target='_blank' "
             + "href='" + link + "'> View data for this field area in new page</a>"
-            + "<iframe width=900, height=300px, "
+            + "<iframe width=600 height=400 "
             + "src='" + link + "' name='iframe_A'></iframe>" + "</div>";
     } else {
         markerpopup = header
@@ -337,7 +369,7 @@ makeMarkerPopup = function (marker, obs) {
     }
 
 	marker.bindPopup(markerpopup, {
-	    maxWidth : 900
+	    maxWidth : 620
     });
     return markerpopup;
 };

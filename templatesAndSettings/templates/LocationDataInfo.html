@@ -1,5 +1,6 @@
 
 {% load admin_extras %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
 select {
     width:85%; 
@@ -12,7 +13,14 @@ option {
           border: solid 1px #DDDDDD; 
 }
 .loadinggif {
-    background:url('http://www.hsi.com.hk/HSI-Net/pages/images/en/share/ajax-loader.gif') no-repeat right center;
+    background: url('http://www.hsi.com.hk/HSI-Net/pages/images/en/share/ajax-loader.gif') no-repeat right center;
+}
+
+/* Add icon to external links */
+a[target="_blank"]:after {
+    font-family: 'FontAwesome';
+    content: " \f08e";
+}
 </style>
 
     
@@ -36,12 +44,16 @@ option {
 					</tr>
 					<tr class="row1">
 				<td width="20%">{{ featureAction.action.method.methodname }} </td>
-				<td width="60%" >{{featureAction.action.method.methoddescription}}</td>
+                <td width="60%" >
+                    <a href="http://127.0.0.1:8000/odm2admin/methods/{{featureAction.action.method.methodid}}/change/">
+                        {{featureAction.action.method.methoddescription}}
+                    </a>
+                </td>
 				<td width="20%">
                     {% if featureAction.action.method.methodlink is None or featureAction.action.method.methodlink == '' %}
                         N/A
                     {% else %}
-                        <a target="_blank" href='{{featureAction.action.method.methodlink}}'> All Data For this Method </a>
+                        <a target="_blank" href='{{featureAction.action.method.methodlink}}'> Documentation </a>
                     {% endif %}
                 </td>
 				</tr>
@@ -51,13 +63,17 @@ option {
 					<th scope="col"  class="sortable column-resultid">start date</th>
 					<th scope="col"  class="sortable column-resultid">description</th>
 					<th scope="col"  class="sortable column-resultid">link</th>
-					
+
 					
 				{% endif %}
 				{% assign done 1 %}
 				<tr class="row1">
 				<td width="20%" >{{featureAction.action.begindatetime.date}}</td>
-				<td width="60%" >{{featureAction.action.actiondescription}}</td>
+                <td width="60%" >
+                    <a href="http://127.0.0.1:8000/odm2admin/actions/{{featureAction.action.actionid}}/change/">
+                        {{featureAction.action.actiondescription}}
+                    </a>
+                </td>
 				<td width="20%">
                     {% if featureAction.action.actionfilelink is None or  featureAction.action.actionfilelink is '' %}
                         N/A

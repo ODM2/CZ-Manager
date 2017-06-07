@@ -574,11 +574,18 @@ def get_features(request, sf_type="all", ds_ids="all"):
     for feat in feats:
         sf = Samplingfeatures.objects.get(samplingfeatureid=feat['samplingfeatureid'])
 
+        # Get url to sf
+        feat.update({
+            'samplingfeatureurl': 'odm2admin/samplingfeatures/{}/change/'.format(sf.samplingfeatureid),
+            'samplingfeaturetypeurl': sf.sampling_feature_type.sourcevocabularyuri
+        })
+
         # Get Site Attr
         if sf.sampling_feature_type.name == 'Site':
             site = Sites.objects.get(samplingfeatureid=sf.samplingfeatureid)
             feat.update({
-                'sitetype': site.sitetypecv.name
+                'sitetype': site.sitetypecv.name,
+                'sitetypeurl': site.sitetypecv.sourcevocabularyuri
             })
 
         # Get Specimen Attr
@@ -586,7 +593,9 @@ def get_features(request, sf_type="all", ds_ids="all"):
             specimen = Specimens.objects.get(samplingfeatureid=sf.samplingfeatureid)
             feat.update({
                 'specimentype': specimen.specimentypecv.name,
-                'specimenmedium': specimen.specimenmediumcv.name
+                'specimentypeurl': specimen.specimentypecv.sourcevocabularyuri,
+                'specimenmedium': specimen.specimenmediumcv.name,
+                'specimenmediumurl': specimen.specimenmediumcv.sourcevocabularyuri,
             })
         # Get Relations
         feat.update({
@@ -611,12 +620,14 @@ def get_features(request, sf_type="all", ds_ids="all"):
             })
 
         # Get lat, lon
-        lat = GEOSGeometry(feat['featuregeometry']).coords[1]
-        lon = GEOSGeometry(feat['featuregeometry']).coords[0]
+        lat = sf.featuregeometrywkt().coords[1]
+        lon = sf.featuregeometrywkt().coords[0]
+        epsg = sf.featuregeometrywkt().crs.srid
         if lat != 0 and lon != 0:
             feat['featuregeometry'] = {
                 'lat': lat,
-                'lng': lon
+                'lng': lon,
+                'crs': epsg
             }
             feats_filtered.append(feat)
 
@@ -639,7 +650,8 @@ def get_relations(s):
                                 values_list('samplingfeatureid_id', flat=True)). \
                          values('samplingfeatureexternalidentifieruri',
                                 'samplingfeatureid__samplingfeaturecode',
-                                'samplingfeatureid__samplingfeatureid'
+                                'samplingfeatureid__samplingfeatureid',
+                                'samplingfeatureexternalidentifier'
                                 ))
         parents = list(Samplingfeatureexternalidentifiers.objects.\
                        filter(samplingfeatureid__in=pf.\
@@ -647,7 +659,8 @@ def get_relations(s):
                                           flat=True)).\
                        values('samplingfeatureexternalidentifieruri',
                               'samplingfeatureid__samplingfeaturecode',
-                              'samplingfeatureid__samplingfeatureid'
+                              'samplingfeatureid__samplingfeatureid',
+                              'samplingfeatureexternalidentifier'
                               ))
 
     if cf.first() is not None:
@@ -656,7 +669,8 @@ def get_relations(s):
                                values_list('samplingfeatureid_id', flat=True)). \
                         values('samplingfeatureexternalidentifieruri',
                                'samplingfeatureid__samplingfeaturecode',
-                               'samplingfeatureid__samplingfeatureid'
+                               'samplingfeatureid__samplingfeatureid',
+                               'samplingfeatureexternalidentifier'
                                ))
 
 
