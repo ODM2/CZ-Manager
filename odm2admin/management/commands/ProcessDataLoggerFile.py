@@ -114,11 +114,13 @@ class Command(BaseCommand):
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
         rowColumnMap = list()
         bulktimeseriesvalues = []
+        bulkcount = 0
         upper_bound_quality_type = CvDataqualitytype.objects.get(name='Physical limit upper bound')
         lower_bound_quality_type = CvDataqualitytype.objects.get(name='Physical limit lower bound')
         emailtitle = "ODM2 Admin Alarm"
         tolist = []
         sendemail = False
+        exceldatetime = False
         emailtext = ""
         dateTimeColNum = 0
         for admin in settings.ADMINS:
@@ -164,6 +166,10 @@ class Command(BaseCommand):
                                 if row[j] == dloggerfileColumns.columnlabel \
                                         and dloggerfileColumns.columndescription == "datetime":
                                     dateTimeColNum = j
+                                if row[j] == dloggerfileColumns.columnlabel \
+                                        and dloggerfileColumns.columndescription == 'exceldatetime':
+                                    dateTimeColNum = j
+                                    exceldatetime = True
                             if not foundColumn:
                                 raise CommandError(
                                     u'Cannot find a column in the CSV matching the '
@@ -194,13 +200,14 @@ class Command(BaseCommand):
                                         datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                                     except ValueError:
                                         try:
-                                            # deal with excel formatted datetimes
-                                            tmpdate = float(row[dateTimeColNum])
-                                            dateTuple = xlrd.xldate_as_tuple(tmpdate, 0)
-                                            dt_obj = datetime(*dateTuple[0:6])
-                                            dateT = dt_obj.strptime(row[dateTimeColNum],
-                                                              "%Y-%m-%d %H:%M:%S.%f")
-                                            datestr= dt_obj.strftime("%Y-%m-%d %H:%M")
+                                            if exceldatetime:
+                                                    # deal with excel formatted datetimes
+                                                    tmpdate = float(row[dateTimeColNum])
+                                                    dateTuple = xlrd.xldate_as_tuple(tmpdate, 0)
+                                                    dt_obj = datetime(*dateTuple[0:6])
+                                                    dateT = dt_obj.strptime(row[dateTimeColNum],
+                                                                      "%Y-%m-%d %H:%M:%S.%f")
+                                                    datestr= dt_obj.strftime("%Y-%m-%d %H:%M")
                                         except ValueError:
                                             continue
                         #if you encounter a blank line continue and try the next one
@@ -473,6 +480,10 @@ class Command(BaseCommand):
                                                 .intendedtimespacingunitsid
                                             )
                                             bulktimeseriesvalues.append(tsvr)
+                                            bulkcount +=1
+                                            if bulkcount > 20000:
+                                                Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
+                                                del bulktimeseriesvalues[:]
                                             # print("saved value")
                                     except IntegrityError:
                                         pass

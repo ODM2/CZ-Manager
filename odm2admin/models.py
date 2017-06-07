@@ -970,7 +970,9 @@ class Dataloggerfilecolumns(models.Model):
     columnlabel = models.CharField(verbose_name="column label", max_length=50)
     columndescription = models.CharField(verbose_name="column description",
                                          help_text="To disble ingestion of a column type skip, " +
-                                                "or to specify a column as the date time enter datetime",
+                                                "or to specify a column as the date time enter datetime" +
+                                                " if the datetime is an excel format numeric datetime" +
+                                                " enter exceldatetime",
                                          max_length=5000,
                                          blank=True)
     measurementequation = models.CharField(verbose_name="measurement equation", max_length=255,
