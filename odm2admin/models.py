@@ -2821,8 +2821,8 @@ class Timeseriesresultvaluesext(models.Model):
         # s += 'Unit Name,'
         # s += 'processing level,'
         s += 'sampling feature/location,'
-        s += 'time aggregation interval,'
-        s += 'time aggregation unit,'
+        # s += 'time aggregation interval,'
+        # s += 'time aggregation unit,'
         #s += 'citation,'
 
         return s
@@ -2850,8 +2850,8 @@ class Timeseriesresultvaluesext(models.Model):
         # s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
         s += ',\" {0}\"'.format(
             self.samplingfeaturename)
-        s += ', {0}'.format(self.timeaggregationinterval)
-        s += ', {0},'.format(self.timeaggregationintervalunitsid)
+        # s += ', {0}'.format(self.timeaggregationinterval)
+        # s += ', {0},'.format(self.timeaggregationintervalunitsid)
         #s = buildCitation(s, self)
 
         # s += ' {0}\"'.format(citation.citationlink)
@@ -2906,8 +2906,8 @@ class Timeseriesresultvaluesextwannotations(models.Model):
         # s += 'Unit Name,'
         # s += 'processing level,'
         s += 'sampling feature/location,'
-        s += 'time aggregation interval,'
-        s += 'time aggregation unit,'
+        # s += 'time aggregation interval,'
+        # s += 'time aggregation unit,'
         s += 'citation,'
         return s
 
@@ -2920,8 +2920,8 @@ class Timeseriesresultvaluesextwannotations(models.Model):
         # s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
         s += ',\" {0}\"'.format(
             self.samplingfeaturename)
-        s += ', {0}'.format(self.timeaggregationinterval)
-        s += ', {0},'.format(self.timeaggregationintervalunitsid)
+        # s += ', {0}'.format(self.timeaggregationinterval)
+        # s += ', {0},'.format(self.timeaggregationintervalunitsid)
         s = buildCitation(s, self)
 
         # s += ' {0}\"'.format(citation.citationlink)
