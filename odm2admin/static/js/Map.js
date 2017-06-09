@@ -273,11 +273,12 @@ maketablecontent = function (obs) {
             + "<td><a target='_blank' href='" + obs.igsnurl + "'>" + obs.igsn + "</a></td>"
             + "</tr>";
     }
-    if (obs.soil_top_depth && obs.soil_bottom_depth && obs.top_units && obs.bottom_units) {
+    if (obs.soil_top_depth && obs.soil_bottom_depth &&
+        obs.soil_top_depth_units && obs.soil_bottom_depth_units) {
         sfsdr = "<tr>"
             + "<td class='title'>Soil Depth Range</td>"
-            + "<td>" + obs.soil_top_depth + " " + obs.top_units + " - " +
-            obs.soil_bottom_depth + " " + obs.bottom_units + "</td>"
+            + "<td>" + obs.soil_top_depth + " " + obs.soil_top_depth_units + " - " +
+            obs.soil_bottom_depth + " " + obs.soil_bottom_depth_units + "</td>"
             + "</tr>";
     }
     if (obs.relationships) {

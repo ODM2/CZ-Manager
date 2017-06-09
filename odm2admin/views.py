@@ -45,6 +45,7 @@ from .models import Profileresults
 from .models import Profileresultvalues
 from .models import Relatedfeatures
 from .models import Results
+from .models import Samplingfeatureextensionpropertyvalues
 from .models import Samplingfeatureexternalidentifiers
 from .models import Samplingfeatures
 from .models import Sites
@@ -603,26 +604,32 @@ def get_features(request, sf_type="all", ds_ids="all"):
         })
 
         # Get IGSN's
-        igsn = sf.samplingfeatureexternalidentifiers_set.get()
-        feat.update({
-            'igsn': igsn.samplingfeatureexternalidentifier,
-            'igsnurl': igsn.samplingfeatureexternalidentifieruri
-        })
+        if Samplingfeatureexternalidentifiers.objects.filter(
+                samplingfeatureid=sf.samplingfeatureid).first() is not None:
+            igsn = sf.samplingfeatureexternalidentifiers_set.get()
+            feat.update({
+                'igsn': igsn.samplingfeatureexternalidentifier,
+                'igsnurl': igsn.samplingfeatureexternalidentifieruri
+            })
+
 
         # Get Soil top and bottom depth
-        sfep = sf.samplingfeatureextensionpropertyvalues_set.get_queryset()
-        if len(sfep) == 2:
-            feat.update({
-                'soil_top_depth': sfep[0].propertyvalue,
-                'top_units': sfep[0].propertyid.propertyunitsid.unitsabbreviation,
-                'soil_bottom_depth': sfep[1].propertyvalue,
-                'bottom_units': sfep[1].propertyid.propertyunitsid.unitsabbreviation
-            })
+        if Samplingfeatureextensionpropertyvalues.objects.filter(
+                samplingfeatureid=sf.samplingfeatureid).first() is not None:
+            sfep = sf.samplingfeatureextensionpropertyvalues_set.get_queryset()
+            if len(sfep) != 0:
+                for ep in sfep:
+                    feat.update({
+                        '{}'.format(ep.propertyid.propertyname): ep.propertyvalue,
+                        '{}_units'.format(ep.propertyid.propertyname): ep.propertyid.propertyunitsid.unitsabbreviation,
+                    })
 
         # Get lat, lon
         lat = sf.featuregeometrywkt().coords[1]
         lon = sf.featuregeometrywkt().coords[0]
-        epsg = sf.featuregeometrywkt().crs.srid
+        epsg = None
+        if sf.featuregeometrywkt().crs is not None:
+            epsg = sf.featuregeometrywkt().crs.srid
         if lat != 0 and lon != 0:
             feat['featuregeometry'] = {
                 'lat': lat,
