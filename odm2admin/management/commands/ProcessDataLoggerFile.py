@@ -484,6 +484,7 @@ class Command(BaseCommand):
                                             if bulkcount > 20000:
                                                 Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
                                                 del bulktimeseriesvalues[:]
+                                                bulkcount = 0
                                             # print("saved value")
                                     except IntegrityError:
                                         pass
