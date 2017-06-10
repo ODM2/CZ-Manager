@@ -1,9 +1,10 @@
 import cStringIO as StringIO
 import math
 import json
+import time
 from datetime import datetime
 from datetime import timedelta
-
+from time import mktime
 from django import template
 from django.contrib import admin
 from django.db.models import Max
@@ -591,9 +592,11 @@ def TimeSeriesGraphing(request, feature_action='All'):
     selected_relatedfeatid = None
     selected_resultid = None
     if feature_action == 'All':
-        selected_resultid = 15
-        selected_featureactionid = 5
-        selected_relatedfeatid = 18
+        selected_featureactionid = 1
+        result = Results.objects.filter(featureactionid=selected_featureactionid).first()
+        selected_resultid = result.resultid
+
+        selected_relatedfeatid = selected_resultid
     else:
         selected_featureactionid = int(feature_action)
 
@@ -641,19 +644,37 @@ def TimeSeriesGraphing(request, feature_action='All'):
         selectedMResultSeries.append(int(resultList[0].resultid))
     elif len(resultList) == 0 and len(selectedMResultSeries) == 0:
         selectedMResultSeries.append(15)
-
+    EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
     if 'startDate' in request.POST:
         entered_start_date = request.POST['startDate']
     else:
-        entered_start_date = "2016-01-01"
+        # entered_start_date = "2016-01-01"
+        recordedenddate = Resultextensionpropertyvalues.objects.\
+            filter(resultid=selected_resultid).filter(propertyid=EndDateProperty.propertyid).get()
+        end_date = recordedenddate.propertyvalue
+        enddt = time.strptime(end_date, "%Y-%m-%d %H:%M")
+        dt = datetime.fromtimestamp(mktime(enddt))
+        last_day_previous_month = dt - timedelta(days=30)
+        entered_start_date = last_day_previous_month.strftime('%Y-%m-%d %H:%M')
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
     else:
-        entered_end_date = "2016-01-05"
+        recordedenddate = Resultextensionpropertyvalues.objects.\
+            filter(resultid=selected_resultid).filter(propertyid=EndDateProperty.propertyid).get()
+        entered_end_date = recordedenddate.propertyvalue
     if entered_end_date == '':
-        entered_end_date = "2016-01-05"
+        recordedenddate = Resultextensionpropertyvalues.objects.\
+            filter(resultid=selected_resultid).filter(propertyid=EndDateProperty.propertyid).get()
+        entered_end_date = recordedenddate.propertyvalue
     if entered_start_date == '':
-        entered_start_date = "2016-01-01"
+        recordedenddate = Resultextensionpropertyvalues.objects.\
+            filter(resultid=selected_resultid).filter(propertyid=EndDateProperty.propertyid).get()
+        end_date = recordedenddate.propertyvalue
+        enddt = time.strptime(end_date, "%Y-%m-%d %H:%M")
+        dt = datetime.fromtimestamp(mktime(enddt))
+        last_day_previous_month = dt - timedelta(days=30)
+        entered_start_date = last_day_previous_month.strftime('%Y-%m-%d %H:%M')
+        # entered_start_date = "2016-01-01"
 
     selected_results = []
     name_of_sampling_features = []
@@ -831,9 +852,10 @@ def TimeSeriesGraphing(request, feature_action='All'):
     selected_relatedfeatid = None
     selected_resultid = None
     if feature_action == 'All':
-        selected_resultid = 15
-        selected_featureactionid = 5
-        selected_relatedfeatid = 18
+        selected_featureactionid = 1
+        result = Results.objects.filter(featureactionid=selected_featureactionid).first()
+        selected_resultid = result.resultid
+        selected_relatedfeatid = selected_resultid
     else:
         selected_featureactionid = int(feature_action)
 

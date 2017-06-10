@@ -1181,7 +1181,7 @@ def create_derived_values_event(ModelAdmin, request, queryset):
             derivedenddate= derivedenddaterepv.propertyvalue
             derivedstartdaterepv = Resultextensionpropertyvalues.objects.filter(resultid=resultidtoderive.resultid).filter(
             propertyid=StartDateProperty).get()
-            derivedstartdate = derivedstartdate.propertyvalue
+            derivedstartdate = derivedstartdaterepv.propertyvalue
         except ObjectDoesNotExist:
             derivedenddate='1800-01-01 00:00'
             derivedstartdate='1800-01-01 00:00'

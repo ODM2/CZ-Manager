@@ -582,7 +582,7 @@ class CvDatasettypecv(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_datasettypecv'
+        db_table = r'odm2"."cv_datasettype'
         ordering = ['term', 'name']
 
 
@@ -970,7 +970,9 @@ class Dataloggerfilecolumns(models.Model):
     columnlabel = models.CharField(verbose_name="column label", max_length=50)
     columndescription = models.CharField(verbose_name="column description",
                                          help_text="To disble ingestion of a column type skip, " +
-                                                "or to specify a column as the date time enter datetime",
+                                                "or to specify a column as the date time enter datetime" +
+                                                " if the datetime is an excel format numeric datetime" +
+                                                " enter exceldatetime",
                                          max_length=5000,
                                          blank=True)
     measurementequation = models.CharField(verbose_name="measurement equation", max_length=255,
@@ -2819,8 +2821,8 @@ class Timeseriesresultvaluesext(models.Model):
         # s += 'Unit Name,'
         # s += 'processing level,'
         s += 'sampling feature/location,'
-        s += 'time aggregation interval,'
-        s += 'time aggregation unit,'
+        # s += 'time aggregation interval,'
+        # s += 'time aggregation unit,'
         #s += 'citation,'
 
         return s
@@ -2848,8 +2850,8 @@ class Timeseriesresultvaluesext(models.Model):
         # s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
         s += ',\" {0}\"'.format(
             self.samplingfeaturename)
-        s += ', {0}'.format(self.timeaggregationinterval)
-        s += ', {0},'.format(self.timeaggregationintervalunitsid)
+        # s += ', {0}'.format(self.timeaggregationinterval)
+        # s += ', {0},'.format(self.timeaggregationintervalunitsid)
         #s = buildCitation(s, self)
 
         # s += ' {0}\"'.format(citation.citationlink)
@@ -2904,8 +2906,8 @@ class Timeseriesresultvaluesextwannotations(models.Model):
         # s += 'Unit Name,'
         # s += 'processing level,'
         s += 'sampling feature/location,'
-        s += 'time aggregation interval,'
-        s += 'time aggregation unit,'
+        # s += 'time aggregation interval,'
+        # s += 'time aggregation unit,'
         s += 'citation,'
         return s
 
@@ -2918,8 +2920,8 @@ class Timeseriesresultvaluesextwannotations(models.Model):
         # s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
         s += ',\" {0}\"'.format(
             self.samplingfeaturename)
-        s += ', {0}'.format(self.timeaggregationinterval)
-        s += ', {0},'.format(self.timeaggregationintervalunitsid)
+        # s += ', {0}'.format(self.timeaggregationinterval)
+        # s += ', {0},'.format(self.timeaggregationintervalunitsid)
         s = buildCitation(s, self)
 
         # s += ' {0}\"'.format(citation.citationlink)
