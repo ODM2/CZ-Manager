@@ -151,7 +151,7 @@
             <div class="app-ODM2CZOData module">
                 <table>
                     <caption>
-                        <h1>Sites and Actions at Sites</h1>
+                        <h1>Sampling Features, Sites, and Actions</h1>
                     </caption>
                     <tr>
                         <th scope="row"><a href="{{ prefixpath }}samplingfeatures/">
@@ -175,9 +175,21 @@
                     </tr>
                     <tr>
                         <th scope="row"><a href="{{ prefixpath }}featureactions/">
-                            {% trans 'Sampling feature (sites) action (link sampling features (sites) and actions)' %}</a></th>
+                            {% trans 'Sampling feature (locations) action (link sampling features (locations) and actions)' %}</a></th>
                         <td><a href="{{ prefixpath }}featureactions/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}featureactions/" class="changelink">{% trans 'Change' %}</a></td>
+                    </tr>
+                     <tr>
+                        <th scope="row"><a href="{{ prefixpath }}sites/">
+                            {% trans 'Sites - sites have a sampling feature, sampling features of type site must have a site' %}</a></th>
+                        <td><a href="{{ prefixpath }}sites/add/" class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}sites/" class="changelink">{% trans 'Change' %}</a></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}sites/">
+                            {% trans 'Spatial references - defines the coordinate system for sites' %}</a></th>
+                        <td><a href="{{ prefixpath }}spatialreferences/add/" class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}Spatialreferences/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
                 </table>
             </div>
@@ -542,9 +554,22 @@
                     </caption>
                     <tr>
                         <th scope="row"><a href="{{ prefixpath }}samplingfeatures/">
-                            {% trans 'Sampling features (sites)' %}</a></th>
+                            {% trans 'Sampling features (locations)' %}</a></th>
                         <td><a href="{{ prefixpath }}samplingfeatures/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}samplingfeatures/" class="changelink">{% trans 'Change' %}</a></td>
+                    </tr>
+                     <tr>
+                        <th scope="row"><a href="{{ prefixpath }}sites/">
+                            {% trans 'Sites - sites have a sampling feature,
+                            sampling features of type site must have a site' %}</a></th>
+                        <td><a href="{{ prefixpath }}sites/add/" class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}sites/" class="changelink">{% trans 'Change' %}</a></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}sites/">
+                            {% trans 'Spatial references - defines the coordinate system for sites' %}</a></th>
+                        <td><a href="{{ prefixpath }}spatialreferences/add/" class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}Spatialreferences/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
                     {% comment %}<tr>
                         <th scope="row"><a href="{{ prefixpath }}samplingfeatureexternalidentifiers/">
@@ -556,13 +581,13 @@
                     </tr>{% endcomment %}
                     <tr>
                         <th scope="row"><a href="{{ prefixpath }}relatedfeatures/">
-                            {% trans 'Relate two features' %}</a></th>
+                            {% trans 'Relate two sampling features' %}</a></th>
                         <td><a href="{{ prefixpath }}relatedfeatures/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}relatedfeatures/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
                     <tr>
                         <th scope="row"><a href="{{ prefixpath }}featureactions/">
-                            {% trans 'Sampling feature (sites) action (link sampling features and actions)' %}</a></th>
+                            {% trans 'Sampling feature (locations) action (link sampling features and actions)' %}</a></th>
                         <td><a href="{{ prefixpath }}featureactions/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}featureactions/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>

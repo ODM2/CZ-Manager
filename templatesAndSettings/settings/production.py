@@ -73,7 +73,7 @@ DATA_DISCLAIMER = {
 SECRET_KEY = 'myRanDom_Secret_Key'
 # Application definition
 CUSTOM_TEMPLATE_PATH = '/admin/{}/'.format(APP_NAME)
-
+BASE_URL= 'admin/'
 URL_PATH = 'admin/'
 """ END PATH CONFIGURATION """
 
