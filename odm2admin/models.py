@@ -2311,10 +2311,10 @@ class Samplingfeatures(models.Model):
     samplingfeatureuuid = UUIDField(default=uuid.uuid4, editable=False)
     sampling_feature_type = models.ForeignKey(CvSamplingfeaturetype,
                                               db_column='samplingfeaturetypecv')
-    samplingfeaturecode = models.CharField(verbose_name='sampling feature or site code', max_length=50)
-    samplingfeaturename = models.CharField(verbose_name='sampling feature or site name', max_length=255,
+    samplingfeaturecode = models.CharField(verbose_name='sampling feature or location code', max_length=50)
+    samplingfeaturename = models.CharField(verbose_name='sampling feature or location name', max_length=255,
                                            blank=True, null=True)
-    samplingfeaturedescription = models.CharField(verbose_name='sampling feature or site description',
+    samplingfeaturedescription = models.CharField(verbose_name='sampling feature or location description',
                                                   max_length=5000,
                                                   blank=True)
     sampling_feature_geo_type = models.ForeignKey(CvSamplingfeaturegeotype,
@@ -2342,7 +2342,7 @@ class Samplingfeatures(models.Model):
         managed = False
         db_table = r'odm2"."samplingfeatures'
         ordering = ('sampling_feature_type', 'samplingfeaturename',)
-        verbose_name = 'sampling feature or site'
+        verbose_name = 'sampling feature (location)'
 
 
 class Sectionresults(models.Model):
@@ -2428,16 +2428,22 @@ class Simulations(models.Model):
 
 class Sites(models.Model):
     samplingfeatureid = models.OneToOneField(Samplingfeatures, db_column='samplingfeatureid',
-                                             primary_key=True)
+                                             primary_key=True, verbose_name='sampling feature')
     sitetypecv = models.ForeignKey(CvSitetype, db_column='sitetypecv')
     latitude = models.FloatField()
     longitude = models.FloatField()
-    spatialreferenceid = models.ForeignKey('Spatialreferences', db_column='spatialreferenceid')
+    spatialreferenceid = models.ForeignKey('Spatialreferences', verbose_name='spatial reference id',
+                                           db_column='spatialreferenceid')
 
     class Meta:
         managed = False
+        verbose_name = 'Site'
         db_table = r'odm2"."sites'
 
+    def __unicode__(self):
+        s = u"%s" % self.samplingfeatureid
+        s += u"- %s" % self.sitetypecv
+        return s
 
 class Spatialoffsets(models.Model):
     spatialoffsetid = models.AutoField(primary_key=True)
@@ -2470,16 +2476,23 @@ class Spatialreferenceexternalidentifiers(models.Model):
 
 
 class Spatialreferences(models.Model):
-    spatialreferenceid = models.AutoField(primary_key=True)
-    srscode = models.CharField(max_length=50, blank=True)
-    srsname = models.CharField(max_length=255)
-    srsdescription = models.CharField(max_length=5000, blank=True)
-    srslink = models.CharField(max_length=255, blank=True)
+    spatialreferenceid = models.AutoField(primary_key=True, verbose_name='spatial reference id')
+    srscode = models.CharField(max_length=50, blank=True, verbose_name='spatial reference code')
+    srsname = models.CharField(max_length=255, verbose_name='spatial reference name')
+    srsdescription = models.CharField(max_length=5000, blank=True,
+                                      verbose_name='spatial reference description')
+    srslink = models.CharField(max_length=255, blank=True,verbose_name='spatial reference link')
 
     class Meta:
         managed = False
+        verbose_name = 'Spatial reference'
         db_table = r'odm2"."spatialreferences'
 
+    def __unicode__(self):
+        if self.srscode:
+            s = u"%s" % self.srscode
+        s += u"- %s" % self.srsname
+        return s
 
 class Specimenbatchpostions(models.Model):
     featureactionid = models.OneToOneField(Featureactions, db_column='featureactionid',

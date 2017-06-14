@@ -72,7 +72,7 @@
         </tr>
 
         <tr>
-            <td class="section"><h1>Add a Sensor and It's Data</h1></td>
+            <td class="section"><h1>Add Equipment, Sensors and Data</h1></td>
         </tr>
         <tr>
             <th scope="row"><a href="{{ prefixpath }}organizations/">
@@ -88,10 +88,16 @@
 
 
         <tr>
-            <th scope="row"><a href="{{ prefixpath }}samplingfeatures/">{% trans 'Add Site- Location of Sensors or equipment' %}</a></th>
+            <th scope="row"><a href="{{ prefixpath }}samplingfeatures/">{% trans 'Add Location of Sensors or equipment' %}</a></th>
             <td><a href="{{ prefixpath }}samplingfeatures/add/" class="addlink">{% trans 'Add' %}</a></td>
             <td><a href="{{ prefixpath }}samplingfeatures/" class="changelink">{% trans 'Change' %}</a></td>
         </tr>
+        <tr>
+            <th scope="row"><a href="{{ prefixpath }}sites/">
+                {% trans 'Sites - sites have a sampling feature, sampling features of type site must have a site' %}</a></th>
+            <td><a href="{{ prefixpath }}sites/add/" class="addlink">{% trans 'Add' %}</a></td>
+            <td><a href="{{ prefixpath }}sites/" class="changelink">{% trans 'Change' %}</a></td>
+                    </tr>
         <tr>
             <td></td>
         </tr>
