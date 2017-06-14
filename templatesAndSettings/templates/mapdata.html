@@ -59,47 +59,44 @@
     {% admin_shortcuts_js %}{% endblock %}
 
 {# end changes #}
-
-{% block coltype %}colM{% endblock %}
-
-{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{##}
+{#{% block coltype %}colM{% endblock %}#}
+{##}
+{#{% block bodyclass %}{{ block.super }} dashboard{% endblock %}#}
 
 
 
 
 {% block content %}
-
-    <div id='content-main'> {% csrf_token %}</div>
-    {% include 'ds_form.html' %}
-    {% include 'sf_form.html' %}
-    <div id="dataset-filter">
-       {% include 'DatasetsList.html' %}
-    </div>
-    <div id="map-container">
+    <div id="mapheader">
+        {% csrf_token %}
+        {% include 'ds_form.html' %}
+        {% include 'sf_form.html' %}
+        <div id="dataset-filter">
+            {% include 'DatasetsList.html' %}
+        </div>
         <div id="latlng" class="panel-header">
             <p>
                 Lat: <span id="lat">0</span>, Lon: <span id="lng">0</span>
             </p>
         </div>
-        <div id="webmap"></div>
     </div>
+    <div id="webmap"></div>
     <script type="application/javascript">
         var url_path = "{{ urlpath }}";
-		var display_titles = false;
+        var display_titles = false;
         {% if map_config.display_titles %}
             display_titles = true;
         {% endif %}
         var myApp = new App;
         myApp.init({{ basemaps|safe }});
-
         var myMap = new MAP;
-        myMap.initMap("webmap", [{{ map_config.lat }}, {{ map_config.lon }}], {{ map_config.zoom }}, {{ legends|safe }}, {{map_config.cluster_feature_types |safe}},display_titles);
+        myMap.initMap("webmap",
+            [{{ map_config.lat }}, {{ map_config.lon }}], {{ map_config.zoom }}, {{ legends|safe }}, {{map_config.cluster_feature_types |safe}}, display_titles);
         myMap.addBaseMap(myApp.PARAMS.basemaps);
 
         var url = myMap.getUrl(JSON.parse('{{ selectedds|safe }}'), JSON.parse('{{ selectedtype|safe }}'));
         myMap.getData(url);
         myMap.makeFilter();
     </script>
-
-
 {% endblock %}

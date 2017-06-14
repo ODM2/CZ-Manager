@@ -3,7 +3,7 @@
  */
 function MAP() {}
 
-MAP.prototype.initMap = function (map_id, initCenter, initZoom, legends,cluster_feature_types, display_titles){
+MAP.prototype.initMap = function (map_id, initCenter, initZoom, legends, cluster_feature_types, display_titles){
 	this.map_id = map_id;
 	this.initCenter = initCenter;
 	this.initZoom = initZoom;
@@ -31,6 +31,24 @@ MAP.prototype.initMap = function (map_id, initCenter, initZoom, legends,cluster_
 
 	this.webmap.on({
         mousemove: displayCoords
+    });
+
+	this.webmap.on('popupopen', function (e) {
+	    console.log(e.popup);
+        var acc = document.getElementsByClassName("accordion");
+        var i;
+
+        for (i = 0; i < acc.length; i++) {
+          acc[i].onclick = function() {
+            this.classList.toggle("active");
+            var panel = this.nextElementSibling;
+            if (panel.style.maxHeight){
+              panel.style.maxHeight = null;
+            } else {
+              panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+          }
+        }
     });
 
 	this.makeLegend(legends);
@@ -103,7 +121,7 @@ MAP.prototype.getData = function (url) {
 createMarker = function (latlng, markerIcon, color, sfname,style_class,icon_str) {
 	if(this.display_titles){
 		var iconDiv = new L.DivIcon({
-		className: style_class + ' awesome-marker leaflet-zoom-animated leaflet-interactive',
+		className: style_class + ' awesome-marker leaflet-zoom-animated leaflet-interactive awesome-marker-labeled',
 		html: '<i class="fa '+ icon_str +' icon-white" aria-hidden="true"></i><p ' +
         'style="background-color:rgba(255,255,255,0.8);margin-top:25px;font-weight:bold;">'+sfname + '</p>'
 		});
@@ -137,7 +155,7 @@ MAP.prototype.getMarker = function (latlng, featType, sfname,style_class,icon_st
     this.legends.forEach(function (l) {
         if (l.feature_type == featType){
             markerIcon = createMarker(latlng, l.icon, l.color, sfname,style_class,icon_str);
-			
+
 		}
     });
     var markerProps = {
@@ -150,56 +168,188 @@ MAP.prototype.getMarker = function (latlng, featType, sfname,style_class,icon_st
         direction: 'right'
     };
     if(this.display_titles){
-		
+
 		return markerIcon.bindTooltip(sfname, tooltipProps);
 	}else{
     return L.marker(latlng, markerProps).bindTooltip(sfname, tooltipProps);
 	}
 };
 
-makeMarkerPopup = function (marker, obs) {
-    var popup = "<br><h2>"+ obs.samplingfeaturename + "</h2>"
-            + "<hr />"
-            + "<table class='table table-bordered table-hover'>"
-            + "<tbody>"
-            + "<tr>"
+
+makerelation = function(relationobs) {
+        var c = '<button class="accordion">Children</button>';
+        var p = '<button class="accordion">Parent</button>';
+        var s = '<button class="accordion">Siblings</button>';
+        if (relationobs.children) {
+            c = c + "<div class='panel'>" + "<p><ul>";
+            relationobs.children.forEach(function (child) {
+                c = c + "<li><a href='/odm2admin/samplingfeatures/" +
+                    child['samplingfeatureid__samplingfeatureid'] +
+                    "/change/'>"+
+                    child['samplingfeatureid__samplingfeaturecode'] +
+                    "</a>, IGSN: <a target='_blank' href='" +
+                    child['samplingfeatureexternalidentifieruri'] + "'>" +
+                    child['samplingfeatureexternalidentifier'] +"</a></li>";
+            });
+            c = c + "</ul></p></div>";
+        } else {
+            c = c + "<div class='panel'><p>No Children</p></div>";
+        }
+        if (relationobs.parents) {
+            p = p + "<div class='panel'>" + "<p><ul>";
+            relationobs.parents.forEach(function (child) {
+                p = p + "<li><a href='/odm2admin/samplingfeatures/" +
+                    child['samplingfeatureid__samplingfeatureid'] +
+                    "/change/'>"+
+                    child['samplingfeatureid__samplingfeaturecode'] +
+                    "</a>, IGSN: <a target='_blank' href='" +
+                    child['samplingfeatureexternalidentifieruri'] + "'>" +
+                    child['samplingfeatureexternalidentifier'] +"</a></li>";
+            });
+            p = p + "</ul></p></div>";
+        } else {
+            p = p + "<div class='panel'><p>No Parent</p></div>";
+        }
+        if (relationobs.siblings) {
+            s = s + "<div class='panel'>" + "<p><ul>";
+            relationobs.siblings.forEach(function (child) {
+                s = s + "<li><a href='/odm2admin/samplingfeatures/" +
+                    child['samplingfeatureid__samplingfeatureid'] +
+                    "/change/'>"+
+                    child['samplingfeatureid__samplingfeaturecode'] +
+                    "</a>, IGSN: <a target='_blank' href='" +
+                    child['samplingfeatureexternalidentifieruri'] + "'>" +
+                    child['samplingfeatureexternalidentifier'] +"</a></li>";
+            });
+            s = s + "</ul></p></div>";
+        } else {
+            s = s + "<div class='panel'><p>No Siblings</p></div>";
+        }
+
+        return p + s + c;
+    };
+
+maketablecontent = function (obs) {
+    var sfcode = '',
+        sftype = '',
+        sfcoords = '',
+        sfdesc = '',
+        sfigsn = '',
+        sfsdr = '',
+        sfrel = '',
+        sitetype = '',
+        sptype = '',
+        spmed = '';
+
+    if (obs.samplingfeaturecode) {
+        sfcode = "<tr>"
             + "<td class='title'>Sampling Feature Code</td>"
-            + "<td>" + obs.samplingfeaturecode + "</td>"
-            + "</tr>"
-            + "<tr>"
+            + "<td><a href='" + obs.samplingfeatureurl + "'>" + obs.samplingfeaturecode + "</a></td>"
+            + "</tr>";
+    }
+    if (obs.sampling_feature_type) {
+        sftype = "<tr>"
             + "<td class='title'>Sampling Feature Type</td>"
-            + "<td>" + obs.sampling_feature_type + "</td>"
-            + "</tr>"
-            + "<tr>"
+            + "<td><a target='_blank' href='" + obs.samplingfeaturetypeurl + "'>" + obs.sampling_feature_type + "</a></td>"
+            + "</tr>";
+    }
+    if (obs.featuregeometry) {
+        sfcoords = "<tr>"
             + "<td class='title'>Coordinates</td>"
-            + "<td>" + obs.featuregeometry.lat + ", " + obs.featuregeometry.lng + "</td>"
-            + "</tr>"
-            + "<tr>"
+            + "<td>" + obs.featuregeometry.lat + ", " + obs.featuregeometry.lng
+            + " (EPSG:<a target='_blank' href='http://epsg.io/" + obs.featuregeometry.crs + "'>"
+            + obs.featuregeometry.crs + "</a>)</td>"
+            + "</tr>";
+    }
+    if (obs.samplingfeaturedescription) {
+        sfdesc = "<tr>"
             + "<td class='title'>Description</td>"
             + "<td>" + obs.samplingfeaturedescription + "</td>"
-            + "</tr>"
-            + "</tbody>"
+            + "</tr>";
+    }
+    if (obs.igsn && obs.igsnurl) {
+        sfigsn = "<tr>"
+            + "<td class='title'>IGSN</td>"
+            + "<td><a target='_blank' href='" + obs.igsnurl + "'>" + obs.igsn + "</a></td>"
+            + "</tr>";
+    }
+    if (obs.soil_top_depth && obs.soil_bottom_depth &&
+        obs.soil_top_depth_units && obs.soil_bottom_depth_units) {
+        sfsdr = "<tr>"
+            + "<td class='title'>Soil Depth Range</td>"
+            + "<td>" + obs.soil_top_depth + " " + obs.soil_top_depth_units + " - " +
+            obs.soil_bottom_depth + " " + obs.soil_bottom_depth_units + "</td>"
+            + "</tr>";
+    }
+    if (obs.relationships) {
+        sfrel = makerelation(obs.relationships);
+    }
+    if (obs.sitetype) {
+        sitetype = "<tr>"
+            + "<td class='title'>Site Type</td>"
+            + "<td><a target='_blank' href='" + obs.sitetypeurl + "'>" + obs.sitetype + "</a></td>"
+            + "</tr>";
+    }
+    if (obs.specimentype) {
+        sptype = "<tr>"
+            + "<td class='title'>Specimen Type</td>"
+            + "<td><a target='_blank' href='" + obs.specimentypeurl + "'>" + obs.specimentype + "</a></td>"
+            + "</tr>";
+    }
+    if (obs.specimenmedium) {
+        spmed = "<tr>"
+            + "<td class='title'>Specimen Medium</td>"
+            + "<td>" + obs.specimenmedium + "</td>"
+            + "</tr>";
+    }
+
+    var tablecontent = sfcode + sftype + sitetype + sptype + spmed + sfcoords + sfdesc + sfigsn + sfsdr;
+    var relationshiptree = sfrel;
+    return {
+        'tablecontent': tablecontent,
+        'relationshiptree': sfrel
+    };
+};
+
+makeMarkerPopup = function (marker, obs) {
+    // console.log(obs.relationships);
+    var header = "<br><h2>"+ obs.samplingfeaturename + "</h2>"
+            + "<hr />";
+    var tablestart = "<table class='table table-bordered table-hover'>"
+            + "<tbody>";
+
+    var content = maketablecontent(obs);
+    var tablecontent = content.tablecontent;
+    var reltree = content.relationshiptree;
+
+
+    var tableend = "</tbody>"
             + "</table>";
+
+    var popup = tablestart + tablecontent + tableend + reltree;
+
     var api = 'mappopup';
     var link = null;
     if (obs.sampling_feature_type == "Site" || obs.sampling_feature_type == "Observation well" ||
         obs.sampling_feature_type == "Stream gage" || obs.sampling_feature_type == "Transect" ||
-        obs.sampling_feature_type == "Weather station") {
-        markerpopup = popup
-            + "<iframe width=900, height=300px, "
+        obs.sampling_feature_type == "Weather station" || obs.sampling_feature_type == "Profile" ||
+        obs.sampling_feature_type == "Specimen") {
+        markerpopup = header + "<div style='height: 500px; overflow: scroll;'>" + popup
+            + "<iframe width=600 height=400 "
             + "src='/" + url_path + api + "/samplingfeature=" + obs.samplingfeatureid
-            + "/popup=true/' name='iframe_A'></iframe>";
+            + "/popup=true/' name='iframe_A'></iframe>" + "</div>";
     } else if (obs.sampling_feature_type == "Excavation") {
         api = 'profilegraph';
 
         link = "/" + url_path + api + "/samplingfeature=" + obs.samplingfeatureid
             + "/popup=true/";
 
-        markerpopup = popup
+        markerpopup = header + "<div style='height: 500px; overflow: scroll;'>"
+            + popup
             + "<a  target='_blank' "
             + "href='" + link + "'> View soil profile data in new page</a>"
-            + "<iframe width=900, height=300px, "
-            + "src='" + link + "' name='iframe_A'></iframe>";
+            + "<iframe width=600 height=400 "
+            + "src='" + link + "' name='iframe_A'></iframe>" + "</div>";
 
     } else if (obs.sampling_feature_type == "Field area") {
         api = 'profilegraph';
@@ -207,18 +357,22 @@ makeMarkerPopup = function (marker, obs) {
         link = "/" + url_path + api + "/selectedrelatedfeature=" + obs.samplingfeatureid
             + "/popup=true/";
 
-        markerpopup = popup
+        markerpopup = header + "<div style='height: 500px; overflow: scroll;'>"
+            + popup
             + "<a  target='_blank' "
             + "href='" + link + "'> View data for this field area in new page</a>"
-            + "<iframe width=900, height=300px, "
-            + "src='" + link + "' name='iframe_A'></iframe>";
+            + "<iframe width=600 height=400 "
+            + "src='" + link + "' name='iframe_A'></iframe>" + "</div>";
     } else {
-        markerpopup = popup;
+        markerpopup = header
+            + "<div style='height: 500px; overflow: scroll;'>"
+            + popup + "</div>";
     }
 
 	marker.bindPopup(markerpopup, {
-	    maxWidth : 900
+	    maxWidth : 620
     });
+    return markerpopup;
 };
 
 MAP.prototype.makeFilter = function () {
