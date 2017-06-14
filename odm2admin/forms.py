@@ -6,6 +6,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.contrib import messages
 from django.core.management import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ValidationError
 from django.forms import CharField
 from django.forms import ModelForm
 from django.forms import TypedChoiceField
@@ -24,6 +25,7 @@ from .models import Citationextensionpropertyvalues
 from .models import Citationexternalidentifiers
 from .models import Citations
 from .models import CvQualitycode
+from .models import CvSitetype
 from .models import Dataloggerfilecolumns
 from .models import Dataloggerfiles
 from .models import Dataloggerprogramfiles
@@ -54,10 +56,12 @@ from .models import Resultsdataquality
 from .models import Samplingfeatureextensionpropertyvalues
 from .models import Samplingfeatureexternalidentifiers
 from .models import Samplingfeatures
+from .models import Spatialreferences
 from .models import Taxonomicclassifiers
 from .models import Timeseriesresults
 from .models import Timeseriesresultvalues
 from .models import Units
+from .models import Sites
 from .models import Variables
 from .models import Resultderivationequations
 from .models import Derivationequations
@@ -65,6 +69,8 @@ from .models import CvCensorcode
 # from io import StringIO
 from ajax_select import make_ajax_field
 from ajax_select.fields import AutoCompleteSelectField
+from ajax_select.admin import AjaxSelectAdminStackedInline
+
 from .models import Measurementresults
 from .models import Measurementresultvalues
 from .models import Profileresultvalues
@@ -140,7 +146,7 @@ class unitsInLine(admin.StackedInline):
     extra = 0
 
 
-class FeatureActionsInline(admin.StackedInline):
+class FeatureActionsInline(admin.StackedInline): # AjaxSelectAdminStackedInline
     model = Featureactions
     fieldsets = (
         ('Details', {
@@ -600,6 +606,39 @@ class TaxonomicclassifiersAdmin(ReadOnlyAdmin):
     search_fields = ['taxonomicclassifiername', 'taxonomicclassifiercommonname',
                      'taxonomicclassifierdescription', 'taxonomic_classifier_type__name']
 
+class SitesAdminForm(ModelForm):
+    samplingfeatureid = AutoCompleteSelectField('sampling_feature_lookup', required=True, help_text='',
+                                              label='Sampling feature',show_help_text =None)
+    class Meta:
+        model = Sites
+        fields = '__all__'
+
+class SitesAdmin(admin.ModelAdmin):
+    form = SitesAdminForm
+    search_fields = ['samplingfeatureid__samplingfeaturename','samplingfeatureid__samplingfeaturecode'
+        , 'samplingfeatureid__samplingfeaturedescription']
+    list_display = ('samplingfeatureid', 'sitetypecv','latitude', 'longitude', 'spatialreferenceid')
+    @staticmethod
+    def __user_is_readonly(request):
+        groups = [x.name for x in request.user.groups.all()]
+        return "readonly" in groups
+
+
+class SpatialreferencesAdminForm(ModelForm):
+    class Meta:
+        model = Spatialreferences
+        fields = '__all__'
+
+class SpatialreferencesAdmin(admin.ModelAdmin):
+    form = SpatialreferencesAdminForm
+    search_fields = ['srscode','srsname', 'srsdescription']
+    list_display = ('srscode', 'srsname','srsdescription', 'srslink')
+    @staticmethod
+    def __user_is_readonly(request):
+        groups = [x.name for x in request.user.groups.all()]
+        return "readonly" in groups
+
+
 
 class SamplingfeatureexternalidentifiersAdminForm(ModelForm):
     class Meta:
@@ -612,11 +651,30 @@ class SamplingfeatureexternalidentifiersAdmin(admin.ModelAdmin):
     search_fields = ['samplingfeatureexternalidentifier']
     list_display = ('samplingfeatureexternalidentifier', 'samplingfeatureexternalidentifieruri')
     save_as = True
+    @staticmethod
+    def __user_is_readonly(request):
+        groups = [x.name for x in request.user.groups.all()]
+        return "readonly" in groups
+#
+# class SamplingfeaturesFormset(forms.models.BaseInlineFormSet):
+#     def clean(self):
+#         super(SamplingfeaturesFormset, self).clean()
+#         # make sure deadline is set
+#         for form in self.forms:
+#          if not form.is_valid():
+#             return #other errors exist, so don't bother
+#          samplingfeaturetype = form.cleaned_data['sampling_feature_type']
+#          sitetypecv = form.cleaned_data['Sitetypecv']
+#          if form.cleaned_data and not form.cleaned_data.get('DELETE') \
+#              and samplingfeaturetype=='Site' and sitetypecv==None :
+#             raise ValidationError('If sampling feature is of type site it must have a related site,'+
+#                                   ' see inline forms below')
 
 
 class SamplingfeaturesAdminForm(ModelForm):
     class Meta:
         model = Samplingfeatures
+        # formset = SamplingfeaturesFormset
         fields = ['sampling_feature_type', 'samplingfeaturecode', 'samplingfeaturename',
                   'samplingfeaturedescription', 'sampling_feature_geo_type', 'featuregeometrywkt',
                   'featuregeometry',
@@ -693,6 +751,31 @@ class SamplingfeaturesAdminForm(ModelForm):
     featuregeometry.initial = GEOSGeometry("POINT(0 0)")
 
 
+class SitesInline(admin.StackedInline):
+    model = Sites
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('samplingfeatureid',
+                       'sitetypecv',
+                       'latitude',
+                       'longitude',
+                       'spatialreferenceid',
+                       )
+        }),
+    )
+    max_num = 1
+    extra = 0
+    min_num = 1
+
+
+class ReadOnlySitesInline(SitesInline):
+    readonly_fields = SitesInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
 class IGSNInline(admin.StackedInline):
     model = Samplingfeatureexternalidentifiers
     fieldsets = (
@@ -744,10 +827,10 @@ class ReadOnlySamplingfeatureextensionpropertiesInline(IGSNInline):
 class SamplingfeaturesAdmin(ReadOnlyAdmin):
     # For readonly usergroup
     user_readonly = [p.name for p in Samplingfeatures._meta.get_fields() if not p.one_to_many]
-    user_readonly_inlines = [ReadOnlyFeatureActionsInline, ReadOnlyIGSNInline]
+    user_readonly_inlines = [ReadOnlyFeatureActionsInline, ReadOnlyIGSNInline,ReadOnlySitesInline]
 
     form = SamplingfeaturesAdminForm
-    inlines_list = [FeatureActionsInline, IGSNInline, SamplingfeatureextensionpropertiesInline]
+    inlines_list = [FeatureActionsInline, IGSNInline, SamplingfeatureextensionpropertiesInline,SitesInline]
 
     search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name',
                      'samplingfeaturename',
@@ -793,7 +876,7 @@ class SamplingfeaturesAdmin(ReadOnlyAdmin):
                    u'target="_blank">{1}</a>'.format(obj.sampling_feature_type.term,
                                                      obj.sampling_feature_type.name)
 
-    sampling_feature_type_linked.short_description = 'Sampling feature / site type'
+    sampling_feature_type_linked.short_description = 'Sampling feature / location type'
     sampling_feature_type_linked.allow_tags = True
 
     @staticmethod
@@ -976,7 +1059,7 @@ class ResultsAdminForm(ModelForm):
     # featureactionid = make_ajax_field(Featureactions,'featureactionid','featureaction_lookup',
     # max_length=500)
     featureactionid = AutoCompleteSelectField('featureaction_lookup', required=True, help_text='',
-                                              label='Sampling feature / site action',show_help_text =None)
+                                              label='Sampling feature / location action',show_help_text =None)
 
     def clean_featureactionid(self):
         featureactioniduni = self.data['featureactionid']
@@ -1088,7 +1171,6 @@ class SamplingFeaturesInline(admin.StackedInline):
     model = Samplingfeatures
     extra = 0
 
-
 class ActionsInline(admin.StackedInline):
     model = Actions
     fieldsets = (
@@ -1185,7 +1267,7 @@ def create_derived_values_event(ModelAdmin, request, queryset):
             derivedenddate= derivedenddaterepv.propertyvalue
             derivedstartdaterepv = Resultextensionpropertyvalues.objects.filter(resultid=resultidtoderive.resultid).filter(
             propertyid=StartDateProperty).get()
-            derivedstartdate = derivedstartdate.propertyvalue
+            derivedstartdate = derivedstartdaterepv.propertyvalue
         except ObjectDoesNotExist:
             derivedenddate='1800-01-01 00:00'
             derivedstartdate='1800-01-01 00:00'
@@ -1262,6 +1344,8 @@ class RelatedresultsAdmin(ReadOnlyAdmin):
                      'relatedresultid__featureactionid__samplingfeatureid__samplingfeaturename']
 
 class FeatureactionsAdminForm(ModelForm):
+    samplingfeatureid = AutoCompleteSelectField('sampling_feature_lookup', required=True, help_text='',
+                                              label='Sampling feature',show_help_text =None)
     class Meta:
         model = Featureactions
         fields = '__all__'
@@ -1595,6 +1679,7 @@ class DataloggerfilecolumnsAdmin(ReadOnlyAdmin):
         return "readonly" in groups
 
 
+
 class ProcessDataloggerfileAdminForm(ModelForm):
     class Meta:
         model = ProcessDataloggerfile
@@ -1774,6 +1859,10 @@ class ProfileresultsvaluesAdmin(ImportExportActionModelAdmin, ReadOnlyAdmin):
 
 # Relatedfeatures AdminForm
 class RelatedfeaturesAdminForm(ModelForm):
+    samplingfeatureid = AutoCompleteSelectField('sampling_feature_lookup', required=True, help_text='',
+                                              label='first sampling feature',show_help_text =None)
+    relatedfeatureid = AutoCompleteSelectField('sampling_feature_lookup', required=True, help_text='',
+                                              label='second sampling feature',show_help_text =None)
     class Meta:
         model = Relatedfeatures
         fields = '__all__'
@@ -1785,7 +1874,7 @@ class RelatedfeaturesAdmin(ReadOnlyAdmin):
     user_readonly_inlines = list()
 
     # For admin users
-    form = RelatedactionsAdminForm
+    form = RelatedfeaturesAdminForm
     inlines_list = list()
 
 
