@@ -34,7 +34,7 @@ MAP.prototype.initMap = function (map_id, initCenter, initZoom, legends, cluster
     });
 
 	this.webmap.on('popupopen', function (e) {
-	    console.log(e.popup);
+	    // console.log(e.popup);
         var acc = document.getElementsByClassName("accordion");
         var i;
 
@@ -101,16 +101,18 @@ MAP.prototype.getData = function (url) {
 				}
 			}
 
+			// For debugging
+			// console.log(sf.featuregeometry);
+			// console.log(sf.sampling_feature_type);
             var marker = _this.drawMarker(sf,style_class,icon_str);
             makeMarkerPopup(marker, sf);
             done = false;
-			for (var i=0; i< cluster_feature_types.length; i++){
-				if(sf['sampling_feature_type'] == cluster_feature_types[i]){
-					_this.markers.addLayer(marker);
-					done = true;
-				} 
-			}
-			if(!done){
+
+            if(cluster_feature_types.includes(sf['sampling_feature_type'])){
+                _this.markers.addLayer(marker);
+                done=true
+            }
+            if(!done){
 				marker.addTo(_this.webmap);
 			}
         });
@@ -132,12 +134,12 @@ createMarker = function (latlng, markerIcon, color, sfname,style_class,icon_str)
             riseOnHover: true
 		});
 		return marker; 
-	}else{
-	return L.AwesomeMarkers.icon({
-        icon: markerIcon,
-        markerColor: color,
-        prefix: 'fa'
-    });
+	} else {
+        return L.AwesomeMarkers.icon({
+            icon: markerIcon,
+            markerColor: color,
+            prefix: 'fa'
+        });
 	}
 };
 
@@ -155,9 +157,9 @@ MAP.prototype.getMarker = function (latlng, featType, sfname,style_class,icon_st
     this.legends.forEach(function (l) {
         if (l.feature_type == featType){
             markerIcon = createMarker(latlng, l.icon, l.color, sfname,style_class,icon_str);
-
 		}
     });
+
     var markerProps = {
         icon: markerIcon
     };
@@ -168,11 +170,11 @@ MAP.prototype.getMarker = function (latlng, featType, sfname,style_class,icon_st
         direction: 'right'
     };
     if(this.display_titles){
-
 		return markerIcon.bindTooltip(sfname, tooltipProps);
-	}else{
-    return L.marker(latlng, markerProps).bindTooltip(sfname, tooltipProps);
-	}
+    } else {
+        mark = L.marker(latlng, markerProps).bindTooltip(sfname, tooltipProps);
+        return L.marker(latlng, markerProps).bindTooltip(sfname, tooltipProps);
+    }
 };
 
 

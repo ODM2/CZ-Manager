@@ -600,9 +600,17 @@ def get_features(request, sf_type="all", ds_ids="all"):
                 'specimenmediumurl': specimen.specimenmediumcv.sourcevocabularyuri,
             })
         # Get Relations
-        feat.update({
-            'relationships': get_relations(sf)
-        })
+        relationship = get_relations(sf)
+        if relationship['siblings'] == [] or relationship['siblings'] is None \
+                and relationship['parents'] == [] or relationship['parents'] is None \
+                and relationship['children'] == [] or relationship['children'] is None:
+            feat.update({
+                'relationships': None
+            })
+        else:
+            feat.update({
+                'relationships': relationship
+            })
 
         # Get IGSN's
         if Samplingfeatureexternalidentifiers.objects.filter(

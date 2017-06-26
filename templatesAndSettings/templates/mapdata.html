@@ -92,7 +92,7 @@
         myApp.init({{ basemaps|safe }});
         var myMap = new MAP;
         myMap.initMap("webmap",
-            [{{ map_config.lat }}, {{ map_config.lon }}], {{ map_config.zoom }}, {{ legends|safe }}, {{map_config.cluster_feature_types |safe}}, display_titles);
+            [{{ map_config.lat }}, {{ map_config.lon }}], {{ map_config.zoom }}, {{ legends|safe }}, {{map_config.cluster_feature_types | safe}}, display_titles);
         myMap.addBaseMap(myApp.PARAMS.basemaps);
 
         var url = myMap.getUrl(JSON.parse('{{ selectedds|safe }}'), JSON.parse('{{ selectedtype|safe }}'));
