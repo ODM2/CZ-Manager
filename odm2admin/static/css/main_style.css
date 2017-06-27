@@ -9,9 +9,12 @@
             background-repeat: no-repeat !important;
             height: 46px !important;
             width: 35px !important;
-			margin-top: -40px !important;
-			margin-left: -19px !important; 
 			
+}
+
+.awesome-marker-labeled {
+    margin-top: -40px !important;
+    margin-left: -19px !important;
 }
 .legend {
     line-height: 18px;
@@ -67,7 +70,6 @@ html, body {
 .panel-header {
     background-color: #474C51;
     color: #ffffff;
-    height: 5%;
     padding: 10px 0 10px 20px;
 }
 
@@ -81,7 +83,7 @@ html, body {
 
 #content {
     padding: 0;
-    height: 100%;
+    height: 81.7%;
 }
 .container-fluid {
     width: 100%;
@@ -103,8 +105,13 @@ html, body {
 
 #webmap {
     width: 100%;
-    height: 100%;
+    height: 95%;
     float: left;
+}
+
+#mapheader {
+    height: 5%;
+    width: 100%;
 }
 
 #latlng {
@@ -157,4 +164,67 @@ div.legend-container.leaflet-control {
 
 #dataset-filter {
     padding: 20px;
+}
+
+/* Main blocks */
+#header {
+    height: 5%;
+}
+
+.admin_shortcuts {
+    height: 11%;
+}
+
+.admin_shortcuts .shortcuts {
+    height: 100%;
+}
+
+#footer {
+    padding: 0;
+}
+
+
+/* Accordion */
+button.accordion {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    transition: 0.4s;
+    margin-bottom: 5px;
+}
+
+button.accordion.active, button.accordion:hover {
+    background-color: #ddd;
+}
+
+button.accordion:after {
+    content: '\002B';
+    color: #777;
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;
+}
+
+button.accordion.active:after {
+    content: "\2212";
+}
+
+div.panel {
+    padding: 0 18px;
+    background-color: white;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
+/* Add icon to external links */
+a[target="_blank"]:after {
+    font-family: 'FontAwesome';
+    content: " \f08e";
 }

@@ -1,6 +1,7 @@
 # from __future__ import unicode_literals
 import compiler
 from django.contrib.gis import forms, admin
+from django.contrib import admin as realadmin
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib import messages
 from django.core.management import settings
@@ -77,6 +78,7 @@ from .models import Profileresultvalues
 from daterange_filter.filter import DateRangeFilter
 import re
 from .readonlyadmin import ReadOnlyAdmin
+from listfilters import SamplingFeatureTypeListFilter
 
 
 # from .admin import MeasurementresultvaluesResource
@@ -841,6 +843,8 @@ class SamplingfeaturesAdmin(ReadOnlyAdmin):
         'igsn',
         'dataset_code')
     readonly_fields = ('samplingfeatureuuid',)
+
+    list_filter = (SamplingFeatureTypeListFilter,)
 
     # your own processing
     def save_model(self, request, obj, form, change):
