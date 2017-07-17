@@ -6,6 +6,7 @@ import io
 import itertools
 import os
 import time
+import xlrd
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.exceptions import ValidationError
@@ -68,22 +69,23 @@ def updateStartDateEndDate(results, startdate, enddate):
     try:
         # raise CommandError(" start date "str(startdate)))
         #
-        Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
-            propertyid=StartDateProperty).update(propertyvalue=startdate)
-        # repvstart.propertyvalue=startdate
-
-        Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
-            propertyid=EndDateProperty).update(propertyvalue=enddate)
-        # repvend.propertyvalue = enddate
+        repvstart= Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
+            propertyid=StartDateProperty).get() #.update(propertyvalue=startdate)
+        repvstart.propertyvalue=startdate
+        repvstart.save()
+        repvend = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
+            propertyid=EndDateProperty).get() #.update(propertyvalue=enddate)
+        repvend.propertyvalue = enddate
+        repvend.save()
 
     except ObjectDoesNotExist:
         # raise CommandError("couldn't find extension property values " +str(repvstart) + "for " +
         # str(StartDateProperty + "for" + str(results))
-        repvstart = Resultextensionpropertyvalues(resultid=results, propertyid=StartDateProperty,
+        repvstart = Resultextensionpropertyvalues(resultid=results.resultid, propertyid=StartDateProperty,
                                                   propertyvalue=startdate)
         # print(repvstart.propertyvalue)
         repvstart.save()
-        repvend = Resultextensionpropertyvalues(resultid=results, propertyid=EndDateProperty,
+        repvend = Resultextensionpropertyvalues(resultid=results.resultid, propertyid=EndDateProperty,
                                                 propertyvalue=enddate)
         # print(repvend.propertyvalue)
         repvend.save()
@@ -113,11 +115,13 @@ class Command(BaseCommand):
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
         rowColumnMap = list()
         bulktimeseriesvalues = []
+        bulkcount = 0
         upper_bound_quality_type = CvDataqualitytype.objects.get(name='Physical limit upper bound')
         lower_bound_quality_type = CvDataqualitytype.objects.get(name='Physical limit lower bound')
         emailtitle = "ODM2 Admin Alarm"
         tolist = []
         sendemail = False
+        exceldatetime = False
         emailtext = ""
         dateTimeColNum = 0
         for admin in settings.ADMINS:
@@ -163,6 +167,10 @@ class Command(BaseCommand):
                                 if row[j] == dloggerfileColumns.columnlabel \
                                         and dloggerfileColumns.columndescription == "datetime":
                                     dateTimeColNum = j
+                                if row[j] == dloggerfileColumns.columnlabel \
+                                        and dloggerfileColumns.columndescription == 'exceldatetime':
+                                    dateTimeColNum = j
+                                    exceldatetime = True
                             if not foundColumn:
                                 raise CommandError(
                                     u'Cannot find a column in the CSV matching the '
@@ -192,7 +200,20 @@ class Command(BaseCommand):
                                                               "%Y-%m-%d %H:%M:%S.%f")  # '1/1/2013 0:10
                                         datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                                     except ValueError:
-                                        continue
+                                        try:
+                                            if exceldatetime:
+                                                    # deal with excel formatted datetimes
+                                                    tmpdate = float(row[dateTimeColNum])
+                                                    dateTuple = xlrd.xldate_as_tuple(tmpdate, 0)
+                                                    dt_obj = datetime(*dateTuple[0:6])
+                                                    dateT = dt_obj.strptime(row[dateTimeColNum],
+                                                                      "%Y-%m-%d %H:%M:%S.%f")
+                                                    datestr= dt_obj.strftime("%Y-%m-%d %H:%M")
+                                        except ValueError:
+                                            continue
+                        #if you encounter a blank line continue and try the next one
+                        except IndexError:
+                            continue
                         # for each column in the data table
                         # raise ValidationError("".join(str(rowColumnMap)))
                         # if check_dates:
@@ -460,6 +481,11 @@ class Command(BaseCommand):
                                                 .intendedtimespacingunitsid
                                             )
                                             bulktimeseriesvalues.append(tsvr)
+                                            bulkcount +=1
+                                            if bulkcount > 20000:
+                                                Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
+                                                del bulktimeseriesvalues[:]
+                                                bulkcount = 0
                                             # print("saved value")
                                     except IntegrityError:
                                         pass

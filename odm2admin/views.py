@@ -1,9 +1,10 @@
 import cStringIO as StringIO
 import math
 import json
+import time
 from datetime import datetime
 from datetime import timedelta
-
+from time import mktime
 from django import template
 from django.contrib import admin
 from django.db.models import Max
@@ -45,8 +46,11 @@ from .models import Profileresults
 from .models import Profileresultvalues
 from .models import Relatedfeatures
 from .models import Results
+from .models import Samplingfeatureextensionpropertyvalues
 from .models import Samplingfeatureexternalidentifiers
 from .models import Samplingfeatures
+from .models import Sites
+from .models import Specimens
 from .models import Timeseriesresultvalues
 from .models import Timeseriesresultvaluesext
 from .models import Timeseriesresultvaluesextwannotations
@@ -570,16 +574,127 @@ def get_features(request, sf_type="all", ds_ids="all"):
     feats = [model_to_dict(f) for f in features]
     feats_filtered = list()
     for feat in feats:
-        lat = GEOSGeometry(feat['featuregeometry']).coords[1]
-        lon = GEOSGeometry(feat['featuregeometry']).coords[0]
+        sf = Samplingfeatures.objects.get(samplingfeatureid=feat['samplingfeatureid'])
+
+        # Get url to sf
+        feat.update({
+            'samplingfeatureurl': 'odm2admin/samplingfeatures/{}/change/'.format(sf.samplingfeatureid),
+            'samplingfeaturetypeurl': sf.sampling_feature_type.sourcevocabularyuri
+        })
+
+        # Get Site Attr
+        if sf.sampling_feature_type.name == 'Site':
+            site = Sites.objects.get(samplingfeatureid=sf.samplingfeatureid)
+            feat.update({
+                'sitetype': site.sitetypecv.name,
+                'sitetypeurl': site.sitetypecv.sourcevocabularyuri
+            })
+
+        # Get Specimen Attr
+        if sf.sampling_feature_type.name == 'Specimen':
+            specimen = Specimens.objects.get(samplingfeatureid=sf.samplingfeatureid)
+            feat.update({
+                'specimentype': specimen.specimentypecv.name,
+                'specimentypeurl': specimen.specimentypecv.sourcevocabularyuri,
+                'specimenmedium': specimen.specimenmediumcv.name,
+                'specimenmediumurl': specimen.specimenmediumcv.sourcevocabularyuri,
+            })
+        # Get Relations
+        relationship = get_relations(sf)
+        if relationship['siblings'] == [] or relationship['siblings'] is None \
+                and relationship['parents'] == [] or relationship['parents'] is None \
+                and relationship['children'] == [] or relationship['children'] is None:
+            feat.update({
+                'relationships': None
+            })
+        else:
+            feat.update({
+                'relationships': relationship
+            })
+
+        # Get IGSN's
+        if Samplingfeatureexternalidentifiers.objects.filter(
+                samplingfeatureid=sf.samplingfeatureid).first() is not None:
+            igsn = sf.samplingfeatureexternalidentifiers_set.get()
+            feat.update({
+                'igsn': igsn.samplingfeatureexternalidentifier,
+                'igsnurl': igsn.samplingfeatureexternalidentifieruri
+            })
+
+
+        # Get Soil top and bottom depth
+        if Samplingfeatureextensionpropertyvalues.objects.filter(
+                samplingfeatureid=sf.samplingfeatureid).first() is not None:
+            sfep = sf.samplingfeatureextensionpropertyvalues_set.get_queryset()
+            if len(sfep) != 0:
+                for ep in sfep:
+                    feat.update({
+                        '{}'.format(ep.propertyid.propertyname): ep.propertyvalue,
+                        '{}_units'.format(ep.propertyid.propertyname): ep.propertyid.propertyunitsid.unitsabbreviation,
+                    })
+
+        # Get lat, lon
+        lat = sf.featuregeometrywkt().coords[1]
+        lon = sf.featuregeometrywkt().coords[0]
+        epsg = None
+        if sf.featuregeometrywkt().crs is not None:
+            epsg = sf.featuregeometrywkt().crs.srid
         if lat != 0 and lon != 0:
             feat['featuregeometry'] = {
                 'lat': lat,
-                'lng': lon
+                'lng': lon,
+                'crs': epsg
             }
             feats_filtered.append(feat)
 
     return HttpResponse(json.dumps(feats_filtered))
+
+
+def get_relations(s):
+    pf = Relatedfeatures.objects.filter(samplingfeatureid_id=s.samplingfeatureid)
+    cf = Relatedfeatures.objects.filter(relatedfeatureid_id=s.samplingfeatureid)
+    sibsf = None
+    parents = None
+    children = None
+    if pf.first() is not None:
+        sib = Relatedfeatures.objects.filter(relationshiptypecv_id='Is child of',
+                                             relatedfeatureid_id=pf.first().relatedfeatureid_id). \
+            exclude(samplingfeatureid_id=s.samplingfeatureid)
+        if sib.first() is not None:
+            sibsf = list(Samplingfeatureexternalidentifiers.objects.\
+                         filter(samplingfeatureid__in=sib.\
+                                values_list('samplingfeatureid_id', flat=True)). \
+                         values('samplingfeatureexternalidentifieruri',
+                                'samplingfeatureid__samplingfeaturecode',
+                                'samplingfeatureid__samplingfeatureid',
+                                'samplingfeatureexternalidentifier'
+                                ))
+        parents = list(Samplingfeatureexternalidentifiers.objects.\
+                       filter(samplingfeatureid__in=pf.\
+                              values_list('relatedfeatureid_id',
+                                          flat=True)).\
+                       values('samplingfeatureexternalidentifieruri',
+                              'samplingfeatureid__samplingfeaturecode',
+                              'samplingfeatureid__samplingfeatureid',
+                              'samplingfeatureexternalidentifier'
+                              ))
+
+    if cf.first() is not None:
+        children = list(Samplingfeatureexternalidentifiers.objects.\
+                        filter(samplingfeatureid__in=cf.\
+                               values_list('samplingfeatureid_id', flat=True)). \
+                        values('samplingfeatureexternalidentifieruri',
+                               'samplingfeatureid__samplingfeaturecode',
+                               'samplingfeatureid__samplingfeatureid',
+                               'samplingfeatureexternalidentifier'
+                               ))
+
+
+    return {
+        'parents': parents,
+        'siblings': sibsf,
+        'children': children
+    }
 
 
 def TimeSeriesGraphing(request, feature_action='All'):
@@ -591,9 +706,11 @@ def TimeSeriesGraphing(request, feature_action='All'):
     selected_relatedfeatid = None
     selected_resultid = None
     if feature_action == 'All':
-        selected_resultid = 15
-        selected_featureactionid = 5
-        selected_relatedfeatid = 18
+        selected_featureactionid = 1
+        result = Results.objects.filter(featureactionid=selected_featureactionid).first()
+        selected_resultid = result.resultid
+
+        selected_relatedfeatid = selected_resultid
     else:
         selected_featureactionid = int(feature_action)
 
@@ -641,19 +758,37 @@ def TimeSeriesGraphing(request, feature_action='All'):
         selectedMResultSeries.append(int(resultList[0].resultid))
     elif len(resultList) == 0 and len(selectedMResultSeries) == 0:
         selectedMResultSeries.append(15)
-
+    EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
     if 'startDate' in request.POST:
         entered_start_date = request.POST['startDate']
     else:
-        entered_start_date = "2016-01-01"
+        # entered_start_date = "2016-01-01"
+        recordedenddate = Resultextensionpropertyvalues.objects.\
+            filter(resultid=selected_resultid).filter(propertyid=EndDateProperty.propertyid).get()
+        end_date = recordedenddate.propertyvalue
+        enddt = time.strptime(end_date, "%Y-%m-%d %H:%M")
+        dt = datetime.fromtimestamp(mktime(enddt))
+        last_day_previous_month = dt - timedelta(days=30)
+        entered_start_date = last_day_previous_month.strftime('%Y-%m-%d %H:%M')
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
     else:
-        entered_end_date = "2016-01-05"
+        recordedenddate = Resultextensionpropertyvalues.objects.\
+            filter(resultid=selected_resultid).filter(propertyid=EndDateProperty.propertyid).get()
+        entered_end_date = recordedenddate.propertyvalue
     if entered_end_date == '':
-        entered_end_date = "2016-01-05"
+        recordedenddate = Resultextensionpropertyvalues.objects.\
+            filter(resultid=selected_resultid).filter(propertyid=EndDateProperty.propertyid).get()
+        entered_end_date = recordedenddate.propertyvalue
     if entered_start_date == '':
-        entered_start_date = "2016-01-01"
+        recordedenddate = Resultextensionpropertyvalues.objects.\
+            filter(resultid=selected_resultid).filter(propertyid=EndDateProperty.propertyid).get()
+        end_date = recordedenddate.propertyvalue
+        enddt = time.strptime(end_date, "%Y-%m-%d %H:%M")
+        dt = datetime.fromtimestamp(mktime(enddt))
+        last_day_previous_month = dt - timedelta(days=30)
+        entered_start_date = last_day_previous_month.strftime('%Y-%m-%d %H:%M')
+        # entered_start_date = "2016-01-01"
 
     selected_results = []
     name_of_sampling_features = []
@@ -831,9 +966,10 @@ def TimeSeriesGraphing(request, feature_action='All'):
     selected_relatedfeatid = None
     selected_resultid = None
     if feature_action == 'All':
-        selected_resultid = 15
-        selected_featureactionid = 5
-        selected_relatedfeatid = 18
+        selected_featureactionid = 1
+        result = Results.objects.filter(featureactionid=selected_featureactionid).first()
+        selected_resultid = result.resultid
+        selected_relatedfeatid = selected_resultid
     else:
         selected_featureactionid = int(feature_action)
 

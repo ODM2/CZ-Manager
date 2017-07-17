@@ -38,6 +38,8 @@ from .forms import ResultsdataqualityAdmin
 from .forms import ResultderivationequationsAdmin
 from .forms import SamplingfeatureexternalidentifiersAdmin
 from .forms import SamplingfeaturesAdmin
+from .forms import SitesAdmin
+from .forms import SpatialreferencesAdmin
 from .forms import TaxonomicclassifiersAdmin
 from .forms import TimeseriesresultsAdmin
 from .forms import TimeseriesresultvaluesAdmin
@@ -82,6 +84,8 @@ from .models import Resultsdataquality
 from .models import Resultderivationequations
 from .models import Samplingfeatureexternalidentifiers
 from .models import Samplingfeatures
+from .models import Sites
+from .models import Spatialreferences
 from .models import Taxonomicclassifiers
 from .models import Timeseriesresults
 from .models import Timeseriesresultvalues
@@ -107,6 +111,8 @@ admin.site.register(Dataloggerprogramfiles, DataloggerprogramfilesAdmin)
 admin.site.register(Dataloggerfiles, DataloggerfilesAdmin)
 admin.site.register(Samplingfeatures, SamplingfeaturesAdmin)
 admin.site.register(Samplingfeatureexternalidentifiers, SamplingfeatureexternalidentifiersAdmin)
+admin.site.register(Sites, SitesAdmin)
+admin.site.register(Spatialreferences,SpatialreferencesAdmin)
 admin.site.register(Affiliations, AffiliationsAdmin)
 admin.site.register(People, PeopleAdmin)
 admin.site.register(Personexternalidentifiers)

@@ -5,7 +5,9 @@ from .models import CvActiontype
 from .models import CvElevationdatum
 from .models import CvMethodtype
 from .models import CvSamplingfeaturetype
+from .models import Samplingfeatures
 from .models import CvSamplingfeaturegeotype
+from .models import CvSitetype
 from .models import CvSpeciation
 from .models import CvTaxonomicclassifiertype
 from .models import CvUnitstype
@@ -375,6 +377,63 @@ class CvActionTypeLookup(LookupChannel):
         # onClick="window.open('http://www.yahoo.com', '_blank')
 
 
+class CvSitetypeLookup(LookupChannel):
+    model = CvSitetype
+
+    def get_query(self, q, request):
+        return CvSitetype.objects.filter(name__icontains=q).order_by('name')  #
+
+    def get_result(self, obj):
+        return obj.name
+
+    def format_match(self, obj):
+        return self.format_item_display(obj)
+        # return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+
+    def format_item_display(self, obj):
+        # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri),
+        # escape(obj.name))
+        return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
+               (escape(obj.name), escape(obj.sourcevocabularyuri))
+        # onClick="window.open('http://www.yahoo.com', '_blank')
+
+
+class SamplingFeatureLookup(LookupChannel):
+    model = Samplingfeatures
+
+    #def get_query(self, q, request):
+    #    return Samplingfeatures.objects.filter(samplingfeaturename__icontains=q).order_by('name')  #
+
+    def get_query(self, q, request):
+        qset = None
+        for part in q.split():
+            if not qset:
+                qset = Samplingfeatures.objects.filter(
+                    Q(samplingfeaturename__icontains=part) |
+                    Q(samplingfeaturecode__icontains=part) |
+                    Q(samplingfeaturedescription__icontains=part)).order_by(
+                    'samplingfeaturename')
+            else:
+                qset = qset & Samplingfeatures.objects.filter(
+                    Q(samplingfeaturename__icontains=part) |
+                    Q(samplingfeaturecode__icontains=part) |
+                    Q(samplingfeaturedescription__icontains=part)).order_by(
+                    'samplingfeaturename')
+        return qset
+
+    def get_result(self, obj):
+        return "%s" % (obj.samplingfeaturename)
+
+    def format_match(self, obj):
+        return self.format_item_display(obj)
+        # return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+
+    def format_item_display(self, obj):
+        # return u"<span class='tag'>%s</span>" % obj.name
+        return "%s- %s" % (
+            obj.samplingfeaturecode, obj.samplingfeaturename)
+
+
 class CvSamplingFeatureTypeLookup(LookupChannel):
     model = CvSamplingfeaturetype
 
@@ -382,7 +441,7 @@ class CvSamplingFeatureTypeLookup(LookupChannel):
         return CvSamplingfeaturetype.objects.filter(name__icontains=q).order_by('name')  #
 
     def get_result(self, obj):
-        return obj.name
+        return "%s" % (obj.name)
 
     def format_match(self, obj):
         return self.format_item_display(obj)
