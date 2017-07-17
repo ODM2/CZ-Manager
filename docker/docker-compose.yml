@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  db:
+    image: mdillon/postgis:9.5
+    restart: always
+    expose:
+      - "5432"
+    volumes:
+      - ./docker-deploy/dbdata:/var/lib/postgresql/data
+  app:
+    build:
+      context: .
+      dockerfile: ./odm2admin/Dockerfile
+    image: odm2/odm2admin
+    links:
+      - db:db
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./docker-deploy/settings:/ODM2-Admin/templatesAndSettings/settings
