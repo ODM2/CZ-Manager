@@ -30,6 +30,10 @@ $(document).ready(function(){
 		var useDates = useDateselm.checked;
 		var g_recaptcha_response = $("#g-recaptcha-response").val();
 		var myresultSeriesExport = {{SelectedResults|safe}};
+		var resultSeriesExport = [];
+		$(".action-checkbox-column:checked").each(function(){
+			resultSeriesExport.push($(this).val());
+		});
 		var emailbutton = document.getElementById("email_data"); //$("#email_data");
 		emailbutton.firstChild.data = "emailing data";
 		$.ajax({
@@ -42,7 +46,7 @@ $(document).ready(function(){
 					'endDate': endDate,
 					'useDates': useDates,
 					'g_recaptcha_response': g_recaptcha_response,
-					'myresultSeriesExport[]': myresultSeriesExport,
+					'myresultSeriesExport[]': resultSeriesExport,
 					'csrfmiddlewaretoken': '{{ csrf_token }}', 
 				},
 				success : function(json) {
