@@ -2275,7 +2275,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
                 "processinglevelcode"
             )
         # myfile.write(lastResult.csvheaderShort())
-        emailtext = emailtext + ' - ' + str(lastResult.email_text())
+        # emailtext = emailtext + ' - ' + str(lastResult.email_text())
         myfile.write('\n')
 
         samplingfeaturename = ''
