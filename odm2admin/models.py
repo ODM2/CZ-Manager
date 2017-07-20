@@ -2144,7 +2144,8 @@ class Resultextensionpropertyvalues(models.Model):
     resultid = models.ForeignKey('Results', db_column='resultid')
     propertyid = models.ForeignKey(Extensionproperties, db_column='propertyid')
     propertyvalue = models.CharField(max_length=255)
-
+    def __unicode__(self):
+        return u"%s - %s: value %s" % (self.resultid, self.propertyid,self.propertyvalue)
     class Meta:
         managed = False
         db_table = r'odm2"."resultextensionpropertyvalues'

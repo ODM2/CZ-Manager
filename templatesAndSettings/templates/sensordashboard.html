@@ -1,0 +1,88 @@
+
+{% extends "admin/base_site.html" %}
+{% load admin_extras %}
+{% load staticfiles %}
+{% load static %}
+{% load i18n  admin_shortcuts_tags %}
+{# django-admin-shortcuts changes these blocks #}
+
+{% block breadcrumbs %}
+	<div class="admin_shortcuts">
+		{% admin_shortcuts %}
+	</div>
+{% endblock %}
+
+ {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
+{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />
+<link rel="stylesheet" href="{% static "css/main_style.css" %}" />
+
+{% endblock %}
+
+
+{% block extrahead %}
+{{ block.super }}{% admin_shortcuts_js %}{% endblock %}
+
+{# end changes #}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+
+
+
+{% block content %}
+<form action="" method="post" name="sensordashboard">
+{% csrf_token %} 
+
+<table>
+					<tr class="sensor-dashboard">	
+				{% for featureaction in featureactions %}
+				{% if forloop.counter|divisibleby:4 %}
+				</tr><tr class="sensor-dashboard"><td class="sensor-dashboard">
+				{% else %}
+				<td class="sensor-dashboard">
+				{% endif %}
+					<table class="sensor-dashboard">
+					<tr ><th scope="col" class="section">Time series</td>
+					<th scope="col"  class="section">variable</th>
+					<th scope="col"  class="section">units</th>
+					<th scope="col"  class="section"></th></tr>
+					<tr>
+					<tr class=”results”>
+					<td >{{featureaction.samplingfeatureid}}</td>
+					<td >{{featureaction.action}}</td>
+					<td></td><td></td><td></td></tr>
+					{% for result in results %}
+						{% if featureaction == result.featureactionid %}
+							<tr ><td >{{result.featureactionid}}</td>
+							<td >{{result.variableid}}</td>
+							<td >{{result.unitsid}}</td>
+							<td ></td>
+							</tr>
+				
+							{% for repv in resultextionproperties %}
+
+								{% if repv.resultid.resultid == result.resultid %}
+								<tr>
+									<td >{{repv.propertyname}}</td>
+								<td>{{repv.propertyvalue}}</td>
+								<td></td><td></td><td></td></tr>
+								{% endif %}	
+							{% endfor %}
+						{% endif %}	
+					{% endfor %}
+					</table>	
+				{% if forloop.counter|divisibleby:4 %}
+				</td></tr><tr>
+				{% else %}
+				</td>
+				{% endif %}
+
+				{% endfor %}
+				</table>	
+
+
+
+{% endblock %}
+</form>

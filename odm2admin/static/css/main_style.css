@@ -122,7 +122,15 @@ html, body {
     height: 100%;
     float: left;
 }
-
+table.sensor-dashboard   {
+    vertical-align: top;
+}
+tr.sensor-dashboard   {
+    vertical-align: top;
+}
+td.sensor-dashboard   {
+    vertical-align: top;
+}
 
 
 td.title {
