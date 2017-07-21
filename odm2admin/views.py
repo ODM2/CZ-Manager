@@ -658,6 +658,9 @@ def truncate(f, n):
     return '.'.join([i, (d+'0'*n)[:n]])
 
 def sensor_dashboard(request):
+    authenticated = True
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('../')
     ids = settings.SENSOR_DASHBOARD['featureactionids']
     timeseriesdays = settings.SENSOR_DASHBOARD['time_series_days']
     fas = Featureactions.objects.filter(featureactionid__in=ids).order_by('samplingfeatureid')
@@ -682,7 +685,7 @@ def sensor_dashboard(request):
             repv.propertyname = "most recent value on: "
         elif "dashboard count" in str(repv.propertyid.propertyname):
             dcount = repv.propertyvalue
-            repv.propertyname = "number of values recorded over " + str(timeseriesdays) + " days"
+            repv.propertyname = "number of values recorded over last " + str(timeseriesdays) + " days"
         elif "dashboard maximum count" in str(repv.propertyid.propertyname):
             dmaxcount = repv.propertyvalue
             # repv.propertyname = str(dcount) + " of " + str(dmaxcount)
@@ -693,6 +696,9 @@ def sensor_dashboard(request):
             repv.propertyname = "values below lower bound "
         elif "dashboard above upper bound count" in  str(repv.propertyid.propertyname):
             repv.propertyname = "values above upper bound "
+        elif "dashboard begin date" in  str(repv.propertyid.propertyname):
+            repv.propertyname = "values above upper bound "
+            repv.propertyvalue = None
         else:
             repv.propertyname = repv.propertyid.propertyname
 
@@ -701,6 +707,7 @@ def sensor_dashboard(request):
         'sensordashboard.html',
         {'featureactions':fas,
          'results': results,
+         'authenticated': authenticated,
          'resultextionproperties':repvs,
          'short_title': 'Time Series'}, )
 

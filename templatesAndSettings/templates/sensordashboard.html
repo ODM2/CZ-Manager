@@ -6,18 +6,32 @@
 {% load i18n  admin_shortcuts_tags %}
 {# django-admin-shortcuts changes these blocks #}
 
-{% block breadcrumbs %}
-	<div class="admin_shortcuts">
-		{% admin_shortcuts %}
-	</div>
-{% endblock %}
+
 
  {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
 {{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />
 <link rel="stylesheet" href="{% static "css/main_style.css" %}" />
-
+{% endblock %}
+{% block title %}
+    Time Series | {{ "site_title"|get_title:6 }}
 {% endblock %}
 
+{% block branding%}
+    <h1>{{ "site_header"|get_title:6 }}</h1>
+{% endblock %}
+
+{% block nav-global %}
+    {% if authenticated %}
+        {% include 'user-tools.html' %}
+    {% endif %}
+{% endblock %}
+{% block breadcrumbs %}
+{% if authenticated %}
+	<div class="admin_shortcuts">
+		{% admin_shortcuts %}
+	</div>
+	{% endif %}
+{% endblock %}
 
 {% block extrahead %}
 {{ block.super }}{% admin_shortcuts_js %}{% endblock %}
@@ -34,7 +48,10 @@
 {% block content %}
 <form action="" method="post" name="sensordashboard">
 {% csrf_token %} 
-
+<div class=”results”>
+<div class="panel-header">
+<p><h3>Sensor Dashboard</h3><p>
+</div>
 <table>
 					<tr class="sensor-dashboard">	
 				{% for featureaction in featureactions %}
@@ -43,36 +60,44 @@
 				{% else %}
 				<td class="sensor-dashboard">
 				{% endif %}
-					<table class="sensor-dashboard">
-					<tr ><th scope="col" class="section">Time series</td>
-					<th scope="col"  class="section">variable</th>
-					<th scope="col"  class="section">units</th>
-					<th scope="col"  class="section"></th></tr>
-					<tr>
-					<tr class=”results”>
-					<td >{{featureaction.samplingfeatureid}}</td>
-					<td >{{featureaction.action}}</td>
-					<td></td><td></td><td></td></tr>
+				    <div class="module sensor-dashboard-width">
+					<table class="module">
+					<tr class="sensor-dashboard-header"><th colspan=2>Site</th>
+					<th colspan=2 >Sensor</th></tr>
+					<tr class="sensor-dashboard-header">
+					<td class="sensor-dashboard">{{featureaction.samplingfeatureid}}</td>
+					<td class="sensor-dashboard" colspan=2>{{featureaction.action}}</td>
+					<td></td></tr>
 					{% for result in results %}
 						{% if featureaction == result.featureactionid %}
-							<tr ><td >{{result.featureactionid}}</td>
-							<td >{{result.variableid}}</td>
-							<td >{{result.unitsid}}</td>
-							<td ></td>
+							<tr class="sensor-dashboard-header"><th >Time series</td>
+							<th>variable</th>
+							<th>units</th>
+							<th></th></tr>
+							<tr>
+							<tr ><td class="sensor-dashboard-header">{{result.featureactionid}}</td>
+							<td class="sensor-dashboard-header">{{result.variableid}}</td>
+							<td class="sensor-dashboard-header">{{result.unitsid}}</td>
+							<td class="sensor-dashboard-header"></td>
 							</tr>
 				
 							{% for repv in resultextionproperties %}
 
 								{% if repv.resultid.resultid == result.resultid %}
-								<tr>
-									<td >{{repv.propertyname}}</td>
-								<td>{{repv.propertyvalue}}</td>
-								<td></td><td></td><td></td></tr>
+									{% if is_none == repv.propertyvalue %}
+									{% else %}
+										<tr class="sensor-dashboard">
+										<td >{{repv.propertyname}}</td>
+										<td colspan=2>{{repv.propertyvalue}}</td>
+										<td></td>
+										</tr>
+									{% endif %}
 								{% endif %}	
 							{% endfor %}
 						{% endif %}	
 					{% endfor %}
-					</table>	
+					</table>
+					</div>
 				{% if forloop.counter|divisibleby:4 %}
 				</td></tr><tr>
 				{% else %}
@@ -81,7 +106,7 @@
 
 				{% endfor %}
 				</table>	
-
+</div>
 
 
 {% endblock %}

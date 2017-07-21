@@ -122,14 +122,39 @@ html, body {
     height: 100%;
     float: left;
 }
+.sensor-dashboard-width {
+	    width: 75%;
+		border-color: #f1f1f1;
+		word-wrap: break-word;
+		white-space: normal !important;
+}
+
 table.sensor-dashboard   {
-    vertical-align: top;
+    vertical-align: baseline;
+	border-color: #f1f1f1;
+	
 }
 tr.sensor-dashboard   {
-    vertical-align: top;
+    vertical-align: baseline;
+	white-space: normal !important;
 }
+tr.sensor-dashboard:nth-child(even){background-color: #f2f2f2}
 td.sensor-dashboard   {
-    vertical-align: top;
+    vertical-align: baseline;
+	border-bottom: 1px solid #ddd;
+	white-space: normal !important;
+	color: #444;
+}
+th.sensor-dashboard   {
+    vertical-align: baseline;
+	color: #444;
+	border-bottom: 1px solid #ddd;
+}
+.sensor-dashboard-header   {
+    
+	color: #444;
+	background-color: #fff;
+	white-space: normal !important;
 }
 
 
