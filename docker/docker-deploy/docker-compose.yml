@@ -2,6 +2,7 @@ version: '3'
 
 services:
   db:
+    container_name: odm2admindb
     image: mdillon/postgis:9.5
     restart: always
     expose:
@@ -9,6 +10,7 @@ services:
     volumes:
       - ./dbdata:/var/lib/postgresql/data
   app:
+    container_name: odm2adminapp
     image: odm2/odm2admin
     links:
       - db:db

@@ -16,10 +16,6 @@ LABEL description='Django admin app for Observation Data Model 2 (ODM2)' \
 
 RUN apt-get update --fix-missing && apt-get install --yes apt-utils postgresql-client
 
-COPY odm2admin/startup.sh /startup.sh
-
-RUN chmod 755 /startup.sh
-
 EXPOSE 8000
 
 RUN git clone "https://github.com/miguelcleon/ODM2-Admin"
@@ -31,7 +27,13 @@ VOLUME templatesAndSettings/settings/
 
 RUN conda create --yes -n odm2adminenv -c conda-forge python=2.7 pytz gdal --file requirements.txt
 
+COPY odm2database/odm2adminDB.sql /odm2adminDB.sql
+COPY odm2database/cvload.py /cvload.py
+
 COPY odm2admin/wait-for-postgres.sh /wait-for-postgres.sh
+COPY odm2admin/startup.sh /startup.sh
+
 RUN chmod 755 /wait-for-postgres.sh
+RUN chmod 755 /startup.sh
 
 CMD ["/bin/bash", "/wait-for-postgres.sh", "db", "/startup.sh"]

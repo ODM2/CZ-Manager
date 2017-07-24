@@ -36,7 +36,7 @@ DATABASES = {
         'HOST': 'db',
         'PORT': '5432',
         'OPTIONS': {
-            'options': '-c search_path=public,admin,odm2,odm2extra'
+            'options': '-c search_path=admin,odm2,odm2extra,public'
         }
     }
 }
