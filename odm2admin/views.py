@@ -601,9 +601,7 @@ def get_features(request, sf_type="all", ds_ids="all"):
             })
         # Get Relations
         relationship = get_relations(sf)
-        if relationship['siblings'] == [] or relationship['siblings'] is None \
-                and relationship['parents'] == [] or relationship['parents'] is None \
-                and relationship['children'] == [] or relationship['children'] is None:
+        if all(value == [] for value in relationship.values()):
             feat.update({
                 'relationships': None
             })
