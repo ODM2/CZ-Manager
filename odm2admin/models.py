@@ -2514,6 +2514,7 @@ class Specimens(models.Model):
 
     class Meta:
         managed = False
+        verbose_name = 'Specimen'
         db_table = r'odm2"."specimens'
 
 

@@ -17,7 +17,7 @@ from import_export.admin import ExportMixin
 from import_export.admin import ImportExportActionModelAdmin
 from django.db.models import Max
 from .management.commands.ProcessDataLoggerFile import updateStartDateEndDate
-from .models import Actionby
+from .models import Actionby, Specimens
 from .models import Actions
 from .models import Affiliations
 from .models import Authorlists
@@ -776,6 +776,32 @@ class ReadOnlySitesInline(SitesInline):
     def has_add_permission(self, request):
         return False
 
+
+class SpecimensInline(admin.StackedInline):
+    model = Specimens
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('samplingfeatureid',
+                       'specimentypecv',
+                       'specimenmediumcv',
+                       'isfieldspecimen',
+                       )
+        }),
+    )
+    max_num = 1
+    extra = 0
+    min_num = 1
+
+
+class ReadOnlySpecimenInline(SpecimensInline):
+    readonly_fields = SpecimensInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+
 class IGSNInline(admin.StackedInline):
     model = Samplingfeatureexternalidentifiers
     fieldsets = (
@@ -827,10 +853,39 @@ class ReadOnlySamplingfeatureextensionpropertiesInline(IGSNInline):
 class SamplingfeaturesAdmin(ReadOnlyAdmin):
     # For readonly usergroup
     user_readonly = [p.name for p in Samplingfeatures._meta.get_fields() if not p.one_to_many]
-    user_readonly_inlines = [ReadOnlyFeatureActionsInline, ReadOnlyIGSNInline,ReadOnlySitesInline]
+    user_readonly_inlines = [
+        ReadOnlyFeatureActionsInline,
+        ReadOnlyIGSNInline,
+        ReadOnlySitesInline,
+        ReadOnlySpecimenInline
+    ]
 
     form = SamplingfeaturesAdminForm
-    inlines_list = [FeatureActionsInline, IGSNInline, SamplingfeatureextensionpropertiesInline,SitesInline]
+    inlines_list = [
+        FeatureActionsInline,
+        IGSNInline,
+        SamplingfeatureextensionpropertiesInline,
+        SitesInline,
+        SpecimensInline
+    ]
+
+    def get_formsets_with_inlines(self, request, obj=None):
+        """
+        Yields formsets and the corresponding inlines.
+        """
+        if obj.sampling_feature_type.name == 'Site':
+            print('Site objecttt')
+            filtinline = [item for item in self.get_inline_instances(request, obj)
+                          if item.verbose_name != 'Specimen']
+        elif obj.sampling_feature_type.name == 'Specimen':
+            filtinline = [item for item in self.get_inline_instances(request, obj)
+                          if item.verbose_name != 'Site']
+        else:
+            filtinline = self.get_inline_instances(request, obj)[:-2]
+
+        for inline in filtinline:
+            print(inline.verbose_name)
+            yield inline.get_formset(request, obj), inline
 
     search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name',
                      'samplingfeaturename',
