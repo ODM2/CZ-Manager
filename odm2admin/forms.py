@@ -884,7 +884,6 @@ class SamplingfeaturesAdmin(ReadOnlyAdmin):
             filtinline = self.get_inline_instances(request, obj)[:-2]
 
         for inline in filtinline:
-            print(inline.verbose_name)
             yield inline.get_formset(request, obj), inline
 
     search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name',
