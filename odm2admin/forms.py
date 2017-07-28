@@ -874,7 +874,6 @@ class SamplingfeaturesAdmin(ReadOnlyAdmin):
         Yields formsets and the corresponding inlines.
         """
         if obj.sampling_feature_type.name == 'Site':
-            print('Site objecttt')
             filtinline = [item for item in self.get_inline_instances(request, obj)
                           if item.verbose_name != 'Specimen']
         elif obj.sampling_feature_type.name == 'Specimen':
