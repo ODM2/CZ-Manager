@@ -601,9 +601,7 @@ def get_features(request, sf_type="all", ds_ids="all"):
             })
         # Get Relations
         relationship = get_relations(sf)
-        if relationship['siblings'] == [] or relationship['siblings'] is None \
-                and relationship['parents'] == [] or relationship['parents'] is None \
-                and relationship['children'] == [] or relationship['children'] is None:
+        if all(value == [] for value in relationship.values()):
             feat.update({
                 'relationships': None
             })
@@ -653,9 +651,9 @@ def get_features(request, sf_type="all", ds_ids="all"):
 def get_relations(s):
     pf = Relatedfeatures.objects.filter(samplingfeatureid_id=s.samplingfeatureid)
     cf = Relatedfeatures.objects.filter(relatedfeatureid_id=s.samplingfeatureid)
-    sibsf = None
-    parents = None
-    children = None
+    sibsf = []
+    parents = []
+    children = []
     if pf.first() is not None:
         sib = Relatedfeatures.objects.filter(relationshiptypecv_id='Is child of',
                                              relatedfeatureid_id=pf.first().relatedfeatureid_id). \
