@@ -873,17 +873,21 @@ class SamplingfeaturesAdmin(ReadOnlyAdmin):
         """
         Yields formsets and the corresponding inlines.
         """
-        if obj.sampling_feature_type.name == 'Site':
-            filtinline = [item for item in self.get_inline_instances(request, obj)
-                          if item.verbose_name != 'Specimen']
-        elif obj.sampling_feature_type.name == 'Specimen':
-            filtinline = [item for item in self.get_inline_instances(request, obj)
-                          if item.verbose_name != 'Site']
-        else:
-            filtinline = self.get_inline_instances(request, obj)[:-2]
+        if obj:
+            if obj.sampling_feature_type.name == 'Site':
+                filtinline = [item for item in self.get_inline_instances(request, obj)
+                              if item.verbose_name != 'Specimen']
+            elif obj.sampling_feature_type.name == 'Specimen':
+                filtinline = [item for item in self.get_inline_instances(request, obj)
+                              if item.verbose_name != 'Site']
+            else:
+                filtinline = self.get_inline_instances(request, obj)[:-2]
 
-        for inline in filtinline:
-            yield inline.get_formset(request, obj), inline
+            for inline in filtinline:
+                yield inline.get_formset(request, obj), inline
+        else:
+            for inline in self.get_inline_instances(request, obj):
+                yield inline.get_formset(request, obj), inline
 
     search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name',
                      'samplingfeaturename',
