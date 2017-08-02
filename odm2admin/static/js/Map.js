@@ -185,7 +185,7 @@ makerelation = function(relationobs) {
         if (relationobs.children) {
             c = c + "<div class='panel'>" + "<p><ul>";
             relationobs.children.forEach(function (child) {
-                c = c + "<li><a href='/odm2admin/samplingfeatures/" +
+                c = c + "<li><a href='/" + url_path + "odm2admin/samplingfeatures/" +
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
@@ -200,7 +200,7 @@ makerelation = function(relationobs) {
         if (relationobs.parents) {
             p = p + "<div class='panel'>" + "<p><ul>";
             relationobs.parents.forEach(function (child) {
-                p = p + "<li><a href='/odm2admin/samplingfeatures/" +
+                p = p + "<li><a href='/" + url_path + "odm2admin/samplingfeatures/" +
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
@@ -215,7 +215,7 @@ makerelation = function(relationobs) {
         if (relationobs.siblings) {
             s = s + "<div class='panel'>" + "<p><ul>";
             relationobs.siblings.forEach(function (child) {
-                s = s + "<li><a href='/odm2admin/samplingfeatures/" +
+                s = s + "<li><a href='/" + url_path + "odm2admin/samplingfeatures/" +
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
