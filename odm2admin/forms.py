@@ -683,10 +683,11 @@ class SamplingfeaturesAdminForm(ModelForm):
     def __init__(self, *args, **kwargs):
         instance = kwargs.get('instance')
         if instance:
-            feat = instance.featuregeometrywkt()
-            initial = kwargs.get('initial', {})
-            initial['featuregeometrywkt'] = '{}'.format(feat)
-            kwargs['initial'] = initial
+            if instance.featuregeometry:
+                feat = instance.featuregeometrywkt()
+                initial = kwargs.get('initial', {})
+                initial['featuregeometrywkt'] = '{}'.format(feat)
+                kwargs['initial'] = initial
         super(SamplingfeaturesAdminForm, self).__init__(*args, **kwargs)
 
     featuregeometrywkt = forms.CharField(

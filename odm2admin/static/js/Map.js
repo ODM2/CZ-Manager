@@ -263,6 +263,12 @@ maketablecontent = function (obs) {
             + obs.featuregeometry.crs + "</a>)</td>"
             + "</tr>";
     }
+    if (obs.elevation_m) {
+        sfelev = "<tr>"
+            + "<td class='title'>Elevation</td>"
+            + "<td>" + obs.elevation_m + " m</td>"
+            + "</tr>";
+    }
     if (obs.samplingfeaturedescription) {
         sfdesc = "<tr>"
             + "<td class='title'>Description</td>"
@@ -305,7 +311,7 @@ maketablecontent = function (obs) {
             + "</tr>";
     }
 
-    var tablecontent = sfcode + sftype + sitetype + sptype + spmed + sfcoords + sfdesc + sfigsn + sfsdr;
+    var tablecontent = sfcode + sftype + sitetype + sptype + spmed + sfcoords + sfelev + sfdesc + sfigsn + sfsdr;
     var relationshiptree = sfrel;
     return {
         'tablecontent': tablecontent,
