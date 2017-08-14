@@ -261,3 +261,19 @@ LEGEND_MAP = {
                          style_class="awesome-marker-icon-cadetblue")
     }
 """ END SAMPLING FEATURE TYPE LEGEND MAPPING """
+
+""" REDIS CACHING CONFIGURATION """
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "odm2admin"
+    }
+}
+
+# Cache time to live is 15 minutes.
+CACHE_TTL = 60 * 15
+""" END REDIS CACHING CONFIGURATION"""
