@@ -241,7 +241,8 @@ maketablecontent = function (obs) {
         sfrel = '',
         sitetype = '',
         sptype = '',
-        spmed = '';
+        spmed = '',
+	sfelev = '';
 
     if (obs.samplingfeaturecode) {
         sfcode = "<tr>"
