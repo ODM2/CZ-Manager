@@ -176,31 +176,31 @@ ADMIN_SHORTCUTS = [
                 'class': 'config',
             },
             {
-                'url': '/' + BASE_URL + 'AddSensor.html',
+                'url': '/' + 'AddSensor',
                 'app_name': '{}'.format(APP_NAME),
                 'title': 'Add Sensor Data',
                 'class': 'tool',
             },
             {
-                'url': '/' + BASE_URL + 'AddProfile.html',
+                'url': '/' + 'AddProfile',
                 'app_name': '{}'.format(APP_NAME),
                 'title': 'Add Soil Profile Data',
                 'class': 'flag',
             },
             {
-                'url': '/' + BASE_URL + 'RecordAction.html',
+                'url': '/' + 'RecordAction',
                 'app_name': '{}'.format(APP_NAME),
                 'title': 'Record an Action',
                 'class': 'notepad',
             },
             {
-                'url': '/' + BASE_URL + 'ManageCitations.html',
+                'url': '/' + 'ManageCitations',
                 'app_name': '{}'.format(APP_NAME),
                 'title': 'Manage Citations',
                 'class': 'pencil',
             },
             {
-                'url': '/' + BASE_URL + 'chartIndex.html',
+                'url': '/' + 'chartIndex',
                 'app_name': '{}'.format(APP_NAME),
                 'title': 'Graph My Data',
                 'class': 'monitor',
@@ -226,8 +226,10 @@ AJAX_LOOKUP_CHANNELS = dict(
     profileresult_lookup=('{}.lookups'.format(APP_NAME), 'ProfileResultsLookup'),
     measurementresult_lookup=('{}.lookups'.format(APP_NAME), 'MeasurementResultsLookup'),
     timeseriesresult_lookup=('{}.lookups'.format(APP_NAME), 'TimeseriesResultsLookup'),
+    sampling_feature_lookup=('{}.lookups'.format(APP_NAME), 'SamplingFeatureLookup'),
     cv_taxonomic_classifier_type=('{}.lookups'.format(APP_NAME), 'CvTaxonomicClassifierTypeLookup'),
     cv_method_type=('{}.lookups'.format(APP_NAME), 'CvMethodTypeLookup'),
+    cv_site_type=('{}.lookups'.format(APP_NAME), 'CvSitetypeLookup'),
     cv_action_type=('{}.lookups'.format(APP_NAME), 'CvActionTypeLookup'),
     cv_sampling_feature_type=('{}.lookups'.format(APP_NAME), 'CvSamplingFeatureTypeLookup'),
     cv_sampling_feature_geo_type=('{}.lookups'.format(APP_NAME), 'CvSamplingFeatureGeoTypeLookup'),
@@ -259,3 +261,19 @@ LEGEND_MAP = {
                          style_class="awesome-marker-icon-cadetblue")
     }
 """ END SAMPLING FEATURE TYPE LEGEND MAPPING """
+
+""" REDIS CACHING CONFIGURATION """
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis:6379/0",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "odm2admin"
+    }
+}
+
+# Cache time to live is 15 minutes.
+CACHE_TTL = 60 * 15
+""" END REDIS CACHING CONFIGURATION"""

@@ -30,8 +30,8 @@ RUN conda create --yes -n odm2adminenv -c conda-forge python=2.7 pytz gdal --fil
 COPY odm2database/odm2adminDB.sql /odm2adminDB.sql
 COPY odm2database/cvload.py /cvload.py
 
-COPY odm2admin/wait-for-postgres.sh /wait-for-postgres.sh
-COPY odm2admin/startup.sh /startup.sh
+COPY wait-for-postgres.sh /wait-for-postgres.sh
+COPY startup.sh /startup.sh
 
 RUN chmod 755 /wait-for-postgres.sh
 RUN chmod 755 /startup.sh
