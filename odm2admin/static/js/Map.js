@@ -241,7 +241,8 @@ maketablecontent = function (obs) {
         sfrel = '',
         sitetype = '',
         sptype = '',
-        spmed = '';
+        spmed = '',
+	sfelev = '';
 
     if (obs.samplingfeaturecode) {
         sfcode = "<tr>"
@@ -261,6 +262,12 @@ maketablecontent = function (obs) {
             + "<td>" + obs.featuregeometry.lat + ", " + obs.featuregeometry.lng
             + " (EPSG:<a target='_blank' href='http://epsg.io/" + obs.featuregeometry.crs + "'>"
             + obs.featuregeometry.crs + "</a>)</td>"
+            + "</tr>";
+    }
+    if (obs.elevation_m) {
+        sfelev = "<tr>"
+            + "<td class='title'>Elevation</td>"
+            + "<td>" + obs.elevation_m + " m</td>"
             + "</tr>";
     }
     if (obs.samplingfeaturedescription) {
@@ -305,7 +312,7 @@ maketablecontent = function (obs) {
             + "</tr>";
     }
 
-    var tablecontent = sfcode + sftype + sitetype + sptype + spmed + sfcoords + sfdesc + sfigsn + sfsdr;
+    var tablecontent = sfcode + sftype + sitetype + sptype + spmed + sfcoords + sfelev + sfdesc + sfigsn + sfsdr;
     var relationshiptree = sfrel;
     return {
         'tablecontent': tablecontent,

@@ -549,7 +549,7 @@ def web_map(request):
 
 def get_features(request, sf_type="all", ds_ids="all"):
     if ds_ids == "all" or sf_type == "all":
-        features = Samplingfeatures.objects.all()
+        features = Samplingfeatures.objects.exclude(featuregeometry__isnull=True)
     elif sf_type == 'filtered':
         dataset_ids = list(ds_ids.split(','))
         datasetresults = Datasetsresults.objects.filter(datasetid__in=dataset_ids)
@@ -630,7 +630,6 @@ def get_features(request, sf_type="all", ds_ids="all"):
                         '{}'.format(ep.propertyid.propertyname): ep.propertyvalue,
                         '{}_units'.format(ep.propertyid.propertyname): ep.propertyid.propertyunitsid.unitsabbreviation,
                     })
-
         # Get lat, lon
         lat = sf.featuregeometrywkt().coords[1]
         lon = sf.featuregeometrywkt().coords[0]
