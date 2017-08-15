@@ -13,3 +13,4 @@ requests
 django-recaptcha
 pyyaml
 xlrd
+django-redis

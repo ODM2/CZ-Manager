@@ -2512,8 +2512,13 @@ class Specimens(models.Model):
     specimenmediumcv = models.ForeignKey(CvSpecimenmedium, db_column='specimenmediumcv')
     isfieldspecimen = models.BooleanField()
 
+    def __unicode__(self):
+        return u'{spectypecv} - {specmedcv}'.format(spectypecv=self.specimentypecv,
+                                                    specmedcv=self.specimenmediumcv)
+
     class Meta:
         managed = False
+        verbose_name = 'Specimen'
         db_table = r'odm2"."specimens'
 
 
