@@ -4,6 +4,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.http.response import HttpResponseRedirect
 from django.conf.urls.static import static
+from django.views.decorators.cache import cache_page
 
 # from ODM2CZOData import views # How can I use config file for this??
 import importlib
@@ -160,7 +161,7 @@ urlpatterns = [url(r'^' + '', include(admin.site.urls)),
                url(r'^' + 'publications.html', views.publications,
                    name="publications"),
                url(r'^' + 'features/type=(?P<sf_type>([\w\s]+,?)+)&'
-                                              'datasets=(?P<ds_ids>([a-zA-Z]+)?(([0-9]+,?)+)?)', views.get_features),
+                                              'datasets=(?P<ds_ids>([a-zA-Z]+)?(([0-9]+,?)+)?)', cache_page(settings.CACHE_TTL)(views.get_features)),
                # url(r'^' + 'pubview/citationid=(?P<citationid>(\d+))/$',
                # views.add_pub,
                #    name="add_pub"),

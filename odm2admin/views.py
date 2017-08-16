@@ -549,7 +549,7 @@ def web_map(request):
 
 def get_features(request, sf_type="all", ds_ids="all"):
     if ds_ids == "all" or sf_type == "all":
-        features = Samplingfeatures.objects.all()
+        features = Samplingfeatures.objects.exclude(featuregeometry__isnull=True)
     elif sf_type == 'filtered':
         dataset_ids = list(ds_ids.split(','))
         datasetresults = Datasetsresults.objects.filter(datasetid__in=dataset_ids)
@@ -601,9 +601,7 @@ def get_features(request, sf_type="all", ds_ids="all"):
             })
         # Get Relations
         relationship = get_relations(sf)
-        if relationship['siblings'] == [] or relationship['siblings'] is None \
-                and relationship['parents'] == [] or relationship['parents'] is None \
-                and relationship['children'] == [] or relationship['children'] is None:
+        if all(value == [] for value in relationship.values()):
             feat.update({
                 'relationships': None
             })
@@ -632,7 +630,6 @@ def get_features(request, sf_type="all", ds_ids="all"):
                         '{}'.format(ep.propertyid.propertyname): ep.propertyvalue,
                         '{}_units'.format(ep.propertyid.propertyname): ep.propertyid.propertyunitsid.unitsabbreviation,
                     })
-
         # Get lat, lon
         lat = sf.featuregeometrywkt().coords[1]
         lon = sf.featuregeometrywkt().coords[0]
@@ -714,9 +711,9 @@ def sensor_dashboard(request):
 def get_relations(s):
     pf = Relatedfeatures.objects.filter(samplingfeatureid_id=s.samplingfeatureid)
     cf = Relatedfeatures.objects.filter(relatedfeatureid_id=s.samplingfeatureid)
-    sibsf = None
-    parents = None
-    children = None
+    sibsf = []
+    parents = []
+    children = []
     if pf.first() is not None:
         sib = Relatedfeatures.objects.filter(relationshiptypecv_id='Is child of',
                                              relatedfeatureid_id=pf.first().relatedfeatureid_id). \
