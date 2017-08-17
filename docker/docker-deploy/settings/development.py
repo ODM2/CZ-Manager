@@ -30,13 +30,13 @@ EMAIL_PORT = 123
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'odm2_db',
+        'NAME': 'odm2',
         'USER': 'postgres',
         'PASSWORD': 'test',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
         'OPTIONS': {
-            'options': '-c search_path=public,admin,odm2,odm2extra'
+            'options': '-c search_path=admin,odm2,odm2extra,public'
         }
     }
 }
