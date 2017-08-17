@@ -2933,12 +2933,13 @@ class Timeseriesresultvaluesextwannotations(models.Model):
     def csvoutput(self):
         # s = str(self.valueid)
         # s += ', {0}'.format(self.datavalue)
-        s = ', {0}'.format(self.valuedatetime)
+        s = '{0}'.format(self.valuedatetime)
         # s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
         # s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
         # s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
         s += ',\" {0}\"'.format(
             self.samplingfeaturename)
+        s += ','
         # s += ', {0}'.format(self.timeaggregationinterval)
         # s += ', {0},'.format(self.timeaggregationintervalunitsid)
         s = buildCitation(s, self)

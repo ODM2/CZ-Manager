@@ -2385,6 +2385,8 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
                                             processingCode+str(myresults.resultid))
             ):
                 myfile.write(",")
+                myfile.write(",")
+                myfile.write(",")
                 position += 1
             myfile.write(myresults.csvoutputShort())
             position += 1
