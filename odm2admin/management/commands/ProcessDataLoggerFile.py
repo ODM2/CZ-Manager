@@ -221,6 +221,8 @@ class Command(BaseCommand):
                         #         resultid__in=DataloggerfilecolumnSet.values("resultid"))
                         #     mrvs = Timeseriesresultvalues.objects.filter(resultid__in=mrs)
                         for colnum in rowColumnMap:
+                            if stop_reading_reversed:
+                                break
                             dataqualitybool = True
                             dataqualityUpperAlarm = True
                             dataqualityLowerAlarm = True

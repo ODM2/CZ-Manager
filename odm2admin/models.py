@@ -2144,7 +2144,8 @@ class Resultextensionpropertyvalues(models.Model):
     resultid = models.ForeignKey('Results', db_column='resultid')
     propertyid = models.ForeignKey(Extensionproperties, db_column='propertyid')
     propertyvalue = models.CharField(max_length=255)
-
+    def __unicode__(self):
+        return u"%s - %s: value %s" % (self.resultid, self.propertyid,self.propertyvalue)
     class Meta:
         managed = False
         db_table = r'odm2"."resultextensionpropertyvalues'
@@ -2738,8 +2739,8 @@ class Timeseriesresultvalues(models.Model):
         # s += 'Unit Name,'
         # s += 'processing level,'
         s += 'sampling feature/location,'
-        s += 'time aggregation interval,'
-        s += 'time aggregation unit,'
+        # s += 'time aggregation interval,'
+        # s += 'time aggregation unit,'
         s += 'citation,'
 
         return s
@@ -2753,8 +2754,8 @@ class Timeseriesresultvalues(models.Model):
         # s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
         s += ',\" {0}\"'.format(
             self.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename)
-        s += ', {0}'.format(self.timeaggregationinterval)
-        s += ', {0},'.format(self.timeaggregationintervalunitsid)
+        # s += ', {0}'.format(self.timeaggregationinterval)
+        # s += ', {0},'.format(self.timeaggregationintervalunitsid)
         s = buildCitation(s, self)
 
         # s += ' {0}\"'.format(citation.citationlink)
@@ -2769,8 +2770,8 @@ class Timeseriesresultvalues(models.Model):
         return s
 
     def csvheaderShort(self):
-        s = 'method,'
-        s += '\" {0} -unit-{1}-processing level-{2}\",'.format(
+        # s = 'method,'
+        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
             self.resultid.resultid.variableid.variablecode,
             self.resultid.resultid.unitsid.unitsname,
             self.resultid.resultid.processing_level.processinglevelcode)
@@ -2779,8 +2780,8 @@ class Timeseriesresultvalues(models.Model):
         return s
 
     def csvoutputShort(self):
-        s = '\" {0}\",'.format(
-            self.resultid.resultid.featureactionid.action.method.methodcode)
+        #s = '\" {0}\",'.format(
+        #    self.resultid.resultid.featureactionid.action.method.methodcode)
         s = '{0},'.format(self.datavalue)
         s += '{0}'.format(self.qualitycodecv)
         trvannotation = Timeseriesresultvalueannotations.objects.filter(valueid=self.valueid)
@@ -2917,9 +2918,9 @@ class Timeseriesresultvaluesextwannotations(models.Model):
 
     @staticmethod
     def csvheader():
-        s = 'databaseid,'
+        # s = 'databaseid,'
         # s+='Value,'
-        s += 'Date and Time,'
+        s = 'Date and Time,'
         # s += 'Variable Name,'
         # s += 'Unit Name,'
         # s += 'processing level,'
@@ -2930,9 +2931,9 @@ class Timeseriesresultvaluesextwannotations(models.Model):
         return s
 
     def csvoutput(self):
-        s = str(self.valueid)
+        # s = str(self.valueid)
         # s += ', {0}'.format(self.datavalue)
-        s += ', {0}'.format(self.valuedatetime)
+        s = ', {0}'.format(self.valuedatetime)
         # s += ',\" {0}\"'.format(self.resultid.resultid.variableid.variablecode)
         # s += ',\" {0}\"'.format(self.resultid.resultid.unitsid.unitsname)
         # s += ',\" {0}\"'.format(self.resultid.resultid.processing_level)
@@ -2954,8 +2955,8 @@ class Timeseriesresultvaluesextwannotations(models.Model):
         return s
 
     def csvheaderShort(self):
-        s = 'method,'
-        s += '\" {0} -unit-{1}-processing level-{2}\",'.format(
+        # s = 'method,'
+        s = '\" {0} -unit-{1}-processing level-{2}\",'.format(
             self.variablecode,
             self.unitsabbreviation,
             self.processinglevelcode)
@@ -2964,10 +2965,10 @@ class Timeseriesresultvaluesextwannotations(models.Model):
         return s
 
     def csvoutputShort(self):
-        result = Results.objects.get(resultid=self.resultid)
-        s = '\" {0}\",'.format(
-            result.featureactionid.action.method.methodcode)
-        s += '{0},'.format(self.datavalue)
+        # result = Results.objects.get(resultid=self.resultid)
+        # s = '\" {0}\",'.format(
+        #     result.featureactionid.action.method.methodcode)
+        s = '{0},'.format(self.datavalue)
         s += '{0},'.format(self.qualitycodecv)
         if self.annotationtext:
             s += '\"{0} \",'.format(self.annotationtext)

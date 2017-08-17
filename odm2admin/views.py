@@ -646,6 +646,67 @@ def get_features(request, sf_type="all", ds_ids="all"):
 
     return HttpResponse(json.dumps(feats_filtered))
 
+def truncate(f, n):
+    '''Truncates/pads a float f to n decimal places without rounding'''
+    s = '{}'.format(f)
+    if 'e' in s or 'E' in s:
+        return '{0:.{1}f}'.format(f, n)
+    i, p, d = s.partition('.')
+    return '.'.join([i, (d+'0'*n)[:n]])
+
+def sensor_dashboard(request):
+    authenticated = True
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('../')
+    ids = settings.SENSOR_DASHBOARD['featureactionids']
+    timeseriesdays = settings.SENSOR_DASHBOARD['time_series_days']
+    fas = Featureactions.objects.filter(featureactionid__in=ids).order_by('samplingfeatureid')
+    #samplingfeatures = Samplingfeatures.filter(samplingfeatureid__in=fas)
+    results = Results.objects.filter(featureactionid__in=fas)
+    tsrs = Timeseriesresults.objects.filter(resultid__in=results)
+    endDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
+    #calculated_result_properties={}
+    #for tsr in tsrs:
+        #print(tsr)
+    repvs = Resultextensionpropertyvalues.objects.filter(resultid__in=results).order_by("resultid","propertyid")
+    dcount = 0
+    dmaxcount = 0
+    lastResult = None
+    for repv in repvs:
+        if "start date" in str(repv.propertyid.propertyname):
+            startdate = repv.propertyvalue
+            repv.propertyname = "Time series began on: "
+        elif "end date" in str(repv.propertyid.propertyname):
+            enddate = repv.propertyvalue
+            # (enddate)
+            repv.propertyname = "most recent value on: "
+        elif "dashboard count" in str(repv.propertyid.propertyname):
+            dcount = repv.propertyvalue
+            repv.propertyname = "number of values recorded over last " + str(timeseriesdays) + " days"
+        elif "dashboard maximum count" in str(repv.propertyid.propertyname):
+            dmaxcount = repv.propertyvalue
+            # repv.propertyname = str(dcount) + " of " + str(dmaxcount)
+            repv.propertyname = "up time"
+            repv.propertyvalue = str(dcount) + " of " + str(dmaxcount) + \
+                                 " or " + str(truncate((float(dcount)/float(dmaxcount))*100, 2)) + "%"
+        elif "dashboard below lower bound count" in  str(repv.propertyid.propertyname):
+            repv.propertyname = "values below lower bound "
+        elif "dashboard above upper bound count" in  str(repv.propertyid.propertyname):
+            repv.propertyname = "values above upper bound "
+        elif "dashboard begin date" in  str(repv.propertyid.propertyname):
+            repv.propertyname = "values above upper bound "
+            repv.propertyvalue = None
+        else:
+            repv.propertyname = repv.propertyid.propertyname
+
+        lastResult = repv.resultid
+    return TemplateResponse(request,
+        'sensordashboard.html',
+        {'featureactions':fas,
+         'results': results,
+         'authenticated': authenticated,
+         'resultextionproperties':repvs,
+         'short_title': 'Time Series'}, )
 
 def get_relations(s):
     pf = Relatedfeatures.objects.filter(samplingfeatureid_id=s.samplingfeatureid)
@@ -2272,7 +2333,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
                 "processinglevelcode"
             )
         # myfile.write(lastResult.csvheaderShort())
-        emailtext = emailtext + ' - ' + str(lastResult.email_text())
+        # emailtext = emailtext + ' - ' + str(lastResult.email_text())
         myfile.write('\n')
 
         samplingfeaturename = ''
