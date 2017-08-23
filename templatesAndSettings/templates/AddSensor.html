@@ -76,7 +76,7 @@
         </tr>
         <tr>
             <th scope="row"><a href="{{ prefixpath }}organizations/">
-                <h6>{% trans '--Add Equipment Manufacturer--' %}</h6></a></th>
+                <h6>{% trans 'Add Equipment Manufacturer' %}</h6></a></th>
             <td><a href="{{ prefixpath }}organizations/add/" class="addlink">{% trans 'Add' %}</a></td>
             <td><a href="{{ prefixpath }}organizations/" class="changelink">{% trans 'Change' %}</a></td>
         </tr>
@@ -103,7 +103,7 @@
         </tr>
         <tr>
 
-            <th scope="row"><a href="{{ prefixpath }}variables/"><h6>{% trans '--Add Variable Recorded--' %}</h6></a>
+            <th scope="row"><a href="{{ prefixpath }}variables/"><h6>{% trans 'Add Variable Recorded' %}</h6></a>
             </th>
             <td><a href="{{ prefixpath }}variables/add/" class="addlink">{% trans 'Add' %}</a></td>
             <td><a href="{{ prefixpath }}variables/" class="changelink">{% trans 'Change' %}</a></td>
@@ -111,14 +111,14 @@
         </tr>
 
         <tr>
-            <th scope="row"><a href="{{ prefixpath }}units/"><h6>{% trans '--Add Units for Variable--' %}</h6></a></th>
+            <th scope="row"><a href="{{ prefixpath }}units/"><h6>{% trans 'Add Units for Variable' %}</h6></a></th>
             <td><a href="{{ prefixpath }}units/add/" class="addlink">{% trans 'Add' %}</a></td>
             <td><a href="{{ prefixpath }}units/" class="changelink">{% trans 'Change' %}</a></td>
         </tr>
         <tr>
-            <th scope="row"><a href="{{ prefixpath }}results/">{% trans 'Add Data Result' %}</a></th>
-            <td><a href="{{ prefixpath }}results/add/" class="addlink">{% trans 'Add' %}</a></td>
-            <td><a href="{{ prefixpath }}results/" class="changelink">{% trans 'Change' %}</a></td>
+            <th scope="row">{% trans 'Add Data Result and Time Series result' %}</th>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <th scope="row"><a href="{{ prefixpath }}methods/">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -134,7 +134,7 @@
         </tr>
         <tr>
             <th scope="row"><a href="{{ prefixpath }}featureactions/">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                {% trans 'Add Feature Action -link location with a sensor or piece of equipment ' %}</a></th>
+                {% trans 'Add Feature Action link location with a sensor or piece of equipment ' %}</a></th>
             <td><a href="{{ prefixpath }}featureactions/add/" class="addlink">{% trans 'Add' %}</a></td>
             <td><a href="{{ prefixpath }}featureactions/" class="changelink">{% trans 'Change' %}</a></td>
         </tr>
@@ -143,6 +143,12 @@
                 {% trans 'Instrument output variables' %}</a></th>
             <td><a href="{{ prefixpath }}instrumentoutputvariables/add/" class="addlink">{% trans 'Add' %}</a></td>
             <td><a href="{{ prefixpath }}instrumentoutputvariables/" class="changelink">{% trans 'Change' %}</a></td>
+        </tr>
+        <tr>
+            <th scope="row"><a href="{{ prefixpath }}results/">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                {% trans 'Add Data Result and Time Series result' %}</a></th>
+            <td><a href="{{ prefixpath }}results/add/" class="addlink">{% trans 'Add' %}</a></td>
+            <td><a href="{{ prefixpath }}results/" class="changelink">{% trans 'Change' %}</a></td>
         </tr>
     </table>
 
