@@ -42,6 +42,9 @@ class Command(BaseCommand):
         ftpfile = False
         print(ftpparse.netloc)
         if len(ftpparse.netloc) > 0:
-            urllib.urlretrieve(ftpfile, str(settings.MEDIA_ROOT) + filename)
+            out_file = str(settings.MEDIA_ROOT) + filename
+            print(out_file)
+            print(ftpfile)
+            urllib.urlretrieve(ftpfile, out_file)
             ftpfile = True
         # file = str(settings.MEDIA_ROOT) + filename  # args[0].name
