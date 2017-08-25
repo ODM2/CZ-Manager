@@ -39,12 +39,10 @@ class Command(BaseCommand):
         fileid = Dataloggerfiles.objects.filter(dataloggerfileid=fileid).get()
         ftpfile = fileid.dataloggerfiledescription
         ftpparse = urlparse(ftpfile)
-        ftpfile = False
-        print(ftpparse.netloc)
+        # print(ftpparse.netloc)
         if len(ftpparse.netloc) > 0:
             out_file = str(settings.MEDIA_ROOT) + filename
-            print(out_file)
-            print(ftpfile)
+            # print(out_file)
+            # print(ftpfile)
             urllib.urlretrieve(ftpfile, out_file)
-            ftpfile = True
         # file = str(settings.MEDIA_ROOT) + filename  # args[0].name

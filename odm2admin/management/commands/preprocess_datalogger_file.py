@@ -34,12 +34,22 @@ class Command(BaseCommand):
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
         # cmdline = bool(options['cmdline'][0])
         filename = str(options['dataloggerfilelink'][0])
+        filenameparts = filename.split('/')
+        filenameout = ''
+        i = 0
+        lastpart = len(filenameparts)
+        for part in filenameparts:
+            i+=1
+            if i ==lastpart:
+                filenameout += '/reversed_' + part
+            else:
+                filenameout += part
         fileid = int(options['dataloggerfileid'][0])
         fileid = Dataloggerfiles.objects.filter(dataloggerfileid=fileid).get()
         databeginson = int(options['databeginson'][0])  # int(databeginson[0])
         columnheaderson = int(options['columnheaderson'][0])
         file_in = str(settings.MEDIA_ROOT) + filename  # args[0].name
-        file_out = str(settings.MEDIA_ROOT) + "reversed_" + filename
+        file_out = str(settings.MEDIA_ROOT) + filenameout
         i=0
         # write the header to the new file
         with io.open(file_in, 'rt', encoding='ascii') as f_in:
