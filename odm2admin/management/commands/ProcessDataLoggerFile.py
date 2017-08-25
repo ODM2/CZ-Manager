@@ -140,12 +140,12 @@ class Command(BaseCommand):
                 if numCols == 0:
                     raise CommandError(
                         'This file has no dataloggerfilecolumns associated with it. ')
-                if not numCols == columnsinCSV:
-                    raise CommandError(
-                        'The number of columns in the ' + str(
-                            columnsinCSV) + ' csv file do not match the number of' +
-                        ' dataloggerfilecolumns ' + str(
-                            numCols) + ' associated with the dataloggerfile in the database. ')
+                # if not numCols == columnsinCSV:
+                #    raise CommandError(
+                #        'The number of columns in the ' + str(
+                #            columnsinCSV) + ' csv file do not match the number of' +
+                #        ' dataloggerfilecolumns ' + str(
+                #            numCols) + ' associated with the dataloggerfile in the database. ')
                 for row in reader:
                     # print(row)
                     # map the column objects to the column in the file assumes first row in
