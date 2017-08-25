@@ -136,17 +136,20 @@ class Command(BaseCommand):
                 DataloggerfilecolumnSet = Dataloggerfilecolumns.objects.filter(
                     dataloggerfileid=fileid)
                 i = 0
-                numCols = DataloggerfilecolumnSet.count()
-                if numCols == 0:
+                numCols = 0
+                numDLCols = DataloggerfilecolumnSet.count()
+
+                if numDLCols == 0:
                     raise CommandError(
                         'This file has no dataloggerfilecolumns associated with it. ')
-                # if not numCols == columnsinCSV:
+                # if not numDLCols == columnsinCSV:
                 #    raise CommandError(
                 #        'The number of columns in the ' + str(
                 #            columnsinCSV) + ' csv file do not match the number of' +
                 #        ' dataloggerfilecolumns ' + str(
-                #            numCols) + ' associated with the dataloggerfile in the database. ')
+                #            numDLCols) + ' associated with the dataloggerfile in the database. ')
                 for row in reader:
+                    numCols = len(row)
                     # print(row)
                     # map the column objects to the column in the file assumes first row in
                     # file contains columnlabel.
