@@ -53,28 +53,30 @@ class Command(BaseCommand):
         i=0
         # write the header to the new file
         with io.open(file_in, 'rt', encoding='ascii') as f_in:
-            with io.open(file_out, 'w', encoding='ascii') as f_out:
-                reader = itertools.tee(csv.reader(f_in))
-                writer = csv.writer(f_out,delimiter=',')
+            with io.open(file_out, 'wb') as f_out:
+                reader =csv.reader(f_in)
+                writer = csv.writer(f_out)
                 for row in reader:
-                    numCols = len(row)
                     # print(row)
                     # map the column objects to the column in the file assumes first row in
                     # file contains columnlabel.
-                    if i < databeginson:
+                    i+=1
+                    if i <= databeginson:
                         writer.writerow(row)
                     else:
                         break
         # write the reversed data
         with io.open(file_in, 'rt', encoding='ascii') as f_in:
-            with io.open(file_out, 'w', encoding='ascii') as f_out:
-                reader = itertools.tee(csv.reader(f_in))
-                writer = csv.writer(f_out,delimiter=',')
-                reversed_reader = reader.reverse()
-                for row in reversed_reader:
+            with io.open(file_out, 'ab') as f_out:
+                reader = csv.reader(f_in)
+                writer = csv.writer(f_out)
+                row2 = []
+                for row in reversed(list(reader)):
+                    #for cell in row:
+                    #    row2.append(unicode(cell))
                     writer.writerow(row)
 
         #shutil.copy(src, dst
-        #Replace original rile with reversed
+        #Replace original file with reversed
         shutil.copy(file_out,file_in)
 
