@@ -71,7 +71,7 @@ class Command(BaseCommand):
                 print('new dashboard begin date')
                 print(dashboardstartproperty)
             timeseriesresultvalues = Timeseriesresultvalues.objects.filter(
-                resultid=tsr.resultid.resultid).filter(valuedatetime__gt=dashboard_start_date).order_by(
+                resultid=tsr.resultid.resultid).exclude(datavalue=float('NaN')).filter(valuedatetime__gt=dashboard_start_date).order_by(
                 'valuedatetime')
             rdqs = Resultsdataquality.objects.filter(resultid=tsr.resultid)
             rdqcount = rdqs.count()
