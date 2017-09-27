@@ -118,14 +118,14 @@ $(document).ready(function(){
 							<th>Units</th>
 							<th>View Time Series</th></tr>
 							<tr>
-							<tr ><td class="sensor-dashboard-header">{{result.featureactionid.action.actionid}}</td>
+							<tr ><td class="sensor-dashboard-header">{{result.featureactionid.action.actiondescription}}</td>
 							<td class="sensor-dashboard-header">{{result.variableid.variable_name}}</td>
 							<td class="sensor-dashboard-header">{{result.unitsid.unitsabbreviation}}</td>
 							<td class="sensor-dashboard-header"> <div class="header">
 							<a class="load_time_series" style="cursor: pointer;"><span>View Time Series</span></a>
 							</div>
 							<div class="content" style="height: 0px;width: 0px;overflow:hidden;"><a class="load_time_series" 
-							href=" {{prefixpath}}../../graphfa/samplingfeature&#61;{{result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{result.resultid}}/popup=smll/"> View Time Series </a></td>
+							href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{result.resultid}}/popup=smll/"> View Time Series </a></td>
 							</td></tr></div>
 							
 							{% for repv in resultextionproperties %}
