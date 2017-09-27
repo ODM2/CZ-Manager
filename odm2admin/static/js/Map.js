@@ -79,8 +79,7 @@ makeURL = function (parameters) {
     var params = params_arr.join('&');
     return baseurl + '/' + params;
 };
-
-MAP.prototype.getData = function (url) {
+MAP.prototype.getData = function (url,spinner) {
     _this = this;
     var Ajax = new AjaxRequest;
 	var featureList = this.legends;
@@ -117,8 +116,11 @@ MAP.prototype.getData = function (url) {
 			}
         });
         _this.markers.addTo(_this.webmap);
+		spinner.stop();
     })
+
 };
+
 
 createMarker = function (latlng, markerIcon, color, sfname,style_class,icon_str) {
 	if(this.display_titles){
