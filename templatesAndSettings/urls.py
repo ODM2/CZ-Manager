@@ -40,7 +40,10 @@ urlpatterns = [url(r'^' + '', include(admin.site.urls)),
                url(r'^' + 'emaildata/$', views.email_data_from_graph),
                url(r'^' + 'addannotation/$', views.add_annotation),
                url(r'^' + 'addL1timeseries/$', views.addL1timeseries),
-               url(r'^' + 'sensordashboard', views.sensor_dashboard),
+               url(r'^' + 'sensordashboard/featureaction=(?P<feature_action>(\d+))/', views.sensor_dashboard),
+               url(r'^' + 'sensordashboard/samplingfeature=(?P<sampling_feature>(\d+))/', views.sensor_dashboard),
+               url(r'^' + 'sensordashboard/$', views.sensor_dashboard),
+
                url(r'^' + 'graphfa/featureaction=(?P<feature_action>(\d+))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                url(

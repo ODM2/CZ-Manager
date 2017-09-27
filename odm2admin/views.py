@@ -654,13 +654,28 @@ def truncate(f, n):
     i, p, d = s.partition('.')
     return '.'.join([i, (d+'0'*n)[:n]])
 
-def sensor_dashboard(request):
+def sensor_dashboard(request, feature_action='NotSet', sampling_feature='NotSet'):
     authenticated = True
     if not request.user.is_authenticated():
-        return HttpResponseRedirect('../')
+        # return HttpResponseRedirect('../')
+        authenticated = False
     ids = settings.SENSOR_DASHBOARD['featureactionids']
     timeseriesdays = settings.SENSOR_DASHBOARD['time_series_days']
-    fas = Featureactions.objects.filter(featureactionid__in=ids).order_by('samplingfeatureid')
+    fas=None
+    if not feature_action == 'NotSet':
+        selected_featureactionid = int(feature_action)
+        print(selected_featureactionid)
+        fas = Featureactions.objects.filter(featureactionid=selected_featureactionid
+                                        ).order_by('-samplingfeatureid')
+    elif not sampling_feature == 'NotSet':
+        selected_featureactionid = 'NotSet'
+        samplingfeatureid = int(sampling_feature)
+        fas = Featureactions.objects.filter(samplingfeatureid=samplingfeatureid
+                                        ).order_by('-samplingfeatureid')
+    else:
+        selected_featureactionid = 'NotSet'
+        print(selected_featureactionid)
+        fas = Featureactions.objects.filter(featureactionid__in=ids).order_by('-samplingfeatureid')
     #samplingfeatures = Samplingfeatures.filter(samplingfeatureid__in=fas)
     results = Results.objects.filter(featureactionid__in=fas)
     tsrs = Timeseriesresults.objects.filter(resultid__in=results)
@@ -702,8 +717,10 @@ def sensor_dashboard(request):
         lastResult = repv.resultid
     return TemplateResponse(request,
         'sensordashboard.html',
-        {'featureactions':fas,
+        {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+         'featureactions':fas,
          'results': results,
+         'feature_action': selected_featureactionid,
          'authenticated': authenticated,
          'resultextionproperties':repvs,
          'short_title': 'Time Series'}, )

@@ -1663,7 +1663,9 @@ class DataloggerfilesAdmin(ReadOnlyAdmin):
     inlines_list = [DataLoggerFileColumnsInline]
 
     actions = [duplicate_Dataloggerfiles_event]
-
+    list_display = ['dataloggerfilename', 'dataloggerfiledescription',]
+    search_fields = ['dataloggerfilename', 'dataloggerfiledescription', 'programid__programname',
+                     'programid__programname', ]
     def get_actions(self, request):
         actions = super(ReadOnlyAdmin, self).get_actions(request)
 
@@ -2330,6 +2332,10 @@ class InstrumentoutputvariablesAdmin(ReadOnlyAdmin):
     # For admin users
     form = InstrumentoutputvariablesAdminForm
     inlines_list = list()
+    search_fields = ['variableid__variable_name__name', 'variableid__variablecode', 'modelid__modelname',
+                     'variableid__variable_type__name','instrumentmethodid__methodname',
+                     'instrumentrawoutputunitsid__unitsname']
+    list_display = ['modelid','variableid', 'instrumentmethodid', 'instrumentrawoutputunitsid']
 
 
 class EquipmentmodelsAdminForm(ModelForm):
