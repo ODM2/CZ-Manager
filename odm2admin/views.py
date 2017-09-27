@@ -1622,6 +1622,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         authenticated = False
     if popup == 'NotSet':
         template = loader.get_template('chart2.html')
+    elif  popup == 'smll':
+        template = loader.get_template('chartsmall.html')
     elif popup == 'Anno':
         if not authenticated:
             return HttpResponseRedirect(settings.CUSTOM_TEMPLATE_PATH)
