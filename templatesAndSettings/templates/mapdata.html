@@ -81,9 +81,14 @@
             </p>
         </div>
     </div>
-    <div id="webmap"></div>
+    <div id="webmap">
+		<div id="spinner"></d
+	</div>
     <script type="application/javascript">
         var url_path = "{{ urlpath }}";
+		spinner = new Spinner().spin();
+		spin=document.getElementById("spinner");
+		spin.appendChild(spinner.el); 
         var display_titles = false;
         {% if map_config.display_titles %}
             display_titles = true;
@@ -96,7 +101,7 @@
         myMap.addBaseMap(myApp.PARAMS.basemaps);
 
         var url = myMap.getUrl(JSON.parse('{{ selectedds|safe }}'), JSON.parse('{{ selectedtype|safe }}'));
-        myMap.getData(url);
-        myMap.makeFilter();
+        myMap.getData(url,spinner);
+        myMap.makeFilter();   
     </script>
 {% endblock %}
