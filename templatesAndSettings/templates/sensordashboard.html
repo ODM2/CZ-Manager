@@ -17,6 +17,7 @@ class = row1 and row2?
  {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
 {{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />
 <link rel="stylesheet" href="{% static "css/main_style.css" %}" />
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 {% endblock %}
 {% block title %}
     Sensor Dashboard | {{ "site_title"|get_title:6 }}
@@ -57,6 +58,11 @@ class = row1 and row2?
 
 $(document).ready(function(){
 	var spinner = null;
+	 $("#featureactionddl").change(function () {
+        var selectedfeatureaction = $('#featureactionddl').val();
+		url = "{{prefixpath|safe}}../sensordashboard/featureaction=" + selectedfeatureaction + "/"
+		window.location.href = url;
+    });
 	$(".header").click(function () {
 		spin=document.getElementById("spinner");
 		spinner = new Spinner().spin();
@@ -90,18 +96,26 @@ $(document).ready(function(){
 <p><h3>Sensor Dashboard </h3><p>
 </div>
 <div class="container">
+<select id="featureactionddl">
+<option value="">Select one...</option>
+{% for featureaction in allfeatureactions %}
+	<option value="{{featureaction.featureactionid}}">
+	{{featureaction.samplingfeatureid}} - {{featureaction.action}}</option>
+{% endfor %}
+</select>
 <div  id="spinner"></div>
 <div class="graph" id="graph">
 <object width="0" height="0" title="graph" id="highcharts_graph" type="text/html"></object>
 </div>
+{% for featureaction in featureactions %}
+	<h3> {{featureaction.featureactionid}} {{featureaction.samplingfeatureid}} - {{featureaction.action.method.methodcode}}</h3>
+{% endfor %}
 <table>
 					<tr class="sensor-dashboard">	
 				{% for featureaction in featureactions %}
-				{% if forloop.counter|divisibleby:4 %}
-				</tr><tr class="sensor-dashboard"><td class="sensor-dashboard">
-				{% else %}
-				<td class="sensor-dashboard">
-				{% endif %}
+
+					<td class="sensor-dashboard">
+
 				    <div class="module sensor-dashboard-width">
 					<table class="module">
 					<tr class="sensor-dashboard-header"><th colspan=2>Site</th>
@@ -113,25 +127,41 @@ $(document).ready(function(){
 					<td></td></tr>
 					{% for result in results %}
 						{% if featureaction == result.featureactionid %}
-							<tr class="sensor-dashboard-header"><th >Time series</td>
-							<th>Variable</th>
-							<th>Units</th>
+							<tr class="sensor-dashboard-header"><th colspan=3>Time series</th>
 							<th>View Time Series</th></tr>
 							<tr>
-							<tr ><td class="sensor-dashboard-header">{{result.featureactionid.action.actionid}}</td>
-							<td class="sensor-dashboard-header">{{result.variableid.variable_name}}</td>
-							<td class="sensor-dashboard-header">{{result.unitsid.unitsabbreviation}}</td>
+							<tr ><td class="sensor-dashboard-header" colspan=2>{{result.resultid}} - {{result.featureactionid.action.actiondescription}} -{{result.variableid}} - {{result.unitsid.unitsname}}</td>
+
+							<td class="sensor-dashboard-header"></td>
 							<td class="sensor-dashboard-header"> <div class="header">
 							<a class="load_time_series" style="cursor: pointer;"><span>View Time Series</span></a>
 							</div>
 							<div class="content" style="height: 0px;width: 0px;overflow:hidden;"><a class="load_time_series" 
-							href=" {{prefixpath}}../../graphfa/samplingfeature&#61;{{result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{result.resultid}}/popup=smll/"> View Time Series </a></td>
+							href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{result.resultid}}/popup=smll/"> View Time Series </a></td>
 							</td></tr></div>
 							
 							{% for repv in resultextionproperties %}
 
 								{% if repv.resultid.resultid == result.resultid %}
 									{% if is_none == repv.propertyvalue %}
+									{% elif repv.propertyid.propertyname in "dashboard sensor active" %}
+										{% if repv.propertyvalue in "1" %}
+											<tr class="sensor-dashboard">
+											<td >{{repv.propertyname}}</td>
+											<td></td>
+											<td></td>
+											<td  class="w3-padding-25 w3-green w3-circle w3-center">  online</td>
+
+											</tr>
+										{% else %}
+											<tr class="sensor-dashboard">
+											<td >{{repv.propertyname}}</td>
+											<td></td>
+											<td></td>
+											<td  class="w3-padding-25 w3-red w3-circle w3-center"> offline</td>
+
+											</tr>
+										{% endif %}
 									{% else %}
 										<tr class="sensor-dashboard">
 										<td >{{repv.propertyname}}</td>
@@ -145,7 +175,7 @@ $(document).ready(function(){
 					{% endfor %}
 					</table>
 					</div>
-				{% if forloop.counter|divisibleby:4 %}
+				{% if forloop.counter|divisibleby:3 %}
 				</td></tr><tr>
 				{% else %}
 				</td>

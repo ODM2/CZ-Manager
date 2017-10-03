@@ -1,0 +1,126 @@
+<head>
+<style>
+	 h1 {
+    font-size: 150%;
+    color: #666;
+    font-weight: bold;
+    margin: 20px 10px 10px;
+}
+</style>
+</head>
+{% block content %}
+	<script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/highcharts-more.js"></script>
+	<script src="http://code.highcharts.com/modules/exporting.js"></script>
+	 <script src="https://rawgithub.com/RolandBanguiran/highcharts-scalable-yaxis/master/scalable-yaxis.js"></script>
+	 <script src="http://highcharts.github.io/export-csv/export-csv.js"></script>
+	 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+	<script>
+    var chart_id = 'chartid';
+    var chart = {{ chart|safe }};
+    var title2 = {{ title2|safe }};
+    var xAxis = {{ xAxis|safe }};
+    var yAxis = {{ yAxis|safe }};
+    var series = {{ series|safe }};
+	var graphType =   '{{graphType|safe }}';
+	var name_of_units = {{name_of_units|safe}};
+	
+$(document).ready(function() {
+	
+	var opposite2 = false;
+	yaxes = [];
+
+	for (var i=0; i<series.length; i++){
+	data = series[i].data;
+		for(var j=0; j<data.length; j++){
+			if(data[j][1]=='null'){
+				data[j][1] = null;
+			}
+			}
+	data.sort();
+	}
+	
+	for (var i=0; i<name_of_units.length; i++) {
+		name = name_of_units[i];
+		//alert(name);
+		   
+		axi = {id: name,
+		scrollbar: {
+        enabled: false
+    },
+		labels: {
+                format: '{value}',
+                style: {
+                    color: Highcharts.getOptions().colors[i]
+                }
+            },
+		title: {
+			text: name
+		},
+		//lineWidth: 2,
+        //lineColor: Highcharts.getOptions().colors[i],
+		opposite: opposite2
+		};
+		yaxes.push(axi);
+		//opposite2 = !opposite2;
+	}
+	//yAxis[1] = yAxis2.replace('"','');
+	var chart =Highcharts.stockChart('chartid', {
+		chart: {renderTo: chart_id, 
+		type: graphType,  zoomType: 'xy',},
+		legend: {
+                            enabled: true,
+                            layout: 'vertical',
+                            align: 'center',
+                            verticalAlign: 'top',
+                            x: 0,
+                            y: 10,
+                            borderWidth: 0
+                        },
+        title: title2,
+		rangeSelector: {
+            allButtonsEnabled: false,
+            selected: 2
+        },
+        xAxis: xAxis,
+        yAxis:yaxes,
+        series: series,
+		tooltip: {
+    formatter: function() {
+        return ''+
+                 ' Value: ' + this.y + 
+                '-- Date: '+ Highcharts.dateFormat(' %e-%b-%Y %I:%M %p', this.x);
+    }
+},
+    });
+	
+	//alert(name_of_units.length);
+
+	
+	
+	});
+	 
+</script>
+    <div id='content-main' style="width: 800px; height: 500px;">
+<p><h1 >
+
+
+
+{% if useDataset %}
+	{{datasetTitle}}
+{% else %}
+	Location - {{featureActionLocation}}<br>
+{% endif %}
+{% if not useSamplingFeature and not useDataset %}
+	Method- {{featureActionMethod}}
+
+</h1>
+{% endif %}
+ {% csrf_token %}
+
+	<div id='chartid' class="chart" style="height:100%; width:100%; margin: 0 auto;"></div>
+	
+{% endblock %}
+
+	 </div>

@@ -123,7 +123,7 @@ html, body {
     float: left;
 }
 .sensor-dashboard-width {
-	    width: 75%;
+	    width: 40%;
 		border-color: #f1f1f1;
 		word-wrap: break-word;
 		white-space: normal !important;
@@ -145,6 +145,9 @@ td.sensor-dashboard   {
 	white-space: normal !important;
 	color: #444;
 }
+.loadinggif {
+    background: url('http://www.hsi.com.hk/HSI-Net/pages/images/en/share/ajax-loader.gif') no-repeat right center;
+}
 th.sensor-dashboard   {
     vertical-align: baseline;
 	color: #444;
@@ -156,7 +159,10 @@ th.sensor-dashboard   {
 	background-color: #fff;
 	white-space: normal !important;
 }
-
+.container .content {
+    display: none;
+    padding : 5px;
+}
 
 td.title {
     font-weight: bold;

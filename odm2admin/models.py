@@ -2668,19 +2668,23 @@ class Taxonomicclassifiers(models.Model):
 class Timeseriesresults(models.Model):
     resultid = models.OneToOneField(Results, verbose_name="Result Series", db_column='resultid',
                                     primary_key=True)
-    xlocation = models.FloatField(blank=True, null=True)
+    xlocation = models.FloatField(blank=True, null=True, verbose_name="x location")
     xlocationunitsid = models.ForeignKey('Units', related_name='+', db_column='xlocationunitsid',
-                                         blank=True, null=True)
-    ylocation = models.FloatField(blank=True, null=True)
+                                         blank=True, null=True, verbose_name="x location units")
+    ylocation = models.FloatField(blank=True, null=True, verbose_name="y location")
     ylocationunitsid = models.ForeignKey('Units', related_name='+', db_column='ylocationunitsid',
-                                         blank=True, null=True)
-    zlocation = models.FloatField(blank=True, null=True)
+                                         verbose_name="y location units", blank=True, null=True)
+    zlocation = models.FloatField(blank=True, null=True, verbose_name="z location")
     zlocationunitsid = models.ForeignKey('Units', related_name='+', db_column='zlocationunitsid',
-                                         blank=True, null=True)
+                                         verbose_name="z location units", blank=True, null=True)
     spatialreferenceid = models.ForeignKey(Spatialreferences, db_column='spatialreferenceid',
+                                           verbose_name="spatial reference",
                                            blank=True, null=True)
-    intendedtimespacing = models.FloatField(blank=True, null=True)
+    intendedtimespacing = models.FloatField(blank=True, null=True, verbose_name="Intended time spacing",
+                                            help_text="time between measurements")
     intendedtimespacingunitsid = models.ForeignKey('Units', related_name='+',
+                                                   help_text="Units of time between measurements. This defines the time"
+                                                             " series 1 hour, or 15 minutes for example.",
                                                    verbose_name="Time Units",
                                                    db_column='intendedtimespacingunitsid',
                                                    blank=True, null=True)
