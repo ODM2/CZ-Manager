@@ -299,6 +299,7 @@ def chartIndex(request):
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
+                   'featureaction': settings.SENSOR_DASHBOARD['featureactionids'][0],
                    'short_title': settings.ADMIN_SHORTCUTS[0]['shortcuts'][5]['title']}
         return TemplateResponse(request, 'chartIndex.html', context)
     else:
@@ -664,21 +665,25 @@ def sensor_dashboard(request, feature_action='NotSet', sampling_feature='NotSet'
         authenticated = False
     ids = settings.SENSOR_DASHBOARD['featureactionids']
     timeseriesdays = settings.SENSOR_DASHBOARD['time_series_days']
-    fas=None
+    fas = None
+    allfas = None
     if not feature_action == 'NotSet':
         selected_featureactionid = int(feature_action)
-        print(selected_featureactionid)
+        # print(selected_featureactionid)
         fas = Featureactions.objects.filter(featureactionid=selected_featureactionid
                                         ).order_by('-samplingfeatureid')
+        allfas = Featureactions.objects.filter(featureactionid__in=ids).order_by('-samplingfeatureid')
     elif not sampling_feature == 'NotSet':
         selected_featureactionid = 'NotSet'
         samplingfeatureid = int(sampling_feature)
         fas = Featureactions.objects.filter(samplingfeatureid=samplingfeatureid
                                         ).order_by('-samplingfeatureid')
+        allfas = Featureactions.objects.filter(featureactionid__in=ids).order_by('-samplingfeatureid')
     else:
         selected_featureactionid = 'NotSet'
-        print(selected_featureactionid)
+        # print(selected_featureactionid)
         fas = Featureactions.objects.filter(featureactionid__in=ids).order_by('-samplingfeatureid')
+        allfas = fas
     #samplingfeatures = Samplingfeatures.filter(samplingfeatureid__in=fas)
     results = Results.objects.filter(featureactionid__in=fas)
     tsrs = Timeseriesresults.objects.filter(resultid__in=results)
@@ -703,14 +708,26 @@ def sensor_dashboard(request, feature_action='NotSet', sampling_feature='NotSet'
             repv.propertyname = "number of values recorded over last " + str(timeseriesdays) + " days"
         elif "dashboard maximum count" in str(repv.propertyid.propertyname):
             dmaxcount = repv.propertyvalue
+            # print(dcount)
+            # print(dmaxcount)
             # repv.propertyname = str(dcount) + " of " + str(dmaxcount)
             repv.propertyname = "up time"
-            repv.propertyvalue = str(dcount) + " of " + str(dmaxcount) + \
-                                 " or " + str(truncate((float(dcount)/float(dmaxcount))*100, 2)) + "%"
+            if float(dmaxcount) > 0:
+                repv.propertyvalue = str(dcount) + " of " + str(dmaxcount) + \
+                                     " or " + str(truncate((float(dcount)/float(dmaxcount))*100, 2)) + "%"
+            # else:
+                # print("dmaxcount less then 0")
+                # print(repv)
+                # print(repv.resultid)
         elif "dashboard below lower bound count" in  str(repv.propertyid.propertyname):
             repv.propertyname = "values below lower bound "
         elif "dashboard above upper bound count" in  str(repv.propertyid.propertyname):
             repv.propertyname = "values above upper bound "
+        #dashboard last recorded value
+        elif "dashboard sensor active" in str(repv.propertyid.propertyname):
+            repv.propertyname = "sensor active "
+        elif "dashboard last recorded value" in str(repv.propertyid.propertyname):
+            repv.propertyname = "last recorded value "
         elif "dashboard begin date" in  str(repv.propertyid.propertyname):
             repv.propertyname = "values above upper bound "
             repv.propertyvalue = None
@@ -722,6 +739,7 @@ def sensor_dashboard(request, feature_action='NotSet', sampling_feature='NotSet'
         'sensordashboard.html',
         {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
          'featureactions':fas,
+         'allfeatureactions':allfas,
          'results': results,
          'feature_action': selected_featureactionid,
          'authenticated': authenticated,
@@ -1746,8 +1764,12 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         # order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
         # .annotate(Min('price')).order_by('price')[0]
         datetime_entered_end_date = datetime.strptime(entered_end_date, '%Y-%m-%d %H:%M')
-        entered_start_date = datetime_entered_end_date - timedelta(
-            map_config['time_series_months'] * 365 / 12)  # .strftime('%Y-%m-%d %H:%M')
+        if popup == 'smll':
+            entered_start_date = datetime_entered_end_date - timedelta(
+                settings.SENSOR_DASHBOARD['time_series_days'])
+        else:
+            entered_start_date = datetime_entered_end_date - timedelta(
+                map_config['time_series_months'] * 365 / 12)  # .strftime('%Y-%m-%d %H:%M')
         entered_start_date = entered_start_date.strftime('%Y-%m-%d %H:%M')
     for selectedMResult in selectedMResultSeries:
         i += 1
@@ -1920,6 +1942,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     return TemplateResponse(request, template, {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'startDate': entered_start_date,
                                                 'endDate': entered_end_date,
+                                                'popup': popup,
                                                 # 'emailsent': emailsent,
                                                 # 'outEmail': outEmail,
                                                 'useSamplingFeature': useSamplingFeature,
