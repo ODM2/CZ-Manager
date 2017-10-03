@@ -83,7 +83,7 @@ class Command(BaseCommand):
                 dashboardlastrecordedvalue = Resultextensionpropertyvalues.objects.filter(resultid=tsr.resultid).get(
                     propertyid=dashboardlastrecordedvaluepid)
                 dashboardlastrecordedvalue.propertyvalue = str(lastvalue.datavalue) + " " \
-                                                           + str(lastvalue.resultid.resultid.unitsid)
+                                                           + str(lastvalue.resultid.resultid.unitsid.unitsname)
                 dashboardlastrecordedvalue.save()
             except ObjectDoesNotExist:
                 dashboardlastrecordedvalue = Resultextensionpropertyvalues(resultid=tsr.resultid,

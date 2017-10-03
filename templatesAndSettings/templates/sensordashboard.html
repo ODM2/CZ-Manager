@@ -108,7 +108,7 @@ $(document).ready(function(){
 <object width="0" height="0" title="graph" id="highcharts_graph" type="text/html"></object>
 </div>
 {% for featureaction in featureactions %}
-	<h3> {{featureaction.samplingfeatureid}} - {{featureaction.action.method.methodcode}}</h3>
+	<h3> {{featureaction.featureactionid}} {{featureaction.samplingfeatureid}} - {{featureaction.action.method.methodcode}}</h3>
 {% endfor %}
 <table>
 					<tr class="sensor-dashboard">	
@@ -127,14 +127,12 @@ $(document).ready(function(){
 					<td></td></tr>
 					{% for result in results %}
 						{% if featureaction == result.featureactionid %}
-							<tr class="sensor-dashboard-header"><th >Time series</td>
-							<th>Variable</th>
-							<th>Units</th>
+							<tr class="sensor-dashboard-header"><th colspan=3>Time series</th>
 							<th>View Time Series</th></tr>
 							<tr>
-							<tr ><td class="sensor-dashboard-header">{{result.resultid}} - {{result.featureactionid.action.actiondescription}}</td>
-							<td class="sensor-dashboard-header">{{result.variableid}}</td>
-							<td class="sensor-dashboard-header">{{result.unitsid.unitsabbreviation}}</td>
+							<tr ><td class="sensor-dashboard-header" colspan=2>{{result.resultid}} - {{result.featureactionid.action.actiondescription}} -{{result.variableid}} - {{result.unitsid.unitsname}}</td>
+
+							<td class="sensor-dashboard-header"></td>
 							<td class="sensor-dashboard-header"> <div class="header">
 							<a class="load_time_series" style="cursor: pointer;"><span>View Time Series</span></a>
 							</div>
