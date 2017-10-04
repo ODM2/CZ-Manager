@@ -2,6 +2,10 @@ language: python
 
 sudo: false
 
+env:
+  global:
+    - secure: "pnfW9b6SpYSWmWPAvTygkOWUjohSOCC+vH4i1lXiGXOG1UUK6F0GsJNEts0SlLvY9Qy4dfrFzyJWEIQ+UNsMOD/gruRgtVQpdzNkGgrAbkZmSpKGSZaj0kqlCPhSKsqOoX2eTaLZfMuW4U7x7h2OVTLE9RORN3kix5DnO9/O+AwVGTP+J55+YngGimWYfJnhP0ECpKNu1sKUf8ZAo2EQPW+8V4nA+QwtzmE+3AfXGSvHsbzMVbn1yRxLzps7vcj2YIufwTWHwE5JRGHMVo/0/Dk3DaORgPyUp19H78Nz4EgW5aiPuiMDdYkmf/RKcrxtMHXFPGBYh1u6RX+crfX3Nyxrbdip703bq/8JcElhzadQmIfQNwYXfC1tU8b67qYATerhXDgQD7EV0ummSbzYeZMJlNyp5Djoel+cDZ/+FFVQNYUJeiVxq8t1LS8iPo/8/ddguuuSQ2d1oPG/t8NgcezRXAug8B1fSce3PHdZALe2SQLubfYMC+q9Kq8vpsMTLYOJUNCywivDTGgv9iJ4ll0XTN2HKD8S+u9mRZTVLarN+dk9SioqppU9ttAYfZK/1Mv+fQ0WXOtutkaZoDSjli3WVFCLkLDuulXR8Y2jd1k1hrnNQ1ZtsEiUP2ASohsBnQM1RubRqj7ceGRhJsq5EfIPwBTh6hQj2UxoA/vrIig="
+
 matrix:
   fast_finish: true
   include:
@@ -13,20 +17,22 @@ matrix:
     env: TEST_TARGET=default
   - python: 2.7
     env: TEST_TARGET=coding_standards
+  - python: 3.6
+    env: TEST_TARGET=docs
   allow_failures:
   - python: 2.7
     env: TEST_TARGET=coding_standards
 
 
 before_install:
-    - wget http://bit.ly/miniconda -O miniconda.sh
-    - bash miniconda.sh -b -p $HOME/miniconda
-    - export PATH="$HOME/miniconda/bin:$PATH"
-    - conda update conda --yes
-    - conda config --add channels conda-forge --force
-    - conda create --yes -n TEST python=$TRAVIS_PYTHON_VERSION --file requirements.txt --file requirements-dev.txt
-    - source activate TEST
-
+  - wget http://bit.ly/miniconda -O miniconda.sh
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
+  - conda update conda
+  - conda config --add channels conda-forge --force
+  - conda create -n TEST python=$TRAVIS_PYTHON_VERSION --file requirements.txt --file requirements-dev.txt
+  - source activate TEST
 
 install:
   - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2admin-${version}.tar.gz && popd
@@ -38,3 +44,17 @@ script:
   - if [[ $TEST_TARGET == 'coding_standards' ]]; then
       find . -type f -name "*.py" ! -name "base.py" | xargs flake8 --max-line-length=100 --ignore=E402 ;
     fi
+
+  - if [[ $TEST_TARGET == 'docs' ]]; then
+      set -e ;
+      conda install doctr ;
+      pushd docs ;
+      make clean html linkcheck ;
+      popd ;
+      python -m doctr deploy --sync .;
+      python -m doctr deploy --sync --no-require-master  --built-docs docs/build/html "docs-$TRAVIS_BRANCH" ;
+    fi
+
+doctr:
+  require-master: true
+  sync: False
