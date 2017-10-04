@@ -36,7 +36,6 @@ or
 
 .. code:: bash
 
-  # creates an env with the dependencies
   conda config --add channels conda-forge --force
   conda create -n ENVNAME python=2.7 --file requirements.txt
 
@@ -44,7 +43,7 @@ or create the conda environment with the development requirements as well:
 
 .. code:: bash
 
-  conda create -n ENVNAME python=2.7 --file requirements.txt --file requirements-dev.txt
+  conda create -n ENVNAME python=2.7 --file requirements.txt --file requirements-dev.txt --channel conda-forge
 
 You will need to run ``extrasql.sql`` on a postgreSQL instance of ODM2,
 a blank schema script can be found here:
