@@ -1375,12 +1375,17 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         realstartdates = []
         realenddates = []
         for startdate in startdates:
-            realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M"))
+            if len(startdate.propertyvalue) == 16:
+                realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M"))
+            else:
+                realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M:%S.%f"))
         for enddate in enddates:
-            realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M"))
+            if len(enddate.propertyvalue) == 16:
+                realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M")) #%Y-%m-%d %H:%M
+            else:
+                realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M:%S.%f"))
         startdate = min(realstartdates).strftime('%Y-%m-%d %H:%M')
         enddate = max(realenddates).strftime('%Y-%m-%d %H:%M')
-
     except (ObjectDoesNotExist) as e:
         try:
             startdate = Timeseriesresultvalues.objects.\
@@ -1391,15 +1396,22 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                 filter(resultid__in=resultList.values("resultid")).\
                 annotate(Max('valuedatetime')).\
                 order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-        except IndexError:
+        except IndexError as e:
+            # html = "<html><body>No Data Available Yet.</body></html>"
+            # return HttpResponse(html)
+            startdate = Timeseriesresultvalues.objects.\
+                filter(resultid__in=resultList.values("resultid")).\
+                annotate(Min('valuedatetime')).\
+                order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+            enddate = Timeseriesresultvalues.objects.\
+                filter(resultid__in=resultList.values("resultid")).\
+                annotate(Max('valuedatetime')).\
+                order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+            methodsOnly = 'True'
+    except ValueError as e:
             # html = "<html><body>No Data Available Yet.</body></html>"
             # return HttpResponse(html)
             methodsOnly = 'True'
-    except ValueError:
-            # html = "<html><body>No Data Available Yet.</body></html>"
-            # return HttpResponse(html)
-            methodsOnly = 'True'
-
     return TemplateResponse(request, template, {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'useSamplingFeature': useSamplingFeature,
                                                 'methodsOnly': methodsOnly,
