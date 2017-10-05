@@ -211,7 +211,7 @@ class Command(BaseCommand):
                                                     dt_obj = datetime(*dateTuple[0:6])
                                                     dateT = dt_obj.strptime(row[dateTimeColNum],
                                                                       "%Y-%m-%d %H:%M:%S.%f")
-                                                    datestr= dt_obj.strftime("%Y-%m-%d %H:%M")
+                                                    datestr= dt_obj.strftime("%Y-%m-%d %H:%M:%S")
                                         except ValueError:
                                             continue
                         #if you encounter a blank line continue and try the next one
@@ -293,7 +293,12 @@ class Command(BaseCommand):
                                         if check_dates:
                                             try:
                                                 enddatestr = getEndDate(mresults)
-                                                enddate = time.strptime(enddatestr, '%Y-%m-%d %H:%M:%S.%f')
+                                                if len(enddatestr) == 16:
+                                                    enddate = time.strptime(enddatestr, '%Y-%m-%d %H:%M')
+                                                elif len(enddatestr) == 19:
+                                                    enddate = time.strptime(enddatestr, '%Y-%m-%d %H:%M:%S')
+                                                else:
+                                                    enddate = time.strptime(enddatestr, '%Y-%m-%d %H:%M:%S.%f')
                                                 if enddate >= dateT:  #.valuedatetime.strftime('%Y-%m-%d %H:%M')
                                                     if reversed:
                                                         stop_reading_reversed = True
