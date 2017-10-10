@@ -79,8 +79,8 @@ $(document).ready(function(){
 		//$graph = $load_time_series.next();
 		//console.log($graph);
 		document.getElementById("highcharts_graph").data=url;
-		document.getElementById("highcharts_graph").width = '100%';
-		document.getElementById("highcharts_graph").height = '600';
+		document.getElementById("highcharts_graph").width = '75%';
+		document.getElementById("highcharts_graph").height = '650';
 		
 		});
 	
@@ -104,8 +104,8 @@ $(document).ready(function(){
 {% endfor %}
 </select>
 <div  id="spinner"></div>
-<div class="graph" id="graph">
-<object width="0" height="0" title="graph" id="highcharts_graph" type="text/html"></object>
+<div class="graph-container" id="graph">
+<object title="graph" id="highcharts_graph" type="text/html"></object>
 </div>
 {% for featureaction in featureactions %}
 	<h3> {{featureaction.featureactionid}} {{featureaction.samplingfeatureid}} - {{featureaction.action.method.methodcode}}</h3>
