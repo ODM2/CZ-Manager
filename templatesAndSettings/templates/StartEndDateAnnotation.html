@@ -45,7 +45,7 @@ $(document).ready(function(){
 					'myresultSeriesExport[]': myresultSeriesExport,
 					'csrfmiddlewaretoken': '{{ csrf_token }}', 
 				},
-				success : function(json) {
+				complete : function(json) {
 					var emailbutton = document.getElementById("email_data"); //$("#email_data");
 					emailbutton.firstChild.data = "email sent";
         },
