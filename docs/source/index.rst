@@ -8,6 +8,9 @@ from NSF Grant EAR-1331841 Luquillo CZO.
 
 ODM2 can be found here: https://github.com/ODM2
 
+Other ODM2 tools can be used in conjunction with ODM2 Admin, extensive
+testing has been done using ODM2 Admin with ODM2PythonAPI and WOFpy.
+
 Django models exist for all ODM2 tables. Forms for ODM2Core and
 a number of additional ODM2 tables. Sites are mapped via a leaflet mapping interface.
 Graphing of time series result values via highcharts are implemented.
@@ -29,7 +32,7 @@ views used for efficiently exporting data as emails.
 
 Primary Installation
 --------------------
-See Docker Folder for dockerhub installation instructions or
+See Docker Folder for dockerhub installation instructions this is the fastest way to get started or
 
 .. code:: bash
 
@@ -57,7 +60,12 @@ https://github.com/ODM2/ODM2/tree/master/src/blank_schema_scripts/postgresql
    :maxdepth: 2
    :caption: Contents:
 
+Using ODM2 Admin
+==================
+.. toctree::
+   :maxdepth: 2
 
+   ODM2AdminShortcuts
 
 Indices and tables
 ==================

@@ -16,6 +16,9 @@ imported as long as data logger file columns and results are properly
 setup.
 ODM2 can be found here: https://github.com/ODM2
 
+Other ODM2 tools can be used in conjunction with ODM2 Admin, extensive
+testing has been done using ODM2 Admin with ODM2PythonAPI and WOFpy.
+
 The file ``settings.yaml`` contains all of the database and local
 file system settings which need to be configured to get a copy of this
 application working. This was developed using a postgresql version of
@@ -70,27 +73,5 @@ https://docs.djangoproject.com/en/1.9/ref/contrib/gis/install/
 
 psycopg2
 
-on ubuntu apt-get install python-psycopg2
-
-django-uuidfield https://github.com/dcramer/django-uuidfield
-
-django-ajax-selects https://github.com/crucialfelix/django-ajax-selects
-
-django-admin-shortcuts
-https://github.com/alesdotio/django-admin-shortcuts/
-
-djangocms\_admin\_style https://github.com/divio/djangocms-admin-style
-
-use this version: pip install djangocms-admin-style==0.2.7
-
-django-apptemplates https://pypi.python.org/pypi/django-apptemplates/
-
-django-daterange-filter
-https://pypi.python.org/pypi/django-daterange-filter/1.1.1
-
-django-import-export
-https://django-import-export.readthedocs.org/en/latest/installation.html
-
-django-jquery
-
-django-recaptcha
+Install all of the requirements in the requirements.txt file
+https://github.com/ODM2/ODM2-Admin/blob/master/requirements.txt
