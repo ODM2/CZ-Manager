@@ -23,6 +23,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ODM2 Admin Shortcuts" href="ODM2AdminShortcuts.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -69,11 +70,15 @@
 
 
 <h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ODM2AdminShortcuts.html">ODM2 Admin Shortcuts</a></li>
+</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="ODM2AdminShortcuts.html" title="next chapter">ODM2 Admin Shortcuts</a></li>
   </ul></li>
 </ul>
 </div>
@@ -95,16 +100,18 @@
             
   <div class="section" id="odm2-admin">
 <h1>ODM2 Admin<a class="headerlink" href="#odm2-admin" title="Permalink to this headline">¶</a></h1>
-<p>This is a Django admin app for Observation Data Model 2 (ODM2). ODM2
+<p>This is an app for site level data management using Observation Data Model 2 (ODM2). ODM2
 was created through National Science Foundation Grant EAR-1224638.
 Support for the development of this application comes
 from NSF Grant EAR-1331841 Luquillo CZO.</p>
+<p>ODM2 can be found here: <a class="reference external" href="https://github.com/ODM2">https://github.com/ODM2</a></p>
+<p>Other ODM2 tools can be used in conjunction with ODM2 Admin, extensive
+testing has been done using ODM2 Admin with ODM2PythonAPI and WOFpy.</p>
 <p>Django models exist for all ODM2 tables. Forms for ODM2Core and
-a number of additional ODM2 tables. Graphing of measurement result
-values via highcharts are implemented. Data logger files can be
-imported as long as data logger file columns and results are properly
-setup.
-ODM2 can be found here: <a class="reference external" href="https://github.com/ODM2">https://github.com/ODM2</a></p>
+a number of additional ODM2 tables. Sites are mapped via a leaflet mapping interface.
+Graphing of time series result values via highcharts are implemented.
+Data logger files can be imported with properly configured data logger file columns and
+time series results results.</p>
 <p>The file <code class="docutils literal"><span class="pre">settings.yaml</span></code> contains all of the database and local
 file system settings which need to be configured to get a copy of this
 application working. This was developed using a postgresql version of
@@ -116,6 +123,7 @@ restored to an empty database. An extrasql.sql file contains some extra
 views used for efficiently exporting data as emails.</p>
 <div class="section" id="primary-installation">
 <h2>Primary Installation<a class="headerlink" href="#primary-installation" title="Permalink to this headline">¶</a></h2>
+<p>See Docker Folder for dockerhub installation instructions this is the fastest way to get started or</p>
 <div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
 </pre></div>
 </div>
@@ -133,6 +141,14 @@ a blank schema script can be found here:
 <a class="reference external" href="https://github.com/ODM2/ODM2/tree/master/src/blank_schema_scripts/postgresql">https://github.com/ODM2/ODM2/tree/master/src/blank_schema_scripts/postgresql</a></p>
 <div class="toctree-wrapper compound">
 </div>
+</div>
+</div>
+<div class="section" id="using-odm2-admin">
+<h1>Using ODM2 Admin<a class="headerlink" href="#using-odm2-admin" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ODM2AdminShortcuts.html">ODM2 Admin Shortcuts</a></li>
+</ul>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -154,7 +170,7 @@ a blank schema script can be found here:
       &copy;2017, Miguel Leon.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.5</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
