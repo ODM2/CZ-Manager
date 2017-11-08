@@ -33,12 +33,12 @@ views used for efficiently exporting data as emails.
 pip install -r requirements.txt
 or
 
-# creates an env with the dependencies
+# creates a conda enviornment with the dependencies
 conda config --add channels conda-forge --force
 conda create -n ENVNAME python=2.7 --file requirements.txt
 
 or create the conda environment with the development requirements as well:
-conda create -n ENVNAME python=2.7 --file requirements.txt --file requirements-dev.txt
+  conda create -n ENVNAME python=2.7 --file requirements.txt --file requirements-dev.txt --channel conda-forge
 
 # install the dependencies in the current env similar to the pip command above
 conda install --file requirements.txt
