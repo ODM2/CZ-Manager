@@ -57,7 +57,12 @@ class Command(BaseCommand):
             recordedenddate = Resultextensionpropertyvalues.objects.filter(resultid=tsr.resultid).get(
                 propertyid=endDateProperty)
             end_date = recordedenddate.propertyvalue
-            enddt = time.strptime(end_date, "%Y-%m-%d %H:%M")
+            if len(end_date) == 16:
+                enddt = time.strptime(end_date, "%Y-%m-%d %H:%M")
+            elif len(end_date) == 19:
+                enddt = time.strptime(end_date, "%Y-%m-%d %H:%M:%S")
+            else:
+                enddt = time.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f")
             dt = datetime.fromtimestamp(mktime(enddt))
             dashboard_start_date = dt - timedelta(days=timeseriesdays)
             tmp_start_date = dashboard_start_date.strftime('%Y-%m-%d %H:%M')

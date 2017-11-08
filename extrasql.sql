@@ -160,3 +160,40 @@ CREATE OR REPLACE VIEW odm2extra.timeseriesresultvaluesextwannotations AS
 
 ALTER TABLE odm2extra.timeseriesresultvaluesextwannotations
   OWNER TO postgres;
+
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET search_path = odm2, pg_catalog;
+
+--
+-- TOC entry 4452 (class 0 OID 59969)
+-- Dependencies: 385
+-- Data for Name: extensionproperties; Type: TABLE DATA; Schema: odm2; Owner: azureadmin
+--
+
+INSERT INTO extensionproperties VALUES (1, 'end date', 'The current end date for the result series', 'String', 11);
+INSERT INTO extensionproperties VALUES (2, 'start date', 'The start date for the result series', 'String', 11);
+INSERT INTO extensionproperties VALUES (4, 'dashboard above upper bound count', 'for time series result dashboard - count of values above upper bound.', 'Integer', 20);
+INSERT INTO extensionproperties VALUES (5, 'dashboard below lower bound count', 'for time series result dashboard - count of values below lower bound.', 'Integer', 20);
+INSERT INTO extensionproperties VALUES (7, 'dashboard begin date', 'calculated value for the sensor dashboard from sensor dashboard settings using time_series_days', 'String', 11);
+INSERT INTO extensionproperties VALUES (6, 'dashboard maximum count', 'maximum count of time series values for dashboard', 'Integer', 20);
+INSERT INTO extensionproperties VALUES (3, 'dashboard count', 'a count of time series results for the dashboard', 'Integer', 20);
+INSERT INTO extensionproperties VALUES (9, 'dashboard sensor active', 'if the last recorded value is 0 or NaN the sensor does not appear to be active.', 'Boolean', 21);
+INSERT INTO extensionproperties VALUES (8, 'dashboard last recorded value', 'last value recorded by sensor', 'Floating point number', 20);
+
+
+--
+-- TOC entry 4458 (class 0 OID 0)
+-- Dependencies: 384
+-- Name: extensionproperties_propertyid_seq; Type: SEQUENCE SET; Schema: odm2; Owner: azureadmin
+--
+
+SELECT pg_catalog.setval('extensionproperties_propertyid_seq', 9, true);
+

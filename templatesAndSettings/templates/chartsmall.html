@@ -86,13 +86,20 @@ $(document).ready(function() {
         xAxis: xAxis,
         yAxis:yaxes,
         series: series,
-		tooltip: {
-    formatter: function() {
-        return ''+
-                 ' Value: ' + this.y + 
-                '-- Date: '+ Highcharts.dateFormat(' %e-%b-%Y %I:%M %p', this.x);
-    }
-},
+    tooltip: {
+        backgroundColor: 'white',
+        borderWidth: 0,
+        borderRadius: 0,
+	xDateFormat: '%e-%b-%Y %I:%M %p',
+        headerFormat: '{point.key} ',
+        pointFormat: ' | <span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b>',
+        positioner: function () {
+            return { x: 10, y: 50 };
+        },
+
+        shadow: false,
+        split: false
+    },
     });
 	
 	//alert(name_of_units.length);
@@ -102,7 +109,7 @@ $(document).ready(function() {
 	});
 	 
 </script>
-    <div id='content-main' style="width: 800px; height: 500px;">
+    <div id='content-main' style="width: 100%; height: 90%;">
 <p><h1 >
 
 
@@ -119,7 +126,7 @@ $(document).ready(function() {
 {% endif %}
  {% csrf_token %}
 
-	<div id='chartid' class="chart" style="height:100%; width:100%; margin: 0 auto;"></div>
+	<div id='chartid' class="chart" style="height:100%; width:100%;"></div>
 	
 {% endblock %}
 

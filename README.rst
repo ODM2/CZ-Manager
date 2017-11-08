@@ -1,8 +1,8 @@
 ODM2 Admin
 ==========
 
-.. image:: https://travis-ci.org/miguelcleon/ODM2-Admin.svg?branch=master
-   :target: https://travis-ci.org/miguelcleon/ODM2-Admin
+.. image:: https://travis-ci.org/ODM2/ODM2-Admin.svg?branch=master
+   :target: https://travis-ci.org/ODM2/ODM2-Admin
 
 This is a Django admin app for Observation Data Model 2 (ODM2). ODM2
 was created through National Science Foundation Grant EAR-1224638.
@@ -33,11 +33,11 @@ views used for efficiently exporting data as emails.
 pip install -r requirements.txt
 or
 
-# creates an env with the depepencies
+# creates an env with the dependencies
 conda config --add channels conda-forge --force
 conda create -n ENVNAME python=2.7 --file requirements.txt
 
-or create the conda environment with the developement requirements as well:
+or create the conda environment with the development requirements as well:
 conda create -n ENVNAME python=2.7 --file requirements.txt --file requirements-dev.txt
 
 # install the dependencies in the current env similar to the pip command above
