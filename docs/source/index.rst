@@ -62,9 +62,12 @@ https://github.com/ODM2/ODM2/tree/master/src/blank_schema_scripts/postgresql
 
 Using ODM2 Admin
 ==================
+
+The documents below provide instructions on using ODM2 Admin.
+
 .. toctree::
    :maxdepth: 2
-
+   GettingStartedInODM2Admin
    ODM2AdminShortcuts
 
 Indices and tables
