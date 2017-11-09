@@ -1,7 +1,10 @@
 docs-master/GettingStartedInODM2Admin.html
+docs-master/InstallODM2AdminWithDocker.html
 docs-master/ODM2AdminShortcuts.html
+docs-master/_images/ODM2AdminInfrastructure.png
 docs-master/_images/ODM2AdminShortcuts.png
 docs-master/_sources/GettingStartedInODM2Admin.rst.txt
+docs-master/_sources/InstallODM2AdminWithDocker.rst.txt
 docs-master/_sources/ODM2AdminShortcuts.rst.txt
 docs-master/_sources/index.rst.txt
 docs-master/_static/ajax-loader.gif
