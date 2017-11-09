@@ -47,7 +47,7 @@ The fastest way to get started is to install with DockerHub:
 
    InstallODM2AdminWithDocker
 
-Alternatively you can download the source code from github (https://github.com/ODM2/ODM2-Admin.git) setup a conda
+Alternatively you can download the source code from github (https://github.com/ODM2/ODM2-Admin) setup a conda
 environment, create an ODM2 database, run the extrasql.sql script (found in the root directory of the source code)
 on that database, and change settings in:
 

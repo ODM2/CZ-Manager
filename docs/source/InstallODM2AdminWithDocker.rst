@@ -25,4 +25,4 @@ command.
 
 
 follow the interactive prompt, once complete you will be able to login through
-a web browser at http://127.0.0.1:8010 with your new account.
+a web browser at 127.0.0.1:8010 with your new account.
