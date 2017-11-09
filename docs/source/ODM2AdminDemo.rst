@@ -1,6 +1,7 @@
 ODM2 Admin Demo
 ===============
 
+
 Below is a tutorial which explains many of the features of ODM2 Admin. Links contained here access a Demonstartion
 version of ODM2 Admin, the ODM2 Admin sandbox hosted by CUAHSI. If you would like access to the sandbox please email
 leonmi@sas.upenn.edu
@@ -30,12 +31,17 @@ Upon logging into ODM2 Admin you will see the below navigation shortcuts across 
 * Fifth, Manage Citations, provides links for managing and exporting citations.
 * Sixth, Graph My Data, provides links for data plotting and a map of your sites.
 
+
 The ODM2 Admin Administration link will take you to a list of all 44 ODM2 entities that can be directly managed using
 ODM2 Admin. Additional entities exist within the ODM2 information model these need to be managed with another tool
 Such as with the ODM2PythonAPI. Django models exist for each ODM2 entity so it is also possible to write Python scripts
-using the Django ORM.
+using the Django Object relational mapper. See :ref:`Managing-ODM2-With-The-Django-ORM` for details on using the Django
+ORM with ODM2 databases.
+
 
 .. toctree::
    :maxdepth: 1
 
-    ODM2AdminAdministration
+   ODM2AdminAdministration
+   ManagingODM2WithTheDjangoORM
+

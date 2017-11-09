@@ -13,8 +13,8 @@ ODM2 can be found here: https://github.com/ODM2
 Other ODM2 tools can be used in conjunction with ODM2 Admin, extensive
 testing has been done using ODM2 Admin with ODM2PythonAPI and WOFpy.
 
-Django ORM models exist for all ODM2 tables. Forms for ODM2Core and
-a number of additional ODM2 tables. Sites are mapped via a leaflet mapping interface.
+Django ORM models exist for all ODM2 tables. Web forms for ODM2Core and
+a number of additional ODM2 tables. Sites and sampling features are mapped via a leaflet mapping interface.
 Graphing of time series result values via highcharts are implemented.
 Data logger files can be imported with properly configured data logger file columns and
 time series results results.
