@@ -21,10 +21,8 @@ setup.
 Other ODM2 tools can be used in conjunction with ODM2 Admin, extensive
 testing has been done using ODM2 Admin with ODM2PythonAPI and WOFpy.
 
-The file ``settings.yaml`` contains all of the database and local
-file system settings which need to be configured to get a copy of this
-application working. This was developed using a postgresql version of
-ODM2 data model, additional modifications will be needed to make this
+This was developed using a postgresql version of
+ODM2 data model, additional modifications may be needed to make this
 work with MSSQL or another database.
 
 An example postgresql database named ODM2AdminExamplePostgresqlDB is

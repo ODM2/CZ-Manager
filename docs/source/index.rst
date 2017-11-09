@@ -87,5 +87,4 @@ The documents below provide instructions on using ODM2 Admin.
    :maxdepth: 1
 
    GettingStartedInODM2Admin
-   ODM2AdminShortcuts
-
+   ODM2AdminDemo
