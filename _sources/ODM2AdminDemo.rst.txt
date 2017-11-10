@@ -39,9 +39,11 @@ using the Django Object relational mapper. See :ref:`Managing-ODM2-With-The-Djan
 ORM with ODM2 databases.
 
 
+
 .. toctree::
    :maxdepth: 1
 
    ODM2AdminAdministration
    ManagingODM2WithTheDjangoORM
+   Using Data Logger Files <DataLoggerFiles>
 
