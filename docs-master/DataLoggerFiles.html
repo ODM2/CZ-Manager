@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Managing ODM2 With The Django ORM &#8212; ODM2-Admin 0.1.0 documentation</title>
+    <title>Data Logger Files &#8212; ODM2-Admin 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -23,8 +23,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Data Logger Files" href="DataLoggerFiles.html" />
-    <link rel="prev" title="ODM2 Admin Administration" href="ODM2AdminAdministration.html" />
+    <link rel="prev" title="Managing ODM2 With The Django ORM" href="ManagingODM2WithTheDjangoORM.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -84,8 +83,7 @@
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="ODM2AdminDemo.html">ODM2 Admin Demo</a><ul>
-      <li>Previous: <a href="ODM2AdminAdministration.html" title="previous chapter">ODM2 Admin Administration</a></li>
-      <li>Next: <a href="DataLoggerFiles.html" title="next chapter">Data Logger Files</a></li>
+      <li>Previous: <a href="ManagingODM2WithTheDjangoORM.html" title="previous chapter">Managing ODM2 With The Django ORM</a></li>
   </ul></li>
   </ul></li>
 </ul>
@@ -106,16 +104,48 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="managing-odm2-with-the-django-orm">
-<span id="id1"></span><h1>Managing ODM2 With The Django ORM<a class="headerlink" href="#managing-odm2-with-the-django-orm" title="Permalink to this headline">¶</a></h1>
-<p>While not all of the ODM2 entities are exposed through the ODM2 Admin interface all of the entities can be managed
-using Python scripts using either ODM2PythonAPI or the Django ORM using the models in ODM2 Admin. Two examples using
-the Django ORM come with the source code of ODM2 Admin.</p>
-<p>The ODM2PythonAPI can be found here: <a class="reference external" href="https://github.com/ODM2/ODM2PythonAPI">https://github.com/ODM2/ODM2PythonAPI</a></p>
-<p>An example merging data from a csv file to  fill a gap in a time series can be found here:
-<a class="reference external" href="https://github.com/ODM2/ODM2-Admin/blob/master/example_scripts/SonadoraNitrateFill.py">https://github.com/ODM2/ODM2-Admin/blob/master/example_scripts/SonadoraNitrateFill.py</a></p>
-<p>An example creating soil profile result values from a file can be found here:
-<a class="reference external" href="https://github.com/ODM2/ODM2-Admin/tree/master/soilsIngestionExample">https://github.com/ODM2/ODM2-Admin/tree/master/soilsIngestionExample</a></p>
+  <div class="section" id="data-logger-files">
+<h1>Data Logger Files<a class="headerlink" href="#data-logger-files" title="Permalink to this headline">¶</a></h1>
+<p>Ingesting data by uploading and processing data logger files is a key feature of ODM2 Admin. While logged into the
+ODM2 Sandbox you can navigate to <a class="reference external" href="https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/dataloggerfiles/">https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/dataloggerfiles/</a></p>
+<img alt="_images/DataLoggerFiles.png" src="_images/DataLoggerFiles.png" />
+<ol class="arabic">
+<li><p class="first">Select the first data logger file ending in QP_DO
+<a class="reference external" href="https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/dataloggerfiles/133/change/">https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/dataloggerfiles/133/change/</a></p>
+</li>
+<li><p class="first">Download and open the file, we can see that the file has 3 columns, Date Time GMT-04:00, DO Conc, and Temp
+the data logger file model correspondingly also has 3 data logger file columns.</p>
+</li>
+<li><p class="first">Click SHOW on the first data logger file column, this data logger file column has a data result, an insturment output
+variable and a Column label. The column label must match a column label in the file for the data logger file to be
+ingested.
+The data logger file column also has a recording interval and a recording interval units as well as an aggregation
+statistic.</p>
+</li>
+<li><p class="first">The Data result contains much of the information about how our time series is configured. Go to the data results page
+(<a class="reference external" href="https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/results/">https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/results/</a>) to find our result. If we search for Prieta, the name
+of the site, we will find our data result as in the below image.</p>
+<img alt="_images/DataResultListPage.png" src="_images/DataResultListPage.png" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</li>
+<li><p class="first">Now select the data result, with the variable DO Concentration and ID 21
+(<a class="reference external" href="https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/results/21/change/">https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/results/21/change/</a>).</p>
+</li>
+<li><p class="first">We can see that here the sampling feature / location action is defined, the Result type (time series coverage),
+The variable, units, processing level, as well as other fields many of them optional. We also see Time Series
+Results, Measurement Results and Profile Results.
+Because this data result defines a time series it needs to have an associated time series result.</p>
+<img alt="_images/DataResultChangeView.png" src="_images/DataResultChangeView.png" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</li>
+<li><p class="first">We can click the + icon to add a variable, unit processing level or other field, we can click the pencil icon to edit
+the current item.</p>
+</li>
+</ol>
 </div>
 
 
@@ -132,7 +162,7 @@ the Django ORM come with the source code of ODM2 Admin.</p>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="_sources/ManagingODM2WithTheDjangoORM.rst.txt"
+      <a href="_sources/DataLoggerFiles.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
