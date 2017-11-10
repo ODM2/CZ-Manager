@@ -55,16 +55,15 @@ MAP_CONFIG = {
     "lat": 0,
     "lon": 0,
     "zoom": 2,
-    "cluster_sites": False,
-    "time_series_months": 3,
-    "cluster_feature_types": ['Profile','Specimen','Excavation','Field area',
-                             'Ecological land classification','Transect'],
+    "cluster_feature_types": ['Profile','Specimen','Excavation','Field area'],
+    "time_series_months": 1,
     "display_titles": True,
     "MapBox": {
       "access_token": 'mapbox accessToken'
     },
     "result_value_processing_levels_to_display": [1, 2, 3],
-    "feature_types": ['Site','Profile','Specimen']
+    "feature_types": ['Site','Profile','Specimen','Excavation','Field area',
+                  'Weather station','Observation well','Stream gage','Transect']
 }
 """ END MAP CONFIGURATION """
 

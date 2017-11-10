@@ -44,6 +44,6 @@ ORM with ODM2 databases.
    :maxdepth: 1
 
    ODM2AdminAdministration
-   ManagingODM2WithTheDjangoORM
    Using Data Logger Files <DataLoggerFiles>
+   ManagingODM2WithTheDjangoORM
 
