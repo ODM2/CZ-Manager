@@ -75,6 +75,7 @@
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="GettingStartedInODM2Admin.html">Getting Started With ODM2 Admin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ODM2AdminSettings.html">configuring ODM2 Admin Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ODM2AdminDemo.html">ODM2 Admin Demo</a></li>
 </ul>
 
@@ -119,11 +120,11 @@ time series results results.</p>
 <div class="section" id="diagram-of-odm2-admin-infrastructure">
 <h2>Diagram of ODM2 Admin infrastructure:<a class="headerlink" href="#diagram-of-odm2-admin-infrastructure" title="Permalink to this headline">¶</a></h2>
 <img alt="_images/ODM2AdminInfrastructure.png" src="_images/ODM2AdminInfrastructure.png" />
-<p>The file <code class="docutils literal"><span class="pre">settings.yaml</span></code> contains all of the database and local
-file system settings which need to be configured to get a copy of this
-application working. This was developed using a postgresql version of
-ODM2 data model, additional modifications will be needed to make this
-work with MSSQL or another database.</p>
+<p>The file <code class="docutils literal"><span class="pre">templatesAndSettings/settings/development.py</span></code> contains all
+of the database and local file system settings which need to be configured
+to get a copy of this application working. This was developed using a
+postgresql version of ODM2 data model, additional modifications will be
+needed to make this work with MSSQL or another database.</p>
 <p>An example postgresql database named ODM2AdminExamplePostgresqlDB is
 provided, this is a custom postgresql format backup which can be
 restored to an empty database. An extrasql.sql file contains some extra
@@ -142,9 +143,9 @@ environment, create an ODM2 database, run the extrasql.sql script (found in the 
 on that database, and change settings in:</p>
 <p>ODM2-Admin-mastertemplatesAndSettingssettingsbase.py
 ODM2-Admin-mastertemplatesAndSettingssettingsdevelopment.py</p>
-<p>When your depolying to production you will want to change the settings in production.py instead of development.py
+<p>When you are depolying to production you will want to change the settings in production.py instead of development.py
 You can also have the settings files point to an existing ODM2 database, you will need to run the extrasql.sql on
-the database.</p>
+the database. For more details on settings see <a class="reference internal" href="ODM2AdminSettings.html#odm2-admin-settings"><span class="std std-ref">ODM2 Admin Settings</span></a></p>
 <div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
 </pre></div>
 </div>
@@ -168,6 +169,7 @@ a blank schema script can be found here:
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="GettingStartedInODM2Admin.html">Getting Started With ODM2 Admin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ODM2AdminSettings.html">configuring ODM2 Admin Settings</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ODM2AdminDemo.html">ODM2 Admin Demo</a></li>
 </ul>
 </div>
