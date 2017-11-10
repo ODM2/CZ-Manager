@@ -45,5 +45,6 @@ ORM with ODM2 databases.
 
    ODM2AdminAdministration
    Using Data Logger Files <DataLoggerFiles>
+   Managing Profile Results With ODM2 Admin <ProfileResults>
    ManagingODM2WithTheDjangoORM
 
