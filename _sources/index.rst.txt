@@ -25,11 +25,11 @@ Diagram of ODM2 Admin infrastructure:
 .. image:: /images/ODM2AdminInfrastructure.png
 
 
-The file ``settings.yaml`` contains all of the database and local
-file system settings which need to be configured to get a copy of this
-application working. This was developed using a postgresql version of
-ODM2 data model, additional modifications will be needed to make this
-work with MSSQL or another database.
+The file ``templatesAndSettings/settings/development.py`` contains all
+of the database and local file system settings which need to be configured
+to get a copy of this application working. This was developed using a
+postgresql version of ODM2 data model, additional modifications will be
+needed to make this work with MSSQL or another database.
 
 An example postgresql database named ODM2AdminExamplePostgresqlDB is
 provided, this is a custom postgresql format backup which can be
@@ -54,9 +54,9 @@ on that database, and change settings in:
 ODM2-Admin-master\templatesAndSettings\settings\base.py
 ODM2-Admin-master\templatesAndSettings\settings\development.py
 
-When your depolying to production you will want to change the settings in production.py instead of development.py
+When you are depolying to production you will want to change the settings in production.py instead of development.py
 You can also have the settings files point to an existing ODM2 database, you will need to run the extrasql.sql on
-the database.
+the database. For more details on settings see :ref:`ODM2-Admin-Settings`
 
 .. code:: bash
 
@@ -87,4 +87,5 @@ The documents below provide instructions on using ODM2 Admin.
    :maxdepth: 1
 
    GettingStartedInODM2Admin
+   configuring ODM2 Admin Settings <ODM2AdminSettings>
    ODM2AdminDemo

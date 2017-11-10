@@ -4,9 +4,12 @@
 ./ManagingODM2WithTheDjangoORM.html
 ./ODM2AdminAdministration.html
 ./ODM2AdminDemo.html
+./ODM2AdminSettings.html
+./_images/ClusteredSite.png
 ./_images/DataLoggerFiles.png
 ./_images/DataResultChangeView.png
 ./_images/DataResultListPage.png
+./_images/NotClustered.png
 ./_images/ODM2AdminHomePage.png
 ./_images/ODM2AdminInfrastructure.png
 ./_images/ODM2AdminShortcuts.png
@@ -16,6 +19,7 @@
 ./_sources/ManagingODM2WithTheDjangoORM.rst.txt
 ./_sources/ODM2AdminAdministration.rst.txt
 ./_sources/ODM2AdminDemo.rst.txt
+./_sources/ODM2AdminSettings.rst.txt
 ./_sources/index.rst.txt
 ./_static/ajax-loader.gif
 ./_static/alabaster.css
