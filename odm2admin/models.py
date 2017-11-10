@@ -1007,11 +1007,11 @@ class Dataloggerfilecolumns(models.Model):
 
 class Dataloggerfiles(models.Model):
     dataloggerfileid = models.AutoField(primary_key=True)
-    programid = models.ForeignKey('Dataloggerprogramfiles', db_column='programid')
-    dataloggerfilename = models.CharField(max_length=255)
-    dataloggerfiledescription = models.CharField(max_length=5000, blank=True)
+    programid = models.ForeignKey('Dataloggerprogramfiles',  verbose_name="Data logger program", db_column='programid')
+    dataloggerfilename = models.CharField(max_length=255, verbose_name="Data logger file name")
+    dataloggerfiledescription = models.CharField(max_length=5000, blank=True, verbose_name="Data logger file description")
     # dataloggerfilelink = models.CharField(max_length=255, blank=True)
-    dataloggerfilelink = models.FileField(upload_to='dataloggerfiles')  # upload_to='.'
+    dataloggerfilelink = models.FileField(upload_to='dataloggerfiles', verbose_name="Data logger file")  # upload_to='.'
     
     def dataloggerfilelinkname(self):
         return self.dataloggerfilelink.name
