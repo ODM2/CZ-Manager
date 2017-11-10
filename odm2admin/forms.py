@@ -1606,7 +1606,7 @@ duplicate_Dataloggerfiles_event.short_description = "Duplicate selected datalogg
 
 class DataLoggerFileColumnsInlineAdminForm(ModelForm):
     resultid = AutoCompleteSelectField('result_lookup', required=True,
-                                       help_text='result to extend as a soil profile result',
+                                       help_text='A data result',
                                        label='Data result',show_help_text =None)
 
     class Meta:
