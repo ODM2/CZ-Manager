@@ -9,7 +9,9 @@ from django.core.management.base import BaseCommand
 from django.core.management import settings
 from django.core import management
 from odm2admin.models import Dataloggerfiles
-
+from odm2admin.models import ProcessDataloggerfile
+from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ValidationError
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
 
@@ -29,9 +31,7 @@ class Command(BaseCommand):
         parser.add_argument('dataloggerfileid', nargs=1, type=str)
         parser.add_argument('databeginson', nargs=1, type=str)
         parser.add_argument('columnheaderson', nargs=1, type=str)
-        parser.add_argument('check_dates', nargs=1, type=bool)
-        parser.add_argument('cmdline', nargs=1, type=bool)
-        parser.add_argument('reversed', nargs=1, type=bool, default=False)
+        parser.add_argument('ftpfrequencyhours', nargs=1, type=str)
 
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
         # cmdline = bool(options['cmdline'][0])
@@ -40,14 +40,21 @@ class Command(BaseCommand):
         check_dates = bool(options['check_dates'][0])
         reversed = bool(options['reversed'][0])
         databeginson = int(options['databeginson'][0])  # int(databeginson[0])
+        ftpfrequencyhours = int(options['ftpfrequencyhours'][0])
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
-        management.call_command('update_datalogger_file', filename,str(fileid)
-                                , str(databeginson), str(columnheaderson),
-                                True, False, True)
-        management.call_command('preprocess_datalogger_file', filename,str(fileid)
-                                , str(databeginson), str(columnheaderson),
-                                 True)
+        dlf = Dataloggerfiles.objects.filter(dataloggerfileid=fileid).get()
 
-        management.call_command('ProcessDataLoggerFile', filename,str(fileid)
-                                , str(databeginson), str(columnheaderson),
-                                True, False, True)
+        filename = dlf.dataloggerfilename
+        fileid = dlf.dataloggerfileid
+        try:
+            pdlf = ProcessDataloggerfile.objects.filter(dlf.dataloggerfileid
+                                                        ).filter(processingCode__icontains='hours between download'
+                                                                 ).get()
+            raise ValidationError("This data logger file has already been setup for FTP.")
+        except ObjectDoesNotExist:
+            management.call_command('update_datalogger_file', filename,str(fileid)
+                                    , str(databeginson), str(columnheaderson),str(ftpfrequencyhours),
+                                    True, False, True)
+            management.call_command('preprocess_datalogger_file', filename,str(fileid)
+                                    , str(databeginson), str(columnheaderson),
+                                     True)

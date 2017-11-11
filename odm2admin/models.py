@@ -22,12 +22,13 @@ from django.db import models
 # from django.contrib.gis.db import models
 import csv
 import io
+from urlparse import urlparse
 import uuid
 from django.db.models import UUIDField
 from django.core import management
 from django.core.exceptions import ValidationError
 from django.core.management import settings
-
+import re
 
 def handle_uploaded_file(f, id):
     destination = io.open(settings.MEDIA_ROOT + '/resultvalues/' + f.name + '.csv', 'wb+')
