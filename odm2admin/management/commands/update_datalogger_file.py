@@ -56,17 +56,16 @@ class Command(BaseCommand):
                 filter(processingCode__icontains='hours between download')
             ftpestablished = len(pdlf)
             if ftpestablished == 0:
-                ProcessDataloggerfile(dataloggerfileid=fileid,
-                                      processingCode=str(ftpfrequencyhours)+" hours between download",
-                                      databeginson=databeginson,columnheaderson=columnheaderson)
-                ProcessDataloggerfile.save()
+                # ProcessDataloggerfile(dataloggerfileid=fileid,
+                #                      processingCode=str(ftpfrequencyhours)+" hours between download",
+                #                      databeginson=databeginson,columnheaderson=columnheaderson)
+                # ProcessDataloggerfile.save()
                 intftpfrequencyhours = int(ftpfrequencyhours)
-                if ftpfrequencyhours < 24:  #ftp fileloc
-                    kronos.register('0 */'+ str(intftpfrequencyhours) + ' * * * wget -q ' +out_file)
-                    # need a setting
-                    kronos.register('5 */' + str(intftpfrequencyhours) + ' * * *  ' + pythonpath +
-                                    " " +  apppath + "/manage.py ProcessDataLoggerFile dataloggerfiles/"+
-                                    filename + " " + fileid.dataloggerfileid + " " +
-                                    str(databeginson) + " " + str(columnheaderson) + " " + str(check_dates) +
-                                    " " + str(cmdline) + " " + str(reversed))
+                kronos.register('0 */'+ str(intftpfrequencyhours) + ' * * * wget -q ' +out_file)
+                # need a setting
+                kronos.register('5 */' + str(intftpfrequencyhours) + ' * * *  ' + pythonpath +
+                                " " +  apppath + "/manage.py ProcessDataLoggerFile dataloggerfiles/"+
+                                filename + " " + str(fileid.dataloggerfileid) + " " +
+                                str(databeginson) + " " + str(columnheaderson) + " " + str(check_dates) +
+                                " " + str(cmdline) + " " + str(reversed))
         # file = str(settings.MEDIA_ROOT) + filename  # args[0].name

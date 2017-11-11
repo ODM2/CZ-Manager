@@ -37,8 +37,6 @@ class Command(BaseCommand):
         # cmdline = bool(options['cmdline'][0])
         filename = str(options['dataloggerfilelink'][0])
         fileid = int(options['dataloggerfileid'][0])
-        check_dates = bool(options['check_dates'][0])
-        reversed = bool(options['reversed'][0])
         databeginson = int(options['databeginson'][0])  # int(databeginson[0])
         ftpfrequencyhours = int(options['ftpfrequencyhours'][0])
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
@@ -47,7 +45,7 @@ class Command(BaseCommand):
         filename = dlf.dataloggerfilename
         fileid = dlf.dataloggerfileid
         try:
-            pdlf = ProcessDataloggerfile.objects.filter(dlf.dataloggerfileid
+            pdlf = ProcessDataloggerfile.objects.filter(dataloggerfileid=dlf.dataloggerfileid
                                                         ).filter(processingCode__icontains='hours between download'
                                                                  ).get()
             raise ValidationError("This data logger file has already been setup for FTP.")
