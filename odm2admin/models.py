@@ -1036,7 +1036,12 @@ class ProcessDataloggerfile(models.Model):
                                                    "dataloggerfilecolumns.",
                                          verbose_name='data logger file',
                                          db_column='dataloggerfileid')
-    processingCode = models.CharField(max_length=255, verbose_name='processing code', default="0")
+    processingCode = models.CharField(max_length=255, verbose_name='processing code',
+                                      help_text="to setup an FTP file download set the processing" +
+                                      "code as 'x hours between download' where x is how many hours to " +
+                                      "wait between downloading copies of the file from the FTP site. " +
+                                      "A datalogger file setup for FTP download must have only 1 " +
+                                      "process data logger file record.", default="0")
     databeginson = models.IntegerField(verbose_name="Data begins on this row number", default=2)
     columnheaderson = models.IntegerField(
         verbose_name="Column headers matching column labels from data logger columns on row")
