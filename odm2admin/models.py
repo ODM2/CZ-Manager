@@ -1069,7 +1069,7 @@ class ProcessDataloggerfile(models.Model):
             ftpfrequencyhours = re.findall(r'^\D*(\d+)', self.processingCode)[0]
             management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
                                     , str(self.databeginson), str(self.columnheaderson),
-                                    str(ftpfrequencyhours))
+                                    str(ftpfrequencyhours), False)
         else:
             management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
                                     , str(self.databeginson), str(self.columnheaderson),

@@ -64,8 +64,7 @@ class Command(BaseCommand):
                 kronos.register('0 */'+ str(intftpfrequencyhours) + ' * * * wget -q ' +out_file)
                 # need a setting
                 kronos.register('5 */' + str(intftpfrequencyhours) + ' * * *  ' + pythonpath +
-                                " " +  apppath + "/manage.py ProcessDataLoggerFile dataloggerfiles/"+
+                                " " +  apppath + "/manage.py updata_preprocess_process_datalogger_file dataloggerfiles/"+
                                 filename + " " + str(fileid.dataloggerfileid) + " " +
-                                str(databeginson) + " " + str(columnheaderson) + " " + str(check_dates) +
-                                " " + str(cmdline) + " " + str(reversed))
+                                str(databeginson) + " " + str(columnheaderson) + " True ")
         # file = str(settings.MEDIA_ROOT) + filename  # args[0].name

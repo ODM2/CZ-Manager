@@ -32,9 +32,10 @@ class Command(BaseCommand):
         parser.add_argument('databeginson', nargs=1, type=str)
         parser.add_argument('columnheaderson', nargs=1, type=str)
         parser.add_argument('ftpfrequencyhours', nargs=1, type=str)
+        parser.add_argument('setupcomplete', nargs=1, type=str)
 
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
-        # cmdline = bool(options['cmdline'][0])
+        setupcomplete = bool(options['setupcomplete'][0])
         filename = str(options['dataloggerfilelink'][0])
         fileid = int(options['dataloggerfileid'][0])
         databeginson = int(options['databeginson'][0])  # int(databeginson[0])
@@ -44,15 +45,21 @@ class Command(BaseCommand):
 
         filename = dlf.dataloggerfilename
         fileid = dlf.dataloggerfileid
-        try:
-            pdlf = ProcessDataloggerfile.objects.filter(dataloggerfileid=dlf.dataloggerfileid
-                                                        ).filter(processingCode__icontains='hours between download'
-                                                                 ).get()
-            raise ValidationError("This data logger file has already been setup for FTP.")
-        except ObjectDoesNotExist:
-            management.call_command('update_datalogger_file', filename,str(fileid)
-                                    , str(databeginson), str(columnheaderson),str(ftpfrequencyhours),
-                                    True, False, True)
-            management.call_command('preprocess_datalogger_file', filename,str(fileid)
+        if not setupcomplete:
+            try:
+                pdlf = ProcessDataloggerfile.objects.filter(dataloggerfileid=dlf.dataloggerfileid
+                                                            ).filter(processingCode__icontains='hours between download'
+                                                                     ).get()
+                raise ValidationError("This data logger file has already been setup for FTP.")
+            except ObjectDoesNotExist:
+                management.call_command('update_datalogger_file', filename,str(fileid)
+                                        , str(databeginson), str(columnheaderson),str(ftpfrequencyhours),
+                                        True, False, True)
+        else:
+            management.call_command('preprocess_datalogger_file', filename, str(fileid)
                                     , str(databeginson), str(columnheaderson),
-                                     True)
+                                    True)
+
+            management.call_command('ProcessDataLoggerFile', filename, str(fileid)
+                                    , str(databeginson), str(columnheaderson),
+                                    True, False, True)
