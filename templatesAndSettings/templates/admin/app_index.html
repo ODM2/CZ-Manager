@@ -56,7 +56,12 @@
                 </div>
             {% endfor %}
         {% endif %}
-        <div>
+            <p><h2> &nbsp;&nbsp;For details about the forms below see the docs:
+                <a href="http://odm2.github.io/ODM2-Admin/ODM2AdminAdministration.html">
+                    ODM2 Admin documention on github IO</a></h2>
+
+            </p>
+            <div>
             <div class="app-ODM2CZOData module">
                 <table>
                     <caption>
@@ -151,19 +156,13 @@
             <div class="app-ODM2CZOData module">
                 <table>
                     <caption>
-                        <h1>Sampling Features and Sites</h1>
+                        <h1>Sampling Features, Sites, and Actions</h1>
                     </caption>
                     <tr>
                         <th scope="row"><a href="{{ prefixpath }}samplingfeatures/">
                             {% trans 'Sampling Feature / location' %}</a></th>
                         <td><a href="{{ prefixpath }}samplingfeatures/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}samplingfeatures/" class="changelink">{% trans 'Change' %}</a></td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><a href="{{ prefixpath }}sites/">
-                            {% trans 'Sites - sites have a sampling feature, sampling features of type site must have a site' %}</a></th>
-                        <td><a href="{{ prefixpath }}sites/add/" class="addlink">{% trans 'Add' %}</a></td>
-                        <td><a href="{{ prefixpath }}sites/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
                     {% comment %}<tr>
                         <th scope="row"><a href="{{ prefixpath }}samplingfeatureexternalidentifiers/">
@@ -185,7 +184,12 @@
                         <td><a href="{{ prefixpath }}featureactions/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}featureactions/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
-
+                     <tr>
+                        <th scope="row"><a href="{{ prefixpath }}sites/">
+                            {% trans 'Sites - sites have a sampling feature, sampling features of type site must have a site' %}</a></th>
+                        <td><a href="{{ prefixpath }}sites/add/" class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}sites/" class="changelink">{% trans 'Change' %}</a></td>
+                    </tr>
                     <tr>
                         <th scope="row"><a href="{{ prefixpath }}spatialreferences/">
                             {% trans 'Spatial references - defines the coordinate system for sites' %}</a></th>
@@ -222,24 +226,6 @@
                             {% trans 'Processing Levels' %}</a></th>
                         <td><a href="{{ prefixpath }}processinglevels/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}processinglevels/" class="changelink">{% trans 'Change' %}</a></td>
-                    </tr>
-                     <tr>
-                        <th scope="row"><a href="{{ prefixpath }}relatedresults/">
-                            {% trans 'Related Results - relate one result to another' %}</a></th>
-                        <td><a href="{{ prefixpath }}relatedresults/add/" class="addlink">{% trans 'Add' %}</a></td>
-                        <td><a href="{{ prefixpath }}relatedresults/" class="changelink">{% trans 'Change' %}</a></td>
-                    </tr>
-                    <tr>
-                        <th scope="row"><a href="{{ prefixpath }}resultderivationequations/">
-                            {% trans 'Related Derivation Equations - derivation equations for results' %}</a></th>
-                        <td><a href="{{ prefixpath }}resultderivationequations/add/" class="addlink">{% trans 'Add' %}</a></td>
-                        <td><a href="{{ prefixpath }}resultderivationequations/" class="changelink">{% trans 'Change' %}</a></td>
-                    </tr>
-                     <tr>
-                        <th scope="row"><a href="{{ prefixpath }}derivationequations/">
-                            {% trans 'Define a Derivation Equation' %}</a></th>
-                        <td><a href="{{ prefixpath }}derivationequations/add/" class="addlink">{% trans 'Add' %}</a></td>
-                        <td><a href="{{ prefixpath }}derivationequations/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
                 </table>
             </div>
@@ -300,16 +286,23 @@
                         <td><a href="{{ prefixpath }}profileresultvalues/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}profileresultvalues/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
-
                     <tr>
-                        <th scope="row"><a href="{{ prefixpath }}extensionproperties/">
-                            {% trans 'Extension properties - define extra fields, can be applied to other
-                            objects like citations or results' %}</a>
-                        </th>
-                        <td><a href="{{ prefixpath }}extensionproperties/add/" class="addlink">{% trans 'Add' %}</a>
-                        </td>
-                        <td><a href="{{ prefixpath }}extensionproperties/" class="changelink">{% trans 'Change' %}</a>
-                        </td>
+                        <th scope="row"><a href="{{ prefixpath }}relatedresults/">
+                            {% trans 'Related Results - relate one result to another' %}</a></th>
+                        <td><a href="{{ prefixpath }}relatedresults/add/" class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}relatedresults/" class="changelink">{% trans 'Change' %}</a></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}resultderivationequations/">
+                            {% trans 'Related Derivation Equations - derivation equations for results' %}</a></th>
+                        <td><a href="{{ prefixpath }}resultderivationequations/add/" class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}resultderivationequations/" class="changelink">{% trans 'Change' %}</a></td>
+                    </tr>
+                     <tr>
+                        <th scope="row"><a href="{{ prefixpath }}derivationequations/">
+                            {% trans 'Define a Derivation Equation' %}</a></th>
+                        <td><a href="{{ prefixpath }}derivationequations/add/" class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}derivationequations/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
                 </table>
             </div>
@@ -342,10 +335,18 @@
                         <td><a href="{{ prefixpath }}methodcitations/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}methodcitations/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
-
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}extensionproperties/">
+                            {% trans 'Extension properties - define extra metrics about citations, can be applied to other objects' %}</a>
+                        </th>
+                        <td><a href="{{ prefixpath }}extensionproperties/add/" class="addlink">{% trans 'Add' %}</a>
+                        </td>
+                        <td><a href="{{ prefixpath }}extensionproperties/" class="changelink">{% trans 'Change' %}</a>
+                        </td>
+                    </tr>
                     <tr>
                         <th scope="row"><a href="{{ prefixpath }}citationextensionpropertyvalues/">
-                            {% trans 'Citation extension properties values - extra metrics about citations' %}</a>
+                            {% trans 'Citation extension properties values - track extra metrics about citations' %}</a>
                         </th>
                         <td><a href="{{ prefixpath }}citationextensionpropertyvalues/add/"
                                class="addlink">{% trans 'Add' %}</a></td>
