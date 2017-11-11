@@ -24,7 +24,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Data Logger Files" href="DataLoggerFiles.html" />
-    <link rel="prev" title="ODM2 Admin Demo" href="ODM2AdminDemo.html" />
+    <link rel="prev" title="ODM2 Admin Walkthrough" href="ODM2AdminDemo.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -77,15 +77,15 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="GettingStartedInODM2Admin.html">Getting Started With ODM2 Admin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ODM2AdminSettings.html">configuring ODM2 Admin Settings</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="ODM2AdminDemo.html">ODM2 Admin Demo</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="ODM2AdminDemo.html">ODM2 Admin Walkthrough</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-  <li><a href="ODM2AdminDemo.html">ODM2 Admin Demo</a><ul>
-      <li>Previous: <a href="ODM2AdminDemo.html" title="previous chapter">ODM2 Admin Demo</a></li>
+  <li><a href="ODM2AdminDemo.html">ODM2 Admin Walkthrough</a><ul>
+      <li>Previous: <a href="ODM2AdminDemo.html" title="previous chapter">ODM2 Admin Walkthrough</a></li>
       <li>Next: <a href="DataLoggerFiles.html" title="next chapter">Data Logger Files</a></li>
   </ul></li>
   </ul></li>
@@ -114,7 +114,7 @@
 <li>People and Organizations</li>
 <li>Variables and Units</li>
 <li>Methods and Actions</li>
-<li>Sampling Features and sites</li>
+<li>Sampling Features and Sites</li>
 <li>Result Definitions</li>
 <li>Result Values</li>
 <li>Citations</li>
@@ -123,11 +123,60 @@
 <li>External Identifier Systems</li>
 </ul>
 <p>Details about ODM2 entities and database schemas can be found on the ODM2 wiki <a class="reference external" href="https://github.com/ODM2/ODM2/wiki/documentation">https://github.com/ODM2/ODM2/wiki/documentation</a></p>
+<p>Many of the below entities use controlled vocabularies which can be found here <a class="reference external" href="http://vocabulary.odm2.org/">http://vocabulary.odm2.org/</a></p>
 <div class="section" id="people-and-organizations">
 <h2>People and Organizations<a class="headerlink" href="#people-and-organizations" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Organizations</li>
+<li><dl class="first docutils">
+<dt><strong>Organizations:</strong> Observations and other Actions can be associated with  the Organization responsible for creating</dt>
+<dd>or performing them. <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_organizations.md">see here for more</a></dd>
+</dl>
+</li>
 <li><strong>People:</strong> ODM2 Core people details can be found <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_people.md">here</a></li>
+<li><strong>Affiliation:</strong> Relates people and organizations</li>
+</ul>
+</div>
+<div class="section" id="variables-and-units">
+<h2>Variables and Units<a class="headerlink" href="#variables-and-units" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>Variables:</strong> ODM2 Core variables details can be found <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_variables.md">here</a></li>
+<li><strong>Units:</strong> ODM2 Core variables details can be found <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_units.md">here</a></li>
+<li><dl class="first docutils">
+<dt><strong>Taxonomic Classifiers:</strong> provide a way to classify Results and Specimens according to terms from a formal taxonomy.</dt>
+<dd>See more details <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_taxonomicclassifiers.md">here</a></dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="methods-and-actions">
+<h2>Methods and Actions<a class="headerlink" href="#methods-and-actions" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt><strong>Methods:</strong> to encode information about the procedure used to perform an Action. Every Action must be performed</dt>
+<dd>using a Method. Methods are modeled generically in ODM2 and can be of many types, including
+* Sample collection methods
+* Sample preparation methods
+* Sample analysis methods
+* Observation methods
+See more here <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_methods.md">here</a></dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>Actions:</strong> ODM2 Core Action details can be found <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_actions.md">here</a></dt>
+<dd>Actions are used to encode information about activities or actions that are performed in the process of making observations.
+Some types of actions include:
+* Observation act (produces a Result)
+* Sample collection
+* Sample preparation
+* Sample analysis (produces a Result)
+* Site visit
+* Instrument deployment (Produces a Result)
+* Instrument maintenance
+* Instrument calibration
+* Etc.</dd>
+</dl>
+</li>
+<li><strong>Related actions:</strong> Allow you to setup sequences of actions by relating one action to another.</li>
 </ul>
 </div>
 </div>

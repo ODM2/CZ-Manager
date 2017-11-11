@@ -1,5 +1,5 @@
-ODM2 Admin Demo
-===============
+ODM2 Admin Walkthrough
+======================
 
 
 Below is a tutorial which explains many of the features of ODM2 Admin. Links contained here access a Demonstartion
