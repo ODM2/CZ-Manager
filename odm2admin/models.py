@@ -1057,9 +1057,18 @@ class ProcessDataloggerfile(models.Model):
         # self.databeginson, self.columnheaderson, False)
         linkname = str(self.dataloggerfileid.dataloggerfilelinkname())
         fileid = self.dataloggerfileid.dataloggerfileid
-        management.call_command('ProcessDataLoggerFile', linkname,str(fileid)
-                                , str(self.databeginson), str(self.columnheaderson),
-                                False, False, False)
+        ftpfile = self.dataloggerfileid.dataloggerfiledescription
+        ftpparse = urlparse(ftpfile)
+        if len(ftpparse.netloc) > 0:
+            ftpfrequencyhours = re.findall(r'^\D*(\d+)', str(self.processingCode))
+            management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
+                                    , str(self.databeginson), str(self.columnheaderson),
+                                    str(ftpfrequencyhours),
+                                    False, False, False)
+        else:
+            management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
+                                    , str(self.databeginson), str(self.columnheaderson),
+                                    False, False, False)
         super(ProcessDataloggerfile, self).save(*args, **kwargs)
         # def get_actions(self, request):
         #     #Disable delete
