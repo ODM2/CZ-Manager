@@ -40,9 +40,12 @@ class Command(BaseCommand):
                 ftpparse = urlparse(ftpfile)
                 if len(ftpparse.netloc) > 0:
                     ftpfrequencyhours = re.findall(r'^\D*(\d+)', pdlf.processingCode)[0]
-                    management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
-                                            , str(pdlf.databeginson), str(pdlf.columnheaderson),
-                                            str(ftpfrequencyhours))
+                    management.call_command('update_datalogger_file', linkname, str(fileid)
+                                            , str(pdlf.databeginso), str(pdlf.columnheaderson), str(ftpfrequencyhours),
+                                            True, False, True)
+                    management.call_command('preprocess_datalogger_file', linkname, str(fileid)
+                                            , str(pdlf.databeginso), str(pdlf.columnheaderson),
+                                            True)
                     management.call_command('ProcessDataLoggerFile', linkname, str(fileid)
                                             , str(pdlf.databeginson), str(pdlf.columnheaderson),
                                             True, False, True)
