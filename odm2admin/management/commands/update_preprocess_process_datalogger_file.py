@@ -35,7 +35,7 @@ class Command(BaseCommand):
         parser.add_argument('setupcomplete', nargs=1, type=str)
 
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
-        setupcomplete = bool(options['setupcomplete'][0])
+        setupcomplete = str(options['setupcomplete'][0])
         filename = str(options['dataloggerfilelink'][0])
         fileid = int(options['dataloggerfileid'][0])
         databeginson = int(options['databeginson'][0])  # int(databeginson[0])
@@ -43,9 +43,9 @@ class Command(BaseCommand):
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
         dlf = Dataloggerfiles.objects.filter(dataloggerfileid=fileid).get()
 
-        filename = dlf.dataloggerfilename
+        filename = dlf.dataloggerfilelinkname()
         fileid = dlf.dataloggerfileid
-        if not setupcomplete:
+        if setupcomplete == 'False':
             try:
                 pdlf = ProcessDataloggerfile.objects.filter(dataloggerfileid=dlf.dataloggerfileid
                                                             ).filter(processingCode__icontains='hours between download'
