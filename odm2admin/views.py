@@ -1400,14 +1400,14 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         except IndexError as e:
             # html = "<html><body>No Data Available Yet.</body></html>"
             # return HttpResponse(html)
-            startdate = Timeseriesresultvalues.objects.\
-                filter(resultid__in=resultList.values("resultid")).\
-                annotate(Min('valuedatetime')).\
-                order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-            enddate = Timeseriesresultvalues.objects.\
-                filter(resultid__in=resultList.values("resultid")).\
-                annotate(Max('valuedatetime')).\
-                order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+            # startdate = Timeseriesresultvalues.objects.\
+            #     filter(resultid__in=resultList.values("resultid")).\
+            #     annotate(Min('valuedatetime')).\
+            #     order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+            # enddate = Timeseriesresultvalues.objects.\
+            #     filter(resultid__in=resultList.values("resultid")).\
+            #     annotate(Max('valuedatetime')).\
+            #     order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
             methodsOnly = 'True'
     except ValueError as e:
             # html = "<html><body>No Data Available Yet.</body></html>"
@@ -2625,9 +2625,11 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         selected_relatedfeatid = 15
 
     useSamplingFeature = False
+    samplingfeaturelabel = None
     if samplingfeature != 'NotSet':
         samplingfeature = int(samplingfeature)
         useSamplingFeature = True
+        samplingfeaturelabel = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
     # find variables found at the sampling feature
     # need to go through featureaction to get to results
 
@@ -2854,6 +2856,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
                                  'chartID': chartID, 'chart': chart, 'series': series,
                                  'title2': title2, 'graphType': graphType, 'yAxis': yAxis,
                                  'name_of_units': name_of_units,
+                                 'samplingfeaturelabel': samplingfeaturelabel,
                                  'relatedFeatureList': relatedFeatureList,
                                  'SelectedRelatedFeature': selected_relatedfeatid,
                                  'name': request.user, 'site_title': admin.site.site_title,

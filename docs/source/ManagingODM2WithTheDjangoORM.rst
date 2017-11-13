@@ -14,3 +14,12 @@ https://github.com/ODM2/ODM2-Admin/blob/master/example_scripts/SonadoraNitrateFi
 
 An example creating soil profile result values from a file can be found here:
 https://github.com/ODM2/ODM2-Admin/tree/master/soilsIngestionExample
+
+
+.. toctree::
+   :maxdepth: 1
+
+   ODM2AdminAdministration
+   Using Data Logger Files <DataLoggerFiles>
+   Managing Profile Results With ODM2 Admin <ProfileResults>
+

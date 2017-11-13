@@ -81,13 +81,17 @@ https://github.com/ODM2/ODM2/tree/master/src/blank_schema_scripts/postgresql
 
 Six instances of ODM2 Admin have been deployed
 
-http://odm2admin.cuahsi.org/LCZO/mapdata.html
-http://odm2admin.cuahsi.org/DryCreek/mapdata.html
-http://odm2admin.cuahsi.org/TRACE/TRACE/mapdata.html
-http://odm2admin.cuahsi.org/CJCZO/mapdata.html
-http://msu-odm2admin.cuahsi.org/MSU/mapdata.html
-https://dev-odm2admin.cuahsi.org/CZIMEA/mapdata.html
+* http://odm2admin.cuahsi.org/LCZO/mapdata.html
+* http://odm2admin.cuahsi.org/DryCreek/mapdata.html
+* http://odm2admin.cuahsi.org/TRACE/TRACE/mapdata.html
+* http://odm2admin.cuahsi.org/CJCZO/mapdata.html
+* http://msu-odm2admin.cuahsi.org/MSU/mapdata.html
+* https://dev-odm2admin.cuahsi.org/CZIMEA/mapdata.html
 
+Another deployment for demonstration porposes is available, the the ODM2 Admin Walkthrough for more information about
+this:
+
+https://dev-odm2admin.cuahsi.org/Sandbox/
 
 Using ODM2 Admin
 ==================
