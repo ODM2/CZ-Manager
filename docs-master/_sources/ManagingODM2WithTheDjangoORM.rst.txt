@@ -16,3 +16,5 @@ An example creating soil profile result values from a file can be found here:
 https://github.com/ODM2/ODM2-Admin/tree/master/soilsIngestionExample
 
 
+* :ref:`ODM2 Admin docs home page<ODM2-Admin>`
+* :ref:`Search the docs <search>`

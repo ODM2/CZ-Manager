@@ -1,3 +1,6 @@
+.. _Data-QA-QC:
+
+
 Time Series Data QA/QC
 ======================
 
@@ -33,3 +36,7 @@ Number (NAN).
 Our Annotated data will then look something like this:
 
   .. image:: /images/AnnotatedData.png
+
+
+* :ref:`ODM2 Admin docs home page<ODM2-Admin>`
+* :ref:`Search the docs <search>`
