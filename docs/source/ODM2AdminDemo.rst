@@ -3,8 +3,8 @@ ODM2 Admin Walkthrough
 
 
 Below is a tutorial which explains many of the features of ODM2 Admin. Links contained here access a Demonstartion
-version of ODM2 Admin, the ODM2 Admin sandbox hosted by CUAHSI. If you would like access to the sandbox please email
-leonmi@sas.upenn.edu
+version of ODM2 Admin populated with data from the `Luquillo Critical Zone Observatory <http://criticalzone.org/luquillo/>`_
+and hosted by `CUAHSI <https://www.cuahsi.org/>`_   . If you would like access to the sandbox please email leonmi@sas.upenn.edu
 
 login to  the sandbox here: https://dev-odm2admin.cuahsi.org/Sandbox/
 
@@ -38,13 +38,12 @@ Such as with the ODM2PythonAPI. Django models exist for each ODM2 entity so it i
 using the Django Object relational mapper. See :ref:`Managing-ODM2-With-The-Django-ORM` for details on using the Django
 ORM with ODM2 databases.
 
-
-
 .. toctree::
    :maxdepth: 1
 
-   ODM2AdminAdministration
-   Using Data Logger Files <DataLoggerFiles>
-   Managing Profile Results With ODM2 Admin <ProfileResults>
-   ManagingODM2WithTheDjangoORM
+   1) The ODM2 Admin Forms <ODM2AdminAdministration>
+   2) Using Data Logger Files <DataLoggerFiles>
+   3) Managing Profile Results With ODM2 Admin <ProfileResults>
+   4) Time series QA/QC <DataQAQC>
+   5) Using the Django ORM <ManagingODM2WithTheDjangoORM>
 

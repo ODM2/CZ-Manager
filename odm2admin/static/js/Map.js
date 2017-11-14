@@ -127,7 +127,7 @@ createMarker = function (latlng, markerIcon, color, sfname,style_class,icon_str)
 		var iconDiv = new L.DivIcon({
 		className: style_class + ' awesome-marker leaflet-zoom-animated leaflet-interactive awesome-marker-labeled',
 		html: '<i class="fa '+ icon_str +' icon-white" aria-hidden="true"></i><p ' +
-        'style="background-color:rgba(255,255,255,0.8);margin-top:25px;font-weight:bold;">'+sfname + '</p>'
+        'style="background-color:rgba(255,255,255,0.8);width:75px;margin-top:25px;font-weight:bold;">'+sfname + '</p>'
 		});
 		marker = L.marker([latlng[0],latlng[1]], {
             icon: iconDiv,

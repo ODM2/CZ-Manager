@@ -22,12 +22,13 @@ from django.db import models
 # from django.contrib.gis.db import models
 import csv
 import io
+from urlparse import urlparse
 import uuid
 from django.db.models import UUIDField
 from django.core import management
 from django.core.exceptions import ValidationError
 from django.core.management import settings
-
+import re
 
 def handle_uploaded_file(f, id):
     destination = io.open(settings.MEDIA_ROOT + '/resultvalues/' + f.name + '.csv', 'wb+')
@@ -1036,7 +1037,12 @@ class ProcessDataloggerfile(models.Model):
                                                    "dataloggerfilecolumns.",
                                          verbose_name='data logger file',
                                          db_column='dataloggerfileid')
-    processingCode = models.CharField(max_length=255, verbose_name='processing code', default="0")
+    processingCode = models.CharField(max_length=255, verbose_name='processing code',
+                                      help_text="to setup an FTP file download set the processing" +
+                                      "code as 'x hours between download' where x is how many hours to " +
+                                      "wait between downloading copies of the file from the FTP site. " +
+                                      "A datalogger file setup for FTP download must have only 1 " +
+                                      "process data logger file record.", default="0")
     databeginson = models.IntegerField(verbose_name="Data begins on this row number", default=2)
     columnheaderson = models.IntegerField(
         verbose_name="Column headers matching column labels from data logger columns on row")
@@ -1057,9 +1063,17 @@ class ProcessDataloggerfile(models.Model):
         # self.databeginson, self.columnheaderson, False)
         linkname = str(self.dataloggerfileid.dataloggerfilelinkname())
         fileid = self.dataloggerfileid.dataloggerfileid
-        management.call_command('ProcessDataLoggerFile', linkname,str(fileid)
-                                , str(self.databeginson), str(self.columnheaderson),
-                                False, False, False)
+        ftpfile = self.dataloggerfileid.dataloggerfiledescription
+        ftpparse = urlparse(ftpfile)
+        if len(ftpparse.netloc) > 0:
+            ftpfrequencyhours = re.findall(r'^\D*(\d+)', self.processingCode)[0]
+            management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
+                                    , str(self.databeginson), str(self.columnheaderson),
+                                    str(ftpfrequencyhours), False)
+        else:
+            management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
+                                    , str(self.databeginson), str(self.columnheaderson),
+                                    False, False, False)
         super(ProcessDataloggerfile, self).save(*args, **kwargs)
         # def get_actions(self, request):
         #     #Disable delete
