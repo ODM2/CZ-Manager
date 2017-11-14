@@ -2638,6 +2638,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         sampling_features = Relatedfeatures.objects.filter(
             relatedfeatureid__exact=selected_relatedfeatid).values(
             'samplingfeatureid')
+        samplingfeaturelabel = Samplingfeatures.objects.filter(samplingfeatureid=selected_relatedfeatid).get()
         # select the feature actions for all of the related features.
         feature_actions = Featureactions.objects.filter(samplingfeatureid__in=sampling_features)
     else:

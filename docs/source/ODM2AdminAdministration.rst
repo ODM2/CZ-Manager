@@ -39,15 +39,18 @@ Methods and Actions
 -------------------
 
 * **Methods:** to encode information about the procedure used to perform an Action. Every Action must be performed
-  using a Method. Methods are modeled generically in ODM2 and can be of many types, including
+  using a Method. Methods are modeled generically in ODM2 and can be of many types, including:
+
     * Sample collection methods
     * Sample preparation methods
     * Sample analysis methods
     * Observation methods
+
     See more `here <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_methods.md>`_
 * **Actions:** ODM2 Core Action details can be found `here  <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_actions.md>`_
   Actions are used to encode information about activities or actions that are performed in the process of making observations.
   Some types of actions include:
+
     * Observation act (produces a Result)
     * Sample collection
     * Sample preparation
@@ -57,13 +60,6 @@ Methods and Actions
     * Instrument maintenance
     * Instrument calibration
     * Etc.
+
 * **Related actions:** Allow you to setup sequences of actions by relating one action to another.
-
-
-.. toctree::
-   :maxdepth: 1
-
-   Using Data Logger Files <DataLoggerFiles>
-   Managing Profile Results With ODM2 Admin <ProfileResults>
-   ManagingODM2WithTheDjangoORM
 
