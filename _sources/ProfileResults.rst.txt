@@ -68,3 +68,5 @@ by the Interdisciplinary Earth Data Alliance (IEDA) http://www.geosamples.org/
     'PALMDYS-21-P125 Slope','http://app.geosamples.org/sample/igsn/IELCZP225'
     'PALMDYS-21-P126 Valley','http://app.geosamples.org/sample/igsn/IELCZP226'
 
+* :ref:`ODM2 Admin docs home page<ODM2-Admin>`
+* :ref:`Search the docs <search>`
