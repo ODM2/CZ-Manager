@@ -115,3 +115,6 @@ https://www.mapbox.com/help/how-access-tokens-work/#mapbox-tokens-api
 
 Add a disclaimer explaining the source of your data. This will appear on publicily available pages where your data are
 viewable.
+
+* :ref:`ODM2 Admin docs home page <ODM2-Admin>`
+* :ref:`Search the docs <search>`

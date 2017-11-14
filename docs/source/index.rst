@@ -1,3 +1,5 @@
+.. _ODM2-Admin:
+
 ODM2 Admin
 ==========
 .. C:\Python27\Scripts\sphinx-build.exe "C:\Users\leonmi\Google Drive\ODM2AdminLT3\docs\source" "C:\Users\leonmi\Google Drive\ODM2AdminLT3\docs\build"
@@ -102,7 +104,7 @@ The documents below provide instructions on using ODM2 Admin.
 
    GettingStartedInODM2Admin
    configuring ODM2 Admin Settings <ODM2AdminSettings>
-   ODM2 Admin Walkthrough <ODM2AdminDemo>
+
 
 
 
@@ -114,8 +116,15 @@ with detailed descriptions and images from the sandbox. Many of the features of 
 .. toctree::
    :maxdepth: 1
 
+   ODM2 Admin Walkthrough <ODM2AdminDemo>
    ODM2AdminAdministration
    Using Data Logger Files <DataLoggerFiles>
    Managing Profile Results With ODM2 Admin <ProfileResults>
    Time series QA/QC <DataQAQC>
+   Data Sharinr and Visualization Tips <DataVisualizationTips>
    ManagingODM2WithTheDjangoORM
+
+Docs Home
+---------
+* :ref:`ODM2 Admin docs home page<ODM2-Admin>`
+* :ref:`Search the docs <search>`

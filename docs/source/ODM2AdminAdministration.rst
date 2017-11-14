@@ -22,17 +22,17 @@ People and Organizations
 ------------------------
 
 * **Organizations:** Observations and other Actions can be associated with  the Organization responsible for creating
-   or performing them. `see here for more <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_organizations.md>`_
-* **People:** ODM2 Core people details can be found `here  <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_people.md>`_
+   or performing them. `see here for ODM2 Organizations doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_organizations.md>`_
+* **People:** ODM2 Core people details can be found `here ODM2 people doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_people.md>`_
 * **Affiliation:** Relates people and organizations
 
 Variables and Units
 -------------------
 
-* **Variables:** ODM2 Core variables details can be found `here <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_variables.md>`_
-* **Units:** ODM2 Core variables details can be found `here <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_units.md>`_
+* **Variables:** ODM2 Core variables details can be found `here ODM2 Variables doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_variables.md>`_
+* **Units:** ODM2 Core variables details can be found `here ODM2 Units doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_units.md>`_
 * **Taxonomic Classifiers:** provide a way to classify Results and Specimens according to terms from a formal taxonomy.
-    See more details `here <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_taxonomicclassifiers.md>`_
+    For more see the `ODM2 Taxonomic Classifiers doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_taxonomicclassifiers.md>`_
 
 
 Methods and Actions
@@ -46,8 +46,8 @@ Methods and Actions
     * Sample analysis methods
     * Observation methods
 
-    See more `here <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_methods.md>`_
-* **Actions:** ODM2 Core Action details can be found `here  <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_actions.md>`_
+    See the `ODM2 Methods doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_methods.md>`_
+* **Actions:** ODM2 Core Action details can be found at the `ODM2 Actions doc  <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_actions.md>`_
   Actions are used to encode information about activities or actions that are performed in the process of making observations.
   Some types of actions include:
 
@@ -63,3 +63,5 @@ Methods and Actions
 
 * **Related actions:** Allow you to setup sequences of actions by relating one action to another.
 
+* :ref:`ODM2 Admin docs home page <ODM2-Admin>`
+* :ref:`Search the docs <search>`

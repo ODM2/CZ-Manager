@@ -19,3 +19,6 @@ The ODM2 Software Ecosystem: https://github.com/ODM2/odm2-software-ecosystem
 ODM2 Admin uses the ODM2 controlled vocabulary. The controlled vocabulary is designed to promote consistency between
 different instances of ODM2 through a community moderated system for managing the master controlled vocabularies.
 http://vocabulary.odm2.org/
+
+* :ref:`ODM2 Admin docs home page<ODM2-Admin>`
+* :ref:`Search the docs <search>`

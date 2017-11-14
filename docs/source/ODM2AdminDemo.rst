@@ -45,5 +45,9 @@ ORM with ODM2 databases.
    2) Using Data Logger Files <DataLoggerFiles>
    3) Managing Profile Results With ODM2 Admin <ProfileResults>
    4) Time series QA/QC <DataQAQC>
-   5) Using the Django ORM <ManagingODM2WithTheDjangoORM>
+   5) Data visuzlization tips <DataVisualizationTips>
+   6) Using the Django ORM <ManagingODM2WithTheDjangoORM>
 
+
+* :ref:`ODM2 Admin docs home page <ODM2-Admin>`
+* :ref:`Search the docs <search>`
