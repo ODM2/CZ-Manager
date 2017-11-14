@@ -14,4 +14,3 @@ django-recaptcha
 pyyaml
 xlrd
 django-redis
-django-kronos
