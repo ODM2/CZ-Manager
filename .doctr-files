@@ -1,4 +1,5 @@
 ./DataLoggerFiles.html
+./DataQAQC.html
 ./GettingStartedInODM2Admin.html
 ./InstallODM2AdminWithDocker.html
 ./ManagingODM2WithTheDjangoORM.html
@@ -6,6 +7,8 @@
 ./ODM2AdminDemo.html
 ./ODM2AdminSettings.html
 ./ProfileResults.html
+./_images/AnnotatedData.png
+./_images/AnnotatingData.png
 ./_images/ClusteredSite.png
 ./_images/DataLoggerFiles.png
 ./_images/DataResultChangeView.png
@@ -15,8 +18,12 @@
 ./_images/ODM2AdminHomePage.png
 ./_images/ODM2AdminInfrastructure.png
 ./_images/ODM2AdminShortcuts.png
-./_images/ProfileResultClay.png
+./_images/PalmDys-21ClaySandSilt.png
+./_images/PalmSJHWS2015ClaySandSilt.png
+./_images/RioEspirituSantoStreamGage.png
+./_images/SelectWaterTempToAnnotate.png
 ./_sources/DataLoggerFiles.rst.txt
+./_sources/DataQAQC.rst.txt
 ./_sources/GettingStartedInODM2Admin.rst.txt
 ./_sources/InstallODM2AdminWithDocker.rst.txt
 ./_sources/ManagingODM2WithTheDjangoORM.rst.txt

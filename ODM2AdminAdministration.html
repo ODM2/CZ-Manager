@@ -74,10 +74,17 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="InstallODM2AdminWithDocker.html">ODM2 Admin Docker Image Creation</a></li>
 </ul>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="GettingStartedInODM2Admin.html">Getting Started With ODM2 Admin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ODM2AdminSettings.html">configuring ODM2 Admin Settings</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="ODM2AdminDemo.html">ODM2 Admin Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ODM2AdminDemo.html">ODM2 Admin Walkthrough</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ODM2 Admin Administration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DataLoggerFiles.html">Using Data Logger Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ProfileResults.html">Managing Profile Results With ODM2 Admin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DataQAQC.html">Time series QA/QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ManagingODM2WithTheDjangoORM.html">Managing ODM2 With The Django ORM</a></li>
 </ul>
 
 <div class="relations">
@@ -150,33 +157,38 @@
 </div>
 <div class="section" id="methods-and-actions">
 <h2>Methods and Actions<a class="headerlink" href="#methods-and-actions" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><dl class="first docutils">
-<dt><strong>Methods:</strong> to encode information about the procedure used to perform an Action. Every Action must be performed</dt>
-<dd>using a Method. Methods are modeled generically in ODM2 and can be of many types, including
-* Sample collection methods
-* Sample preparation methods
-* Sample analysis methods
-* Observation methods
-See more here <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_methods.md">here</a></dd>
-</dl>
+<ul>
+<li><p class="first"><strong>Methods:</strong> to encode information about the procedure used to perform an Action. Every Action must be performed
+using a Method. Methods are modeled generically in ODM2 and can be of many types, including:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Sample collection methods</li>
+<li>Sample preparation methods</li>
+<li>Sample analysis methods</li>
+<li>Observation methods</li>
+</ul>
+<p>See more <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_methods.md">here</a></p>
+</div></blockquote>
 </li>
-<li><dl class="first docutils">
-<dt><strong>Actions:</strong> ODM2 Core Action details can be found <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_actions.md">here</a></dt>
-<dd>Actions are used to encode information about activities or actions that are performed in the process of making observations.
-Some types of actions include:
-* Observation act (produces a Result)
-* Sample collection
-* Sample preparation
-* Sample analysis (produces a Result)
-* Site visit
-* Instrument deployment (Produces a Result)
-* Instrument maintenance
-* Instrument calibration
-* Etc.</dd>
-</dl>
+<li><p class="first"><strong>Actions:</strong> ODM2 Core Action details can be found <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_actions.md">here</a>
+Actions are used to encode information about activities or actions that are performed in the process of making observations.
+Some types of actions include:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Observation act (produces a Result)</li>
+<li>Sample collection</li>
+<li>Sample preparation</li>
+<li>Sample analysis (produces a Result)</li>
+<li>Site visit</li>
+<li>Instrument deployment (Produces a Result)</li>
+<li>Instrument maintenance</li>
+<li>Instrument calibration</li>
+<li>Etc.</li>
+</ul>
+</div></blockquote>
 </li>
-<li><strong>Related actions:</strong> Allow you to setup sequences of actions by relating one action to another.</li>
+<li><p class="first"><strong>Related actions:</strong> Allow you to setup sequences of actions by relating one action to another.</p>
+</li>
 </ul>
 </div>
 </div>
