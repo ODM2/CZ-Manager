@@ -1,3 +1,5 @@
+.. _ProfileResults:
+
 ODM2 Admin Managing Profile Results
 ===================================
 
