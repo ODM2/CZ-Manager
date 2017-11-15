@@ -1,12 +1,14 @@
 ODM2 Admin Walkthrough
 ======================
 
-
-Below is a tutorial which explains many of the features of ODM2 Admin. Links contained here access a Demonstartion
+Below is a tutorial which explains many of the features of ODM2 Admin. This tutorial was developed for the 2017
+BiG-CZ / ODM2 Hands-On Workshop, November 15-16, 2017 at UC Riverside, CA. It is meant as a demonstration of the
+capabilities of ODM2 Admin and as a use case for ODM2. Links contained here access a demonstartion
 version of ODM2 Admin populated with data from the `Luquillo Critical Zone Observatory <http://criticalzone.org/luquillo/>`_
-and hosted by `CUAHSI <https://www.cuahsi.org/>`_   . If you would like access to the sandbox please email leonmi@sas.upenn.edu
+and hosted by `CUAHSI <https://www.cuahsi.org/>`_   . If you would like access to the sandbox please email
+leonmi@sas.upenn.edu
 
-login to  the sandbox here: https://dev-odm2admin.cuahsi.org/Sandbox/
+You can login to  the sandbox here: https://dev-odm2admin.cuahsi.org/Sandbox/
 
 After logging in you will see the ODM2 Admin Home page:
 
@@ -32,11 +34,16 @@ Upon logging into ODM2 Admin you will see the below navigation shortcuts across 
 * Sixth, Graph My Data, provides links for data plotting and a map of your sites.
 
 
-The ODM2 Admin Administration link will take you to a list of all 44 ODM2 entities that can be directly managed using
-ODM2 Admin. Additional entities exist within the ODM2 information model these need to be managed with another tool
+The ODM2 Admin Administration link will take you to a list of all 44 ODM2 entities that can be directly managed in
+ODM2 Admin. See the ODM2 Admin Forms for details about the ODM2 Admin Forms :ref:ODM2-Administration.
+
+Recent actions show changes you have recently completed in ODM2 Admin such as adding or editing an item in the forms.
+
+Additional entities exist within the ODM2 information model these need to be managed with another tool
 Such as with the ODM2PythonAPI. Django models exist for each ODM2 entity so it is also possible to write Python scripts
 using the Django Object relational mapper. See :ref:`Managing-ODM2-With-The-Django-ORM` for details on using the Django
 ORM with ODM2 databases.
+
 
 .. toctree::
    :maxdepth: 1
@@ -45,7 +52,7 @@ ORM with ODM2 databases.
    2) Using Data Logger Files <DataLoggerFiles>
    3) Managing Profile Results With ODM2 Admin <ProfileResults>
    4) Time series QA/QC <DataQAQC>
-   5) Data visuzlization tips <DataVisualizationTips>
+   5) Data visuzlization and URL parameters <DataVisualizationTips>
    6) Using the Django ORM <ManagingODM2WithTheDjangoORM>
 
 
