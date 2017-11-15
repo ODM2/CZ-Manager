@@ -117,14 +117,16 @@ with detailed descriptions and images from the sandbox. Many of the features of 
    :maxdepth: 1
 
    ODM2 Admin Walkthrough <ODM2AdminDemo>
-   ODM2AdminAdministration
-   Using Data Logger Files <DataLoggerFiles>
-   Managing Profile Results With ODM2 Admin <ProfileResults>
-   Time series QA/QC <DataQAQC>
-   Data Sharinr and Visualization Tips <DataVisualizationTips>
-   ManagingODM2WithTheDjangoORM
+
+
+* :ref:`ODM2-Administration`
+* :ref:`Using Data Logger Files <DataLoggerFiles>`
+* :ref:`Managing Profile Results With ODM2 Admin <ProfileResults>`
+* :ref:`Time series QA/QC <Data-QA-QC>`
+* :ref:`Data Sharing and Visualization Tips <Data-Visualization>`
+* :ref:`ManagingODM2WithTheDjangoORM <Managing-ODM2-With-The-Django-ORM>`
 
 Docs Home
 ---------
-* :ref:`ODM2 Admin docs home page<ODM2-Admin>`
+* :ref:`ODM2 Admin docs home page <ODM2-Admin>`
 * :ref:`Search the docs <search>`

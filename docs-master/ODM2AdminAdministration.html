@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>ODM2 Admin Administration &#8212; ODM2-Admin 0.1.0 documentation</title>
+    <title>ODM2 Administration &#8212; ODM2-Admin 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -79,13 +79,7 @@
 <li class="toctree-l1"><a class="reference internal" href="ODM2AdminSettings.html">configuring ODM2 Admin Settings</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="ODM2AdminDemo.html">ODM2 Admin Walkthrough</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">ODM2 Admin Administration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DataLoggerFiles.html">Using Data Logger Files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ProfileResults.html">Managing Profile Results With ODM2 Admin</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DataQAQC.html">Time series QA/QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DataVisualizationTips.html">Data Sharinr and Visualization Tips</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ManagingODM2WithTheDjangoORM.html">Managing ODM2 With The Django ORM</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="ODM2AdminDemo.html">ODM2 Admin Walkthrough</a></li>
 </ul>
 
 <div class="relations">
@@ -115,8 +109,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="odm2-admin-administration">
-<h1>ODM2 Admin Administration<a class="headerlink" href="#odm2-admin-administration" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="odm2-administration">
+<span id="id1"></span><h1>ODM2 Administration<a class="headerlink" href="#odm2-administration" title="Permalink to this headline">¶</a></h1>
 <p>The ODM2 entities you can administer with ODM2 Admin are organized in a number of catogories.</p>
 <ul class="simple">
 <li>People and Organizations</li>
@@ -194,6 +188,91 @@ Some types of actions include:</p>
 </li>
 <li><p class="first"><a class="reference internal" href="search.html"><span class="std std-ref">Search the docs</span></a></p>
 </li>
+</ul>
+</div>
+<div class="section" id="sampling-features-and-sites">
+<h2>Sampling Features and Sites<a class="headerlink" href="#sampling-features-and-sites" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>Sampling Features:</strong> very Action must be performed on or at a Sampling Feature. For example, a “Site visit” Action
+is made to a Site Sampling Feature. A “Laboratory analysis” Action is performed on a Specimen Sampling Feature.
+For more see the <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_samplingfeatures.md">ODM2 docs</a></li>
+<li><strong>Related Features:</strong> labeled as ‘relate two features’ in ODM2 Admin, allows you to establish relationships between
+sampling features such as parent child relationships.</li>
+<li><strong>Feature action:</strong> labeled as ‘Sampling feature actions’ in ODM2 Admin. For more see <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_featureactions.md">ODM2 Feature actions doc</a></li>
+<li><strong>Sites</strong></li>
+<li><strong>Saptial References:</strong></li>
+</ul>
+</div>
+<div class="section" id="results">
+<h2>Results<a class="headerlink" href="#results" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>Results:</strong> labeled as data results in ODM2 Admin.</li>
+<li><strong>Datasets:</strong> The Datasets entity is used to encode information about groups of Results that are logically related.
+A Dataset has a type, title, an abstract, and is the entity in ODM2 that would receive a citation.
+For more see the <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_datasets.md">ODM2 Datasets doc</a></li>
+<li><strong>Dataset Results:</strong></li>
+<li><strong>Processing Levels:</strong> Each Result recorded in ODM2 has a ProcessingLevel, which specifies the level of quality
+control or data processing that the Result has been subjected to. For more see <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_processinglevels.md">ODM2 Processing Levels doc</a></li>
+</ul>
+</div>
+<div class="section" id="result-values">
+<h2>Result Values<a class="headerlink" href="#result-values" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>Time Series Results:</strong> A Time Series Result consists of a series of ResultValues for a single Variable,
+measured on or at a single SamplingFeature (e.g., a Site), using a single Method (e.g., sensor), with specific Units,
+and having a specific ProcessingLevel, but measured over time. For more see <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/ext_results_timeseries.md">ODM2 Time Series Coverage Results doc</a></li>
+<li><strong>Time Series Result Values:</strong> Values for a given time series.</li>
+<li><strong>Measurement Results:</strong> A Measurement Result consists of a single ResultValue for a single Variable, measured on or
+at a single SamplingFeature (e.g., in most cases a Specimen), using a single Method (e.g., laboratory analytical
+Method), with specific Units, and having a specific ProcessingLevel. For more see <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/ext_results_measurement.md">ODM2 Measurement Results doc</a></li>
+<li><strong>Measurement Result Values:</strong> Values for a measurement result.</li>
+<li><strong>Measurement Result Value Files:</strong></li>
+<li><strong>Profile Results:</strong> An Depth Profile Coverage Result consists of a series of ResultValues for a single Variable, at
+a single location, measured using a single Method, with specific Units, having a specific ProcessingLevel, but
+measured over multiple depths. For more see <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/ext_results_profile.md">ODM2 Profile Results doc</a></li>
+<li><strong>Profile Result Values:</strong> Values for a profile result.</li>
+<li><strong>Related Results:</strong> Results can be related to one another. In ODM2 Admin they can be used to say that one result is
+derived from another using derivation equations.</li>
+<li><strong>Related Derivation Equations:</strong> relate derivation equations and results</li>
+<li><strong>Derivation equation:</strong></li>
+</ul>
+</div>
+<div class="section" id="citations">
+<h2>citations<a class="headerlink" href="#citations" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>Citations:</strong></li>
+<li><strong>Author list:</strong></li>
+<li><strong>Dataset citations:</strong> link a dataset to a citation</li>
+<li><strong>Method citations:</strong> link a method to a citation</li>
+<li><strong>Extension properties:</strong> define extra metrics about citations, can be applied to other objects</li>
+<li><strong>Citation extension properties values:</strong> track extra metrics about citations</li>
+</ul>
+</div>
+<div class="section" id="data-logger-files">
+<h2>Data logger files<a class="headerlink" href="#data-logger-files" title="Permalink to this headline">¶</a></h2>
+<p>For details about how to use data logger files see <a class="reference internal" href="DataLoggerFiles.html#dataloggerfiles"><span class="std std-ref">Using Data Logger Files</span></a></p>
+<ul class="simple">
+<li><strong>Data logger program files:</strong></li>
+<li><strong>Data logger files:</strong></li>
+<li><strong>Data logger file columns:</strong></li>
+<li><strong>Process data logger files:</strong></li>
+<li><strong>Instrument output variables:</strong> Associated with a data logger file column.</li>
+<li><strong>Equipment models:</strong> That recorded some data values in a data logger file.</li>
+</ul>
+</div>
+<div class="section" id="data-quality">
+<h2>Data quality<a class="headerlink" href="#data-quality" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>Data quality:</strong> The optional DataQuality extension enables ODM2 users to encode specific information about the
+quality of their Results. The DataQuality entity provides values for the precision, detection limit, etc. for Results.
+For more see the <a class="reference external" href="https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/ext_dataquality.md">ODM2 Data quality doc</a></li>
+<li><strong>results data quality:</strong> Specify the data quality for specific data results.</li>
+</ul>
+</div>
+<div class="section" id="external-identifier-systems">
+<h2>External identifier systems<a class="headerlink" href="#external-identifier-systems" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>External identifier systems:</strong> Such as an IGSN or ORCiD.</li>
 </ul>
 </div>
 </div>

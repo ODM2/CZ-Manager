@@ -1,5 +1,7 @@
-ODM2 Admin Administration
-=========================
+.. _ODM2-Administration:
+
+ODM2 Administration
+===================
 
 The ODM2 entities you can administer with ODM2 Admin are organized in a number of catogories.
 
@@ -65,3 +67,112 @@ Methods and Actions
 
 * :ref:`ODM2 Admin docs home page <ODM2-Admin>`
 * :ref:`Search the docs <search>`
+
+Sampling Features and Sites
+---------------------------
+
+* **Sampling Features:** very Action must be performed on or at a Sampling Feature. For example, a "Site visit" Action
+  is made to a Site Sampling Feature. A "Laboratory analysis" Action is performed on a Specimen Sampling Feature.
+  For more see the `ODM2 docs <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_samplingfeatures.md>`_
+
+* **Related Features:** labeled as 'relate two features' in ODM2 Admin, allows you to establish relationships between
+  sampling features such as parent child relationships.
+
+* **Feature action:** labeled as 'Sampling feature actions' in ODM2 Admin. For more see `ODM2 Feature actions doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_featureactions.md>`_
+
+* **Sites**
+
+* **Saptial References:**
+
+Results
+-------
+
+* **Results:** labeled as data results in ODM2 Admin.
+
+* **Datasets:** The Datasets entity is used to encode information about groups of Results that are logically related.
+  A Dataset has a type, title, an abstract, and is the entity in ODM2 that would receive a citation.
+  For more see the `ODM2 Datasets doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_datasets.md>`_
+
+* **Dataset Results:**
+
+* **Processing Levels:** Each Result recorded in ODM2 has a ProcessingLevel, which specifies the level of quality
+  control or data processing that the Result has been subjected to. For more see `ODM2 Processing Levels doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_processinglevels.md>`_
+
+Result Values
+-------------
+
+* **Time Series Results:** A Time Series Result consists of a series of ResultValues for a single Variable,
+  measured on or at a single SamplingFeature (e.g., a Site), using a single Method (e.g., sensor), with specific Units,
+  and having a specific ProcessingLevel, but measured over time. For more see `ODM2 Time Series Coverage Results doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/ext_results_timeseries.md>`_
+
+* **Time Series Result Values:** Values for a given time series.
+
+* **Measurement Results:** A Measurement Result consists of a single ResultValue for a single Variable, measured on or
+  at a single SamplingFeature (e.g., in most cases a Specimen), using a single Method (e.g., laboratory analytical
+  Method), with specific Units, and having a specific ProcessingLevel. For more see `ODM2 Measurement Results doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/ext_results_measurement.md>`_
+
+* **Measurement Result Values:** Values for a measurement result.
+
+* **Measurement Result Value Files:**
+
+* **Profile Results:** An Depth Profile Coverage Result consists of a series of ResultValues for a single Variable, at
+  a single location, measured using a single Method, with specific Units, having a specific ProcessingLevel, but
+  measured over multiple depths. For more see `ODM2 Profile Results doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/ext_results_profile.md>`_
+
+* **Profile Result Values:** Values for a profile result.
+
+* **Related Results:** Results can be related to one another. In ODM2 Admin they can be used to say that one result is
+  derived from another using derivation equations.
+
+* **Related Derivation Equations:** relate derivation equations and results
+
+* **Derivation equation:**
+
+citations
+---------
+
+* **Citations:**
+
+* **Author list:**
+
+* **Dataset citations:** link a dataset to a citation
+
+* **Method citations:** link a method to a citation
+
+* **Extension properties:** define extra metrics about citations, can be applied to other objects
+
+* **Citation extension properties values:** track extra metrics about citations
+
+Data logger files
+-----------------
+
+For details about how to use data logger files see :ref:`Using Data Logger Files <DataLoggerFiles>`
+
+* **Data logger program files:**
+
+* **Data logger files:**
+
+* **Data logger file columns:**
+
+* **Process data logger files:**
+
+* **Instrument output variables:** Associated with a data logger file column.
+
+* **Equipment models:** That recorded some data values in a data logger file.
+
+Data quality
+------------
+
+* **Data quality:** The optional DataQuality extension enables ODM2 users to encode specific information about the
+  quality of their Results. The DataQuality entity provides values for the precision, detection limit, etc. for Results.
+  For more see the `ODM2 Data quality doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/ext_dataquality.md>`_
+
+* **results data quality:** Specify the data quality for specific data results.
+
+External identifier systems
+---------------------------
+
+* **External identifier systems:** Such as an IGSN or ORCiD.
+
+
+
