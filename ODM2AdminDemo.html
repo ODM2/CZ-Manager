@@ -23,7 +23,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="ODM2 Admin Administration" href="ODM2AdminAdministration.html" />
+    <link rel="next" title="ODM2 Administration" href="ODM2AdminAdministration.html" />
     <link rel="prev" title="ODM2 Admin Settings" href="ODM2AdminSettings.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -80,12 +80,6 @@
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">ODM2 Admin Walkthrough</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ODM2AdminAdministration.html">ODM2 Admin Administration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DataLoggerFiles.html">Using Data Logger Files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ProfileResults.html">Managing Profile Results With ODM2 Admin</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DataQAQC.html">Time series QA/QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DataVisualizationTips.html">Data Sharinr and Visualization Tips</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ManagingODM2WithTheDjangoORM.html">Managing ODM2 With The Django ORM</a></li>
 </ul>
 
 <div class="relations">
@@ -93,7 +87,7 @@
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="ODM2AdminSettings.html" title="previous chapter">ODM2 Admin Settings</a></li>
-      <li>Next: <a href="ODM2AdminAdministration.html" title="next chapter">ODM2 Admin Administration</a></li>
+      <li>Next: <a href="ODM2AdminAdministration.html" title="next chapter">ODM2 Administration</a></li>
   </ul></li>
 </ul>
 </div>
@@ -115,10 +109,13 @@
             
   <div class="section" id="odm2-admin-walkthrough">
 <h1>ODM2 Admin Walkthrough<a class="headerlink" href="#odm2-admin-walkthrough" title="Permalink to this headline">¶</a></h1>
-<p>Below is a tutorial which explains many of the features of ODM2 Admin. Links contained here access a Demonstartion
+<p>Below is a tutorial which explains many of the features of ODM2 Admin. This tutorial was developed for the 2017
+BiG-CZ / ODM2 Hands-On Workshop, November 15-16, 2017 at UC Riverside, CA. It is meant as a demonstration of the
+capabilities of ODM2 Admin and as a use case for ODM2. Links contained here access a demonstartion
 version of ODM2 Admin populated with data from the <a class="reference external" href="http://criticalzone.org/luquillo/">Luquillo Critical Zone Observatory</a>
-and hosted by <a class="reference external" href="https://www.cuahsi.org/">CUAHSI</a>   . If you would like access to the sandbox please email <a class="reference external" href="mailto:leonmi&#37;&#52;&#48;sas&#46;upenn&#46;edu">leonmi<span>&#64;</span>sas<span>&#46;</span>upenn<span>&#46;</span>edu</a></p>
-<p>login to  the sandbox here: <a class="reference external" href="https://dev-odm2admin.cuahsi.org/Sandbox/">https://dev-odm2admin.cuahsi.org/Sandbox/</a></p>
+and hosted by <a class="reference external" href="https://www.cuahsi.org/">CUAHSI</a>   . If you would like access to the sandbox please email
+<a class="reference external" href="mailto:leonmi&#37;&#52;&#48;sas&#46;upenn&#46;edu">leonmi<span>&#64;</span>sas<span>&#46;</span>upenn<span>&#46;</span>edu</a></p>
+<p>You can login to  the sandbox here: <a class="reference external" href="https://dev-odm2admin.cuahsi.org/Sandbox/">https://dev-odm2admin.cuahsi.org/Sandbox/</a></p>
 <p>After logging in you will see the ODM2 Admin Home page:</p>
 <img alt="_images/ODM2AdminHomePage.png" src="_images/ODM2AdminHomePage.png" />
 <p>This page consists of several parts, links to log out and change your password, the ODM2 Admin Shortcuts, ODM2 Admin
@@ -137,8 +134,10 @@ new sensor data or you want to make changes to information relavent to sensor da
 <li>Fifth, Manage Citations, provides links for managing and exporting citations.</li>
 <li>Sixth, Graph My Data, provides links for data plotting and a map of your sites.</li>
 </ul>
-<p>The ODM2 Admin Administration link will take you to a list of all 44 ODM2 entities that can be directly managed using
-ODM2 Admin. Additional entities exist within the ODM2 information model these need to be managed with another tool
+<p>The ODM2 Admin Administration link will take you to a list of all 44 ODM2 entities that can be directly managed in
+ODM2 Admin. See the ODM2 Admin Forms for details about the ODM2 Admin Forms :ref:ODM2-Administration.</p>
+<p>Recent actions show changes you have recently completed in ODM2 Admin such as adding or editing an item in the forms.</p>
+<p>Additional entities exist within the ODM2 information model these need to be managed with another tool
 Such as with the ODM2PythonAPI. Django models exist for each ODM2 entity so it is also possible to write Python scripts
 using the Django Object relational mapper. See <a class="reference internal" href="ManagingODM2WithTheDjangoORM.html#managing-odm2-with-the-django-orm"><span class="std std-ref">Managing ODM2 With The Django ORM</span></a> for details on using the Django
 ORM with ODM2 databases.</p>
@@ -148,7 +147,7 @@ ORM with ODM2 databases.</p>
 <li class="toctree-l1"><a class="reference internal" href="DataLoggerFiles.html">2) Using Data Logger Files</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ProfileResults.html">3) Managing Profile Results With ODM2 Admin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="DataQAQC.html">4) Time series QA/QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DataVisualizationTips.html">5) Data visuzlization tips</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DataVisualizationTips.html">5) Data visuzlization and URL parameters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ManagingODM2WithTheDjangoORM.html">6) Using the Django ORM</a></li>
 </ul>
 </div>
