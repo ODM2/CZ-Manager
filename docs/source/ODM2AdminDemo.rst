@@ -35,7 +35,7 @@ Upon logging into ODM2 Admin you will see the below navigation shortcuts across 
 
 
 The ODM2 Admin Administration link will take you to a list of all 44 ODM2 entities that can be directly managed in
-ODM2 Admin. See the ODM2 Admin Forms for details about the ODM2 Admin Forms :ref:ODM2-Administration.
+ODM2 Admin. See the ODM2 Admin Forms for details about the ODM2 Admin Forms :ref:`ODM2-Administration`.
 
 Recent actions show changes you have recently completed in ODM2 Admin such as adding or editing an item in the forms.
 
@@ -52,9 +52,10 @@ ORM with ODM2 databases.
    2) Using Data Logger Files <DataLoggerFiles>
    3) Managing Profile Results With ODM2 Admin <ProfileResults>
    4) Time series QA/QC <DataQAQC>
-   5) Data visuzlization and URL parameters <DataVisualizationTips>
+   5) Data visualization and URL parameters <DataVisualizationTips>
    6) Using the Django ORM <ManagingODM2WithTheDjangoORM>
 
 
 * :ref:`ODM2 Admin docs home page <ODM2-Admin>`
 * :ref:`Search the docs <search>`
+

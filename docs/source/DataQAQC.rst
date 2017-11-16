@@ -37,6 +37,7 @@ Our Annotated data will then look something like this:
 
   .. image:: /images/AnnotatedData.png
 
+:ref:`5) Data visualization and URL parameters <Data-Visualization>`
 
 * :ref:`ODM2 Admin docs home page<ODM2-Admin>`
 * :ref:`Search the docs <search>`
