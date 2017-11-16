@@ -10,6 +10,8 @@ was created through National Science Foundation Grant EAR-1224638.
 Support for the development of this application comes
 from NSF Grant EAR-1331841 Luquillo CZO.
 
+The ODM2 Admin source code can be found here: https://github.com/ODM2/ODM2-Admin
+
 ODM2 can be found here: https://github.com/ODM2
 
 Other ODM2 tools can be used in conjunction with ODM2 Admin, extensive
