@@ -28,12 +28,18 @@ Diagram of ODM2 Admin infrastructure:
 
 .. image:: /images/ODM2AdminInfrastructure.png
 
-
-The file ``templatesAndSettings/settings/development.py`` contains all
-of the database and local file system settings which need to be configured
-to get a copy of this application working. This was developed using a
-postgresql version of ODM2 data model, additional modifications will be
+ODM2 Admin This was developed using a postgresql version of ODM2 data model, additional modifications may be
 needed to make this work with MSSQL or another database.
+
+Extended infrasructure with WOFpy web services and ODM2PythonAPI
+----------------------------------------------------------------
+
+.. image:: /images/Extendedinfrastructure.png
+
+ODM2 Admin can be setup in conjunction with WOFpy and ODM2PythonAPI. WOFpy implements CUAHSI's water one flow web
+services. See the `WOFpy github page <https://github.com/ODM2/WOFpy>`_ for more.
+ODM2PythoAPI is a A Python-based application programmer's interface for the Observations Data Model 2 (ODM2).
+For more see the `ODM2PythonAPI github page <https://github.com/ODM2/ODM2PythonAPI>`_
 
 An example postgresql database named ODM2AdminExamplePostgresqlDB is
 provided, this is a custom postgresql format backup which can be
@@ -55,8 +61,10 @@ Alternatively you can download the source code from github (https://github.com/O
 environment, create an ODM2 database, run the extrasql.sql script (found in the root directory of the source code)
 on that database, and change settings in:
 
-ODM2-Admin-master\templatesAndSettings\settings\base.py
-ODM2-Admin-master\templatesAndSettings\settings\development.py
+.. code:: bash
+
+   ODM2-Admin-master\templatesAndSettings\settings\base.py
+   ODM2-Admin-master\templatesAndSettings\settings\development.py
 
 When you are depolying to production you will want to change the settings in production.py instead of development.py
 You can also have the settings files point to an existing ODM2 database, you will need to run the extrasql.sql on
