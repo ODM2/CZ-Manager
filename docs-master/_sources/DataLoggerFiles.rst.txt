@@ -37,5 +37,7 @@ ODM2 Sandbox you can navigate to https://dev-odm2admin.cuahsi.org/Sandbox/odm2ad
 #. We can click the + icon to add a variable, unit processing level or other field, we can click the pencil icon to edit
    the current item.
 
+:ref:`3) Managing Profile Results With ODM2 Admin <ProfileResults>`
+
 * :ref:`ODM2 Admin docs home page<ODM2-Admin>`
 * :ref:`Search the docs <search>`
