@@ -20,6 +20,9 @@ WOFpy
 
 ODM2 Admin can also be used with WOFpy and water one flow webservices can be registered with CUAHSI HIS central.
 
+WOFpy REST API test page:
+http://odm2admin.cuahsi.org/wofpy/odm2lczo/rest_1_1/
+
 This is still in testing an initial implementation has been registered with the HIS central QA system:
 
 http://qa-hiscentral.cuahsi.org/testpage.aspx?n=100002
