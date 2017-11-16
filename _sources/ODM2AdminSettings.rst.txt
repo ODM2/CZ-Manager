@@ -113,8 +113,20 @@ https://www.mapbox.com/help/how-access-tokens-work/#mapbox-tokens-api
 
     }
 
-Add a disclaimer explaining the source of your data. This will appear on publicily available pages where your data are
-viewable.
+Add general information about the organization that generated the data. This will appear on publicily available pages
+where your data are viewable.
+
+..  code:: python
+
+    SENSOR_DASHBOARD = {
+        "time_series_days": 15,
+        "featureactionids": [1699, 1784,1782,1780,1701,1707,1778,1779],
+    }
+
+Add sampling feature actions to the sensor dashboard. Feature actions listed here will be present in a drop down list on
+the sensor dashboard page.
+
+The sensor dashboard can be found by visiting 'Graph My Data' -> 'Sensor Dashboard'.
 
 * :ref:`ODM2 Admin docs home page <ODM2-Admin>`
 * :ref:`Search the docs <search>`
