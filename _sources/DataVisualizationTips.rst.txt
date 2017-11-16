@@ -47,3 +47,8 @@ In this case we see that water temperature is recorded by three instruments a Wa
 Water Conductivity sensor.
 
    .. image:: /images/RESSHWaterTemp.png
+
+:ref:`6) Using the Django ORM <Managing-ODM2-With-The-Django-ORM>`
+
+* :ref:`ODM2 Admin docs home page<ODM2-Admin>`
+* :ref:`Search the docs <search>`

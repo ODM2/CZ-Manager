@@ -1,9 +1,9 @@
 .. _ODM2-Administration:
 
-ODM2 Administration
-===================
+ODM2 Admin Forms
+================
 
-The ODM2 entities you can administer with ODM2 Admin are organized in a number of catogories.
+The ODM2 entities you can administer with ODM2 Admin Forms are organized in a number of catogories.
 
 * People and Organizations
 * Variables and Units
@@ -65,24 +65,25 @@ Methods and Actions
 
 * **Related actions:** Allow you to setup sequences of actions by relating one action to another.
 
-* :ref:`ODM2 Admin docs home page <ODM2-Admin>`
-* :ref:`Search the docs <search>`
+
 
 Sampling Features and Sites
 ---------------------------
 
-* **Sampling Features:** very Action must be performed on or at a Sampling Feature. For example, a "Site visit" Action
+* **Sampling Features:** Every Action must be performed on or at a Sampling Feature. For example, a "Site visit" Action
   is made to a Site Sampling Feature. A "Laboratory analysis" Action is performed on a Specimen Sampling Feature.
   For more see the `ODM2 docs <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_samplingfeatures.md>`_
 
+  * Feature actions, sampling feature external identifiers, sampling feature extension property values, and sites
+    are inline forms in sampling features.
 * **Related Features:** labeled as 'relate two features' in ODM2 Admin, allows you to establish relationships between
   sampling features such as parent child relationships.
 
 * **Feature action:** labeled as 'Sampling feature actions' in ODM2 Admin. For more see `ODM2 Feature actions doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_featureactions.md>`_
 
-* **Sites**
+* **Sites** Sampling features could also be specimens if they are locations then they need to have an associated site.
 
-* **Saptial References:**
+* **Saptial References:**  a coordinate-based local, regional or global system used to locate geographical entities.
 
 Results
 -------
@@ -93,7 +94,7 @@ Results
   A Dataset has a type, title, an abstract, and is the entity in ODM2 that would receive a citation.
   For more see the `ODM2 Datasets doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_datasets.md>`_
 
-* **Dataset Results:**
+* **Dataset Results:** Results that are part of a dataset.
 
 * **Processing Levels:** Each Result recorded in ODM2 has a ProcessingLevel, which specifies the level of quality
   control or data processing that the Result has been subjected to. For more see `ODM2 Processing Levels doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_processinglevels.md>`_
@@ -113,8 +114,6 @@ Result Values
 
 * **Measurement Result Values:** Values for a measurement result.
 
-* **Measurement Result Value Files:**
-
 * **Profile Results:** An Depth Profile Coverage Result consists of a series of ResultValues for a single Variable, at
   a single location, measured using a single Method, with specific Units, having a specific ProcessingLevel, but
   measured over multiple depths. For more see `ODM2 Profile Results doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/ext_results_profile.md>`_
@@ -124,16 +123,21 @@ Result Values
 * **Related Results:** Results can be related to one another. In ODM2 Admin they can be used to say that one result is
   derived from another using derivation equations.
 
-* **Related Derivation Equations:** relate derivation equations and results
+* **Related Derivation Equations:** relate derivation equations and results. derived results can have derivation
+  equations, You can derive them using related results.
 
-* **Derivation equation:**
+.. image:: /images/DerivingValues.png
+
+* **Derivation equation:** An equation used to derive values from a time series. These allow you to transform things
+  like stage height into discharge using a ratings curve. Or an instrument measurement say in millivolts into an
+  observation of interest.
 
 citations
 ---------
 
-* **Citations:**
+* **Citations:** A citation
 
-* **Author list:**
+* **Author list:** A list of Authors
 
 * **Dataset citations:** link a dataset to a citation
 
@@ -148,13 +152,13 @@ Data logger files
 
 For details about how to use data logger files see :ref:`Using Data Logger Files <DataLoggerFiles>`
 
-* **Data logger program files:**
+* **Data logger program files:** The program used by the data logger while logging values.
 
-* **Data logger files:**
+* **Data logger files:** Files containing time series result values.
 
-* **Data logger file columns:**
+* **Data logger file columns:** Columns associated with data logger files these match columns in the file.
 
-* **Process data logger files:**
+* **Process data logger files:** Used to ingest data logger files.
 
 * **Instrument output variables:** Associated with a data logger file column.
 
@@ -174,5 +178,7 @@ External identifier systems
 
 * **External identifier systems:** Such as an IGSN or ORCiD.
 
+:ref:`2) Using Data Logger Files <DataLoggerFiles>`
 
-
+* :ref:`ODM2 Admin docs home page <ODM2-Admin>`
+* :ref:`Search the docs <search>`
