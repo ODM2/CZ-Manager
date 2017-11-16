@@ -2,11 +2,13 @@ import cStringIO as StringIO
 import math
 import json
 import time
+import sys
 from datetime import datetime
 from datetime import timedelta
 from time import mktime
 from django import template
 from django.contrib import admin
+from django.db import connection
 from django.db.models import Max
 from django.db.models import Min
 from django.db.models import Q
@@ -14,16 +16,25 @@ from django.http import HttpResponseRedirect
 from django.http import StreamingHttpResponse
 from django.shortcuts import render
 from django.template import loader
+from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.core import mail
+from django.core import serializers
 from django.core.management import settings
+from templatesAndSettings.settings import exportdb
 from django.template.response import TemplateResponse
 from django.core.exceptions import ObjectDoesNotExist
+from hs_restclient_helper import get_oauth_hs
 from django.core import management
 # from oauth2_provider.views.generic import ProtectedResourceView
 from django.http import HttpResponse
 from django.forms.models import model_to_dict
 from django.contrib.gis.geos import GEOSGeometry
+import hs_restclient as hs_r
+from hs_restclient import HydroShare, HydroShareAuthOAuth2
+from oauthlib.oauth2 import TokenExpiredError
+from oauthlib.oauth2 import InvalidGrantError, InvalidClientError
+
 import requests
 # from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
 # from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DISCLAIMER
@@ -56,6 +67,7 @@ from .models import Timeseriesresultvaluesext
 from .models import Timeseriesresultvaluesextwannotations
 from .models import Timeseriesresultvalueannotations
 from .models import Units
+
 from .models import Variables
 from .models import Timeseriesresults
 from .models import Resultextensionpropertyvalues
@@ -223,6 +235,10 @@ __author__ = 'leonmi'
 # instance=Citationextensionpropertyvalues()) for x in range(0,3)]
 #     return TemplateResponse(request, 'publications2.html',{'citation_form':citation_form,
 # 'author_forms':author_forms,'citation_property_forms':citation_property_forms,})
+
+@login_required()
+def oauth_view(request, *args, **kwargs):
+    return HttpResponse('Secret contents!', status=200)
 
 def publications(request):
     # if request.user.is_authenticated():
@@ -696,6 +712,7 @@ def sensor_dashboard(request, feature_action='NotSet', sampling_feature='NotSet'
     dmaxcount = 0
     lastResult = None
     for repv in repvs:
+        # print(repv.resultid)
         if "start date" in str(repv.propertyid.propertyname):
             startdate = repv.propertyvalue
             repv.propertyname = "Time series began on: "
@@ -863,9 +880,11 @@ def TimeSeriesGraphing(request, feature_action='All'):
             filter(resultid=selected_resultid).filter(propertyid=EndDateProperty.propertyid).get()
         end_date = recordedenddate.propertyvalue
         enddt = time.strptime(end_date, "%Y-%m-%d %H:%M")
+        print(enddt)
         dt = datetime.fromtimestamp(mktime(enddt))
         last_day_previous_month = dt - timedelta(days=30)
         entered_start_date = last_day_previous_month.strftime('%Y-%m-%d %H:%M')
+        print(entered_start_date)
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
     else:
@@ -1297,6 +1316,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
 def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', dataset='NotSet',
                    resultidu='NotSet',
                    startdate='NotSet', enddate='NotSet', popup='NotSet'):
+    # print("HERE")
     if not request.user.is_authenticated():
         # return HttpResponseRedirect('../')
         authenticated = False
@@ -1403,6 +1423,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         except IndexError as e:
             # html = "<html><body>No Data Available Yet.</body></html>"
             # return HttpResponse(html)
+            print(e)
             startdate = Timeseriesresultvalues.objects.\
                 filter(resultid__in=resultList.values("resultid")).\
                 annotate(Min('valuedatetime')).\
@@ -1439,6 +1460,7 @@ def is_number(s):
 
 def add_annotation(request):
     # print('annotate')
+    resultid = None
     resultid = None
     annotationvals = None
     annotation = None
@@ -1612,6 +1634,154 @@ def addL1timeseries(request):
             # print(result)
     return HttpResponse(json.dumps(response_data),content_type='application/json')
 
+
+#another approach
+#https://rlskoeser.github.io/2016/03/31/migrating-data-between-databases-with-django/
+def createODM2SQLiteFile(request):
+    entered_end_date = ''
+    entered_start_date = ''
+    myresultSeriesExport = []
+
+    if 'exportdata' in request.POST and 'myresultSeriesExport[]' in request.POST:
+        selectedMResultSeries = request.POST.getlist('myresultSeriesExport[]')
+        myresultSeriesExport = None
+        if request.POST['useDates'] == 'true':
+            useDates = True
+        else:
+            useDates = False
+        if useDates:
+            if 'endDate' in request.POST:
+                # print(entered_end_date)
+                entered_end_date = request.POST['endDate']
+            if 'startDate' in request.POST:
+                entered_start_date = request.POST['startDate']
+            #Employees.objects.values_list('eng_name', flat=True)
+            myresultSeriesExport = Timeseriesresultvalues.objects.all() \
+                .filter(valuedatetime__gte=entered_start_date) \
+                .filter(valuedatetime__lte=entered_end_date) \
+                .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
+        else:
+            myresultSeriesExport = Timeseriesresultvalues.objects.all() \
+                .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
+            # emailspreadsheet2(request, myresultSeriesExport, False)
+    #management.call_command('dump_object', 'odm2admin.Timeseriesresults', 17160, 17162, kitchensink=True)
+    sysout = sys.stdout
+    loc = settings.FIXTURE_DIR
+    print(myresultSeriesExport.first())
+    sys.stdout = open(loc+ 'tmp.json', 'w')
+    tmploc1 = loc+ 'tmp.json'
+    management.call_command('dump_object', 'odm2admin.Timeseriesresultvalues', myresultSeriesExport.first().valueid, kitchensink=True)
+    sys.stdout.close()
+    #jsonfile = open(loc+ 'tmp2.json', 'w')
+    # i=0
+    values = myresultSeriesExport.values_list('valueid', flat=True)
+    sys.stdout = open(loc + 'tmp2.json', 'w')
+    tmploc2 = loc+ 'tmp2.json'
+    sys.stdout.write(serializers.serialize("json", myresultSeriesExport[1:], indent=4,use_natural_foreign_keys=False,use_natural_primary_keys=False))
+    sys.stdout.close()
+    sys.stdout = sysout
+
+    #settings.MAP_CONFIG['result_value_processing_levels_to_display']
+    db_name = exportdb.DATABASES['default']['NAME']
+    print(db_name)
+    print(tmploc1)
+    database = ''
+    if 'exportdata' in request.POST:
+        # print(entered_end_date)
+        exportdata = request.POST['exportdata']
+        if exportdata == 'true':
+            database = 'export'
+        if 'publishdata' in request.POST:
+            # print(entered_end_date)
+            publishdata = request.POST['publishdata']
+            if publishdata == 'true':
+                database = 'published'
+    management.call_command('loaddata',
+                            tmploc1 ,database=database)  # ,database='export'
+    print('finished first file')
+    management.call_command('loaddata',
+                            tmploc2,database=database)
+    #management.call_command('create_sqlite_export',tmploc1,tmploc2, settings=exportdb)
+    return myresultSeriesExport
+    #outfile = loc +'tmp2.json'
+    #print(outfile)
+    #with open(outfile, 'w') as jsonfile:
+    #    json.dump(data, jsonfile)
+
+@login_required()
+def export_to_hydroshare(request):
+
+    valuestoexport = createODM2SQLiteFile(request)
+
+    export_complete = True
+    resource_link = ''
+    user = request.user
+    # print(request.POST['hydroshareusername'])
+
+    if 'hydroshareusername' in request.POST and 'hydrosharepassword' in request.POST:
+        hs_client_id = settings.SOCIAL_AUTH_HYDROSHARE_UP_KEY
+        hs_client_secret = settings.SOCIAL_AUTH_HYDROSHARE_UP_SECRET
+        username = request.POST['hydroshareusername']
+        password =  request.POST['hydrosharepassword']
+        auth = HydroShareAuthOAuth2(hs_client_id, hs_client_secret,
+                                    username=username, password=password)
+    else:
+        hs_client_id = settings.SOCIAL_AUTH_HYDROSHARE_KEY
+        hs_client_secret = settings.SOCIAL_AUTH_HYDROSHARE_SECRET
+        social = user.social_auth.get(provider='hydroshare')
+        token = social.extra_data['access_token']
+        print(social.extra_data)
+        print(token)
+        auth = HydroShareAuthOAuth2(hs_client_id, hs_client_secret,
+                                    token=social.extra_data)
+    #hs = get_oauth_hs(request)
+    #userInfo = hs.getUserInfo()
+    #
+    # token = None
+    #if 'code' in request.POST:
+    #    print(request.POST['code'])
+    #    token = request.POST['code']
+    #print('expires in ' + str(token['expires_in']))
+
+    #auth = HydroShareAuthOAuth2(client_id, client_secret,
+    #                            username='miguelcleon', password='7jmftUpata')
+    hs = HydroShare(auth=auth)
+    username = hs.getUserInfo()
+    print(username)
+    abstracttext = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
+    if 'startDate' in request.POST:
+        entered_start_date = request.POST['startDate']
+        abstracttext += ' data values from: ' + entered_start_date
+    if 'endDate' in request.POST:
+        # print(entered_end_date)
+        entered_end_date = request.POST['endDate']
+        abstracttext += ' ending on: ' + entered_end_date
+
+    abstract = abstracttext
+    title = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
+    keywords = ('test', 'test 2')
+    rtype = 'GenericResource'
+    fpath = exportdb.DATABASES['default']['NAME']
+    #metadata = '[{"coverage":{"type":"period", "value":{"start":"'+entered_start_date +'", "end":"'+ entered_end_date +'"}}}, {"creator":{"name":"Miguel Leon"}}]'
+    metadata = '[{"coverage":{"type":"period", "value":{"start":"03/26/2017", "end":"04/25/2017"}}}, {"creator":{"name":"Miguel Leon"}}]'
+    extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
+
+    #abstract = 'My abstract'
+    #title = 'My resource'
+    #keywords = ('my keyword 1', 'my keyword 2')
+    #rtype = 'GenericResource'
+    #fpath = 'C:/Users/leonmi/Google Drive/ODM2AdminLT2/ODM2SQliteBlank.db'
+    #metadata = '[{"coverage":{"type":"period", "value":{"start":"01/01/2000", "end":"12/12/2010"}}}, {"creator":{"name":"John Smith"}}, {"creator":{"name":"Lisa Miller"}}]'
+    #extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
+    resource_id = hs.createResource(rtype, title, resource_file=fpath, keywords=keywords, abstract=abstract,
+                                         metadata=metadata, extra_metadata=extra_metadata)
+    print(resource_id)
+    # for resource in hs.getResourceList():
+    #     print(resource)
+    return HttpResponse({'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+                                                'export_complete': export_complete,
+                                                'username' : username,
+                                                'resource_link': resource_link,},content_type='application/json')
 def email_data_from_graph(request):
     emailsent = False
     outEmail = ''
@@ -2628,9 +2798,11 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         selected_relatedfeatid = 15
 
     useSamplingFeature = False
+    samplingfeaturelabel = None
     if samplingfeature != 'NotSet':
         samplingfeature = int(samplingfeature)
         useSamplingFeature = True
+        samplingfeaturelabel = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
     # find variables found at the sampling feature
     # need to go through featureaction to get to results
 
@@ -2639,6 +2811,8 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         sampling_features = Relatedfeatures.objects.filter(
             relatedfeatureid__exact=selected_relatedfeatid).values(
             'samplingfeatureid')
+        print(sampling_features.count())
+        samplingfeaturelabel = Samplingfeatures.objects.filter(samplingfeatureid=selected_relatedfeatid).get()
         # select the feature actions for all of the related features.
         feature_actions = Featureactions.objects.filter(samplingfeatureid__in=sampling_features)
     else:
@@ -2857,6 +3031,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
                                  'chartID': chartID, 'chart': chart, 'series': series,
                                  'title2': title2, 'graphType': graphType, 'yAxis': yAxis,
                                  'name_of_units': name_of_units,
+                                 'samplingfeaturelabel': samplingfeaturelabel,
                                  'relatedFeatureList': relatedFeatureList,
                                  'SelectedRelatedFeature': selected_relatedfeatid,
                                  'name': request.user, 'site_title': admin.site.site_title,

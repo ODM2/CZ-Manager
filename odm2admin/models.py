@@ -1,4 +1,5 @@
-﻿# C:\ODM2\odm2testsite\odm2testsite\templates
+﻿
+# C:\ODM2\odm2testsite\odm2testsite\templates
 # This is an auto-generated Django model module.
 # You'll have to do the following manually to clean this up:
 #   * Rearrange models' order
@@ -15,6 +16,7 @@ import time
 
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import GEOSGeometry
+from django.db import connection
 from django.db import models
 # from django.forms import ModelFormWithFileField
 # from .forms import DataloggerprogramfilesAdminForm
@@ -22,13 +24,14 @@ from django.db import models
 # from django.contrib.gis.db import models
 import csv
 import io
+import re
 from urlparse import urlparse
 import uuid
 from django.db.models import UUIDField
 from django.core import management
 from django.core.exceptions import ValidationError
 from django.core.management import settings
-import re
+
 
 def handle_uploaded_file(f, id):
     destination = io.open(settings.MEDIA_ROOT + '/resultvalues/' + f.name + '.csv', 'wb+')
@@ -96,7 +99,11 @@ class Actionannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."actionannotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ActionAnnotations'
+        else:
+            db_table = r'actionannotations'
 
 
 class Actionby(models.Model):
@@ -118,7 +125,11 @@ class Actionby(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."actionby'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ActionBy'
+        else:
+            db_table = r'actionby'
         verbose_name = 'action by'
         verbose_name_plural = 'action by'
 
@@ -130,7 +141,7 @@ class Actiondirectives(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."actiondirectives'
+        db_table = r'actiondirectives'
 
 
 class Actionextensionpropertyvalues(models.Model):
@@ -141,7 +152,12 @@ class Actionextensionpropertyvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."actionextensionpropertyvalues'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ActionExtensionPropertyValues'
+        else:
+            db_table = r'actionextensionpropertyvalues'
+        _exportdb = settings.EXPORTDB
 
 
 class Actions(models.Model):
@@ -174,7 +190,12 @@ class Actions(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."actions'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Actions'
+        else:
+            db_table = r'actions'
+        _exportdb = settings.EXPORTDB
         verbose_name = 'action'
 
 
@@ -202,7 +223,11 @@ class Affiliations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."affiliations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Affiliations'
+        else:
+            db_table = r'affiliations'
         verbose_name = 'affiliation (relate people and organizations)'
         verbose_name_plural = 'affiliation (relate people and organizations)'
         ordering = ['-primaryemail']
@@ -225,7 +250,11 @@ class Annotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."annotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Annotations'
+        else:
+            db_table = r'annotations'
 
 
 class Authorlists(models.Model):
@@ -241,7 +270,11 @@ class Authorlists(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."authorlists'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'AuthorLists'
+        else:
+            db_table = r'authorlists'
         verbose_name = 'author list'
         verbose_name_plural = 'author list'
 
@@ -275,7 +308,11 @@ class Calibrationactions(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."calibrationactions'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CalibrationActions'
+        else:
+            db_table = r'calibrationactions'
 
 
 class Calibrationreferenceequipment(models.Model):
@@ -285,7 +322,12 @@ class Calibrationreferenceequipment(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."calibrationreferenceequipment'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CalibrationReferenceEquipment'
+        else:
+            db_table = r'calibrationreferenceequipment'
+
 
 
 class Calibrationstandards(models.Model):
@@ -295,7 +337,11 @@ class Calibrationstandards(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."calibrationstandards'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CalibrationStandards'
+        else:
+            db_table = r'calibrationstandards'
 
 
 class Categoricalresults(models.Model):
@@ -312,7 +358,11 @@ class Categoricalresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."categoricalresults'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CategoricalResults'
+        else:
+            db_table = r'categoricalresults'
 
 
 class Categoricalresultvalueannotations(models.Model):
@@ -322,7 +372,11 @@ class Categoricalresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."categoricalresultvalueannotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CategoricalResultValueAnnotations'
+        else:
+            db_table = r'categoricalresultvalueannotations'
 
 
 class Categoricalresultvalues(models.Model):
@@ -334,7 +388,11 @@ class Categoricalresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."categoricalresultvalues'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CategoricalResultValues'
+        else:
+            db_table = r'categoricalresultvalues'
 
 
 class Citationextensionpropertyvalues(models.Model):
@@ -349,7 +407,12 @@ class Citationextensionpropertyvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."citationextensionpropertyvalues'
+
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CitationExtensionPropertyValues'
+        else:
+            db_table = r'citationextensionpropertyvalues'
         verbose_name = 'citation extension property'
         verbose_name_plural = 'citation extension properties'
 
@@ -430,7 +493,11 @@ class Citationexternalidentifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."citationexternalidentifiers'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CitationExternalIdentifiers'
+        else:
+            db_table = r'citationexternalidentifiers'
         verbose_name = 'citationexternalidentifier'
 
 
@@ -451,7 +518,11 @@ class Citations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."citations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Citations'
+        else:
+            db_table = r'citations'
         ordering = ['title']
         verbose_name = 'citation'
 
@@ -503,7 +574,12 @@ class CvActiontype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_actiontype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_ActionType'
+        else:
+            db_table = r'cv_actiontype'
+
         ordering = ['term', 'name']
 
 
@@ -519,7 +595,11 @@ class CvAggregationstatistic(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_aggregationstatistic'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_AggregationStatistic'
+        else:
+            db_table = r'cv_aggregationstatistic'
         ordering = ['term', 'name']
 
 
@@ -535,7 +615,11 @@ class CvAnnotationtype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_annotationtype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_AnnotationType'
+        else:
+            db_table = r'cv_annotationtype'
         ordering = ['term', 'name']
 
 
@@ -551,7 +635,11 @@ class CvCensorcode(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_censorcode'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_CensorCode'
+        else:
+            db_table = r'cv_censorcode'
         ordering = ['term', 'name']
 
 
@@ -567,7 +655,11 @@ class CvDataqualitytype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_dataqualitytype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_DataQualityType'
+        else:
+            db_table = r'cv_dataqualitytype'
         ordering = ['term', 'name']
 
 
@@ -583,7 +675,11 @@ class CvDatasettypecv(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_datasettype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_DatasetType'
+        else:
+            db_table = r'cv_datasettype'
         ordering = ['term', 'name']
 
 
@@ -599,7 +695,11 @@ class CvDirectivetype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_directivetype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_DirectiveType'
+        else:
+            db_table = r'cv_directivetype'
         ordering = ['term', 'name']
 
 
@@ -615,7 +715,11 @@ class CvElevationdatum(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_elevationdatum'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_ElevationDatum'
+        else:
+            db_table = r'cv_elevationdatum'
         verbose_name = 'elevation datum'
         ordering = ['term', 'name']
 
@@ -632,7 +736,11 @@ class CvEquipmenttype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_equipmenttype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_EquipmentType'
+        else:
+            db_table = r'cv_equipmenttype'
         ordering = ['term', 'name']
 
 
@@ -648,7 +756,11 @@ class CvMethodtype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_methodtype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_MethodType'
+        else:
+            db_table = r'cv_methodtype'
         ordering = ['term', 'name']
 
 
@@ -664,7 +776,12 @@ class CvOrganizationtype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_organizationtype'
+        # db_table = r'cv_organizationtype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_OrganizationType'
+        else:
+            db_table = r'cv_organizationtype'
         ordering = ['term', 'name']
 
 
@@ -680,7 +797,11 @@ class CvPropertydatatype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_propertydatatype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_PropertyDataType'
+        else:
+            db_table = r'cv_propertydatatype'
         ordering = ['term', 'name']
 
 
@@ -696,7 +817,12 @@ class CvQualitycode(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_qualitycode'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_QualityCode'
+        else:
+            db_table = r'cv_qualitycode'
+        _exportdb = settings.EXPORTDB
         ordering = ['term', 'name']
 
 
@@ -712,7 +838,7 @@ class CvReferencematerialmedium(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_referencematerialmedium'
+        db_table = r'cv_referencematerialmedium'
         ordering = ['term', 'name']
 
 
@@ -728,7 +854,11 @@ class CvRelationshiptype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_relationshiptype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_RelationshipType'
+        else:
+            db_table = r'cv_relationshiptype'
         ordering = ['term', 'name']
 
 
@@ -744,7 +874,11 @@ class CvResulttype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_resulttype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_ResultType'
+        else:
+            db_table = r'cv_resulttype'
         ordering = ['term', 'name']
 
 
@@ -760,7 +894,12 @@ class CvMedium(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_medium'
+        db_table = r'cv_medium'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_Medium'
+        else:
+            db_table = r'cv_medium'
         ordering = ['term', 'name']
 
 
@@ -776,7 +915,11 @@ class CvSamplingfeaturegeotype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_samplingfeaturegeotype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_SamplingFeatureGeoType'
+        else:
+            db_table = r'cv_samplingfeaturegeotype'
         verbose_name = 'sampling feature geo type'
         ordering = ['term', 'name']
 
@@ -793,7 +936,11 @@ class CvSamplingfeaturetype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_samplingfeaturetype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_SamplingFeatureType'
+        else:
+            db_table = r'cv_samplingfeaturetype'
         verbose_name = 'sampling feature type'
         ordering = ['term', 'name']
 
@@ -810,7 +957,11 @@ class CvSitetype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_sitetype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_SiteType'
+        else:
+            db_table = r'cv_sitetype'
         ordering = ['term', 'name']
 
 
@@ -826,7 +977,11 @@ class CvSpatialoffsettype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_spatialoffsettype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_SpatialOffsetType'
+        else:
+            db_table = r'cv_spatialoffsettype'
         ordering = ['term', 'name']
 
 
@@ -842,7 +997,11 @@ class CvSpeciation(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_speciation'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_Speciation'
+        else:
+            db_table = r'cv_speciation'
         ordering = ['term', 'name']
 
 
@@ -858,7 +1017,7 @@ class CvSpecimenmedium(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_medium'
+        db_table = r'cv_medium'
         ordering = ['term', 'name']
 
 
@@ -874,7 +1033,11 @@ class CvSpecimentype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_specimentype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_SpecimenType'
+        else:
+            db_table = r'cv_specimentype'
         ordering = ['term', 'name']
 
 
@@ -890,7 +1053,11 @@ class CvStatus(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_status'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_Status'
+        else:
+            db_table = r'cv_status'
         ordering = ['term', 'name']
 
 
@@ -906,7 +1073,12 @@ class CvTaxonomicclassifiertype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_taxonomicclassifiertype'
+
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_TaxonomicClassifierType'
+        else:
+            db_table = r'cv_taxonomicclassifiertype'
         ordering = ['term', 'name']
         verbose_name = "taxonomic classifier"
 
@@ -923,7 +1095,11 @@ class CvUnitstype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_unitstype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_UnitsType'
+        else:
+            db_table = r'cv_unitstype'
         ordering = ['term', 'name']
 
 
@@ -939,7 +1115,11 @@ class CvVariablename(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_variablename'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_VariableName'
+        else:
+            db_table = r'cv_variablename'
         ordering = ['term', 'name']
 
 
@@ -955,7 +1135,11 @@ class CvVariabletype(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."cv_variabletype'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'CV_VariableType'
+        else:
+            db_table = r'cv_variabletype'
         ordering = ['term', 'name']
 
 
@@ -971,9 +1155,9 @@ class Dataloggerfilecolumns(models.Model):
     columnlabel = models.CharField(verbose_name="column label", max_length=50)
     columndescription = models.CharField(verbose_name="column description",
                                          help_text="To disble ingestion of a column type skip, " +
-                                                "or to specify a column as the date time enter datetime" +
-                                                " if the datetime is an excel format numeric datetime" +
-                                                " enter exceldatetime",
+                                                   "or to specify a column as the date time enter datetime" +
+                                                   " if the datetime is an excel format numeric datetime" +
+                                                   " enter exceldatetime",
                                          max_length=5000,
                                          blank=True)
     measurementequation = models.CharField(verbose_name="measurement equation", max_length=255,
@@ -1002,7 +1186,12 @@ class Dataloggerfilecolumns(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."dataloggerfilecolumns'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'DataloggerFileColumns'
+        else:
+            db_table = r'dataloggerfilecolumns'
+        _exportdb = settings.EXPORTDB
         verbose_name = 'data logger file column'
 
 
@@ -1013,7 +1202,7 @@ class Dataloggerfiles(models.Model):
     dataloggerfiledescription = models.CharField(max_length=5000, blank=True)
     # dataloggerfilelink = models.CharField(max_length=255, blank=True)
     dataloggerfilelink = models.FileField(upload_to='dataloggerfiles')  # upload_to='.'
-    
+
     def dataloggerfilelinkname(self):
         return self.dataloggerfilelink.name
     def __unicode__(self):
@@ -1022,14 +1211,19 @@ class Dataloggerfiles(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."dataloggerfiles'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'DataLoggerFiles'
+        else:
+            db_table = r'dataloggerfiles'
+        _exportdb = settings.EXPORTDB
         verbose_name = 'data logger file'
 
 
 class ProcessDataloggerfile(models.Model):
     processdataloggerfileid = models.AutoField(primary_key=True)
     dataloggerfileid = models.ForeignKey('dataloggerfiles',
-                                         help_text="CAUTION dataloggerfilecolumns must be setup" +
+                                         help_text="CAUTION data logger file columns must be setup" +
                                                    ", the date and time stamp is expected to " +
                                                    "be the first column, " +
                                                    " column names must match " +
@@ -1037,7 +1231,12 @@ class ProcessDataloggerfile(models.Model):
                                                    "dataloggerfilecolumns.",
                                          verbose_name='data logger file',
                                          db_column='dataloggerfileid')
-    processingCode = models.CharField(max_length=255, verbose_name='processing code', default="0")
+    processingCode = models.CharField(max_length=255, verbose_name='processing code',
+                                      help_text="to setup an FTP file download set the processing" +
+                                      "code as 'x hours between download' where x is how many hours to " +
+                                      "wait between downloading copies of the file from the FTP site. " +
+                                      "A datalogger file setup for FTP download must have only 1 " +
+                                      "process data logger file record.", default="0")
     databeginson = models.IntegerField(verbose_name="Data begins on this row number", default=2)
     columnheaderson = models.IntegerField(
         verbose_name="Column headers matching column labels from data logger columns on row")
@@ -1058,9 +1257,17 @@ class ProcessDataloggerfile(models.Model):
         # self.databeginson, self.columnheaderson, False)
         linkname = str(self.dataloggerfileid.dataloggerfilelinkname())
         fileid = self.dataloggerfileid.dataloggerfileid
-        management.call_command('ProcessDataLoggerFile', linkname,str(fileid)
-                                , str(self.databeginson), str(self.columnheaderson),
-                                False, False, False)
+        ftpfile = self.dataloggerfileid.dataloggerfiledescription
+        ftpparse = urlparse(ftpfile)
+        if len(ftpparse.netloc) > 0:
+            ftpfrequencyhours = re.findall(r'^\D*(\d+)', self.processingCode)[0]
+            management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
+                                    , str(self.databeginson), str(self.columnheaderson),
+                                    str(ftpfrequencyhours))
+        else:
+            management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
+                                    , str(self.databeginson), str(self.columnheaderson),
+                                    False, False, False)
         super(ProcessDataloggerfile, self).save(*args, **kwargs)
         # def get_actions(self, request):
         #     #Disable delete
@@ -1090,7 +1297,11 @@ class Dataloggerprogramfiles(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."dataloggerprogramfiles'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'DataloggerProgramFiles'
+        else:
+            db_table = r'dataloggerprogramfiles'
         verbose_name = 'data logger program file'
 
 
@@ -1100,9 +1311,9 @@ class Dataquality(models.Model):
                                           verbose_name="data quality type")
     dataqualitycode = models.CharField(max_length=255, verbose_name="data quality code",
                                        help_text="for an alarm test include the word alarm." +
-                                       " for a hard bounds check include the word bound (if a value" +
-                                       " falls below a lower limit, or exceeds a lower limit the " +
-                                       "value will be set to NaN (not a number). ")
+                                                 " for a hard bounds check include the word bound (if a value" +
+                                                 " falls below a lower limit, or exceeds a lower limit the " +
+                                                 "value will be set to NaN (not a number). ")
     dataqualityvalue = models.FloatField(blank=True, null=True, verbose_name="data quality value")
     dataqualityvalueunitsid = models.ForeignKey('Units', related_name='+',
                                                 db_column='dataqualityvalueunitsid',
@@ -1118,7 +1329,11 @@ class Dataquality(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."dataquality'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'DataQuality'
+        else:
+            db_table = r'dataquality'
         verbose_name = 'data quality'
         verbose_name_plural = 'data quality'
 
@@ -1132,7 +1347,11 @@ class Datasetcitations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."datasetcitations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'DatasetCitations'
+        else:
+            db_table = r'datasetcitations'
         verbose_name = 'dataset citation'
 
 
@@ -1153,7 +1372,11 @@ class Datasets(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."datasets'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Datasets'
+        else:
+            db_table = r'datasets'
         verbose_name = 'dataset'
 
 
@@ -1171,7 +1394,11 @@ class Datasetsresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."datasetsresults'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'DatasetsResults'
+        else:
+            db_table = r'datasetsresults'
         verbose_name = 'dataset result'
 
 
@@ -1184,8 +1411,12 @@ class Derivationequations(models.Model):
         return s
     class Meta:
         managed = False
-        db_table = r'odm2"."derivationequations'
-        verbose_name='derivation equation'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'DerivationEquations'
+        else:
+            db_table = r'derivationequations'
+        verbose_name= 'derivation equation'
 
 class Directives(models.Model):
     directiveid = models.AutoField(primary_key=True)
@@ -1194,7 +1425,11 @@ class Directives(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."directives'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Directives'
+        else:
+            db_table = r'directives'
 
 
 class Equipment(models.Model):
@@ -1213,7 +1448,11 @@ class Equipment(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."equipment'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Equipment'
+        else:
+            db_table = r'equipment'
 
 
 class Equipmentannotations(models.Model):
@@ -1223,7 +1462,11 @@ class Equipmentannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."equipmentannotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'EquipmentAnnotations'
+        else:
+            db_table = r'equipmentannotations'
 
 
 class Equipmentmodels(models.Model):
@@ -1249,7 +1492,11 @@ class Equipmentmodels(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."equipmentmodels'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'EquipmentModels'
+        else:
+            db_table = r'equipmentmodels'
         verbose_name = "equipment model"
 
 
@@ -1260,7 +1507,11 @@ class Equipmentused(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."equipmentused'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'EquipmentUsed'
+        else:
+            db_table = r'equipmentused'
 
 
 class Extensionproperties(models.Model):
@@ -1278,7 +1529,11 @@ class Extensionproperties(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."extensionproperties'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ExtensionProperties'
+        else:
+            db_table = r'extensionproperties'
         verbose_name = 'extension property'
         verbose_name_plural = 'extension properties'
 
@@ -1296,7 +1551,11 @@ class Externalidentifiersystems(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."externalidentifiersystems'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ExternalIdentifierSystems'
+        else:
+            db_table = r'externalidentifiersystems'
 
 
 class Featureactions(models.Model):
@@ -1325,7 +1584,11 @@ class Featureactions(models.Model):
     #     super(Featureactions, self).save(*args, **kwargs)
     class Meta:
         managed = False
-        db_table = r'odm2"."featureactions'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'FeatureActions'
+        else:
+            db_table = r'featureactions'
         verbose_name = 'action at sampling feature'
         verbose_name_plural = 'action at sampling feature'
 
@@ -1367,7 +1630,11 @@ class Instrumentoutputvariables(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."instrumentoutputvariables'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'InstrumentOutputVariables'
+        else:
+            db_table = r'instrumentoutputvariables'
         verbose_name = "instrument output variable"
 
 
@@ -1379,7 +1646,11 @@ class Maintenanceactions(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."maintenanceactions'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'MaintenanceActions'
+        else:
+            db_table = r'maintenanceactions'
 
 
 class Measurementresults(models.Model):
@@ -1420,7 +1691,11 @@ class Measurementresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."measurementresults'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'MeasurementResults'
+        else:
+            db_table = r'measurementresults'
         ordering = ['censorcodecv', 'resultid']
         verbose_name = 'measurement result'
 
@@ -1432,7 +1707,11 @@ class Measurementresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."measurementresultvalueannotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'MeasurementResultValueAnnotations'
+        else:
+            db_table = r'measurementresultvalueannotations'
 
 
 class Measurementresultvalues(models.Model):
@@ -1501,7 +1780,11 @@ class Measurementresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."measurementresultvalues'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'MeasurementResultValues'
+        else:
+            db_table = r'measurementresultvalues'
         verbose_name = 'measurement result value'
 
 
@@ -1535,7 +1818,11 @@ class Methodannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."methodannotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'MethodAnnotations'
+        else:
+            db_table = r'methodannotations'
 
 
 class Methodcitations(models.Model):
@@ -1552,7 +1839,11 @@ class Methodcitations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."methodcitations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'MethodCitations'
+        else:
+            db_table = r'methodcitations'
         verbose_name = 'method citation'
 
 
@@ -1564,7 +1855,11 @@ class Methodextensionpropertyvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."methodextensionpropertyvalues'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'MethodExtensionPropertyValues'
+        else:
+            db_table = r'methodextensionpropertyvalues'
 
 
 class Methodexternalidentifiers(models.Model):
@@ -1577,7 +1872,12 @@ class Methodexternalidentifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."methodexternalidentifiers'
+
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'MethodExternalIdentifiers'
+        else:
+            db_table = r'methodexternalidentifiers'
 
 
 class Methods(models.Model):
@@ -1610,7 +1910,11 @@ class Methods(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."methods'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Methods'
+        else:
+            db_table = r'methods'
         verbose_name = 'method'
         ordering = ["methodname"]
 
@@ -1624,7 +1928,11 @@ class Modelaffiliations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."modelaffiliations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ModelAffiliations'
+        else:
+            db_table = r'modelaffiliations'
 
 
 class Models(models.Model):
@@ -1637,7 +1945,12 @@ class Models(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."models'
+
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Models'
+        else:
+            db_table = r'models'
 
 
 class Organizations(models.Model):
@@ -1662,7 +1975,11 @@ class Organizations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."organizations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Organizations'
+        else:
+            db_table = r'organizations'
         verbose_name = 'organization'
 
 
@@ -1680,7 +1997,11 @@ class People(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."people'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'People'
+        else:
+            db_table = r'people'
         verbose_name = 'people'
         verbose_name_plural = 'people'
         ordering = ["personlastname"]
@@ -1702,7 +2023,11 @@ class Personexternalidentifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."personexternalidentifiers'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'PersonExternalIdentifiers'
+        else:
+            db_table = r'personexternalidentifiers'
         verbose_name_plural = 'ORCID (Person Unique Identifier)'
 
 
@@ -1728,7 +2053,11 @@ class Pointcoverageresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."pointcoverageresults'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'PointCoverageResults'
+        else:
+            db_table = r'pointcoverageresults'
 
 
 class Pointcoverageresultvalueannotations(models.Model):
@@ -1738,7 +2067,11 @@ class Pointcoverageresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."pointcoverageresultvalueannotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'PointCoverageResultValueAnnotations'
+        else:
+            db_table = r'pointcoverageresultvalueannotations'
 
 
 class Pointcoverageresultvalues(models.Model):
@@ -1756,7 +2089,11 @@ class Pointcoverageresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."pointcoverageresultvalues'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'PointCoverageResultValues'
+        else:
+            db_table = r'pointcoverageresultvalues'
 
 
 class Processinglevels(models.Model):
@@ -1773,7 +2110,11 @@ class Processinglevels(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."processinglevels'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ProcessingLevels'
+        else:
+            db_table = r'processinglevels'
         verbose_name = 'processing level'
 
 
@@ -1822,7 +2163,11 @@ class Profileresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."profileresults'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ProfileResults'
+        else:
+            db_table = r'profileresults'
         verbose_name = 'profile result'
 
 
@@ -1833,7 +2178,11 @@ class Profileresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."profileresultvalueannotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ProfileResultValueAnnotations'
+        else:
+            db_table = r'profileresultvalueannotations'
 
 
 class Profileresultvalues(models.Model):
@@ -1932,7 +2281,11 @@ class Profileresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."profileresultvalues'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ProfileResultValues'
+        else:
+            db_table = r'profileresultvalues'
         verbose_name = 'profile result value'
 
 
@@ -1946,7 +2299,11 @@ class Referencematerialexternalidentifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."referencematerialexternalidentifiers'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ReferenceMaterialExternalIdentifiers'
+        else:
+            db_table = r'referencematerialexternalidentifiers'
 
 
 class Referencematerials(models.Model):
@@ -1965,7 +2322,11 @@ class Referencematerials(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."referencematerials'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ReferenceMaterials'
+        else:
+            db_table = r'referencematerials'
 
 
 class Referencematerialvalues(models.Model):
@@ -1979,7 +2340,11 @@ class Referencematerialvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."referencematerialvalues'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ReferenceMaterialValues'
+        else:
+            db_table = r'referencematerialvalues'
 
 
 class Relatedactions(models.Model):
@@ -2001,7 +2366,11 @@ class Relatedactions(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."relatedactions'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'RelatedActions'
+        else:
+            db_table = r'relatedactions'
         verbose_name = 'related action (associates one action with another)'
         verbose_name_plural = 'related action (associates one action with another)'
 
@@ -2015,7 +2384,11 @@ class Relatedannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."relatedannotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'RelatedAnnotations'
+        else:
+            db_table = r'relatedannotations'
 
 
 class Relatedcitations(models.Model):
@@ -2027,7 +2400,11 @@ class Relatedcitations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."relatedcitations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'RelatedCitations'
+        else:
+            db_table = r'relatedcitations'
 
 
 class Relateddatasets(models.Model):
@@ -2040,7 +2417,11 @@ class Relateddatasets(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."relateddatasets'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'RelatedDatasets'
+        else:
+            db_table = r'relateddatasets'
 
 
 class Relatedequipment(models.Model):
@@ -2056,7 +2437,11 @@ class Relatedequipment(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."relatedequipment'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'RelatedEquipment'
+        else:
+            db_table = r'relatedequipment'
 
 
 class Relatedfeatures(models.Model):
@@ -2078,7 +2463,11 @@ class Relatedfeatures(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."relatedfeatures'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'RelatedFeatures'
+        else:
+            db_table = r'relatedfeatures'
         verbose_name = 'relate two feature'
 
 
@@ -2090,7 +2479,11 @@ class Relatedmodels(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."relatedmodels'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'RelatedModels'
+        else:
+            db_table = r'relatedmodels'
 
 
 class Relatedresults(models.Model):
@@ -2110,7 +2503,11 @@ class Relatedresults(models.Model):
             self.resultid, self.relationshiptypecv, self.relatedresultid)
     class Meta:
         managed = False
-        db_table = r'odm2"."relatedresults'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'RelatedResults'
+        else:
+            db_table = r'relatedresults'
         verbose_name = 'related result'
 
 
@@ -2123,7 +2520,11 @@ class Resultannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."resultannotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ResultAnnotations'
+        else:
+            db_table = r'resultannotations'
 
 
 class Resultderivationequations(models.Model):
@@ -2136,8 +2537,12 @@ class Resultderivationequations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."resultderivationequations'
-        verbose_name='result derivation equation'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ResultDerivationEquations'
+        else:
+            db_table = r'resultderivationequations'
+        verbose_name= 'result derivation equation'
 
 
 class Resultextensionpropertyvalues(models.Model):
@@ -2146,10 +2551,15 @@ class Resultextensionpropertyvalues(models.Model):
     propertyid = models.ForeignKey(Extensionproperties, db_column='propertyid')
     propertyvalue = models.CharField(max_length=255)
     def __unicode__(self):
-        return u"%s - %s: value %s" % (self.resultid, self.propertyid,self.propertyvalue)
+        return u"%s - %s: value %s" % (self.resultid, self.propertyid, self.propertyvalue)
+
     class Meta:
         managed = False
-        db_table = r'odm2"."resultextensionpropertyvalues'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ResultExtensionPropertyValues'
+        else:
+            db_table = r'resultextensionpropertyvalues'
 
 
 class Resultnormalizationvalues(models.Model):
@@ -2161,7 +2571,11 @@ class Resultnormalizationvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."resultnormalizationvalues'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ResultNormalizationValues'
+        else:
+            db_table = r'resultnormalizationvalues'
 
 
 class Results(models.Model):
@@ -2212,7 +2626,7 @@ class Results(models.Model):
         s += 'sampling feature/location,'
         s += 'time aggregation interval,'
         s += 'time aggregation unit,'
-        #s += 'citation,'
+        # s += 'citation,'
 
         return s
 
@@ -2229,12 +2643,17 @@ class Results(models.Model):
             self.unitsid.unitsabbreviation,
             self.processing_level.processinglevelcode)
         return s
+
     def __unicode__(self):
         return u"%s - %s - ID: %s" % (self.variableid, self.featureactionid, self.resultid)
 
     class Meta:
         managed = False
-        db_table = r'odm2"."results'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Results'
+        else:
+            db_table = r'results'
         verbose_name = 'data result'
         ordering = ["variableid"]
 
@@ -2250,7 +2669,11 @@ class Resultsdataquality(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."resultsdataquality'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'ResultsDataQuality'
+        else:
+            db_table = r'resultsdataquality'
         verbose_name = 'results data quality'
         verbose_name_plural = 'results data quality'
 
@@ -2268,7 +2691,11 @@ class Samplingfeatureannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."samplingfeatureannotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'SamplingFeatureAnnotations'
+        else:
+            db_table = r'samplingfeatureannotations'
 
 
 class Samplingfeatureextensionpropertyvalues(models.Model):
@@ -2280,12 +2707,17 @@ class Samplingfeatureextensionpropertyvalues(models.Model):
     def __unicode__(self):
         s = u"%s" % self.samplingfeatureid
         if self.propertyvalue:
-            s += u"- %s - %s%s" % (self.propertyid.propertyname, self.propertyvalue, self.propertyid.propertyunitsid.unitsabbreviation)
+            s += u"- %s - %s%s" % (
+            self.propertyid.propertyname, self.propertyvalue, self.propertyid.propertyunitsid.unitsabbreviation)
         return s
 
     class Meta:
         managed = False
-        db_table = r'odm2"."samplingfeatureextensionpropertyvalues'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'SamplingFeatureExtensionPropertyValues'
+        else:
+            db_table = r'samplingfeatureextensionpropertyvalues'
 
 
 class Samplingfeatureexternalidentifiers(models.Model):
@@ -2305,7 +2737,11 @@ class Samplingfeatureexternalidentifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."samplingfeatureexternalidentifiers'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'SamplingFeatureExternalIdentifiers'
+        else:
+            db_table = r'samplingfeatureexternalidentifiers'
 
 
 class Samplingfeatures(models.Model):
@@ -2342,7 +2778,12 @@ class Samplingfeatures(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."samplingfeatures'
+        _exportdb = settings.EXPORTDB
+        print(_exportdb)
+        if _exportdb:
+            db_table = r'SamplingFeatures'
+        else:
+            db_table = r'samplingfeatures'
         ordering = ('sampling_feature_type', 'samplingfeaturename',)
         verbose_name = 'sampling feature (location)'
 
@@ -2371,7 +2812,11 @@ class Sectionresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."sectionresults'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'SectionResults'
+        else:
+            db_table = r'sectionresults'
 
 
 class Sectionresultvalueannotations(models.Model):
@@ -2381,7 +2826,11 @@ class Sectionresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."sectionresultvalueannotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'SectionResultValueAnnotations'
+        else:
+            db_table = r'sectionresultvalueannotations'
 
 
 class Sectionresultvalues(models.Model):
@@ -2406,7 +2855,11 @@ class Sectionresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."sectionresultvalues'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'SectionResultValues'
+        else:
+            db_table = r'sectionresultvalues'
 
 
 class Simulations(models.Model):
@@ -2425,7 +2878,11 @@ class Simulations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."simulations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Simulations'
+        else:
+            db_table = r'simulations'
 
 
 class Sites(models.Model):
@@ -2440,12 +2897,17 @@ class Sites(models.Model):
     class Meta:
         managed = False
         verbose_name = 'Site'
-        db_table = r'odm2"."sites'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Sites'
+        else:
+            db_table = r'sites'
 
     def __unicode__(self):
         s = u"%s" % self.samplingfeatureid
         s += u"- %s" % self.sitetypecv
         return s
+
 
 class Spatialoffsets(models.Model):
     spatialoffsetid = models.AutoField(primary_key=True)
@@ -2461,7 +2923,11 @@ class Spatialoffsets(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."spatialoffsets'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'SpatialOffsets'
+        else:
+            db_table = r'spatialoffsets'
 
 
 class Spatialreferenceexternalidentifiers(models.Model):
@@ -2474,7 +2940,11 @@ class Spatialreferenceexternalidentifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."spatialreferenceexternalidentifiers'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'SpatialReferenceExternalIdentifiers'
+        else:
+            db_table = r'spatialreferenceexternalidentifiers'
 
 
 class Spatialreferences(models.Model):
@@ -2483,18 +2953,23 @@ class Spatialreferences(models.Model):
     srsname = models.CharField(max_length=255, verbose_name='spatial reference name')
     srsdescription = models.CharField(max_length=5000, blank=True,
                                       verbose_name='spatial reference description')
-    srslink = models.CharField(max_length=255, blank=True,verbose_name='spatial reference link')
+    srslink = models.CharField(max_length=255, blank=True, verbose_name='spatial reference link')
 
     class Meta:
         managed = False
         verbose_name = 'Spatial reference'
-        db_table = r'odm2"."spatialreferences'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'SpatialReferences'
+        else:
+            db_table = r'spatialreferences'
 
     def __unicode__(self):
         if self.srscode:
             s = u"%s" % self.srscode
         s += u"- %s" % self.srsname
         return s
+
 
 class Specimenbatchpostions(models.Model):
     featureactionid = models.OneToOneField(Featureactions, db_column='featureactionid',
@@ -2504,7 +2979,11 @@ class Specimenbatchpostions(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."specimenbatchpostions'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'SpecimenBatchPostions'
+        else:
+            db_table = r'specimenbatchpostions'
 
 
 class Specimens(models.Model):
@@ -2516,7 +2995,11 @@ class Specimens(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."specimens'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Specimens'
+        else:
+            db_table = r'specimens'
 
 
 class Specimentaxonomicclassifiers(models.Model):
@@ -2528,7 +3011,11 @@ class Specimentaxonomicclassifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."specimentaxonomicclassifiers'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'SpecimenTaxonomicClassifiers'
+        else:
+            db_table = r'specimentaxonomicclassifiers'
 
 
 class Spectraresults(models.Model):
@@ -2557,7 +3044,11 @@ class Spectraresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."spectraresults'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'SpectraResults'
+        else:
+            db_table = r'spectraresults'
 
 
 class Spectraresultvalueannotations(models.Model):
@@ -2567,7 +3058,11 @@ class Spectraresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."spectraresultvalueannotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'SpectraResultValueAnnotations'
+        else:
+            db_table = r'spectraresultvalueannotations'
 
 
 class Spectraresultvalues(models.Model):
@@ -2587,7 +3082,11 @@ class Spectraresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."spectraresultvalues'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'SpectraResultValues'
+        else:
+            db_table = r'spectraresultvalues'
 
 
 class Taxonomicclassifierexternalidentifiers(models.Model):
@@ -2601,24 +3100,28 @@ class Taxonomicclassifierexternalidentifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."taxonomicclassifierexternalidentifiers'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'TaxonomicClassifierExternalIdentifiers'
+        else:
+            db_table = r'taxonomicclassifierexternalidentifiers'
 
-        # I needed to add a sequence and set it as the default for the primary
-        #  key to make the Taxonomic Classifiers class work
-        # this is the SQL
+            # I needed to add a sequence and set it as the default for the primary
+            #  key to make the Taxonomic Classifiers class work
+            # this is the SQL
 
-        # CREATE SEQUENCE odm2.taxonomicclassifiers_taxonomicclassifiersid_seq
-        #   INCREMENT 1
-        #   MINVALUE 2
-        #   MAXVALUE 9223372036854775807
-        #   START 3
-        #   CACHE 1;
-        # ALTER TABLE odm2.taxonomicclassifiers_taxonomicclassifiersid_seq
-        #   OWNER TO postgres;
+            # CREATE SEQUENCE odm2.taxonomicclassifiers_taxonomicclassifiersid_seq
+            #   INCREMENT 1
+            #   MINVALUE 2
+            #   MAXVALUE 9223372036854775807
+            #   START 3
+            #   CACHE 1;
+            # ALTER TABLE odm2.taxonomicclassifiers_taxonomicclassifiersid_seq
+            #   OWNER TO postgres;
 
-        # ALTER TABLE odm2.taxonomicclassifiers
-        #  ALTER COLUMN taxonomicclassifierid SET DEFAULT nextval
-        # ('odm2.taxonomicclassifiers_taxonomicclassifiersid_seq'::regclass);
+            # ALTER TABLE odm2.taxonomicclassifiers
+            #  ALTER COLUMN taxonomicclassifierid SET DEFAULT nextval
+            # ('odm2.taxonomicclassifiers_taxonomicclassifiersid_seq'::regclass);
 
 
 class Taxonomicclassifiers(models.Model):
@@ -2657,7 +3160,11 @@ class Taxonomicclassifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."taxonomicclassifiers'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'TaxonomicClassifiers'
+        else:
+            db_table = r'taxonomicclassifiers'
         verbose_name = 'taxonomic classifier'
 
 
@@ -2695,7 +3202,12 @@ class Timeseriesresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."timeseriesresults'
+
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'TimeSeriesResults'
+        else:
+            db_table = r'timeseriesresults'
         ordering = ['resultid']
         verbose_name = 'time series result'
 
@@ -2707,7 +3219,11 @@ class Timeseriesresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."timeseriesresultvalueannotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'TimeSeriesResultValueAnnotations'
+        else:
+            db_table = r'timeseriesresultvalueannotations'
 
 
 class Timeseriesresultvalues(models.Model):
@@ -2761,7 +3277,6 @@ class Timeseriesresultvalues(models.Model):
         # s += ' {0}\"'.format(citation.citationlink)
         return s
 
-
     def email_text(self):
         s = '{0} -unit-{1}-processing level-{2} '.format(
             self.resultid.resultid.variableid.variablecode,
@@ -2780,7 +3295,7 @@ class Timeseriesresultvalues(models.Model):
         return s
 
     def csvoutputShort(self):
-        #s = '\" {0}\",'.format(
+        # s = '\" {0}\",'.format(
         #    self.resultid.resultid.featureactionid.action.method.methodcode)
         s = '{0},'.format(self.datavalue)
         s += '{0}'.format(self.qualitycodecv)
@@ -2795,7 +3310,11 @@ class Timeseriesresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."timeseriesresultvalues'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'TimeSeriesResultValues'
+        else:
+            db_table = r'timeseriesresultvalues'
         verbose_name = 'time series result value'
 
 
@@ -2824,6 +3343,7 @@ class Timeseriesresultvaluesext(models.Model):
     variablecode = models.CharField(verbose_name='variable code', max_length=50)
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
     aggregationstatisticname = models.CharField(primary_key=True, max_length=255)
+
     def __unicode__(self):
         s = u"%s " % self.resultid
         s += u"- %s" % self.datavalue
@@ -2842,9 +3362,10 @@ class Timeseriesresultvaluesext(models.Model):
         s += 'sampling feature/location,'
         # s += 'time aggregation interval,'
         # s += 'time aggregation unit,'
-        #s += 'citation,'
+        # s += 'citation,'
 
         return s
+
     def email_text(self):
         s = '{0} -unit-{1}-processing level-{2} '.format(
             self.variablecode,
@@ -2852,6 +3373,7 @@ class Timeseriesresultvaluesext(models.Model):
             self.processinglevelcode)
         s += 'location- {0}'.format(self.samplingfeaturename)
         return s
+
     def csvheaderShort(self):
         s = 'method,'
         s += '\" {0} -unit-{1}-processing level-{2}\",'.format(
@@ -2860,6 +3382,7 @@ class Timeseriesresultvaluesext(models.Model):
             self.processinglevelcode)
         s += 'quality code,'
         return s
+
     def csvoutput(self):
         s = str(self.valueid)
         # s += ', {0}'.format(self.datavalue)
@@ -2871,12 +3394,10 @@ class Timeseriesresultvaluesext(models.Model):
             self.samplingfeaturename)
         # s += ', {0}'.format(self.timeaggregationinterval)
         # s += ', {0},'.format(self.timeaggregationintervalunitsid)
-        #s = buildCitation(s, self)
+        # s = buildCitation(s, self)
 
         # s += ' {0}\"'.format(citation.citationlink)
         return s
-
-
 
     def csvoutputShort(self):
         s = '\" {0}\",'.format(
@@ -2909,6 +3430,7 @@ class Timeseriesresultvaluesextwannotations(models.Model):
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
     aggregationstatisticname = models.CharField(primary_key=True, max_length=255)
     annotationtext = models.CharField(max_length=500)
+
     def __unicode__(self):
         s = u"%s " % self.resultid
         s += u"- %s" % self.datavalue
@@ -2974,13 +3496,14 @@ class Timeseriesresultvaluesextwannotations(models.Model):
         if self.annotationtext:
             s += '\"{0} \",'.format(self.annotationtext)
         else:
-             s += ','
+            s += ','
         return s
 
     class Meta:
         managed = False
         db_table = r'odm2extra"."timeseriesresultvaluesextwannotations'
         verbose_name = 'time series result value'
+
 
 class Trajectoryresults(models.Model):
     resultid = models.OneToOneField(Results, db_column='resultid', primary_key=True)
@@ -3001,7 +3524,12 @@ class Trajectoryresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."trajectoryresults'
+
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'TrajectoryResults'
+        else:
+            db_table = r'trajectoryresults'
 
 
 class Trajectoryresultvalueannotations(models.Model):
@@ -3011,7 +3539,11 @@ class Trajectoryresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."trajectoryresultvalueannotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'TrajectoryResultValueAnnotations'
+        else:
+            db_table = r'trajectoryresultvalueannotations'
 
 
 class Trajectoryresultvalues(models.Model):
@@ -3038,7 +3570,12 @@ class Trajectoryresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."trajectoryresultvalues'
+
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'TrajectoryResultValues'
+        else:
+            db_table = r'trajectoryresultvalues'
 
 
 class Transectresults(models.Model):
@@ -3062,7 +3599,12 @@ class Transectresults(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."transectresults'
+
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'TransectResults'
+        else:
+            db_table = r'transectresults'
 
 
 class Transectresultvalueannotations(models.Model):
@@ -3072,7 +3614,11 @@ class Transectresultvalueannotations(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."transectresultvalueannotations'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'TransectResultValueAnnotations'
+        else:
+            db_table = r'transectresultvalueannotations'
 
 
 class Transectresultvalues(models.Model):
@@ -3099,7 +3645,11 @@ class Transectresultvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."transectresultvalues'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'TransectResultValues'
+        else:
+            db_table = r'transectresultvalues'
 
 
 class Units(models.Model):
@@ -3127,7 +3677,11 @@ class Units(models.Model):
     class Meta:
         managed = False
         ordering = ('unitsabbreviation', 'unitsname',)
-        db_table = r'odm2"."units'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Units'
+        else:
+            db_table = r'units'
         verbose_name = 'unit'
 
 
@@ -3139,7 +3693,11 @@ class Variableextensionpropertyvalues(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."variableextensionpropertyvalues'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'VariableExtensionPropertyValues'
+        else:
+            db_table = r'variableextensionpropertyvalues'
 
 
 class Variableexternalidentifiers(models.Model):
@@ -3152,7 +3710,11 @@ class Variableexternalidentifiers(models.Model):
 
     class Meta:
         managed = False
-        db_table = r'odm2"."variableexternalidentifiers'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'VariableExternalIdentifiers'
+        else:
+            db_table = r'variableexternalidentifiers'
 
 
 class Variables(models.Model):
@@ -3182,5 +3744,18 @@ class Variables(models.Model):
     class Meta:
         managed = False
         ordering = ('variablecode', 'variable_name',)
-        db_table = r'odm2"."variables'
+        _exportdb = settings.EXPORTDB
+        if _exportdb:
+            db_table = r'Variables'
+        else:
+            db_table = r'variables'
         verbose_name = 'variable'
+
+
+
+
+
+
+
+
+
