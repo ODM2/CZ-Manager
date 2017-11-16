@@ -37,6 +37,15 @@ ODM2 Sandbox you can navigate to https://dev-odm2admin.cuahsi.org/Sandbox/odm2ad
 #. We can click the + icon to add a variable, unit processing level or other field, we can click the pencil icon to edit
    the current item.
 
+The Sensor dashboard:
+---------------------
+
+We have a dashboard view of sensors which can also be configured in the settings files.
+
+Here is an example dashboard for `DryCreek Experimental Watershed <https://earth.boisestate.edu/drycreek/>`_.
+
+http://odm2admin.cuahsi.org/DryCreek/sensordashboard/featureaction=20/
+
 :ref:`3) Managing Profile Results With ODM2 Admin <ProfileResults>`
 
 * :ref:`ODM2 Admin docs home page<ODM2-Admin>`
