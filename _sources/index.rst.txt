@@ -5,10 +5,13 @@ ODM2 Admin
 .. C:\Python27\Scripts\sphinx-build.exe "C:\Users\leonmi\Google Drive\ODM2AdminLT3\docs\source" "C:\Users\leonmi\Google Drive\ODM2AdminLT3\docs\build"
    run sphinx
 
-This is an app for site level data management using Observation Data Model 2 (ODM2). ODM2
-was created through National Science Foundation Grant EAR-1224638.
-Support for the development of this application comes
-from NSF Grant EAR-1331841 Luquillo CZO.
+ODM2 Admin is an application for site level data management of environmental observations using
+Observation Data Model 2 (ODM2). The application was designed for management of data from the Luquillo
+Critical Zone Observatory located in northeastern Puerto Rico. For more details about why ODM2 Admin was developed
+see :ref:`Motivation-for-ODM2-Admin`
+
+ODM2 was created through National Science Foundation Grant EAR-1224638.
+Support for the development of this application comes from NSF Grant EAR-1331841 Luquillo CZO.
 
 The ODM2 Admin source code can be found here: https://github.com/ODM2/ODM2-Admin
 
@@ -112,6 +115,7 @@ The documents below provide instructions on using ODM2 Admin.
 .. toctree::
    :maxdepth: 1
 
+   Motivation for ODM2 Admin <ODM2Adminbackground>
    GettingStartedInODM2Admin
    configuring ODM2 Admin Settings <ODM2AdminSettings>
 

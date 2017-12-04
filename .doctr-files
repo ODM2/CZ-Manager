@@ -7,6 +7,7 @@
 ./ODM2AdminAdministration.html
 ./ODM2AdminDemo.html
 ./ODM2AdminSettings.html
+./ODM2Adminbackground.html
 ./ProfileResults.html
 ./_images/AnnotatedData.png
 ./_images/AnnotatingData.png
@@ -36,6 +37,7 @@
 ./_sources/ODM2AdminAdministration.rst.txt
 ./_sources/ODM2AdminDemo.rst.txt
 ./_sources/ODM2AdminSettings.rst.txt
+./_sources/ODM2Adminbackground.rst.txt
 ./_sources/ProfileResults.rst.txt
 ./_sources/index.rst.txt
 ./_static/ajax-loader.gif
