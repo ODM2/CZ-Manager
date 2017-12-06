@@ -13,7 +13,7 @@ class VariablesTest(TestCase):
     def test_variables_creation(self):
         var = self.create_variable()
         var_unicode_rep = "%s" % var.variablecode
-        if self.variabledefinition:
+        if var.variabledefinition:
             var_unicode_rep += " - %s" % var.variabledefinition[:20]
         self.assertTrue(isinstance(var, Variables))
         self.assertEqual(var.__unicode__(), var_unicode_rep)
