@@ -55,7 +55,7 @@ install:
 
 script:
   - if [[ $TEST_TARGET == 'default' ]]; then
-      python setup.py test;
+      py.test -vv tests ;
     fi
   - if [[ $TEST_TARGET == 'coding_standards' ]]; then
       find . -type f -name "*.py" ! -name "base.py" ! -name "conf.py" | xargs flake8 --max-line-length=100 --ignore=E402 ;

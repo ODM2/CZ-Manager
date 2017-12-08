@@ -1,18 +1,7 @@
 import os
 import sys
 from setuptools import setup
-from setuptools.command.test import test as TestCommand
 
-
-class PyTest(TestCommand):
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.verbose = True
-
-    def run_tests(self):
-        import pytest
-        errno = pytest.main(self.test_args)
-        sys.exit(errno)
 
 
 def extract_version(module='odm2admin'):
@@ -65,7 +54,6 @@ setup(name='odm2admin',
       install_requires=install_requires,
       packages=['odm2admin',],
       tests_require=['pytest'],
-      cmdclass=dict(test=PyTest),
       author=['Miguel Leon'],
       author_email='leonmi@sas.upenn.edu',
       )
