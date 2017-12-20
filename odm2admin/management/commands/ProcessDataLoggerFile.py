@@ -203,17 +203,13 @@ class Command(BaseCommand):
                                                               "%Y-%m-%d %H:%M:%S.%f")  # '1/1/2013 0:10
                                         datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                                     except ValueError:
-                                        try:
-                                            if exceldatetime:
-                                                    # deal with excel formatted datetimes
-                                                    tmpdate = float(row[dateTimeColNum])
-                                                    dateTuple = xlrd.xldate_as_tuple(tmpdate, 0)
-                                                    dt_obj = datetime(*dateTuple[0:6])
-                                                    dateT = dt_obj.strptime(row[dateTimeColNum],
-                                                                      "%Y-%m-%d %H:%M:%S.%f")
-                                                    datestr= dt_obj.strftime("%Y-%m-%d %H:%M:%S")
-                                        except ValueError:
-                                            continue
+                                        if exceldatetime:
+                                                # deal with excel formatted datetimes
+                                                tmpdate = float(row[dateTimeColNum])
+                                                dateTuple = xlrd.xldate_as_tuple(tmpdate, 0)
+                                                dt_obj = datetime(*dateTuple[0:6])
+                                                dateT = dt_obj
+                                                datestr= dt_obj.strftime("%Y-%m-%d %H:%M:%S")
                         #if you encounter a blank line continue and try the next one
                         except IndexError:
                             continue

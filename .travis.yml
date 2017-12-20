@@ -21,15 +21,12 @@ matrix:
   include:
   - python: 2.7
     env: TEST_TARGET=default
-  - python: 3.6
-    env: TEST_TARGET=default
   - python: 2.7
     env: TEST_TARGET=coding_standards
-  - python: 3.6
-    env: TEST_TARGET=docs
   allow_failures:
   - python: 2.7
     env: TEST_TARGET=coding_standards
+
 
 
 before_install:
