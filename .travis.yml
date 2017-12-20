@@ -21,12 +21,15 @@ matrix:
   include:
   - python: 2.7
     env: TEST_TARGET=default
+  - python: 3.6
+    env: TEST_TARGET=default
   - python: 2.7
     env: TEST_TARGET=coding_standards
+  - python: 3.6
+    env: TEST_TARGET=docs
   allow_failures:
   - python: 2.7
     env: TEST_TARGET=coding_standards
-
 
 
 before_install:
@@ -52,7 +55,7 @@ install:
 
 script:
   - if [[ $TEST_TARGET == 'default' ]]; then
-      python setup.py test;
+      python $TRAVIS_BUILD_DIR/manage.py test tests/;
     fi
   - if [[ $TEST_TARGET == 'coding_standards' ]]; then
       find . -type f -name "*.py" ! -name "base.py" ! -name "conf.py" | xargs flake8 --max-line-length=100 --ignore=E402 ;
