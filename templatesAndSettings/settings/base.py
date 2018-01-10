@@ -133,6 +133,31 @@ MIDDLEWARE_CLASSES = (
 )
 """ END MIDDLEWARE CONFIGURATION """
 
+""" OAUTH SETTINGS """
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.open_id.OpenIdAuth',
+    'social_core.backends.google.GoogleOpenId',
+    'social_core.backends.google.GoogleOAuth2',
+    #'odm2admin.hydroshare_backend.HydroShareOAuth2',
+    'social_core.backends.google.GoogleOAuth',
+    'django.contrib.auth.backends.ModelBackend',
+)
+# Oauth CORS_ORIGIN_ALLOW_ALL = True
+
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+    'social_core.pipeline.social_auth.associate_by_email',
+)
+""" END OAUTH SETTINGS """
+
 """ URL AND WSGI CONFIGURATION """
 ROOT_URLCONF = 'templatesAndSettings.urls'
 
