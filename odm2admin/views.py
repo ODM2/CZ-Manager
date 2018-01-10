@@ -16,6 +16,7 @@ from django.http import HttpResponseRedirect
 from django.http import StreamingHttpResponse
 from django.shortcuts import render
 from django.template import loader
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from django.core import mail
@@ -67,7 +68,6 @@ from .models import Timeseriesresultvaluesext
 from .models import Timeseriesresultvaluesextwannotations
 from .models import Timeseriesresultvalueannotations
 from .models import Units
-
 from .models import Variables
 from .models import Timeseriesresults
 from .models import Resultextensionpropertyvalues
@@ -75,7 +75,7 @@ from .models import Extensionproperties
 # from .forms import LoginForm
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
+
 
 register = template.Library()
 
@@ -1682,9 +1682,9 @@ def createODM2SQLiteFile(request):
     sys.stdout = sysout
 
     #settings.MAP_CONFIG['result_value_processing_levels_to_display']
-    db_name = exportdb.DATABASES['default']['NAME']
-    print(db_name)
-    print(tmploc1)
+    #db_name = exportdb.DATABASES['export']['NAME']
+    #print(db_name)
+    # print(tmploc1)
     database = ''
     if 'exportdata' in request.POST:
         # print(entered_end_date)
@@ -1696,12 +1696,13 @@ def createODM2SQLiteFile(request):
             publishdata = request.POST['publishdata']
             if publishdata == 'true':
                 database = 'published'
-    management.call_command('loaddata',
-                            tmploc1 ,database=database)  # ,database='export'
-    print('finished first file')
-    management.call_command('loaddata',
-                            tmploc2,database=database)
-    #management.call_command('create_sqlite_export',tmploc1,tmploc2, settings=exportdb)
+    #management.call_command('loaddata',
+    #                        tmploc1 ,database=database)  # ,database='export'
+    # print('finished first file')
+    #management.call_command('loaddata',
+    #                        tmploc2,database=database)
+    #export_data.send(sender= Timeseriesresultvalues,tmploc1=tmploc1,tmploc2=tmploc2)
+    management.call_command('create_sqlite_export',tmploc1,tmploc2, settings=exportdb)
     return myresultSeriesExport
     #outfile = loc +'tmp2.json'
     #print(outfile)
