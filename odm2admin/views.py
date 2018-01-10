@@ -17,24 +17,24 @@ from django.http import StreamingHttpResponse
 from django.shortcuts import render
 from django.template import loader
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
-from django.core import mail
+# from django.core import mail
 from django.core import serializers
 from django.core.management import settings
 from templatesAndSettings.settings import exportdb
 from django.template.response import TemplateResponse
 from django.core.exceptions import ObjectDoesNotExist
-from hs_restclient_helper import get_oauth_hs
+# from hs_restclient_helper import get_oauth_hs
 from django.core import management
 # from oauth2_provider.views.generic import ProtectedResourceView
 from django.http import HttpResponse
 from django.forms.models import model_to_dict
-from django.contrib.gis.geos import GEOSGeometry
-import hs_restclient as hs_r
+# from django.contrib.gis.geos import GEOSGeometry
+# import hs_restclient as hs_r
 from hs_restclient import HydroShare, HydroShareAuthOAuth2
-from oauthlib.oauth2 import TokenExpiredError
-from oauthlib.oauth2 import InvalidGrantError, InvalidClientError
+# from oauthlib.oauth2 import TokenExpiredError
+# from oauthlib.oauth2 import InvalidGrantError, InvalidClientError
 
 import requests
 # from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
