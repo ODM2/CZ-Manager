@@ -174,7 +174,6 @@ INSTALLED_APPS = (
     '{}'.format(APP_NAME),
     'import_export',
     'social_django',
-    'oauth2_provider',
     'admin_shortcuts',
     'daterange_filter',
     'captcha',

@@ -44,6 +44,7 @@ urlpatterns = [url(r'^' + '', include(admin.site.urls)),
                # (?:featureaction-(?P<featureaction>\d+)/)?$  (?P<variable_a>(\d+)
                # (?P<feature_action>(\d+))
                url(r'^' + 'emaildata/$', views.email_data_from_graph),
+               url(r'^' + 'export_to_hydroshare/$', views.export_to_hydroshare),
                url(r'^' + 'addannotation/$', views.add_annotation),
                url(r'^' + 'addL1timeseries/$', views.addL1timeseries),
                url(r'^' + 'sensordashboard/featureaction=(?P<feature_action>(\d+))/', views.sensor_dashboard),
