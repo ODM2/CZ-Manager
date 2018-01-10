@@ -177,6 +177,7 @@ INSTALLED_APPS = (
     'admin_shortcuts',
     'daterange_filter',
     'captcha',
+    'fixture_magic',
     # 'dal',
     # 'dal_select2',
     'ajax_select',
