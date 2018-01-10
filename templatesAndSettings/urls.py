@@ -4,7 +4,8 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.http.response import HttpResponseRedirect
 from django.conf.urls.static import static
-
+from oauthlib.oauth2 import InvalidGrantError, InvalidClientError
+# from django.contrib.auth import views as auth_views
 # from ODM2CZOData import views # How can I use config file for this??
 import importlib
 
@@ -17,6 +18,12 @@ admin.site.site_title = settings.SITE_TITLE
 # admin_site.admin_view()
 urlpatterns = [url(r'^' + '', include(admin.site.urls)),
                url(r'^' + 'lookups/', include(ajax_select_urls)),
+               # url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+               # url(r'^oauthview$', views.oauth_view, name='oauth_view'),
+               url('', include('social_django.urls', namespace='social')),
+               # url(r'^login/$', auth_views.login, name='login'),
+               # url(r'^logout/$', auth_views.logout, name='logout'),
+               url(r'^oauth/', include('social_django.urls', namespace='social')),
                url(r'^$', lambda r: HttpResponseRedirect('{}/'.format(settings.APP_NAME))),
                url(r'^' + 'AddSensor', views.AddSensor, name="AddSensor"),
                url(r'^' + 'chartIndex', views.chartIndex,

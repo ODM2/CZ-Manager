@@ -58,6 +58,8 @@ TEMPLATES = [{
             'django.template.context_processors.request',
             'django.contrib.auth.context_processors.auth',
             'django.contrib.messages.context_processors.messages',
+            'social_django.context_processors.backends',
+            'social_django.context_processors.login_redirect',
         ],
     },
 }]
@@ -103,29 +105,30 @@ USE_TZ = True
 """ MEDIA CONFIGURATION """
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 MEDIA_ROOT = '{}/{}/upfiles/'.format(BASE_DIR, APP_NAME)
-# URL that handles the media served from MEDIA_ROOT.
+#  URL that handles the media served from MEDIA_ROOT.
 MEDIA_URL = '/{}/{}/media/'.format(os.path.basename(BASE_DIR), APP_NAME)
 """ END MEDIA CONFIGURATION """
-
+# Absolute filesystem path to the directory that will hold database export and import files
+FIXTURE_DIR = '{}/{}/fixtures/'.format(BASE_DIR, APP_NAME)
 
 """ STATIC FILE CONFIGURATION """
 # Absolute path to the directory static files should be collected to. Don't put
 # anything in this directory yourself; store your static files in apps' static/
 # subdirectories and in STATICFILES_DIRS.
-# STATIC_ROOT = '{}/{}/static'.format(BASE_DIR, APP_NAME)
-STATIC_DIR = '{}/{}/static'.format(BASE_DIR, APP_NAME)
-STATICFILES_DIRS = [STATIC_DIR]
+STATIC_ROOT = '{}/{}/static'.format(BASE_DIR, APP_NAME)
 # URL prefix for static files.
 STATIC_URL = '/static/'
 """ END STATIC FILE CONFIGURATION """
-
+""" END PATH CONFIGURATION """
 
 """ MIDDLEWARE CONFIGURATION """
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    #'corsheaders.middleware.CorsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
     # 'django.contrib.auth.middleware.SessionAuthenticationMiddleware', didn't work in production
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -170,6 +173,8 @@ INSTALLED_APPS = (
     'djangocms_admin_style',
     '{}'.format(APP_NAME),
     'import_export',
+    'social_django',
+    'oauth2_provider',
     'admin_shortcuts',
     'daterange_filter',
     'captcha',
