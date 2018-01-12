@@ -3,6 +3,8 @@ import math
 import json
 import time
 import sys
+import os
+import subprocess32 as subprocess
 from datetime import datetime
 from datetime import timedelta
 from time import mktime
@@ -30,6 +32,7 @@ from django.core import management
 # from oauth2_provider.views.generic import ProtectedResourceView
 from django.http import HttpResponse
 from django.forms.models import model_to_dict
+from django.utils.crypto import get_random_string
 # from django.contrib.gis.geos import GEOSGeometry
 # import hs_restclient as hs_r
 from hs_restclient import HydroShare, HydroShareAuthOAuth2
@@ -1667,16 +1670,22 @@ def createODM2SQLiteFile(request):
     #management.call_command('dump_object', 'odm2admin.Timeseriesresults', 17160, 17162, kitchensink=True)
     sysout = sys.stdout
     loc = settings.FIXTURE_DIR
-    print(myresultSeriesExport.first())
-    sys.stdout = open(loc+ 'tmp.json', 'w')
-    tmploc1 = loc+ 'tmp.json'
+    # print(myresultSeriesExport.first())
+    random_string = get_random_string(length=5)
+    tmpfixture1 = 'tmp'  + '.json' #+ random_string
+    sys.stdout = open(loc+ tmpfixture1, 'w')
+    tmploc1 = loc+ tmpfixture1
     management.call_command('dump_object', 'odm2admin.Timeseriesresultvalues', myresultSeriesExport.first().valueid, kitchensink=True)
     sys.stdout.close()
     #jsonfile = open(loc+ 'tmp2.json', 'w')
     # i=0
     values = myresultSeriesExport.values_list('valueid', flat=True)
-    sys.stdout = open(loc + 'tmp2.json', 'w')
-    tmploc2 = loc+ 'tmp2.json'
+    random_string = get_random_string(length=5)
+    # add random string back later
+    tmpfixture2 = 'tmp'  + '.json' # + random_string
+    sys.stdout = open(loc + tmpfixture2, 'w')
+    # sys.stdout = open(loc + 'tmp2.json, 'w')
+    tmploc2 = loc+ tmpfixture1
     sys.stdout.write(serializers.serialize("json", myresultSeriesExport[1:], indent=4,use_natural_foreign_keys=False,use_natural_primary_keys=False))
     sys.stdout.close()
     sys.stdout = sysout
@@ -1702,8 +1711,33 @@ def createODM2SQLiteFile(request):
     #management.call_command('loaddata',
     #                        tmploc2,database=database)
     #export_data.send(sender= Timeseriesresultvalues,tmploc1=tmploc1,tmploc2=tmploc2)
-    management.call_command('create_sqlite_export',tmploc1,tmploc2, settings=exportdb)
+    #management.call_command('create_sqlite_export',tmploc1,tmploc2, settings=exportdb)
+    # call('../')
+    # print(tmploc1)
+    # print(tmploc2)
+    dbfilepath = exportdb.DATABASES['default']['NAME']
+    path = os.path.dirname(dbfilepath)
+    dbfile = os.path.basename(dbfilepath)
+    dbfilename = os.path.splitext(dbfile)[0]
+    random_string = get_random_string(length=5)
+    dbfile2 = path +"/" + dbfilename +  random_string + ".db"
+    #command = ['python',  '/home/azureadmin/webapps/ODM2-AdminLCZO/manageexport.py', 'create_sqlite_export', tmploc1, tmploc2]
+    command = 'cp ' + dbfilepath + ' ' + str(dbfile2)
+    # print(command)
+    response = subprocess.check_call(command,shell=True)
+    #write an extra settings file instead - have it contain just DATABASES; remove databases from exportdb.py and import new file. 2
+    exportdb.DATABASES['default']['NAME'] = dbfile2
+    command = settings.BASE_DIR + '/scripts/create_sqlite_file.sh '+ dbfile2 + ' %>> ' + settings.BASE_DIR +'/logging/sqlite_export.log'
+    # print(command)
+    response = subprocess.check_call(command,shell=True) #
+    # print("response")
+    # print(response)
+    # print(exportdb.DATABASES['default']['NAME'])
     return myresultSeriesExport
+    # outfile = loc +'tmp2.json'
+    # print(outfile)
+    # with open(outfile, 'w') as jsonfile:
+    #    json.dump(data, jsonfile)
     #outfile = loc +'tmp2.json'
     #print(outfile)
     #with open(outfile, 'w') as jsonfile:
@@ -1763,6 +1797,7 @@ def export_to_hydroshare(request):
     keywords = ('test', 'test 2')
     rtype = 'GenericResource'
     fpath = exportdb.DATABASES['default']['NAME']
+    # print(fpath)
     #metadata = '[{"coverage":{"type":"period", "value":{"start":"'+entered_start_date +'", "end":"'+ entered_end_date +'"}}}, {"creator":{"name":"Miguel Leon"}}]'
     metadata = '[{"coverage":{"type":"period", "value":{"start":"03/26/2017", "end":"04/25/2017"}}}, {"creator":{"name":"Miguel Leon"}}]'
     extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'

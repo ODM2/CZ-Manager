@@ -13,8 +13,8 @@ from django.core import management
 from odm2admin.models import Dataloggerfiles
 from templatesAndSettings.settings import exportdb
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings.exportdb")
-
+#os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings.exportdb")
+os.environ['DJANGO_SETTINGS_MODULE'] = "templatesAndSettings.settings.exportdb"
 __author__ = 'leonmi'
 
 
@@ -27,13 +27,24 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('jsonfile1', nargs=1, type=str)
         parser.add_argument('jsonfile2', nargs=1, type=str)
-
+        parser.add_argument('dbfile', nargs=1, type=str)
 
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
         # cmdline = bool(options['cmdline'][0])
-        jsonfile1 = str(options['jsonfile1'][0])
-        jsonfile2 = str(options['jsonfile2'][0])
-        print(jsonfile1,jsonfile2)
-        print(connection.settings_dict['NAME'])
-        management.call_command('loaddata',jsonfile1, settings=exportdb)  # ,database='export'
-        management.call_command('loaddata',jsonfile2, settings=exportdb)
+        try:
+            jsonfile1 = str(options['jsonfile1'][0])
+            jsonfile2 = str(options['jsonfile2'][0])
+            dbfile = str(options['dbfile'][0])
+            self.stdout.write('start data load')
+            # print('start data load')
+            #f = open('/home/azureadmin/webapps/logs/logfile.txt', 'rw')
+            #f.write('start load data')
+            #f.write(jsonfile1,jsonfile2)
+            exportdb.DATABASES['default']['NAME'] = dbfile
+            # print(connection.settings_dict['NAME'])
+            #f.close()
+            management.call_command('loaddata',jsonfile1)  # ,database='export'
+            management.call_command('loaddata',jsonfile2)
+            # print('end data load')
+        except Exception, e:
+            return e
