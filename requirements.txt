@@ -15,7 +15,7 @@ django-recaptcha
 # django-redis
 pyyaml
 xlrd
-hs_restclient
+# hs_restclient
 django-fixture-magic
 social-auth-app-django
 django-redis
