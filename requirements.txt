@@ -18,3 +18,4 @@ xlrd
 hs_restclient
 django-fixture-magic
 social-auth-app-django
+django-redis

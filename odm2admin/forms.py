@@ -16,7 +16,7 @@ from import_export.admin import ExportMixin
 from import_export.admin import ImportExportActionModelAdmin
 from django.db.models import Max
 from .management.commands.ProcessDataLoggerFile import updateStartDateEndDate
-from .models import Actionby
+from .models import Actionby, Specimens
 from .models import Actions
 from .models import Affiliations
 from .models import Authorlists
@@ -681,10 +681,11 @@ class SamplingfeaturesAdminForm(ModelForm):
     def __init__(self, *args, **kwargs):
         instance = kwargs.get('instance')
         if instance:
-            feat = instance.featuregeometrywkt()
-            initial = kwargs.get('initial', {})
-            initial['featuregeometrywkt'] = '{}'.format(feat)
-            kwargs['initial'] = initial
+            if instance.featuregeometry:
+                feat = instance.featuregeometrywkt()
+                initial = kwargs.get('initial', {})
+                initial['featuregeometrywkt'] = '{}'.format(feat)
+                kwargs['initial'] = initial
         super(SamplingfeaturesAdminForm, self).__init__(*args, **kwargs)
 
     featuregeometrywkt = forms.CharField(
@@ -774,6 +775,32 @@ class ReadOnlySitesInline(SitesInline):
     def has_add_permission(self, request):
         return False
 
+
+class SpecimensInline(admin.StackedInline):
+    model = Specimens
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('samplingfeatureid',
+                       'specimentypecv',
+                       'specimenmediumcv',
+                       'isfieldspecimen',
+                       )
+        }),
+    )
+    max_num = 1
+    extra = 0
+    min_num = 1
+
+
+class ReadOnlySpecimenInline(SpecimensInline):
+    readonly_fields = SpecimensInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
+
 class IGSNInline(admin.StackedInline):
     model = Samplingfeatureexternalidentifiers
     fieldsets = (
@@ -825,10 +852,41 @@ class ReadOnlySamplingfeatureextensionpropertiesInline(IGSNInline):
 class SamplingfeaturesAdmin(ReadOnlyAdmin):
     # For readonly usergroup
     user_readonly = [p.name for p in Samplingfeatures._meta.get_fields() if not p.one_to_many]
-    user_readonly_inlines = [ReadOnlyFeatureActionsInline, ReadOnlyIGSNInline,ReadOnlySitesInline]
+    user_readonly_inlines = [
+        ReadOnlyFeatureActionsInline,
+        ReadOnlyIGSNInline,
+        ReadOnlySitesInline,
+        ReadOnlySpecimenInline
+    ]
 
     form = SamplingfeaturesAdminForm
-    inlines_list = [FeatureActionsInline, IGSNInline, SamplingfeatureextensionpropertiesInline,SitesInline]
+    inlines_list = [
+        FeatureActionsInline,
+        IGSNInline,
+        SamplingfeatureextensionpropertiesInline,
+        SitesInline,
+        SpecimensInline
+    ]
+
+    def get_formsets_with_inlines(self, request, obj=None):
+        """
+        Yields formsets and the corresponding inlines.
+        """
+        if obj:
+            if obj.sampling_feature_type.name == 'Site':
+                filtinline = [item for item in self.get_inline_instances(request, obj)
+                              if item.verbose_name != 'Specimen']
+            elif obj.sampling_feature_type.name == 'Specimen':
+                filtinline = [item for item in self.get_inline_instances(request, obj)
+                              if item.verbose_name != 'Site']
+            else:
+                filtinline = self.get_inline_instances(request, obj)[:-2]
+
+            for inline in filtinline:
+                yield inline.get_formset(request, obj), inline
+        else:
+            for inline in self.get_inline_instances(request, obj):
+                yield inline.get_formset(request, obj), inline
 
     search_fields = ['sampling_feature_type__name', 'sampling_feature_geo_type__name',
                      'samplingfeaturename',
@@ -1546,7 +1604,7 @@ duplicate_Dataloggerfiles_event.short_description = "Duplicate selected datalogg
 
 class DataLoggerFileColumnsInlineAdminForm(ModelForm):
     resultid = AutoCompleteSelectField('result_lookup', required=True,
-                                       help_text='result to extend as a soil profile result',
+                                       help_text='A data result',
                                        label='Data result',show_help_text =None)
 
     class Meta:

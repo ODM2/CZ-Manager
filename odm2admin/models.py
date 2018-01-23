@@ -1225,10 +1225,10 @@ class Dataloggerfiles(models.Model):
     dataloggerfileid = models.AutoField(primary_key=True)
     programid = models.ForeignKey('Dataloggerprogramfiles', db_column='programid',
                                  on_delete=models.CASCADE)
-    dataloggerfilename = models.CharField(max_length=255)
-    dataloggerfiledescription = models.CharField(max_length=5000, blank=True)
+    dataloggerfilename = models.CharField(max_length=255, verbose_name="Data logger file name")
+    dataloggerfiledescription = models.CharField(max_length=5000, blank=True, verbose_name="Data logger file description")
     # dataloggerfilelink = models.CharField(max_length=255, blank=True)
-    dataloggerfilelink = models.FileField(upload_to='dataloggerfiles')  # upload_to='.'
+    dataloggerfilelink = models.FileField(upload_to='dataloggerfiles', verbose_name="Data logger file")  # upload_to='.'
 
     def dataloggerfilelinkname(self):
         return self.dataloggerfilelink.name
@@ -1291,7 +1291,7 @@ class ProcessDataloggerfile(models.Model):
             ftpfrequencyhours = re.findall(r'^\D*(\d+)', self.processingCode)[0]
             management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
                                     , str(self.databeginson), str(self.columnheaderson),
-                                    str(ftpfrequencyhours))
+                                    str(ftpfrequencyhours), False)
         else:
             management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
                                     , str(self.databeginson), str(self.columnheaderson),
@@ -3199,6 +3199,10 @@ class Specimens(models.Model):
                                          on_delete=models.CASCADE)
     isfieldspecimen = models.BooleanField()
 
+    def __unicode__(self):
+        return u'{spectypecv} - {specmedcv}'.format(spectypecv=self.specimentypecv,
+                                                    specmedcv=self.specimenmediumcv)
+
     class Meta:
         managed = False
         _exportdb = settings.EXPORTDB
@@ -3206,6 +3210,8 @@ class Specimens(models.Model):
             db_table = r'Specimens'
         else:
             db_table = r'specimens'
+        verbose_name = 'Specimen'
+
 
 
 class Specimentaxonomicclassifiers(models.Model):

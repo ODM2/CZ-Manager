@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 import argparse
 import os
 from urlparse import urlparse
-import urllib
-import kronos
+# import kronos
+import shutil
+import urllib2
+from contextlib import closing
 from django.core.management.base import BaseCommand
 from django.core.management import settings
 
@@ -48,25 +50,26 @@ class Command(BaseCommand):
         apppath = settings.BASE_DIR
         # print(ftpparse.netloc)
         if len(ftpparse.netloc) > 0:
-            out_file = str(settings.MEDIA_ROOT) + filename
+            out_file = str(settings.MEDIA_ROOT)+ filename
             # print(out_file)
             # print(ftpfile)
-            urllib.urlretrieve(ftpfile, out_file)
-            pdlf = ProcessDataloggerfile.objects.filter(dataloggerfileid=fileid).\
-                filter(processingCode__icontains='hours between download')
-            ftpestablished = len(pdlf)
-            if ftpestablished == 0:
-                ProcessDataloggerfile(dataloggerfileid=fileid,
-                                      processingCode=str(ftpfrequencyhours)+" hours between download",
-                                      databeginson=databeginson,columnheaderson=columnheaderson)
-                ProcessDataloggerfile.save()
-                intftpfrequencyhours = int(ftpfrequencyhours)
-                if ftpfrequencyhours < 24:  #ftp fileloc
-                    kronos.register('0 */'+ str(intftpfrequencyhours) + ' * * * wget -q ' +out_file)
-                    # need a setting
-                    kronos.register('5 */' + str(intftpfrequencyhours) + ' * * *  ' + pythonpath +
-                                    " " +  apppath + "/manage.py ProcessDataLoggerFile dataloggerfiles/"+
-                                    filename + " " + fileid.dataloggerfileid + " " +
-                                    str(databeginson) + " " + str(columnheaderson) + " " + str(check_dates) +
-                                    " " + str(cmdline) + " " + str(reversed))
+            # urllib.urlretrieve(ftpfile, out_file)
+            with closing(urllib2.urlopen(ftpfile)) as r:
+                with open(out_file, 'w') as f:
+                    shutil.copyfileobj(r, f)
+            # pdlf = ProcessDataloggerfile.objects.filter(dataloggerfileid=fileid).\
+            #     filter(processingCode__icontains='hours between download')
+            # ftpestablished = len(pdlf)
+            # if ftpestablished == 0:
+            #     # ProcessDataloggerfile(dataloggerfileid=fileid,
+            #     #                      processingCode=str(ftpfrequencyhours)+" hours between download",
+            #     #                      databeginson=databeginson,columnheaderson=columnheaderson)
+            #     # ProcessDataloggerfile.save()
+            #     intftpfrequencyhours = int(ftpfrequencyhours)
+            #     kronos.register('0 */'+ str(intftpfrequencyhours) + ' * * * wget -q ' +out_file)
+            #     # need a setting
+            #     kronos.register('5 */' + str(intftpfrequencyhours) + ' * * *  ' + pythonpath +
+            #                     " " +  apppath + "/manage.py updata_preprocess_process_datalogger_file dataloggerfiles/"+
+            #                     filename + " " + str(fileid.dataloggerfileid) + " " +
+            #                     str(databeginson) + " " + str(columnheaderson) + " True ")
         # file = str(settings.MEDIA_ROOT) + filename  # args[0].name

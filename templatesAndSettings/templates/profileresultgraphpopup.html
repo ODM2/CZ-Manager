@@ -19,9 +19,9 @@
 {{ block.super }}<title>
 	{% block title %}{% endblock %}
   </title>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-    <script src="http://code.highcharts.com/highcharts.js"></script>
-	<script src="http://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
 	 
 	 <script>
     var chart_id = 'chartid';
@@ -119,6 +119,9 @@ $(document).ready(function() {
 
     <div id='content-main'> {% csrf_token %}
 	 </div>
+	 <h1><a href="{{prefixpath}}../odm2admin/samplingfeatures/{{samplingfeaturelabel.samplingfeatureid}}/change/">
+                        Location: {{ samplingfeaturelabel.samplingfeaturename}}
+                    </a></h1>
 	<div id='chartid' class="chart" style="height:75%; width:100%"></div>
 	
 

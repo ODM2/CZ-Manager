@@ -12,10 +12,6 @@ select {
 option {
           border: solid 1px #DDDDDD; 
 }
-.loadinggif {
-    background: url('http://www.hsi.com.hk/HSI-Net/pages/images/en/share/ajax-loader.gif') no-repeat right center;
-}
-
 /* Add icon to external links */
 a[target="_blank"]:after {
     font-family: 'FontAwesome';
@@ -45,7 +41,7 @@ a[target="_blank"]:after {
 					<tr class="row1">
 				<td width="20%">{{ featureAction.action.method.methodname }} </td>
                 <td width="60%" >
-                    <a href="odm2admin/methods/{{featureAction.action.method.methodid}}/change/">
+                    <a target="_blank" href="{{prefixpath}}../odm2admin/methods/{{featureAction.action.method.methodid}}/change/">
                         {{featureAction.action.method.methoddescription}}
                     </a>
                 </td>
@@ -70,7 +66,7 @@ a[target="_blank"]:after {
 				<tr class="row1">
 				<td width="20%" >{{featureAction.action.begindatetime.date}}</td>
                 <td width="60%" >
-                    <a href="odm2admin/actions/{{featureAction.action.actionid}}/change/">
+                    <a target="_blank" href="{{prefixpath}}../odm2admin/actions/{{featureAction.action.actionid}}/change/">
                         {{featureAction.action.actiondescription}}
                     </a>
                 </td>

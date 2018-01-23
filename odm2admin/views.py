@@ -567,7 +567,7 @@ def web_map(request):
 
 def get_features(request, sf_type="all", ds_ids="all"):
     if ds_ids == "all" or sf_type == "all":
-        features = Samplingfeatures.objects.all()
+        features = Samplingfeatures.objects.exclude(featuregeometry__isnull=True)
     elif sf_type == 'filtered':
         dataset_ids = list(ds_ids.split(','))
         datasetresults = Datasetsresults.objects.filter(datasetid__in=dataset_ids)
@@ -619,9 +619,7 @@ def get_features(request, sf_type="all", ds_ids="all"):
             })
         # Get Relations
         relationship = get_relations(sf)
-        if relationship['siblings'] == [] or relationship['siblings'] is None \
-                and relationship['parents'] == [] or relationship['parents'] is None \
-                and relationship['children'] == [] or relationship['children'] is None:
+        if all(value == [] for value in relationship.values()):
             feat.update({
                 'relationships': None
             })
@@ -650,7 +648,6 @@ def get_features(request, sf_type="all", ds_ids="all"):
                         '{}'.format(ep.propertyid.propertyname): ep.propertyvalue,
                         '{}_units'.format(ep.propertyid.propertyname): ep.propertyid.propertyunitsid.unitsabbreviation,
                     })
-
         # Get lat, lon
         lat = sf.featuregeometrywkt().coords[1]
         lon = sf.featuregeometrywkt().coords[0]
@@ -767,9 +764,9 @@ def sensor_dashboard(request, feature_action='NotSet', sampling_feature='NotSet'
 def get_relations(s):
     pf = Relatedfeatures.objects.filter(samplingfeatureid_id=s.samplingfeatureid)
     cf = Relatedfeatures.objects.filter(relatedfeatureid_id=s.samplingfeatureid)
-    sibsf = None
-    parents = None
-    children = None
+    sibsf = []
+    parents = []
+    children = []
     if pf.first() is not None:
         sib = Relatedfeatures.objects.filter(relationshiptypecv_id='Is child of',
                                              relatedfeatureid_id=pf.first().relatedfeatureid_id). \
@@ -1424,7 +1421,6 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         except IndexError as e:
             # html = "<html><body>No Data Available Yet.</body></html>"
             # return HttpResponse(html)
-            print(e)
             startdate = Timeseriesresultvalues.objects.\
                 filter(resultid__in=resultList.values("resultid")).\
                 annotate(Min('valuedatetime')).\
@@ -2845,7 +2841,6 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         sampling_features = Relatedfeatures.objects.filter(
             relatedfeatureid__exact=selected_relatedfeatid).values(
             'samplingfeatureid')
-        print(sampling_features.count())
         samplingfeaturelabel = Samplingfeatures.objects.filter(samplingfeatureid=selected_relatedfeatid).get()
         # select the feature actions for all of the related features.
         feature_actions = Featureactions.objects.filter(samplingfeatureid__in=sampling_features)

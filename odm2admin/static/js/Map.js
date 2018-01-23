@@ -127,7 +127,7 @@ createMarker = function (latlng, markerIcon, color, sfname,style_class,icon_str)
 		var iconDiv = new L.DivIcon({
 		className: style_class + ' awesome-marker leaflet-zoom-animated leaflet-interactive awesome-marker-labeled',
 		html: '<i class="fa '+ icon_str +' icon-white" aria-hidden="true"></i><p ' +
-        'style="background-color:rgba(255,255,255,0.8);margin-top:25px;font-weight:bold;">'+sfname + '</p>'
+        'style="background-color:rgba(255,255,255,0.8);width:75px;margin-top:25px;font-weight:bold;">'+sfname + '</p>'
 		});
 		marker = L.marker([latlng[0],latlng[1]], {
             icon: iconDiv,
@@ -187,7 +187,7 @@ makerelation = function(relationobs) {
         if (relationobs.children) {
             c = c + "<div class='panel'>" + "<p><ul>";
             relationobs.children.forEach(function (child) {
-                c = c + "<li><a href='/odm2admin/samplingfeatures/" +
+                c = c + "<li><a href='/" + url_path + "odm2admin/samplingfeatures/" +
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
@@ -202,7 +202,7 @@ makerelation = function(relationobs) {
         if (relationobs.parents) {
             p = p + "<div class='panel'>" + "<p><ul>";
             relationobs.parents.forEach(function (child) {
-                p = p + "<li><a href='/odm2admin/samplingfeatures/" +
+                p = p + "<li><a href='/" + url_path + "odm2admin/samplingfeatures/" +
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
@@ -217,7 +217,7 @@ makerelation = function(relationobs) {
         if (relationobs.siblings) {
             s = s + "<div class='panel'>" + "<p><ul>";
             relationobs.siblings.forEach(function (child) {
-                s = s + "<li><a href='/odm2admin/samplingfeatures/" +
+                s = s + "<li><a href='/" + url_path + "odm2admin/samplingfeatures/" +
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
@@ -243,7 +243,8 @@ maketablecontent = function (obs) {
         sfrel = '',
         sitetype = '',
         sptype = '',
-        spmed = '';
+        spmed = '',
+	sfelev = '';
 
     if (obs.samplingfeaturecode) {
         sfcode = "<tr>"
@@ -263,6 +264,12 @@ maketablecontent = function (obs) {
             + "<td>" + obs.featuregeometry.lat + ", " + obs.featuregeometry.lng
             + " (EPSG:<a target='_blank' href='http://epsg.io/" + obs.featuregeometry.crs + "'>"
             + obs.featuregeometry.crs + "</a>)</td>"
+            + "</tr>";
+    }
+    if (obs.elevation_m) {
+        sfelev = "<tr>"
+            + "<td class='title'>Elevation</td>"
+            + "<td>" + obs.elevation_m + " m</td>"
             + "</tr>";
     }
     if (obs.samplingfeaturedescription) {
@@ -307,7 +314,7 @@ maketablecontent = function (obs) {
             + "</tr>";
     }
 
-    var tablecontent = sfcode + sftype + sitetype + sptype + spmed + sfcoords + sfdesc + sfigsn + sfsdr;
+    var tablecontent = sfcode + sftype + sitetype + sptype + spmed + sfcoords + sfelev + sfdesc + sfigsn + sfsdr;
     var relationshiptree = sfrel;
     return {
         'tablecontent': tablecontent,

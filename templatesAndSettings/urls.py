@@ -5,9 +5,7 @@ from django.urls import include, re_path
 from django.contrib import admin
 from django.http.response import HttpResponseRedirect
 from django.conf.urls.static import static
-from social_django import urls as social_urls
-from oauthlib.oauth2 import InvalidGrantError, InvalidClientError
-# from django.contrib.auth import views as auth_views
+from django.views.decorators.cache import cache_page
 # from ODM2CZOData import views # How can I use config file for this??
 import importlib
 
@@ -175,7 +173,7 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                re_path(r'^' + 'publications.html', views.publications,
                    name="publications"),
                re_path(r'^' + 'features/type=(?P<sf_type>([\w\s]+,?)+)&'
-                                              'datasets=(?P<ds_ids>([a-zA-Z]+)?(([0-9]+,?)+)?)', views.get_features),
+                                              'datasets=(?P<ds_ids>([a-zA-Z]+)?(([0-9]+,?)+)?)', cache_page(settings.CACHE_TTL)(views.get_features)),
                # url(r'^' + 'pubview/citationid=(?P<citationid>(\d+))/$',
                # views.add_pub,
                #    name="add_pub"),

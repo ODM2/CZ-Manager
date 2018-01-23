@@ -43,7 +43,7 @@ color:#dddddd !important;;
 {% block extrahead %}
 {{ block.super }}
  <script src='https://www.google.com/recaptcha/api.js'></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 
 
 {% admin_shortcuts_js %}{% endblock %}
@@ -61,9 +61,9 @@ color:#dddddd !important;;
 
 	<script src="https://code.highcharts.com/stock/highstock.js"></script>
     <script src="https://code.highcharts.com/stock/highcharts-more.js"></script>
-	<script src="http://code.highcharts.com/modules/exporting.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
 	 <script src="https://rawgithub.com/RolandBanguiran/highcharts-scalable-yaxis/master/scalable-yaxis.js"></script>
-	 <script src="http://highcharts.github.io/export-csv/export-csv.js"></script>
+	 <script src="https://highcharts.github.io/export-csv/export-csv.js"></script>
 	 
 	<script>
     var chart_id = 'chartid';
@@ -78,7 +78,7 @@ color:#dddddd !important;;
 
 	//alert(name_of_units.length);
 
-	//http://jsfiddle.net/gh/get/jquery/1.7.2/highslide-software/highcharts.com/tree/master/samples/highcharts/chart/events-selection-points/
+	//https://jsfiddle.net/gh/get/jquery/1.7.2/highslide-software/highcharts.com/tree/master/samples/highcharts/chart/events-selection-points/
 	 function toast(chart, text) {
 		chart.toast = chart.renderer.label(text, 100, 120)
 			.attr({
@@ -330,6 +330,7 @@ Method- {{featureActionMethod}}
 <div id="report"  ></div>
 <table>
 <th>Add an annotation for the selected points</th>
+<tr><td colspan="3">to see more details about how to add annotations see <a target="_blank" href="http://odm2.github.io/ODM2-Admin/DataQAQC.html">The ODM2 Admin docs</a></td></tr>
 <tr><td colspan="3" style="vertical-align:middle"><textarea rows="5" cols="100" id="annotation"   name=" Add Annotation"></textarea> Annotation
 </td></tr>
 <tr><td>Data quality code: <select class="form-control" id="SelectedQualityCode" name="SelectedQualityCode">
