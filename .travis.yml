@@ -5,16 +5,10 @@ sudo: false
 matrix:
   fast_finish: true
   include:
-  - python: 2.7
-    env: TEST_TARGET=default
-  - python: 3.5
-    env: TEST_TARGET=default
   - python: 3.6
     env: TEST_TARGET=default
-  - python: 2.7
-    env: TEST_TARGET=coding_standards
   allow_failures:
-  - python: 2.7
+  - python: 3.6
     env: TEST_TARGET=coding_standards
 
 
@@ -26,7 +20,7 @@ before_install:
     - conda config --add channels conda-forge --force
     - conda create --yes -n TEST python=$TRAVIS_PYTHON_VERSION --file requirements.txt --file requirements-dev.txt
     - source activate TEST
-
+    - pip install --upgrade http://github.com/miguelcleon/django-admin-shortcuts/zipball/master
 
 install:
   - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2admin-${version}.tar.gz && popd

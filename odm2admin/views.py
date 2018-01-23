@@ -1,10 +1,10 @@
-import cStringIO as StringIO
+from io import StringIO
 import math
 import json
 import time
 import sys
 import os
-import subprocess32 as subprocess
+import subprocess
 from datetime import datetime
 from datetime import timedelta
 from time import mktime
@@ -303,7 +303,7 @@ def publications(request):
 
 # ======================= SHORTCUTS =========================================
 def AddSensor(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
@@ -312,22 +312,20 @@ def AddSensor(request):
     else:
         return HttpResponseRedirect('../')
 
-
+@login_required()
 def chartIndex(request):
-    if request.user.is_authenticated():
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
                    'featureaction': settings.SENSOR_DASHBOARD['featureactionids'][0],
                    'short_title': settings.ADMIN_SHORTCUTS[0]['shortcuts'][5]['title']}
         return TemplateResponse(request, 'chartIndex.html', context)
-    else:
-        return HttpResponseRedirect('../')
+
 
 
 # chartIndex
 def AddProfile(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
@@ -338,7 +336,7 @@ def AddProfile(request):
 
 
 def RecordAction(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
@@ -349,7 +347,7 @@ def RecordAction(request):
 
 
 def ManageCitations(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
@@ -461,7 +459,7 @@ def relatedFeaturesFilter(request, done, selected_resultid, featureaction,
 
 
 def web_map(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         authenticated = True
     else:
         authenticated = False
@@ -679,7 +677,7 @@ def truncate(f, n):
 
 def sensor_dashboard(request, feature_action='NotSet', sampling_feature='NotSet'):
     authenticated = True
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         # return HttpResponseRedirect('../')
         authenticated = False
     ids = settings.SENSOR_DASHBOARD['featureactionids']
@@ -815,7 +813,7 @@ def get_relations(s):
 
 def TimeSeriesGraphing(request, feature_action='All'):
     authenticated = True
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return HttpResponseRedirect('../')
 
     template = loader.get_template('chart.html')
@@ -1320,7 +1318,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                    resultidu='NotSet',
                    startdate='NotSet', enddate='NotSet', popup='NotSet'):
     # print("HERE")
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         # return HttpResponseRedirect('../')
         authenticated = False
     else:
@@ -1857,7 +1855,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                             resultidu='NotSet', startdate='NotSet', enddate='NotSet',
                             popup='NotSet'):  # ,startdate='',enddate=''
     authenticated = True
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         # return HttpResponseRedirect('../')
         authenticated = False
     if popup == 'NotSet':
@@ -2204,7 +2202,7 @@ def removeDupsFromListOfStrings(listOfStrings):
 
 def scatter_plot(request):
     authenticated = True
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         authenticated = False
     xVariableSelection = yVariableSelection = fieldarea1 = fieldarea2 = filteredFeatures = None
     xVar = None
@@ -2805,7 +2803,7 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
 
 def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet', popup='NotSet'):
     authenticated = True
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         authenticated = False
     if popup == 'NotSet':
         template = loader.get_template('chartVariableAndFeature.html')

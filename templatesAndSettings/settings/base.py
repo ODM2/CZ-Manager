@@ -122,7 +122,7 @@ STATIC_URL = '/static/'
 """ END PATH CONFIGURATION """
 
 """ MIDDLEWARE CONFIGURATION """
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -245,26 +245,6 @@ ADMIN_SHORTCUTS_SETTINGS = {
 """ END ADMIN SHORTCUTS CONFIGURATION """
 
 
-""" AJAX LOOKUPS CONFIGURATION """
-AJAX_LOOKUP_CHANNELS = dict(
-    cv_variable_name=('{}.lookups'.format(APP_NAME), 'CvVariableNameLookup'),
-    cv_variable_type=('{}.lookups'.format(APP_NAME), 'CvVariableTypeLookup'),
-    cv_unit_type=('{}.lookups'.format(APP_NAME), 'CvUnitTypeLookup'),
-    cv_speciation=('{}.lookups'.format(APP_NAME), 'CvVariableSpeciationLookup'),
-    featureaction_lookup=('{}.lookups'.format(APP_NAME), 'FeatureactionsLookup'),
-    result_lookup=('{}.lookups'.format(APP_NAME), 'ResultsLookup'),
-    profileresult_lookup=('{}.lookups'.format(APP_NAME), 'ProfileResultsLookup'),
-    measurementresult_lookup=('{}.lookups'.format(APP_NAME), 'MeasurementResultsLookup'),
-    timeseriesresult_lookup=('{}.lookups'.format(APP_NAME), 'TimeseriesResultsLookup'),
-    sampling_feature_lookup=('{}.lookups'.format(APP_NAME), 'SamplingFeatureLookup'),
-    cv_taxonomic_classifier_type=('{}.lookups'.format(APP_NAME), 'CvTaxonomicClassifierTypeLookup'),
-    cv_method_type=('{}.lookups'.format(APP_NAME), 'CvMethodTypeLookup'),
-    cv_site_type=('{}.lookups'.format(APP_NAME), 'CvSitetypeLookup'),
-    cv_action_type=('{}.lookups'.format(APP_NAME), 'CvActionTypeLookup'),
-    cv_sampling_feature_type=('{}.lookups'.format(APP_NAME), 'CvSamplingFeatureTypeLookup'),
-    cv_sampling_feature_geo_type=('{}.lookups'.format(APP_NAME), 'CvSamplingFeatureGeoTypeLookup'),
-    cv_elevation_datum=('{}.lookups'.format(APP_NAME), 'CvElevationDatumLookup'))
-""" END AJAX LOOKUPS CONFIGURATION """
 
 """ SAMPLING FEATURE TYPE LEGEND MAPPING """
 LEGEND_MAP = {
