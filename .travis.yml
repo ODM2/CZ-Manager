@@ -48,6 +48,7 @@ before_install:
   - pip install --upgrade http://github.com/miguelcleon/django-admin-shortcuts/zipball/master
   - pip install hs_restclient
   - pip install django-fixture-magic
+  - pip install social-auth-app-django
 install:
   - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2admin-${version}.tar.gz && popd
 
