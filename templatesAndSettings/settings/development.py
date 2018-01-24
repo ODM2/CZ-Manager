@@ -9,6 +9,10 @@ from .base import *
 DEBUG = True
 """ END DEBUG CONFIGURATION """
 
+""" EXPORTDB FLAG CONFIGURATION - if set to true this will use Camel case table names for SQLite"""
+EXPORTDB = False 
+""" EXPORTDB FLAG CONFIGURATION """
+
 """ ALLOWED HOSTS CONFIGURATION """
 ALLOWED_HOSTS = ['127.0.0.1',]
 """ END ALLOWED HOSTS CONFIGURATION """
