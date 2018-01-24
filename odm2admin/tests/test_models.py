@@ -18,4 +18,4 @@ class VariablesTest(TestCase):
         if self.variabledefinition:
             var_unicode_rep += " - %s" % var.variabledefinition[:20]
         self.assertTrue(isinstance(var, Variables))
-        self.assertEqual(var.__unicode__(), var_unicode_rep)
+        self.assertEqual(var.__str__(), var_unicode_rep)
