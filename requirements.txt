@@ -1,5 +1,4 @@
 django-admin-shortcuts
-# See https://github.com/miguelcleon/ODM2-Admin/issues/104 ==1.4.3
 django-ajax-selects
 django-apptemplates
 django-daterange-filter
@@ -15,7 +14,8 @@ django-recaptcha
 # django-redis
 pyyaml
 xlrd
-# hs_restclient
-django-fixture-magic
 social-auth-app-django
 django-redis
+# The two packages below are not on a conda channel
+# django-fixture-magic
+# hs_restclient
