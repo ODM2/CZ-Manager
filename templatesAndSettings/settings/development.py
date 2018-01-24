@@ -2,7 +2,7 @@
 Development settings and globals.
 """
 
-from base import *
+from .base import *
 
 """ DEBUG CONFIGURATION """
 # Disable debugging by default.
