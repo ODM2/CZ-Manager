@@ -14,8 +14,8 @@ django-recaptcha
 # django-redis
 pyyaml
 xlrd
-social-auth-app-django
 django-redis
-# The two packages below are not on a conda channel
+# The trhee packages below are not on a conda channel
 # django-fixture-magic
 # hs_restclient
+# social-auth-app-django
