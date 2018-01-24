@@ -43,12 +43,10 @@ before_install:
   - conda update conda
   - conda config --add channels conda-forge --force
   - conda config --add channels odm2 --force
-  - conda create --name TEST python=$TRAVIS_PYTHON_VERSION --file requirements.txt --file requirements-dev.txt
+  - conda create --name TEST python=$TRAVIS_PYTHON_VERSION libgdal --file requirements.txt --file requirements-dev.txt
   - source activate TEST
   - pip install --upgrade http://github.com/miguelcleon/django-admin-shortcuts/zipball/master
-  - pip install hs_restclient
-  - pip install django-fixture-magic
-  - pip install social-auth-app-django
+
 install:
   - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2admin-${version}.tar.gz && popd
 
