@@ -8,7 +8,7 @@ from .base import *
 # Disable debugging by default.
 DEBUG = True
 """ END DEBUG CONFIGURATION """
-EXPORTDB =False
+
 """ ALLOWED HOSTS CONFIGURATION """
 ALLOWED_HOSTS = ['127.0.0.1',]
 """ END ALLOWED HOSTS CONFIGURATION """
@@ -28,11 +28,19 @@ EMAIL_PORT = 123
 
 """ DATABASE CONFIGURATION """
 DATABASES = {
-    'default': {  # export
+    'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME':'{}/ODM2SQliteBlank.db'.format(BASE_DIR),
+        'NAME': '../../ODM2SQliteBlank.db',
     },
 }
+# DATABASES = {
+#      'default': {
+#          'ENGINE': 'django.db.backends.sqlite3',
+#          'NAME': 'ODM2SQliteBlank.db',
+#      }
+# }
+""" END DATABASE CONFIGURATION """
+
 """ END DATABASE CONFIGURATION """
 
 """ SENSOR DASHBOARD CONFIGURATION """
