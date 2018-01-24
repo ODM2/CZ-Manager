@@ -21,6 +21,8 @@ matrix:
   include:
   - python: 3.6
     env: TEST_TARGET=default
+  - python: 3.6
+    env: TEST_TARGET=docs
   allow_failures:
   - python: 3.6
     env: TEST_TARGET=coding_standards
@@ -45,12 +47,13 @@ before_install:
   - source activate TEST
   - pip install --upgrade http://github.com/miguelcleon/django-admin-shortcuts/zipball/master
   - pip install hs_restclient
+  - pip install django-fixture-magic
 install:
   - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2admin-${version}.tar.gz && popd
 
 script:
   - if [[ $TEST_TARGET == 'default' ]]; then
-      python setup.py test;
+      python $TRAVIS_BUILD_DIR/manage.py test tests/;
     fi
   - if [[ $TEST_TARGET == 'coding_standards' ]]; then
       find . -type f -name "*.py" ! -name "base.py" ! -name "conf.py" | xargs flake8 --max-line-length=100 --ignore=E402 ;
