@@ -1434,6 +1434,10 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
             # html = "<html><body>No Data Available Yet.</body></html>"
             # return HttpResponse(html)
             methodsOnly = 'True'
+    for result in resultList:
+        tsr = Timeseriesresults.objects.filter(resultid=result).get()
+        result.timeintervalunits = tsr.intendedtimespacingunitsid
+        result.timeinterval = tsr.intendedtimespacing
     return TemplateResponse(request, template, {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'useSamplingFeature': useSamplingFeature,
                                                 'methodsOnly': methodsOnly,

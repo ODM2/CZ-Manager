@@ -98,6 +98,7 @@ a[target="_blank"]:after {
 					<tr ><th scope="col" class="section">Result Series</td>
 					<th scope="col"  class="sortable column-resultid">Variable</th>
 					<th scope="col"  class="sortable column-resultid">Units</th>
+					<th scope="col"  class="sortable column-resultid">Time Interval</th>
 					<th scope="col"  class="sortable column-resultid">Graph Data</th>
 					<th scope="col"  class="sortable column-resultid">Annotate Data</th>
 					<th scope="col"  class="sortable column-resultid">Processing Level</th></tr>
@@ -108,6 +109,7 @@ a[target="_blank"]:after {
 									<td >{{Result.resultid}}</td>
 									<td >{{Result.variableid.variablecode}}</td>
 									<td >{{Result.unitsid}}</td>
+									<td >{{Result.timeinterval}} {{Result.timeintervalunits}}</td>
 									<td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}"> View Time Series </a></td>
 									<td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}/popup=Anno/"> View Time Series </a></td>
 									<td > {{Result.processing_level}}</td>
