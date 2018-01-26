@@ -9,6 +9,9 @@ from .base import *
 DEBUG = True
 """ END DEBUG CONFIGURATION """
 
+""" EXPORTDB FLAG CONFIGURATION - if set to true this will use Camel case table names for SQLite"""
+EXPORTDB = False
+""" EXPORTDB FLAG CONFIGURATION """
 
 """ TRAVIS CONFIGURATION """
 TRAVIS_ENVIRONMENT = False
