@@ -1,17 +1,16 @@
 # from __future__ import unicode_literals
-import compiler
+# import compiler
 from django.contrib.gis import forms, admin
-from django.contrib import admin as realadmin
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib import messages
 from django.core.management import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.exceptions import ValidationError
 from django.forms import CharField
 from django.forms import ModelForm
 from django.forms import TypedChoiceField
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.utils.html import format_html, format_html_join
 from import_export import resources
 from import_export.admin import ExportMixin
 from import_export.admin import ImportExportActionModelAdmin
@@ -69,7 +68,6 @@ from .models import CvCensorcode
 # from io import StringIO
 from ajax_select import make_ajax_field
 from ajax_select.fields import AutoCompleteSelectField
-from ajax_select.admin import AjaxSelectAdminStackedInline
 
 from .models import Measurementresults
 from .models import Measurementresultvalues
@@ -78,7 +76,7 @@ from .models import Profileresultvalues
 from daterange_filter.filter import DateRangeFilter
 import re
 from .readonlyadmin import ReadOnlyAdmin
-from listfilters import SamplingFeatureTypeListFilter
+from .listfilters import SamplingFeatureTypeListFilter
 
 
 # from .admin import MeasurementresultvaluesResource
@@ -97,11 +95,11 @@ def link_list_display_DOI(link):
             match = re.match("10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?![\"&\'<>])[[:graph:]])+", link)
 
         if match:
-            return u'<a href="http://dx.doi.org/%s" target="_blank">%s</a>' % (link, link)
+            return format_html('<a href="http://dx.doi.org/%s" target="_blank">%s</a>' % (link, link))
         else:
-            return u'<a href="%s" target="_blank">%s</a>' % (link, link)
+            return format_html('<a href="%s" target="_blank">%s</a>' % (link, link))
     else:
-        return u'<a href="%s" target="_blank">%s</a>' % (link, link)
+        return format_html('<a href="%s" target="_blank">%s</a>' % (link, link))
 
 
 class variablesInLine(admin.StackedInline):
@@ -274,13 +272,13 @@ class MethodcitationsAdmin(ReadOnlyAdmin):
     list_display = ('method_id', 'method_link', 'relationshiptypecv', 'citation_link')
 
     def method_link(self, obj):
-        return u'<a href="%smethods/%s/">See Method</a>' % (settings.CUSTOM_TEMPLATE_PATH,
-                                                            obj.methodid.methodid)
+        return format_html('<a href="%smethods/%s/">See Method</a>' % (settings.CUSTOM_TEMPLATE_PATH,
+                                                            obj.methodid.methodid))
 
     def citation_link(self, obj):
-        return u'<a href="%scitations/%s/">%s</a>' % (settings.CUSTOM_TEMPLATE_PATH,
+        return format_html('<a href="%scitations/%s/">%s</a>' % (settings.CUSTOM_TEMPLATE_PATH,
                                                       obj.citationid.citationid,
-                                                      obj.citationid)
+                                                      obj.citationid))
 
     def method_id(self, obj):
         return obj.methodid
@@ -429,8 +427,8 @@ class CitationsAdmin(ReadOnlyAdmin):
 
     def doi(self, obj):
         external_id = Citationexternalidentifiers.objects.get(citationid=obj.citationid)
-        return u'<a href="http://dx.doi.org/{0}" target="_blank">{0}</a>'.format(
-            external_id.citationexternalidentifier)
+        return format_html('<a href="http://dx.doi.org/{0}" target="_blank">{0}</a>'.format(
+            external_id.citationexternalidentifier))
 
     def primary_author(self, obj):
         author_list = Authorlists.objects.filter(citationid=obj.citationid)
@@ -513,17 +511,17 @@ class VariablesAdminForm(ModelForm):
     # variable_type = make_ajax_field(Variables,'variable_type','cv_variable_type')
     speciation = make_ajax_field(Variables, 'speciation', 'cv_speciation')
 
-    variable_name.help_text = u'view variable names here <a href="http://vocabulary.odm2.org/' \
-                              u'variablename/" target="_blank">' \
-                              u'http://vocabulary.odm2.org/variablename/</a>'
+    variable_name.help_text = format_html('view variable names here <a href="http://vocabulary.odm2.org/' \
+                              'variablename/" target="_blank">' \
+                              'http://vocabulary.odm2.org/variablename/</a>')
     variable_name.allow_tags = True
-    variable_type.help_text = u'view variable types here <a href="http://vocabulary.odm2.org/' \
-                              u'variabletype/" target="_blank" >' \
-                              u'http://vocabulary.odm2.org/variabletype/</a>'
+    variable_type.help_text = format_html('view variable types here <a href="http://vocabulary.odm2.org/' \
+                              'variabletype/" target="_blank" >' \
+                              'http://vocabulary.odm2.org/variabletype/</a>')
     variable_type.allow_tags = True
-    speciation.help_text = u'view variable types here <a href="http://vocabulary.odm2.org/' \
-                           u'speciation/" target="_blank" >' \
-                           u'http://vocabulary.odm2.org/speciation/</a>'
+    speciation.help_text = format_html('view variable types here <a href="http://vocabulary.odm2.org/' \
+                           'speciation/" target="_blank" >' \
+                           'http://vocabulary.odm2.org/speciation/</a>')
     speciation.allow_tags = True
 
     class Meta:
@@ -551,24 +549,24 @@ class VariablesAdmin(ReadOnlyAdmin):
     save_as = True
     def variable_name_linked(self, obj):
         if obj.variable_name:
-            return u'<a href="http://vocabulary.odm2.org/variablename/{0}" target=' \
-                   u'"_blank">{1}</a>'.format(obj.variable_name.term, obj.variable_name.name)
+            return format_html('<a href="http://vocabulary.odm2.org/variablename/{0}" target=' \
+                   '"_blank">{1}</a>'.format(obj.variable_name.term, obj.variable_name.name))
 
     variable_name_linked.short_description = 'Variable Name'
     variable_name_linked.allow_tags = True
 
     def variable_type_linked(self, obj):
         if obj.variable_type:
-            return u'<a href="http://vocabulary.odm2.org/variabletype/{0}" target=' \
-                   u'"_blank">{1}</a>'.format(obj.variable_type.term, obj.variable_type.name)
+            return format_html('<a href="http://vocabulary.odm2.org/variabletype/{0}" target=' \
+                   '"_blank">{1}</a>'.format(obj.variable_type.term, obj.variable_type.name))
 
     variable_type_linked.short_description = 'Variable Type'
     variable_type_linked.allow_tags = True
 
     def speciation_linked(self, obj):
         if obj.speciation:
-            return u'<a href="http://vocabulary.odm2.org/speciation/{0}" target=' \
-                   u'"_blank">{1}</a>'.format(obj.speciation.term, obj.speciation.name)
+            return format_html('<a href="http://vocabulary.odm2.org/speciation/{0}" target=' \
+                   '"_blank">{1}</a>'.format(obj.speciation.term, obj.speciation.name))
 
     speciation_linked.short_description = 'Speciation'
     speciation_linked.allow_tags = True
@@ -915,8 +913,8 @@ class SamplingfeaturesAdmin(ReadOnlyAdmin):
     def igsn(self, obj):
         external_id = Samplingfeatureexternalidentifiers.objects.get(
             samplingfeatureid=obj.samplingfeatureid)
-        return u'<a href="https://app.geosamples.org/sample/igsn/{0}" ' \
-               u'target="_blank">{0}</a>'.format(external_id.samplingfeatureexternalidentifier)
+        return format_html('<a href="https://app.geosamples.org/sample/igsn/{0}" ' \
+               'target="_blank">{0}</a>'.format(external_id.samplingfeatureexternalidentifier))
 
     igsn.allow_tags = True
 
@@ -930,9 +928,9 @@ class SamplingfeaturesAdmin(ReadOnlyAdmin):
 
     def sampling_feature_type_linked(self, obj):
         if obj.sampling_feature_type:
-            return u'<a href="http://vocabulary.odm2.org/samplingfeaturetype/{0}" ' \
-                   u'target="_blank">{1}</a>'.format(obj.sampling_feature_type.term,
-                                                     obj.sampling_feature_type.name)
+            return format_html('<a href="http://vocabulary.odm2.org/samplingfeaturetype/{0}" ' \
+                   'target="_blank">{1}</a>'.format(obj.sampling_feature_type.term,
+                                                     obj.sampling_feature_type.name))
 
     sampling_feature_type_linked.short_description = 'Sampling feature / location type'
     sampling_feature_type_linked.allow_tags = True
@@ -1220,7 +1218,7 @@ class OrganizationsAdmin(ReadOnlyAdmin):
     list_display = ('organizationname', 'organizationdescription', 'organization_link')
 
     def organization_link(self, org):
-        return u'<a href={0} target="_blank">{0}</a>'.format(org.organizationlink)
+        return format_html('<a href={0} target="_blank">{0}</a>'.format(org.organizationlink))
 
     organization_link.allow_tags = True
 
@@ -1580,8 +1578,8 @@ class MethodsAdmin(ReadOnlyAdmin):
 
     def method_type_linked(self, obj):
         if obj.methodtypecv:
-            return u'<a href="http://vocabulary.odm2.org/methodtype/{0}" target=' \
-                   u'"_blank">{1}</a>'.format(obj.methodtypecv.term, obj.methodtypecv.name)
+            return format_html('<a href="http://vocabulary.odm2.org/methodtype/{0}" target=' \
+                   '"_blank">{1}</a>'.format(obj.methodtypecv.term, obj.methodtypecv.name))
 
     method_type_linked.short_description = 'Method Type'
     method_type_linked.allow_tags = True
@@ -1997,9 +1995,9 @@ class MeasurementresultsAdmin(ReadOnlyAdmin):
                      'resultid__variableid__variable_type__name']
 
     def data_link(self, obj):
-        return u'<a href="%sfeatureactions/%s/">%s</a>' % (
+        return format_html('<a href="%sfeatureactions/%s/">%s</a>' % (
             settings.CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid,
-            obj.resultid.featureactionid)
+            obj.resultid.featureactionid))
 
     data_link.short_description = 'sampling feature /site action'
     data_link.allow_tags = True
@@ -2068,9 +2066,9 @@ class TimeseriesresultsAdmin(ReadOnlyAdmin):
                      'resultid__variableid__variable_type__name']
 
     def data_link(self, obj):
-        return u'<a href="%sfeatureactions/%s/">%s</a>' % (
+        return format_html('<a href="%sfeatureactions/%s/">%s</a>' % (
             settings.CUSTOM_TEMPLATE_PATH, obj.resultid.featureactionid.featureactionid,
-            obj.resultid.featureactionid)
+            obj.resultid.featureactionid))
 
     data_link.short_description = 'sampling feature / site action'
     data_link.allow_tags = True
@@ -2120,9 +2118,9 @@ class TimeseriesresultvaluesAdmin(ImportExportActionModelAdmin, ReadOnlyAdmin):
                      'resultid__resultid__variableid__variable_type__name']
 
     def feature_action_link(self, obj):
-        return u'<a href="/admin/ODM2CZOData/featureactions/%s/">%s</a>' % (
+        return format_html('<a href="/admin/ODM2CZOData/featureactions/%s/">%s</a>' % (
             obj.resultid.resultid.featureactionid.featureactionid,
-            obj.resultid.resultid.featureactionid)
+            obj.resultid.resultid.featureactionid))
 
     feature_action_link.short_description = 'feature action'
     feature_action_link.allow_tags = True
@@ -2207,9 +2205,9 @@ class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin, ReadOnlyAdmin):
                      'resultid__resultid__variableid__variable_type__name']
 
     def feature_action_link(self, obj):
-        return u'<a href="/admin/ODM2CZOData/featureactions/%s/">%s</a>' % (
+        return format_html('<a href="/admin/ODM2CZOData/featureactions/%s/">%s</a>' % (
             obj.resultid.resultid.featureactionid.featureactionid,
-            obj.resultid.resultid.featureactionid)
+            obj.resultid.resultid.featureactionid))
 
     feature_action_link.short_description = 'feature action'
     feature_action_link.allow_tags = True
@@ -2491,8 +2489,8 @@ class PeopleAdmin(ReadOnlyAdmin):
 
     def orcid(self, obj):
         external_id = Personexternalidentifiers.objects.get(personid=obj.personid)
-        return u'<a href="http://orcid.org/{0}" target="_blank">{0}</a>'.format(
-            external_id.personexternalidentifier)
+        return format_html('<a href="http://orcid.org/{0}" target="_blank">{0}</a>'.format(
+            external_id.personexternalidentifier))
 
     def affiliation(self, obj):
         org = Organizations.objects.filter(affiliations__personid_id=obj.personid)
@@ -2500,13 +2498,13 @@ class PeopleAdmin(ReadOnlyAdmin):
         for org_name in org:
             if org_name.organizationlink:
                 name_list.append(
-                    u'<a href="{0}" target="_blank">{1}</a>'.format(org_name.organizationlink,
-                                                                    org_name.organizationname))
+                    format_html('<a href="{0}" target="_blank">{1}</a>'.format(org_name.organizationlink,
+                                                                    org_name.organizationname)))
             else:
                 name_list.append(
-                    u'{0}'.format(org_name.organizationname))
+                    format_html('{0}'.format(org_name.organizationname)))
 
-        return u'; '.join(name_list)
+        return format_html('; '.join(name_list))
 
     orcid.allow_tags = True
     affiliation.allow_tags = True

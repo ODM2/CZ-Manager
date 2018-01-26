@@ -1,16 +1,20 @@
 django-admin-shortcuts
-# See https://github.com/miguelcleon/ODM2-Admin/issues/104
-django-ajax-selects==1.4.3
+django-ajax-selects
 django-apptemplates
 django-daterange-filter
 django-import-export
 django-jquery
-django==1.10.5
+# django-kronos
+django==2.0.1
 # Pinned to 0.2.7 to preserve page style.
 djangocms-admin-style==0.2.7
 psycopg2
 requests
 django-recaptcha
+# django-redis
 pyyaml
 xlrd
 django-redis
+django-fixture-magic
+hs_restclient
+social-auth-app-django

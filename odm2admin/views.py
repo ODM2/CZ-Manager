@@ -1,12 +1,16 @@
-import cStringIO as StringIO
+from io import StringIO
 import math
 import json
 import time
+import sys
+import os
+import subprocess
 from datetime import datetime
 from datetime import timedelta
 from time import mktime
 from django import template
 from django.contrib import admin
+from django.db import connection
 from django.db.models import Max
 from django.db.models import Min
 from django.db.models import Q
@@ -14,16 +18,27 @@ from django.http import HttpResponseRedirect
 from django.http import StreamingHttpResponse
 from django.shortcuts import render
 from django.template import loader
+from django.contrib.auth.decorators import login_required
+# from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
-from django.core import mail
+# from django.core import mail
+from django.core import serializers
 from django.core.management import settings
+from templatesAndSettings.settings import exportdb
 from django.template.response import TemplateResponse
 from django.core.exceptions import ObjectDoesNotExist
+# from hs_restclient_helper import get_oauth_hs
 from django.core import management
 # from oauth2_provider.views.generic import ProtectedResourceView
 from django.http import HttpResponse
 from django.forms.models import model_to_dict
-from django.contrib.gis.geos import GEOSGeometry
+from django.utils.crypto import get_random_string
+# from django.contrib.gis.geos import GEOSGeometry
+# import hs_restclient as hs_r
+from hs_restclient import HydroShare, HydroShareAuthOAuth2
+# from oauthlib.oauth2 import TokenExpiredError
+# from oauthlib.oauth2 import InvalidGrantError, InvalidClientError
+
 import requests
 # from templatesAndSettings.settings import CUSTOM_TEMPLATE_PATH
 # from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DISCLAIMER
@@ -63,7 +78,7 @@ from .models import Extensionproperties
 # from .forms import LoginForm
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
+
 
 register = template.Library()
 
@@ -224,6 +239,10 @@ __author__ = 'leonmi'
 #     return TemplateResponse(request, 'publications2.html',{'citation_form':citation_form,
 # 'author_forms':author_forms,'citation_property_forms':citation_property_forms,})
 
+@login_required()
+def oauth_view(request, *args, **kwargs):
+    return HttpResponse('Secret contents!', status=200)
+
 def publications(request):
     # if request.user.is_authenticated():
     citationList = Citations.objects.all()
@@ -284,7 +303,7 @@ def publications(request):
 
 # ======================= SHORTCUTS =========================================
 def AddSensor(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
@@ -293,22 +312,20 @@ def AddSensor(request):
     else:
         return HttpResponseRedirect('../')
 
-
+@login_required()
 def chartIndex(request):
-    if request.user.is_authenticated():
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
                    'featureaction': settings.SENSOR_DASHBOARD['featureactionids'][0],
                    'short_title': settings.ADMIN_SHORTCUTS[0]['shortcuts'][5]['title']}
         return TemplateResponse(request, 'chartIndex.html', context)
-    else:
-        return HttpResponseRedirect('../')
+
 
 
 # chartIndex
 def AddProfile(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
@@ -319,7 +336,7 @@ def AddProfile(request):
 
 
 def RecordAction(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
@@ -330,7 +347,7 @@ def RecordAction(request):
 
 
 def ManageCitations(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
                    'authenticated': True, 'site_title': admin.site.site_title,
                    'site_header': admin.site.site_header,
@@ -442,7 +459,7 @@ def relatedFeaturesFilter(request, done, selected_resultid, featureaction,
 
 
 def web_map(request):
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         authenticated = True
     else:
         authenticated = False
@@ -657,7 +674,7 @@ def truncate(f, n):
 
 def sensor_dashboard(request, feature_action='NotSet', sampling_feature='NotSet'):
     authenticated = True
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         # return HttpResponseRedirect('../')
         authenticated = False
     ids = settings.SENSOR_DASHBOARD['featureactionids']
@@ -693,6 +710,7 @@ def sensor_dashboard(request, feature_action='NotSet', sampling_feature='NotSet'
     dmaxcount = 0
     lastResult = None
     for repv in repvs:
+        # print(repv.resultid)
         if "start date" in str(repv.propertyid.propertyname):
             startdate = repv.propertyvalue
             repv.propertyname = "Time series began on: "
@@ -792,7 +810,7 @@ def get_relations(s):
 
 def TimeSeriesGraphing(request, feature_action='All'):
     authenticated = True
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         return HttpResponseRedirect('../')
 
     template = loader.get_template('chart.html')
@@ -860,9 +878,11 @@ def TimeSeriesGraphing(request, feature_action='All'):
             filter(resultid=selected_resultid).filter(propertyid=EndDateProperty.propertyid).get()
         end_date = recordedenddate.propertyvalue
         enddt = time.strptime(end_date, "%Y-%m-%d %H:%M")
+        print(enddt)
         dt = datetime.fromtimestamp(mktime(enddt))
         last_day_previous_month = dt - timedelta(days=30)
         entered_start_date = last_day_previous_month.strftime('%Y-%m-%d %H:%M')
+        print(entered_start_date)
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
     else:
@@ -1294,7 +1314,8 @@ def TimeSeriesGraphing(request, feature_action='All'):
 def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', dataset='NotSet',
                    resultidu='NotSet',
                    startdate='NotSet', enddate='NotSet', popup='NotSet'):
-    if not request.user.is_authenticated():
+    # print("HERE")
+    if not request.user.is_authenticated:
         # return HttpResponseRedirect('../')
         authenticated = False
     else:
@@ -1400,19 +1421,23 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         except IndexError as e:
             # html = "<html><body>No Data Available Yet.</body></html>"
             # return HttpResponse(html)
-            # startdate = Timeseriesresultvalues.objects.\
-            #     filter(resultid__in=resultList.values("resultid")).\
-            #     annotate(Min('valuedatetime')).\
-            #     order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-            # enddate = Timeseriesresultvalues.objects.\
-            #     filter(resultid__in=resultList.values("resultid")).\
-            #     annotate(Max('valuedatetime')).\
-            #     order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+            startdate = Timeseriesresultvalues.objects.\
+                filter(resultid__in=resultList.values("resultid")).\
+                annotate(Min('valuedatetime')).\
+                order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+            enddate = Timeseriesresultvalues.objects.\
+                filter(resultid__in=resultList.values("resultid")).\
+                annotate(Max('valuedatetime')).\
+                order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
             methodsOnly = 'True'
     except ValueError as e:
             # html = "<html><body>No Data Available Yet.</body></html>"
             # return HttpResponse(html)
             methodsOnly = 'True'
+    for result in resultList:
+        tsr = Timeseriesresults.objects.filter(resultid=result).get()
+        result.timeintervalunits = tsr.intendedtimespacingunitsid
+        result.timeinterval = tsr.intendedtimespacing
     return TemplateResponse(request, template, {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'useSamplingFeature': useSamplingFeature,
                                                 'methodsOnly': methodsOnly,
@@ -1436,6 +1461,7 @@ def is_number(s):
 
 def add_annotation(request):
     # print('annotate')
+    resultid = None
     resultid = None
     annotationvals = None
     annotation = None
@@ -1609,6 +1635,187 @@ def addL1timeseries(request):
             # print(result)
     return HttpResponse(json.dumps(response_data),content_type='application/json')
 
+
+#another approach
+#https://rlskoeser.github.io/2016/03/31/migrating-data-between-databases-with-django/
+def createODM2SQLiteFile(request):
+    entered_end_date = ''
+    entered_start_date = ''
+    myresultSeriesExport = []
+
+    if 'exportdata' in request.POST and 'myresultSeriesExport[]' in request.POST:
+        selectedMResultSeries = request.POST.getlist('myresultSeriesExport[]')
+        myresultSeriesExport = None
+        if request.POST['useDates'] == 'true':
+            useDates = True
+        else:
+            useDates = False
+        if useDates:
+            if 'endDate' in request.POST:
+                # print(entered_end_date)
+                entered_end_date = request.POST['endDate']
+            if 'startDate' in request.POST:
+                entered_start_date = request.POST['startDate']
+            #Employees.objects.values_list('eng_name', flat=True)
+            myresultSeriesExport = Timeseriesresultvalues.objects.all() \
+                .filter(valuedatetime__gte=entered_start_date) \
+                .filter(valuedatetime__lte=entered_end_date) \
+                .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
+        else:
+            myresultSeriesExport = Timeseriesresultvalues.objects.all() \
+                .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
+            # emailspreadsheet2(request, myresultSeriesExport, False)
+    #management.call_command('dump_object', 'odm2admin.Timeseriesresults', 17160, 17162, kitchensink=True)
+    sysout = sys.stdout
+    loc = settings.FIXTURE_DIR
+    # print(myresultSeriesExport.first())
+    random_string = get_random_string(length=5)
+    tmpfixture1 = 'tmp'  + '.json' #+ random_string
+    sys.stdout = open(loc+ tmpfixture1, 'w')
+    tmploc1 = loc+ tmpfixture1
+    management.call_command('dump_object', 'odm2admin.Timeseriesresultvalues', myresultSeriesExport.first().valueid, kitchensink=True)
+    sys.stdout.close()
+    #jsonfile = open(loc+ 'tmp2.json', 'w')
+    # i=0
+    values = myresultSeriesExport.values_list('valueid', flat=True)
+    random_string = get_random_string(length=5)
+    # add random string back later
+    tmpfixture2 = 'tmp'  + '.json' # + random_string
+    sys.stdout = open(loc + tmpfixture2, 'w')
+    # sys.stdout = open(loc + 'tmp2.json, 'w')
+    tmploc2 = loc+ tmpfixture1
+    sys.stdout.write(serializers.serialize("json", myresultSeriesExport[1:], indent=4,use_natural_foreign_keys=False,use_natural_primary_keys=False))
+    sys.stdout.close()
+    sys.stdout = sysout
+
+    #settings.MAP_CONFIG['result_value_processing_levels_to_display']
+    #db_name = exportdb.DATABASES['export']['NAME']
+    #print(db_name)
+    # print(tmploc1)
+    database = ''
+    if 'exportdata' in request.POST:
+        # print(entered_end_date)
+        exportdata = request.POST['exportdata']
+        if exportdata == 'true':
+            database = 'export'
+        if 'publishdata' in request.POST:
+            # print(entered_end_date)
+            publishdata = request.POST['publishdata']
+            if publishdata == 'true':
+                database = 'published'
+    #management.call_command('loaddata',
+    #                        tmploc1 ,database=database)  # ,database='export'
+    # print('finished first file')
+    #management.call_command('loaddata',
+    #                        tmploc2,database=database)
+    #export_data.send(sender= Timeseriesresultvalues,tmploc1=tmploc1,tmploc2=tmploc2)
+    #management.call_command('create_sqlite_export',tmploc1,tmploc2, settings=exportdb)
+    # call('../')
+    # print(tmploc1)
+    # print(tmploc2)
+    dbfilepath = exportdb.DATABASES['default']['NAME']
+    path = os.path.dirname(dbfilepath)
+    dbfile = os.path.basename(dbfilepath)
+    dbfilename = os.path.splitext(dbfile)[0]
+    random_string = get_random_string(length=5)
+    dbfile2 = path +"/" + dbfilename +  random_string + ".db"
+    #command = ['python',  '/home/azureadmin/webapps/ODM2-AdminLCZO/manageexport.py', 'create_sqlite_export', tmploc1, tmploc2]
+    command = 'cp ' + dbfilepath + ' ' + str(dbfile2)
+    # print(command)
+    response = subprocess.check_call(command,shell=True)
+    #write an extra settings file instead - have it contain just DATABASES; remove databases from exportdb.py and import new file. 2
+    exportdb.DATABASES['default']['NAME'] = dbfile2
+    command = settings.BASE_DIR + '/scripts/create_sqlite_file.sh '+ dbfile2 + ' %>> ' + settings.BASE_DIR +'/logging/sqlite_export.log'
+    # print(command)
+    response = subprocess.check_call(command,shell=True) #
+    # print("response")
+    # print(response)
+    # print(exportdb.DATABASES['default']['NAME'])
+    return myresultSeriesExport
+    # outfile = loc +'tmp2.json'
+    # print(outfile)
+    # with open(outfile, 'w') as jsonfile:
+    #    json.dump(data, jsonfile)
+    #outfile = loc +'tmp2.json'
+    #print(outfile)
+    #with open(outfile, 'w') as jsonfile:
+    #    json.dump(data, jsonfile)
+
+@login_required()
+def export_to_hydroshare(request):
+
+    valuestoexport = createODM2SQLiteFile(request)
+
+    export_complete = True
+    resource_link = ''
+    user = request.user
+    # print(request.POST['hydroshareusername'])
+
+    if 'hydroshareusername' in request.POST and 'hydrosharepassword' in request.POST:
+        hs_client_id = settings.SOCIAL_AUTH_HYDROSHARE_UP_KEY
+        hs_client_secret = settings.SOCIAL_AUTH_HYDROSHARE_UP_SECRET
+        username = request.POST['hydroshareusername']
+        password =  request.POST['hydrosharepassword']
+        auth = HydroShareAuthOAuth2(hs_client_id, hs_client_secret,
+                                    username=username, password=password)
+    else:
+        hs_client_id = settings.SOCIAL_AUTH_HYDROSHARE_KEY
+        hs_client_secret = settings.SOCIAL_AUTH_HYDROSHARE_SECRET
+        social = user.social_auth.get(provider='hydroshare')
+        token = social.extra_data['access_token']
+        print(social.extra_data)
+        print(token)
+        auth = HydroShareAuthOAuth2(hs_client_id, hs_client_secret,
+                                    token=social.extra_data)
+    #hs = get_oauth_hs(request)
+    #userInfo = hs.getUserInfo()
+    #
+    # token = None
+    #if 'code' in request.POST:
+    #    print(request.POST['code'])
+    #    token = request.POST['code']
+    #print('expires in ' + str(token['expires_in']))
+
+    #auth = HydroShareAuthOAuth2(client_id, client_secret,
+    #                            username='miguelcleon', password='7jmftUpata')
+    hs = HydroShare(auth=auth)
+    username = hs.getUserInfo()
+    print(username)
+    abstracttext = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
+    if 'startDate' in request.POST:
+        entered_start_date = request.POST['startDate']
+        abstracttext += ' data values from: ' + entered_start_date
+    if 'endDate' in request.POST:
+        # print(entered_end_date)
+        entered_end_date = request.POST['endDate']
+        abstracttext += ' ending on: ' + entered_end_date
+
+    abstract = abstracttext
+    title = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
+    keywords = ('test', 'test 2')
+    rtype = 'GenericResource'
+    fpath = exportdb.DATABASES['default']['NAME']
+    # print(fpath)
+    #metadata = '[{"coverage":{"type":"period", "value":{"start":"'+entered_start_date +'", "end":"'+ entered_end_date +'"}}}, {"creator":{"name":"Miguel Leon"}}]'
+    metadata = '[{"coverage":{"type":"period", "value":{"start":"03/26/2017", "end":"04/25/2017"}}}, {"creator":{"name":"Miguel Leon"}}]'
+    extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
+
+    #abstract = 'My abstract'
+    #title = 'My resource'
+    #keywords = ('my keyword 1', 'my keyword 2')
+    #rtype = 'GenericResource'
+    #fpath = 'C:/Users/leonmi/Google Drive/ODM2AdminLT2/ODM2SQliteBlank.db'
+    #metadata = '[{"coverage":{"type":"period", "value":{"start":"01/01/2000", "end":"12/12/2010"}}}, {"creator":{"name":"John Smith"}}, {"creator":{"name":"Lisa Miller"}}]'
+    #extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
+    resource_id = hs.createResource(rtype, title, resource_file=fpath, keywords=keywords, abstract=abstract,
+                                         metadata=metadata, extra_metadata=extra_metadata)
+    print(resource_id)
+    # for resource in hs.getResourceList():
+    #     print(resource)
+    return HttpResponse({'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+                                                'export_complete': export_complete,
+                                                'username' : username,
+                                                'resource_link': resource_link,},content_type='application/json')
 def email_data_from_graph(request):
     emailsent = False
     outEmail = ''
@@ -1648,7 +1855,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                             resultidu='NotSet', startdate='NotSet', enddate='NotSet',
                             popup='NotSet'):  # ,startdate='',enddate=''
     authenticated = True
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         # return HttpResponseRedirect('../')
         authenticated = False
     if popup == 'NotSet':
@@ -1952,6 +2159,10 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     #     return response
     # else:
         # raise ValidationError(relatedFeatureList)
+    for result in resultList:
+        tsr = Timeseriesresults.objects.filter(resultid=result).get()
+        result.timeintervalunits = tsr.intendedtimespacingunitsid
+        result.timeinterval = tsr.intendedtimespacing
     return TemplateResponse(request, template, {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'startDate': entered_start_date,
                                                 'endDate': entered_end_date,
@@ -1995,7 +2206,7 @@ def removeDupsFromListOfStrings(listOfStrings):
 
 def scatter_plot(request):
     authenticated = True
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         authenticated = False
     xVariableSelection = yVariableSelection = fieldarea1 = fieldarea2 = filteredFeatures = None
     xVar = None
@@ -2596,7 +2807,7 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
 
 def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet', popup='NotSet'):
     authenticated = True
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         authenticated = False
     if popup == 'NotSet':
         template = loader.get_template('chartVariableAndFeature.html')

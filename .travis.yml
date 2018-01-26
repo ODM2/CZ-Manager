@@ -19,16 +19,12 @@ before_cache:
 matrix:
   fast_finish: true
   include:
-  - python: 2.7
-    env: TEST_TARGET=default
   - python: 3.6
     env: TEST_TARGET=default
-  - python: 2.7
-    env: TEST_TARGET=coding_standards
   - python: 3.6
     env: TEST_TARGET=docs
   allow_failures:
-  - python: 2.7
+  - python: 3.6
     env: TEST_TARGET=coding_standards
 
 
@@ -47,15 +43,19 @@ before_install:
   - conda update conda
   - conda config --add channels conda-forge --force
   - conda config --add channels odm2 --force
-  - conda create --name TEST python=$TRAVIS_PYTHON_VERSION --file requirements.txt --file requirements-dev.txt
+  - conda create --name TEST python=$TRAVIS_PYTHON_VERSION libgdal boost --file requirements.txt --file requirements-dev.txt
   - source activate TEST
+  - pip install --upgrade http://github.com/miguelcleon/django-admin-shortcuts/zipball/master
 
 install:
   - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2admin-${version}.tar.gz && popd
 
+before_script:
+- psql -c "CREATE DATABASE test;" -U postgres
+
 script:
   - if [[ $TEST_TARGET == 'default' ]]; then
-      python setup.py test;
+      python $TRAVIS_BUILD_DIR/manage.py test tests/;
     fi
   - if [[ $TEST_TARGET == 'coding_standards' ]]; then
       find . -type f -name "*.py" ! -name "base.py" ! -name "conf.py" | xargs flake8 --max-line-length=100 --ignore=E402 ;

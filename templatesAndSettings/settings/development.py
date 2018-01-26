@@ -2,12 +2,22 @@
 Development settings and globals.
 """
 
-from base import *
+from .base import *
 
 """ DEBUG CONFIGURATION """
 # Disable debugging by default.
 DEBUG = True
 """ END DEBUG CONFIGURATION """
+
+""" EXPORTDB FLAG CONFIGURATION - if set to true this will use Camel case table names for SQLite"""
+EXPORTDB = False
+""" EXPORTDB FLAG CONFIGURATION """
+
+""" TRAVIS CONFIGURATION """
+TRAVIS_ENVIRONMENT = False
+if 'TRAVIS' in os.environ:
+    TRAVIS_ENVIRONMENT = True
+""" END TRAVIS CONFIGURATION """
 
 """ ALLOWED HOSTS CONFIGURATION """
 ALLOWED_HOSTS = ['127.0.0.1',]
@@ -25,21 +35,33 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 123
 """ EMAIL CONFIGURATION """
 
-
 """ DATABASE CONFIGURATION """
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'db_name',
-        'USER': 'user',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-        'OPTIONS': {
-            'options': '-c search_path=public,admin,odm2,odm2extra'
+if TRAVIS_ENVIRONMENT:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'test',  # Must match travis.yml setting
+            'USER': 'postgres',
+            'PASSWORD': '',
+            'HOST': 'localhost',
+            'PORT': '',
         }
     }
-}
+else:
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.contrib.gis.db.backends.postgis',
+            'NAME': 'db_name',
+            'USER': 'user',
+            'PASSWORD': 'password',
+            'HOST': 'localhost',
+            'PORT': '5432',
+            'OPTIONS': {
+                'options': '-c search_path=public,admin,odm2,odm2extra'
+            }
+        }
+    }
 """ END DATABASE CONFIGURATION """
 
 """ SENSOR DASHBOARD CONFIGURATION """
@@ -72,7 +94,6 @@ MAP_CONFIG = {
 DATA_DISCLAIMER = {
     "text" : "Add a link discribing where your data come from",
     "linktext" : "The name of my site",
-    "link" : "http://mysiteswegpage.page/"
-
+    "link" : "http://mysiteswegpage.page/",
 }
 """ END DATA DISCLAIMER CONFIGURATION """

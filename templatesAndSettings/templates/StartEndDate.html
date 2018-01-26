@@ -21,6 +21,86 @@ option {
 
 //$.getJSON('/er/poll/'+question_id ,function(data) {
 $(document).ready(function(){
+	$('#to_hydroshare').click(function(){
+	    console.log('hydro share button');
+	    var startDate = $("#startDate").val();
+		var endDate = $("#endDate").val();
+		var username = $('#hydroshareUsername').val();
+		var password = $('#hydrosharePassword').val();
+		var useDateselm =  document.getElementById("useDates"); //$("#useDates").val();
+		var useDates = useDateselm.checked;
+		var hydrosharebutton = document.getElementById("to_hydroshare"); 
+		console.log(hydrosharebutton);
+		hydrosharebutton.firstChild.data = "exporting to hydroshare";
+		var resultSeriesExport = [];
+		$(".action-checkbox-column:checked").each(function(){
+			console.log($(this).val());
+			resultSeriesExport.push($(this).val());
+		});
+		console.log(startDate);
+		console.log(username);
+		console.log(password);
+		console.log(resultSeriesExport);
+		$.ajax({
+				url: "{{prefixpath}}../export_to_hydroshare/",
+				type: "POST",
+				data: {
+					'startDate': startDate,
+					'endDate': endDate,
+					'hydroshareusername' : username,
+					'hydrosharepassword' : password,
+					'useDates': useDates,
+					'exportdata': true,
+					'publishdata': false,
+					'myresultSeriesExport[]': resultSeriesExport,
+					'csrfmiddlewaretoken': '{{ csrf_token }}', 
+				},
+				complete : function(json) {
+					var hydrosharebutton = document.getElementById("to_hydroshare");
+					hydrosharebutton.firstChild.data = "export complete";
+        },
+		});
+	});
+	$('#to_publish').click(function(){
+	    console.log('hydro share button');
+	    var startDate = $("#startDate").val();
+		var endDate = $("#endDate").val();
+		var username = $('#hydroshareUsername').val();
+		var password = $('#hydrosharePassword').val();
+		var useDateselm =  document.getElementById("useDates"); //$("#useDates").val();
+		var useDates = useDateselm.checked;
+		var hydrosharebutton = document.getElementById("to_hydroshare"); 
+		console.log(hydrosharebutton);
+		hydrosharebutton.firstChild.data = "exporting to hydroshare";
+		var resultSeriesExport = [];
+		$(".action-checkbox-column:checked").each(function(){
+			console.log($(this).val());
+			resultSeriesExport.push($(this).val());
+		});
+		console.log(startDate);
+		console.log(username);
+		console.log(password);
+		console.log(resultSeriesExport);
+		$.ajax({
+				url: "{{prefixpath}}../export_to_hydroshare/",
+				type: "POST",
+				data: {
+					'startDate': startDate,
+					'endDate': endDate,
+					'hydroshareusername' : username,
+					'hydrosharepassword' : password,
+					'useDates': useDates,
+					'exportdata': false,
+					'publishdata': true,
+					'myresultSeriesExport[]': resultSeriesExport,
+					'csrfmiddlewaretoken': '{{ csrf_token }}', 
+				},
+				complete : function(json) {
+					var hydrosharebutton = document.getElementById("to_hydroshare");
+					hydrosharebutton.firstChild.data = "export complete";
+        },
+		});
+	});
 	$('#email_data').click(function(){
 		var outEmail = $("#outEmail").val();
 		var startDate = $("#startDate").val();
@@ -63,7 +143,7 @@ $(document).ready(function(){
     
 	<form action="" method="post">
 	{% csrf_token %} 
-	
+	<a href="{% url "social:begin" "hydroshare" %}?next={{ request.path }}">Login to Hydroshare</a>
 	<table >
 	{% for method in methods %}
 	<tr><td>
@@ -81,6 +161,13 @@ $(document).ready(function(){
 			End Date (format YYYY-MM-DD HH:MM) </input>
 			
 			<input type="submit" name="update_chart" value="Update Chart" />
+			
+			<button  type="button" name="to_publish"  id="to_publish"/>Publish Data</button>
+			</td></tr>
+			<tr><td>
+			Username: <input id="hydroshareUsername" maxlength="100" name="hydroshareUsername" type="text"></input>
+			Password: <input id="hydrosharePassword" maxlength="100" name="hydrosharePassword" type="password"></input>
+			<button  type="button" name="to_hydroshare"  id="to_hydroshare"/>Upload To Hydroshare</button>
 			</td></tr>
 			<tr><td><div class="g-recaptcha" data-sitekey="6LdYnQ8UAAAAAI38kvlrKy4kF28VMYWnGO4dDjPA"></div>
 			use dates to filter data in email: <input id="useDates" type="checkbox" name="useDates" checked></input>
@@ -101,6 +188,7 @@ $(document).ready(function(){
 				<th scope="col"  class="sortable column-resultid">id</th>
 				<th scope="col"  class="sortable column-resultid">Variable</th>
 				<th scope="col"  class="sortable column-resultid">Units</th>
+				<th scope="col"  class="sortable column-resultid">Time Interval</th>
 				<th scope="col"  class="sortable column-resultid">Location</th>
 				<th scope="col"  class="sortable column-resultid">Method</th>
 				<th scope="col"  class="sortable column-resultid">Processing Level</th>
@@ -121,6 +209,7 @@ $(document).ready(function(){
 										<td >{{Result.resultid}}</td>
 										<td >{{Result.variableid.variablecode}}</td>
 										<td >{{Result.unitsid}}</td>
+										<td >{{Result.timeinterval}} {{Result.timeintervalunits}}</td>
 										<td >{{Result.featureactionid.samplingfeatureid}}</td>
 										<td >{{Result.featureactionid.action.method.methodcode}}</td>
 										<td > {{Result.processing_level}}</td>
