@@ -39,7 +39,7 @@ EMAIL_PORT = 123
 if TRAVIS_ENVIRONMENT:
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgis',
+            'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'test',  # Must match travis.yml setting
             'USER': 'postgres',
             'PASSWORD': '',
