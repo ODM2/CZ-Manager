@@ -56,7 +56,6 @@ before_script:
 script:
   - if [[ $TEST_TARGET == 'default' ]]; then
       python $TRAVIS_BUILD_DIR/manage.py test tests/;
-      python
     fi
   - if [[ $TEST_TARGET == 'coding_standards' ]]; then
       find . -type f -name "*.py" ! -name "base.py" ! -name "conf.py" | xargs flake8 --max-line-length=100 --ignore=E402 ;
