@@ -43,7 +43,7 @@ before_install:
   - conda update conda
   - conda config --add channels conda-forge --force
   - conda config --add channels odm2 --force
-  - conda create --name TEST python=$TRAVIS_PYTHON_VERSION --file requirements.txt --file requirements-dev.txt
+  - conda create --name TEST python=$TRAVIS_PYTHON_VERSION libgdal boost --file requirements.txt --file requirements-dev.txt
   - source activate TEST
   - pip install --upgrade http://github.com/miguelcleon/django-admin-shortcuts/zipball/master
 
