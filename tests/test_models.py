@@ -1,6 +1,22 @@
-from django.test import TestCase
-from ..odm2admin.models import Variables, CvVariabletype, CvVariablename
+import sys
+from pathlib import Path # if you haven't already done so
+file = Path(__file__).resolve()
+parent, root = file.parent, file.parents[1]
+sys.path.append(str(root))
 
+# Additionally remove the current file's directory from sys.path
+try:
+    sys.path.remove(str(parent))
+except ValueError: # Already removed
+    pass
+
+from django.test import TestCase
+from odm2admin.models import Variables, CvVariabletype, CvVariablename
+
+# if __name__ == '__main__':
+#     from odm2admin.models import Variables, CvVariabletype, CvVariablename
+# else:
+#     from ..models import Variables, CvVariabletype, CvVariablename
 
 class VariablesTest(TestCase):
     def create_variable(self, variablecode='test',variabledefinition='test', nodatavalue=-6999):
