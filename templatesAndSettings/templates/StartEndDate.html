@@ -188,6 +188,7 @@ $(document).ready(function(){
 				<th scope="col"  class="sortable column-resultid">id</th>
 				<th scope="col"  class="sortable column-resultid">Variable</th>
 				<th scope="col"  class="sortable column-resultid">Units</th>
+				<th scope="col"  class="sortable column-resultid">Time Interval</th>
 				<th scope="col"  class="sortable column-resultid">Location</th>
 				<th scope="col"  class="sortable column-resultid">Method</th>
 				<th scope="col"  class="sortable column-resultid">Processing Level</th>
@@ -208,6 +209,7 @@ $(document).ready(function(){
 										<td >{{Result.resultid}}</td>
 										<td >{{Result.variableid.variablecode}}</td>
 										<td >{{Result.unitsid}}</td>
+										<td >{{Result.timeinterval}} {{Result.timeintervalunits}}</td>
 										<td >{{Result.featureactionid.samplingfeatureid}}</td>
 										<td >{{Result.featureactionid.action.method.methodcode}}</td>
 										<td > {{Result.processing_level}}</td>

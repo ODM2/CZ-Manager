@@ -2159,6 +2159,10 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     #     return response
     # else:
         # raise ValidationError(relatedFeatureList)
+    for result in resultList:
+        tsr = Timeseriesresults.objects.filter(resultid=result).get()
+        result.timeintervalunits = tsr.intendedtimespacingunitsid
+        result.timeinterval = tsr.intendedtimespacing
     return TemplateResponse(request, template, {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'startDate': entered_start_date,
                                                 'endDate': entered_end_date,
