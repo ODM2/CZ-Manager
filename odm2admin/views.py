@@ -1777,7 +1777,7 @@ def export_to_hydroshare(request):
     #print('expires in ' + str(token['expires_in']))
 
     #auth = HydroShareAuthOAuth2(client_id, client_secret,
-    #                            username='miguelcleon', password='7jmftUpata')
+    #                            username='', password='')
     hs = HydroShare(auth=auth)
     username = hs.getUserInfo()
     print(username)
