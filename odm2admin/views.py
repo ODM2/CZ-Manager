@@ -239,9 +239,6 @@ __author__ = 'leonmi'
 #     return TemplateResponse(request, 'publications2.html',{'citation_form':citation_form,
 # 'author_forms':author_forms,'citation_property_forms':citation_property_forms,})
 
-@login_required()
-def oauth_view(request, *args, **kwargs):
-    return HttpResponse('Secret contents!', status=200)
 
 def publications(request):
     # if request.user.is_authenticated():
@@ -878,11 +875,9 @@ def TimeSeriesGraphing(request, feature_action='All'):
             filter(resultid=selected_resultid).filter(propertyid=EndDateProperty.propertyid).get()
         end_date = recordedenddate.propertyvalue
         enddt = time.strptime(end_date, "%Y-%m-%d %H:%M")
-        print(enddt)
         dt = datetime.fromtimestamp(mktime(enddt))
         last_day_previous_month = dt - timedelta(days=30)
         entered_start_date = last_day_previous_month.strftime('%Y-%m-%d %H:%M')
-        print(entered_start_date)
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
     else:
