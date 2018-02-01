@@ -3,7 +3,7 @@ import inspect
 
 from django import template
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.management import settings
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ugettext

@@ -1,4 +1,4 @@
-from ajax_select import LookupChannel
+from ajax_select import register, LookupChannel
 
 # ========= Import all Controlled Vocabulary Module =========#
 from .models import CvActiontype
@@ -22,7 +22,7 @@ from .models import Timeseriesresults
 from django.utils.html import escape
 from django.db.models import Q
 
-
+@register('timeseriesresult_lookup')
 class TimeseriesResultsLookup(LookupChannel):
     model = Timeseriesresults
 
@@ -61,7 +61,7 @@ class TimeseriesResultsLookup(LookupChannel):
         obj = Timeseriesresults.objects.filter(resultid__in=ids)
         return obj
 
-
+@register('measurementresult_lookup')
 class MeasurementResultsLookup(LookupChannel):
     model = Measurementresults
 
@@ -100,7 +100,7 @@ class MeasurementResultsLookup(LookupChannel):
         obj = Measurementresults.objects.filter(resultid__in=ids)
         return obj
 
-
+@register('profileresult_lookup')
 class ProfileResultsLookup(LookupChannel):
     model = Profileresults
 
@@ -139,7 +139,7 @@ class ProfileResultsLookup(LookupChannel):
         obj = Profileresults.objects.filter(resultid__in=ids)
         return obj
 
-
+@register('result_lookup')
 class ResultsLookup(LookupChannel):
     model = Results
 
@@ -187,7 +187,7 @@ class ResultsLookup(LookupChannel):
         obj = Results.objects.filter(resultid__in=ids)
         return obj
 
-
+@register('featureaction_lookup')
 class FeatureactionsLookup(LookupChannel):
     model = Featureactions
 
@@ -229,7 +229,7 @@ class FeatureactionsLookup(LookupChannel):
         obj = Featureactions.objects.filter(featureactionid__in=ids)
         return obj
 
-
+@register('cv_variable_name')
 class CvVariableNameLookup(LookupChannel):
     model = CvVariablename
 
@@ -250,7 +250,7 @@ class CvVariableNameLookup(LookupChannel):
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
 
-
+@register('cv_speciation')
 class CvVariableSpeciationLookup(LookupChannel):
     model = CvSpeciation
 
@@ -271,7 +271,7 @@ class CvVariableSpeciationLookup(LookupChannel):
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
 
-
+@register('cv_variable_type')
 class CvVariableTypeLookup(LookupChannel):
     model = CvVariabletype
 
@@ -288,11 +288,11 @@ class CvVariableTypeLookup(LookupChannel):
     def format_item_display(self, obj):
         # return "<a href= %s target='_blank'> %s </a>" % (escape(obj.sourcevocabularyuri),
         # escape(obj.name))
-        return u"%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
+        return "%s  <a href= %s target='_blank' style='color:blue;'> reference link </a>" % \
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
 
-
+@register('cv_units_type')
 class CvUnitTypeLookup(LookupChannel):
     model = CvUnitstype
 
@@ -313,7 +313,7 @@ class CvUnitTypeLookup(LookupChannel):
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
 
-
+@register('cv_taxonomic_classifier_type')
 class CvTaxonomicClassifierTypeLookup(LookupChannel):
     model = CvTaxonomicclassifiertype
 
@@ -334,7 +334,7 @@ class CvTaxonomicClassifierTypeLookup(LookupChannel):
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
 
-
+@register('cv_method_type')
 class CvMethodTypeLookup(LookupChannel):
     model = CvMethodtype
 
@@ -355,7 +355,7 @@ class CvMethodTypeLookup(LookupChannel):
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
 
-
+@register('cv_action_type')
 class CvActionTypeLookup(LookupChannel):
     model = CvActiontype
 
@@ -376,7 +376,7 @@ class CvActionTypeLookup(LookupChannel):
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
 
-
+@register('cv_site_type')
 class CvSitetypeLookup(LookupChannel):
     model = CvSitetype
 
@@ -397,7 +397,7 @@ class CvSitetypeLookup(LookupChannel):
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
 
-
+@register('sampling_feature_lookup')
 class SamplingFeatureLookup(LookupChannel):
     model = Samplingfeatures
 
@@ -433,7 +433,7 @@ class SamplingFeatureLookup(LookupChannel):
         return "%s- %s" % (
             obj.samplingfeaturecode, obj.samplingfeaturename)
 
-
+@register('cv_sampling_feature_type')
 class CvSamplingFeatureTypeLookup(LookupChannel):
     model = CvSamplingfeaturetype
 
@@ -454,7 +454,7 @@ class CvSamplingFeatureTypeLookup(LookupChannel):
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
 
-
+@register('cv_sampling_feature_geo_type')
 class CvSamplingFeatureGeoTypeLookup(LookupChannel):
     model = CvSamplingfeaturegeotype
 
@@ -475,7 +475,7 @@ class CvSamplingFeatureGeoTypeLookup(LookupChannel):
                (escape(obj.name), escape(obj.sourcevocabularyuri))
         # onClick="window.open('http://www.yahoo.com', '_blank')
 
-
+@register('cv_elevation_datum')
 class CvElevationDatumLookup(LookupChannel):
     model = CvElevationdatum
 

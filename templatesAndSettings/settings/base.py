@@ -58,6 +58,8 @@ TEMPLATES = [{
             'django.template.context_processors.request',
             'django.contrib.auth.context_processors.auth',
             'django.contrib.messages.context_processors.messages',
+            'social_django.context_processors.backends',
+            'social_django.context_processors.login_redirect',
         ],
     },
 }]
@@ -103,35 +105,61 @@ USE_TZ = True
 """ MEDIA CONFIGURATION """
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 MEDIA_ROOT = '{}/{}/upfiles/'.format(BASE_DIR, APP_NAME)
-# URL that handles the media served from MEDIA_ROOT.
+#  URL that handles the media served from MEDIA_ROOT.
 MEDIA_URL = '/{}/{}/media/'.format(os.path.basename(BASE_DIR), APP_NAME)
 """ END MEDIA CONFIGURATION """
-
+# Absolute filesystem path to the directory that will hold database export and import files
+FIXTURE_DIR = '{}/{}/fixtures/'.format(BASE_DIR, APP_NAME)
 
 """ STATIC FILE CONFIGURATION """
 # Absolute path to the directory static files should be collected to. Don't put
 # anything in this directory yourself; store your static files in apps' static/
 # subdirectories and in STATICFILES_DIRS.
-# STATIC_ROOT = '{}/{}/static'.format(BASE_DIR, APP_NAME)
-STATIC_DIR = '{}/{}/static'.format(BASE_DIR, APP_NAME)
-STATICFILES_DIRS = [STATIC_DIR]
+STATIC_ROOT = '{}/{}/static'.format(BASE_DIR, APP_NAME)
 # URL prefix for static files.
 STATIC_URL = '/static/'
 """ END STATIC FILE CONFIGURATION """
-
+""" END PATH CONFIGURATION """
 
 """ MIDDLEWARE CONFIGURATION """
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    #'corsheaders.middleware.CorsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
     # 'django.contrib.auth.middleware.SessionAuthenticationMiddleware', didn't work in production
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 'admin_reorder.middleware.ModelAdminReorder',
 )
 """ END MIDDLEWARE CONFIGURATION """
+
+""" OAUTH SETTINGS """
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.open_id.OpenIdAuth',
+    'social_core.backends.google.GoogleOpenId',
+    'social_core.backends.google.GoogleOAuth2',
+    #'odm2admin.hydroshare_backend.HydroShareOAuth2',
+    'social_core.backends.google.GoogleOAuth',
+    'django.contrib.auth.backends.ModelBackend',
+)
+# Oauth CORS_ORIGIN_ALLOW_ALL = True
+
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+    'social_core.pipeline.social_auth.associate_by_email',
+)
+""" END OAUTH SETTINGS """
 
 """ URL AND WSGI CONFIGURATION """
 ROOT_URLCONF = 'templatesAndSettings.urls'
@@ -145,9 +173,11 @@ INSTALLED_APPS = (
     'djangocms_admin_style',
     '{}'.format(APP_NAME),
     'import_export',
+    'social_django',
     'admin_shortcuts',
     'daterange_filter',
     'captcha',
+    'fixture_magic',
     # 'dal',
     # 'dal_select2',
     'ajax_select',
@@ -215,26 +245,6 @@ ADMIN_SHORTCUTS_SETTINGS = {
 """ END ADMIN SHORTCUTS CONFIGURATION """
 
 
-""" AJAX LOOKUPS CONFIGURATION """
-AJAX_LOOKUP_CHANNELS = dict(
-    cv_variable_name=('{}.lookups'.format(APP_NAME), 'CvVariableNameLookup'),
-    cv_variable_type=('{}.lookups'.format(APP_NAME), 'CvVariableTypeLookup'),
-    cv_unit_type=('{}.lookups'.format(APP_NAME), 'CvUnitTypeLookup'),
-    cv_speciation=('{}.lookups'.format(APP_NAME), 'CvVariableSpeciationLookup'),
-    featureaction_lookup=('{}.lookups'.format(APP_NAME), 'FeatureactionsLookup'),
-    result_lookup=('{}.lookups'.format(APP_NAME), 'ResultsLookup'),
-    profileresult_lookup=('{}.lookups'.format(APP_NAME), 'ProfileResultsLookup'),
-    measurementresult_lookup=('{}.lookups'.format(APP_NAME), 'MeasurementResultsLookup'),
-    timeseriesresult_lookup=('{}.lookups'.format(APP_NAME), 'TimeseriesResultsLookup'),
-    sampling_feature_lookup=('{}.lookups'.format(APP_NAME), 'SamplingFeatureLookup'),
-    cv_taxonomic_classifier_type=('{}.lookups'.format(APP_NAME), 'CvTaxonomicClassifierTypeLookup'),
-    cv_method_type=('{}.lookups'.format(APP_NAME), 'CvMethodTypeLookup'),
-    cv_site_type=('{}.lookups'.format(APP_NAME), 'CvSitetypeLookup'),
-    cv_action_type=('{}.lookups'.format(APP_NAME), 'CvActionTypeLookup'),
-    cv_sampling_feature_type=('{}.lookups'.format(APP_NAME), 'CvSamplingFeatureTypeLookup'),
-    cv_sampling_feature_geo_type=('{}.lookups'.format(APP_NAME), 'CvSamplingFeatureGeoTypeLookup'),
-    cv_elevation_datum=('{}.lookups'.format(APP_NAME), 'CvElevationDatumLookup'))
-""" END AJAX LOOKUPS CONFIGURATION """
 
 """ SAMPLING FEATURE TYPE LEGEND MAPPING """
 LEGEND_MAP = {
