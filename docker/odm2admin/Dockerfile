@@ -36,4 +36,4 @@ COPY startup.sh /startup.sh
 RUN chmod 755 /wait-for-postgres.sh
 RUN chmod 755 /startup.sh
 
-CMD ["/bin/bash", "/wait-for-postgres.sh", "db", "/startup.sh"]
+CMD ["/bin/bash", "/wait-for-postgres.sh", "127.0.0.1", "/startup.sh"]
