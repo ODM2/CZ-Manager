@@ -19,6 +19,11 @@ from django.db.models import Manager as GeoManager
 from django.contrib.gis.geos import GEOSGeometry
 from django.db import connection
 from django.db import models
+from django.db.models import UUIDField
+from django.core import management
+from django.core.exceptions import ValidationError
+from django.core.management import settings
+from django.contrib.gis.geos import GEOSGeometry
 # from django.forms import ModelFormWithFileField
 # from .forms import DataloggerprogramfilesAdminForm
 # from odm2testapp.forms import VariablesForm
