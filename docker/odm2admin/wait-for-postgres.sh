@@ -12,7 +12,7 @@ until psql -h "$host" -U "postgres" -c '\l'; do
   sleep 1
 done
 
-# psql -v ON_ERROR_STOP=1 --host "$host" --username "postgres" -c "CREATE DATABASE odm2;"
+psql -v ON_ERROR_STOP=0 --host "$host" --username "postgres" -c "CREATE DATABASE odm2;"
 psql -v ON_ERROR_STOP=1 --host "$host" --username "postgres" --dbname "odm2" --file /odm2adminDB.sql
 
 >&2 echo "Postgres is up - executing command"
