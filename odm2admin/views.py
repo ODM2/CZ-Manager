@@ -1820,7 +1820,7 @@ def export_to_hydroshare(request):
     # #metadata = '[{"coverage":{"type":"period", "value":{"start":"01/01/2000", "end":"12/12/2010"}}}, {"creator":{"name":"John Smith"}}, {"creator":{"name":"Lisa Miller"}}]'
     # #extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
     resource_id = hs.createResource(rtype, title, resource_file=fpath, keywords=keywords, abstract=abstract,
-    #                                      metadata=metadata, extra_metadata=extra_metadata)
+                                          metadata=metadata, extra_metadata=extra_metadata)
     # print(resource_id)
     # for resource in hs.getResourceList():
     #     print(resource)
