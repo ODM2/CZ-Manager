@@ -36,7 +36,7 @@ from django.core.mail import EmailMessage
 # from django.core import mail
 from django.core import serializers
 from django.core.management import settings
-from ..templatesAndSettings.settings import exportdb
+from templatesAndSettings.settings import exportdb
 from django.template.response import TemplateResponse
 from django.core.exceptions import ObjectDoesNotExist
 # from hs_restclient_helper import get_oauth_hs
