@@ -47,7 +47,7 @@ from django.forms.models import model_to_dict
 from django.utils.crypto import get_random_string
 # from django.contrib.gis.geos import GEOSGeometry
 # import hs_restclient as hs_r
-#from hs_restclient import HydroShare, HydroShareAuthOAuth2
+from hs_restclient import HydroShare, HydroShareAuthOAuth2
 # from oauthlib.oauth2 import TokenExpiredError
 # from oauthlib.oauth2 import InvalidGrantError, InvalidClientError
 
@@ -1768,8 +1768,8 @@ def export_to_hydroshare(request):
         hs_client_secret = settings.SOCIAL_AUTH_HYDROSHARE_UP_SECRET
         username = request.POST['hydroshareusername']
         password =  request.POST['hydrosharepassword']
-        # auth = HydroShareAuthOAuth2(hs_client_id, hs_client_secret,
-        #                            username=username, password=password)
+        auth = HydroShareAuthOAuth2(hs_client_id, hs_client_secret,
+                                    username=username, password=password)
     else:
         hs_client_id = settings.SOCIAL_AUTH_HYDROSHARE_KEY
         hs_client_secret = settings.SOCIAL_AUTH_HYDROSHARE_SECRET
@@ -1777,8 +1777,8 @@ def export_to_hydroshare(request):
         token = social.extra_data['access_token']
         print(social.extra_data)
         print(token)
-        # auth = HydroShareAuthOAuth2(hs_client_id, hs_client_secret,
-        #                             token=social.extra_data)
+        auth = HydroShareAuthOAuth2(hs_client_id, hs_client_secret,
+                                     token=social.extra_data)
     #hs = get_oauth_hs(request)
     #userInfo = hs.getUserInfo()
     #
@@ -1790,27 +1790,27 @@ def export_to_hydroshare(request):
 
     #auth = HydroShareAuthOAuth2(client_id, client_secret,
     #                            username='', password='')
-    # hs = HydroShare(auth=auth)
-    # username = hs.getUserInfo()
+    hs = HydroShare(auth=auth)
+    username = hs.getUserInfo()
     # print(username)
-    # abstracttext = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
-    # if 'startDate' in request.POST:
-    #     entered_start_date = request.POST['startDate']
-    #     abstracttext += ' data values from: ' + entered_start_date
-    # if 'endDate' in request.POST:
+    abstracttext = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
+    if 'startDate' in request.POST:
+        entered_start_date = request.POST['startDate']
+        abstracttext += ' data values from: ' + entered_start_date
+    if 'endDate' in request.POST:
     #     # print(entered_end_date)
-    #     entered_end_date = request.POST['endDate']
-    #     abstracttext += ' ending on: ' + entered_end_date
+        entered_end_date = request.POST['endDate']
+        abstracttext += ' ending on: ' + entered_end_date
     #
-    # abstract = abstracttext
-    # title = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
-    # keywords = ('test', 'test 2')
-    # rtype = 'GenericResource'
-    # fpath = exportdb.DATABASES['default']['NAME']
+    abstract = abstracttext
+    title = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
+    keywords = ('test', 'test 2')
+    rtype = 'GenericResource'
+    fpath = exportdb.DATABASES['default']['NAME']
     # # print(fpath)
     # #metadata = '[{"coverage":{"type":"period", "value":{"start":"'+entered_start_date +'", "end":"'+ entered_end_date +'"}}}, {"creator":{"name":"Miguel Leon"}}]'
-    # metadata = '[{"coverage":{"type":"period", "value":{"start":"03/26/2017", "end":"04/25/2017"}}}, {"creator":{"name":"Miguel Leon"}}]'
-    # extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
+    metadata = '[{"coverage":{"type":"period", "value":{"start":"03/26/2017", "end":"04/25/2017"}}}, {"creator":{"name":"Miguel Leon"}}]'
+    extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
     #
     # #abstract = 'My abstract'
     # #title = 'My resource'
@@ -1819,7 +1819,7 @@ def export_to_hydroshare(request):
     # #fpath = 'C:/Users/leonmi/Google Drive/ODM2AdminLT2/ODM2SQliteBlank.db'
     # #metadata = '[{"coverage":{"type":"period", "value":{"start":"01/01/2000", "end":"12/12/2010"}}}, {"creator":{"name":"John Smith"}}, {"creator":{"name":"Lisa Miller"}}]'
     # #extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
-    # resource_id = hs.createResource(rtype, title, resource_file=fpath, keywords=keywords, abstract=abstract,
+    resource_id = hs.createResource(rtype, title, resource_file=fpath, keywords=keywords, abstract=abstract,
     #                                      metadata=metadata, extra_metadata=extra_metadata)
     # print(resource_id)
     # for resource in hs.getResourceList():
