@@ -12,7 +12,27 @@ until psql -h "$host" -U "postgres" -c '\l'; do
   sleep 1
 done
 
-psql -v ON_ERROR_STOP=0 --host "$host" --username "postgres" -c "CREATE DATABASE odm2;"
+
+
+# sql to check whether given database exist
+sql1="select count(1) from pg_catalog.pg_database where datname = 'odm2'"
+
+# sql to create database (add other params as needed)
+sql2="create database odm2"
+
+# depending on how PATH is set psql may require a fully qualified path
+cmd="psql -h \"$host\" -U \"postgres\" -t -c \"$sql1\""
+
+db_exists=`eval $cmd`
+
+if [ $db_exists -eq 0 ] ; then
+   # create the database, discard the output
+   psql -v ON_ERROR_STOP=1 --host "$host" --username "postgres" -c "CREATE DATABASE odm2;"
+   eval $cmd
+fi
+
+
+# psql -v ON_ERROR_STOP=1 --host "$host" --username "postgres" -c "CREATE DATABASE odm2;"
 psql -v ON_ERROR_STOP=1 --host "$host" --username "postgres" --dbname "odm2" --file /odm2adminDB.sql
 
 >&2 echo "Postgres is up - executing command"
