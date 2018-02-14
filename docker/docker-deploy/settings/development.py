@@ -2,12 +2,16 @@
 Development settings and globals.
 """
 
-from base import *
+from .base import *
 
 """ DEBUG CONFIGURATION """
 # Disable debugging by default.
 DEBUG = True
 """ END DEBUG CONFIGURATION """
+
+""" EXPORTDB FLAG CONFIGURATION - if set to true this will use Camel case table names for SQLite"""
+EXPORTDB = False
+""" EXPORTDB FLAG CONFIGURATION """
 
 """ ALLOWED HOSTS CONFIGURATION """
 ALLOWED_HOSTS = ['127.0.0.1',]

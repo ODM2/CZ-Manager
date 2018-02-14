@@ -1,3 +1,15 @@
+import sys
+from pathlib import Path # if you haven't already done so
+file = Path(__file__).resolve()
+parent, root = file.parent, file.parents[1]
+sys.path.append(str(root))
+
+# Additionally remove the current file's directory from sys.path
+try:
+    sys.path.remove(str(parent))
+except ValueError: # Already removed
+    pass
+
 from io import StringIO
 import math
 import json
@@ -1766,7 +1778,7 @@ def export_to_hydroshare(request):
         print(social.extra_data)
         print(token)
         auth = HydroShareAuthOAuth2(hs_client_id, hs_client_secret,
-                                    token=social.extra_data)
+                                     token=social.extra_data)
     #hs = get_oauth_hs(request)
     #userInfo = hs.getUserInfo()
     #
@@ -1780,36 +1792,36 @@ def export_to_hydroshare(request):
     #                            username='', password='')
     hs = HydroShare(auth=auth)
     username = hs.getUserInfo()
-    print(username)
+    # print(username)
     abstracttext = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
     if 'startDate' in request.POST:
         entered_start_date = request.POST['startDate']
         abstracttext += ' data values from: ' + entered_start_date
     if 'endDate' in request.POST:
-        # print(entered_end_date)
+    #     # print(entered_end_date)
         entered_end_date = request.POST['endDate']
         abstracttext += ' ending on: ' + entered_end_date
-
+    #
     abstract = abstracttext
     title = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
     keywords = ('test', 'test 2')
     rtype = 'GenericResource'
     fpath = exportdb.DATABASES['default']['NAME']
-    # print(fpath)
-    #metadata = '[{"coverage":{"type":"period", "value":{"start":"'+entered_start_date +'", "end":"'+ entered_end_date +'"}}}, {"creator":{"name":"Miguel Leon"}}]'
+    # # print(fpath)
+    # #metadata = '[{"coverage":{"type":"period", "value":{"start":"'+entered_start_date +'", "end":"'+ entered_end_date +'"}}}, {"creator":{"name":"Miguel Leon"}}]'
     metadata = '[{"coverage":{"type":"period", "value":{"start":"03/26/2017", "end":"04/25/2017"}}}, {"creator":{"name":"Miguel Leon"}}]'
     extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
-
-    #abstract = 'My abstract'
-    #title = 'My resource'
-    #keywords = ('my keyword 1', 'my keyword 2')
-    #rtype = 'GenericResource'
-    #fpath = 'C:/Users/leonmi/Google Drive/ODM2AdminLT2/ODM2SQliteBlank.db'
-    #metadata = '[{"coverage":{"type":"period", "value":{"start":"01/01/2000", "end":"12/12/2010"}}}, {"creator":{"name":"John Smith"}}, {"creator":{"name":"Lisa Miller"}}]'
-    #extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
+    #
+    # #abstract = 'My abstract'
+    # #title = 'My resource'
+    # #keywords = ('my keyword 1', 'my keyword 2')
+    # #rtype = 'GenericResource'
+    # #fpath = 'C:/Users/leonmi/Google Drive/ODM2AdminLT2/ODM2SQliteBlank.db'
+    # #metadata = '[{"coverage":{"type":"period", "value":{"start":"01/01/2000", "end":"12/12/2010"}}}, {"creator":{"name":"John Smith"}}, {"creator":{"name":"Lisa Miller"}}]'
+    # #extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
     resource_id = hs.createResource(rtype, title, resource_file=fpath, keywords=keywords, abstract=abstract,
-                                         metadata=metadata, extra_metadata=extra_metadata)
-    print(resource_id)
+                                          metadata=metadata, extra_metadata=extra_metadata)
+    # print(resource_id)
     # for resource in hs.getResourceList():
     #     print(resource)
     return HttpResponse({'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
