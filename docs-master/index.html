@@ -4,20 +4,12 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>ODM2 Admin &#8212; ODM2-Admin 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '0.1.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
@@ -30,8 +22,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   <div class="document">
     
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -92,12 +83,14 @@
 </div>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -152,26 +145,26 @@ views used for efficiently exporting data as emails.</p>
 <p>Alternatively you can download the source code from github (<a class="reference external" href="https://github.com/ODM2/ODM2-Admin">https://github.com/ODM2/ODM2-Admin</a>) setup a conda
 environment, create an ODM2 database, run the extrasql.sql script (found in the root directory of the source code)
 on that database, and change settings in:</p>
-<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">ODM2</span><span class="o">-</span><span class="n">Admin</span><span class="o">-</span><span class="n">master</span>\<span class="n">templatesAndSettings</span>\<span class="n">settings</span>\<span class="n">base</span><span class="o">.</span><span class="n">py</span>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ODM2</span><span class="o">-</span><span class="n">Admin</span><span class="o">-</span><span class="n">master</span>\<span class="n">templatesAndSettings</span>\<span class="n">settings</span>\<span class="n">base</span><span class="o">.</span><span class="n">py</span>
 <span class="n">ODM2</span><span class="o">-</span><span class="n">Admin</span><span class="o">-</span><span class="n">master</span>\<span class="n">templatesAndSettings</span>\<span class="n">settings</span>\<span class="n">development</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 <p>When you are depolying to production you will want to change the settings in production.py instead of development.py
 You can also have the settings files point to an existing ODM2 database, you will need to run the extrasql.sql on
 the database. For more details on settings see <a class="reference internal" href="ODM2AdminSettings.html#odm2-admin-settings"><span class="std std-ref">ODM2 Admin Settings</span></a></p>
-<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
 </pre></div>
 </div>
 <p>or</p>
-<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">config</span> <span class="o">--</span><span class="n">add</span> <span class="n">channels</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="o">--</span><span class="n">force</span>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">config</span> <span class="o">--</span><span class="n">add</span> <span class="n">channels</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="o">--</span><span class="n">force</span>
 <span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">ENVNAME</span> <span class="n">python</span><span class="o">=</span><span class="mf">2.7</span> <span class="o">--</span><span class="n">file</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
 </pre></div>
 </div>
 <p>or create the conda environment with the development requirements as well:</p>
-<div class="code bash highlight-default"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">ENVNAME</span> <span class="n">python</span><span class="o">=</span><span class="mf">2.7</span> <span class="o">--</span><span class="n">file</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="o">--</span><span class="n">file</span> <span class="n">requirements</span><span class="o">-</span><span class="n">dev</span><span class="o">.</span><span class="n">txt</span> <span class="o">--</span><span class="n">channel</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">ENVNAME</span> <span class="n">python</span><span class="o">=</span><span class="mf">2.7</span> <span class="o">--</span><span class="n">file</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span> <span class="o">--</span><span class="n">file</span> <span class="n">requirements</span><span class="o">-</span><span class="n">dev</span><span class="o">.</span><span class="n">txt</span> <span class="o">--</span><span class="n">channel</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span>
 </pre></div>
 </div>
-<p>You will need to run <code class="docutils literal"><span class="pre">extrasql.sql</span></code> on a postgreSQL instance of ODM2,
+<p>You will need to run <code class="docutils literal notranslate"><span class="pre">extrasql.sql</span></code> on a postgreSQL instance of ODM2,
 a blank schema script can be found here:
 <a class="reference external" href="https://github.com/ODM2/ODM2/tree/master/src/blank_schema_scripts/postgresql">https://github.com/ODM2/ODM2/tree/master/src/blank_schema_scripts/postgresql</a></p>
 <p>Six instances of ODM2 Admin have been deployed</p>
@@ -235,7 +228,7 @@ with detailed descriptions and images from the sandbox. Many of the features of 
       &copy;2017, Miguel Leon.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.6</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
