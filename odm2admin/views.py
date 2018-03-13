@@ -63,6 +63,7 @@ from .models import Citationextensionpropertyvalues
 from .models import Citations
 from .models import CvQualitycode
 from .models import CvAnnotationtype
+from .models import Datasetcitations
 from .models import Datasets
 from .models import Datasetsresults
 from .models import Featureactions
@@ -401,12 +402,11 @@ def ManageCitations(request):
 
 def get_name_of_sampling_feature(selected_result):
     title_feature_action = Featureactions.objects.filter(
-        featureactionid=selected_result.values('featureactionid'))
+        featureactionid=selected_result.featureactionid.featureactionid).get()
     title_sampling_feature = Samplingfeatures.objects.filter(
-        samplingfeatureid=title_feature_action.values('samplingfeatureid'))
-    s = str(title_sampling_feature.values_list('samplingfeaturename', flat=True))
-    name_of_sampling_feature = s.split('\'')[1]
-    return name_of_sampling_feature
+        samplingfeatureid=title_feature_action.samplingfeatureid.samplingfeatureid).get()
+    s = str(title_sampling_feature.samplingfeaturename)
+    return s
 
 
 def get_name_of_variable(selected_result):
@@ -889,8 +889,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
         recordedenddate = Resultextensionpropertyvalues.objects.\
             filter(resultid=selected_resultid).filter(propertyid=EndDateProperty.propertyid).get()
         end_date = recordedenddate.propertyvalue
-        enddt = time.strptime(end_date, "%Y-%m-%d %H:%M")
-        print(enddt)
+        enddt = time.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f")
         dt = datetime.fromtimestamp(mktime(enddt))
         last_day_previous_month = dt - timedelta(days=30)
         entered_start_date = last_day_previous_month.strftime('%Y-%m-%d %H:%M')
@@ -909,7 +908,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
         recordedenddate = Resultextensionpropertyvalues.objects.\
             filter(resultid=selected_resultid).filter(propertyid=EndDateProperty.propertyid).get()
         end_date = recordedenddate.propertyvalue
-        enddt = time.strptime(end_date, "%Y-%m-%d %H:%M")
+        enddt = time.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f")
         dt = datetime.fromtimestamp(mktime(enddt))
         last_day_previous_month = dt - timedelta(days=30)
         entered_start_date = last_day_previous_month.strftime('%Y-%m-%d %H:%M')
@@ -926,7 +925,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
 
     for selectedMResult in selectedMResultSeries:
         i += 1
-        selected_result = Results.objects.filter(resultid=selectedMResult)
+        selected_result = Results.objects.filter(resultid=selectedMResult).get()
         selected_results.append(selected_result)
         # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
 
@@ -1166,7 +1165,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
 
     for selectedMResult in selectedMResultSeries:
         i += 1
-        selected_result = Results.objects.filter(resultid=selectedMResult)
+        selected_result = Results.objects.filter(resultid=selectedMResult).get()
         selected_results.append(selected_result)
         # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
 
@@ -1406,16 +1405,16 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         realenddates = []
         for startdate in startdates:
             if len(startdate.propertyvalue) == 16:
-                realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M"))
+                realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M:%S.%f"))
             elif len(startdate.propertyvalue) == 19:
-                realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M:%S"))
+                realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M:%S.%f"))
             else:
                 realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M:%S.%f"))
         for enddate in enddates:
             if len(enddate.propertyvalue) == 16:
-                realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M")) #%Y-%m-%d %H:%M
+                realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M:%S.%f")) #%Y-%m-%d %H:%M
             elif len(enddate.propertyvalue) == 19:
-                realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M:%S"))
+                realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M:%S.%f"))
             else:
                 realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M:%S.%f"))
         startdate = min(realstartdates).strftime('%Y-%m-%d %H:%M')
@@ -2005,16 +2004,16 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         entered_start_date = entered_start_date.strftime('%Y-%m-%d %H:%M')
     for selectedMResult in selectedMResultSeries:
         i += 1
-        selected_result = Results.objects.filter(resultid=selectedMResult)
+        selected_result = Results.objects.filter(resultid=selectedMResult).get()
         selected_results.append(selected_result)
         # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
 
         tmpname = get_name_of_sampling_feature(selected_result)
         name_of_sampling_features.append(tmpname)
         myresultSeries.append(Timeseriesresultvalues.objects.all()
-                              .filter(~Q(datavalue__lte=-6999))
-                              .filter(valuedatetime__gt=entered_start_date)
-                              .filter(valuedatetime__lt=entered_end_date)
+                              .filter(~Q(datavalue__lte=selectedMResult.variableid.nodatavalue))
+                              .filter(valuedatetime__gte=entered_start_date)
+                              .filter(valuedatetime__lte=entered_end_date)
                               .filter(resultid=selectedMResult).order_by('-valuedatetime'))
 
         data.update({'datavalue' + str(i): []})
@@ -2929,22 +2928,22 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
     selectedMResultsSeries = sortedResults
     for selectedMResult in selectedMResultsSeries:
         i += 1
-        selected_result = Results.objects.filter(resultid=selectedMResult.resultid)
+        selected_result = Results.objects.filter(resultid=selectedMResult.resultid).get()
         # if 'update_result_on_related_feature' in request.POST:
         # raise ValidationError(selected_result)
         selected_results.append(selected_result)
         # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
 
-        tmpname = get_name_of_sampling_feature(selected_result)
+        tmpname = selected_result.featureactionid.samplingfeatureid.samplingfeaturename # get_name_of_sampling_feature(selected_result)
         tmpLocName = tmpname
 
-        tmpname = get_name_of_variable(selected_result)
+        tmpname = selected_result.variableid.variablecode # get_name_of_variable(selected_result)
         unitAndVariable = tmpname
         if name_of_variables.__len__() > 0:
             name_of_variables.append(tmpname)
         else:
             name_of_variables.append(tmpname)
-        tmpname = get_name_of_units(selected_result)
+        tmpname = selected_result.unitsid.unitsname # get_name_of_units(selected_result)
         # if(selectedMResult.resultid==2072):
         # raise ValidationError(tmpname)
         unitAndVariable = unitAndVariable + " " + tmpname
@@ -3061,6 +3060,17 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
     for int_selectedvariableid in selectedMVariableSeries:
         int_selectedvariable_ids.append(int(int_selectedvariableid))
     # if the user hit the export csv button export the measurement results to csv
+    linkExtProperty = Extensionproperties.objects.filter(propertyname="DatasetFileLink").get()
+    datasetresults = Datasetsresults.objects.filter(resultid__in=selectedMResultsSeries)
+    datasets = Datasets.objects.filter(datasetid__in=datasetresults.values("datasetid"))
+    datasetcitations = Datasetcitations.objects.filter(datasetid__in=datasets)
+    citations = Citations.objects.filter(citationid__in=datasetcitations.values("citationid"))
+
+    datasetcitationlinks = {}
+    for citation in citations:
+        extprop = Citationextensionpropertyvalues.objects.filter(citationid=citation).get(propertyid=linkExtProperty)
+        datasetcitationlinks[citation.title] = extprop.propertyvalue
+
     if 'export_data' in request.POST:
         resultValuesSeries = resultValuesSeries.order_by(
             "resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
@@ -3074,6 +3084,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         # raise ValidationError(relatedFeatureList)
         return TemplateResponse(request, template,
                                 {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+                                 'datasetcitationlinks': datasetcitationlinks,
                                  'variableList': variableList,
                                  'SelectedVariables': int_selectedvariable_ids,
                                  'authenticated': authenticated, 'data_disclaimer': data_disclaimer,
@@ -3085,4 +3096,5 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
                                  'SelectedRelatedFeature': selected_relatedfeatid,
                                  'name': request.user, 'site_title': admin.site.site_title,
                                  'site_header': admin.site.site_header,
-                                 'short_title': 'Soils Data'}, )
+                                 'short_title': 'Soils Data'
+                                 }, )
