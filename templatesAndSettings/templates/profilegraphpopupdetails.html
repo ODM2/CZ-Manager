@@ -20,7 +20,14 @@ option {
 	<form action="" method="post">
 	{% csrf_token %} 
 	<table >
-	
+		{% for citation, link in datasetcitationlinks.items %}
+		<tr><td>All data for
+			<a href="{{ link }}" target="_blank">{{ citation }}</a>
+			</td>
+			<td> </td>
+		</tr>
+		{% endfor %}
+	<tr><td>
 		<tr><td><input type="submit" name="update_chart" value="Update Chart" />
 	<input type="submit" name="export_data" value="Export Data" /></td></tr>
 	</table>
