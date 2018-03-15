@@ -1405,16 +1405,16 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         realenddates = []
         for startdate in startdates:
             if len(startdate.propertyvalue) == 16:
-                realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M:%S.%f"))
+                realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M"))
             elif len(startdate.propertyvalue) == 19:
-                realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M:%S.%f"))
+                realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M:%S"))
             else:
                 realstartdates.append(datetime.strptime(startdate.propertyvalue, "%Y-%m-%d %H:%M:%S.%f"))
         for enddate in enddates:
             if len(enddate.propertyvalue) == 16:
-                realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M:%S.%f")) #%Y-%m-%d %H:%M
+                realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M")) #%Y-%m-%d %H:%M
             elif len(enddate.propertyvalue) == 19:
-                realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M:%S.%f"))
+                realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M:%S"))
             else:
                 realenddates.append(datetime.strptime(enddate.propertyvalue, "%Y-%m-%d %H:%M:%S.%f"))
         startdate = min(realstartdates).strftime('%Y-%m-%d %H:%M')
