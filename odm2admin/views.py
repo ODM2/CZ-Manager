@@ -1321,6 +1321,28 @@ def TimeSeriesGraphing(request, feature_action='All'):
                                  'site_header': admin.site.site_header,
                                  'short_title': 'Time Series'}, )
 
+def groupResultsByVariable(sampling_feature):
+    fas = Featureactions.objects.filter(samplingfeatureid=sampling_feature)
+    results = Results.objects.filter(featureactionid__in=fas).order_by('variableid__variable_name')
+    lastresult = None
+    groupedResults = {}
+    firstvar = True
+    lastvarname = None
+    varname = None
+    for result in results:
+        varname = result.variableid.variable_name
+        if lastvarname and lastresult:
+            if  varname == lastvarname and lastresult.unitsid.unit_type == result.unitsid.unit_type:
+                variablename = result.variableid.variable_name
+                if firstvar:
+                    groupedResults[str(variablename)]=[lastresult.resultid]
+                firstvar = False
+                groupedResults[str(variablename)].append(result.resultid)
+            else:
+                firstvar = True
+        lastvarname = varname
+        lastresult = result
+    return groupedResults
 
 def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', dataset='NotSet',
                    resultidu='NotSet',
@@ -1373,6 +1395,8 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                 actions = Actions.objects.filter(actionid__in=featureActions.values("action"))
                 methods = Methods.objects.filter(methodid__in=actions.values("method"))
                 featureActionLocation = samplefeature.samplingfeaturename
+                resultListGrouped = groupResultsByVariable(samplefeature)
+                # print(resultListGrouped)
             else:
                 resultList = Results.objects.filter(featureactionid=feature_action)\
                     .filter(
@@ -1461,7 +1485,8 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                                                 'useDataset': useDataset, 'startDate': startdate,
                                                 'endDate': enddate,
                                                 'authenticated': authenticated, 'methods': methods,
-                                                'resultList': resultList}, )
+                                                'resultList': resultList,
+                                                'resultListGrouped': resultListGrouped}, )
 
 def is_number(s):
     try:
@@ -1509,7 +1534,10 @@ def add_annotation(request):
     lastannotationval = None
     for rid in resultid:
         intrid = int(rid)
+        # print('result id')
+        # print(rid)
         for annotationval in annotationvals:
+            print(annotationval)
             if is_number(annotationval):
                 floatval = float(annotationval)
                 try:
@@ -1526,10 +1554,10 @@ def add_annotation(request):
                         annotationobj.save()
                         tsrv.datavalue = float('nan')
                         tsrv.qualitycodecv = qualitycode
-                        tsrv.save()
+                        tsrv.save(force_update=True)
                     elif cvqualitycode:
                         tsrv.qualitycodecv = qualitycode
-                        tsrv.save()
+                        tsrv.save(force_update=True)
                     tsrvanno = Timeseriesresultvalueannotations(valueid=tsrv,
                                                                 annotationid=annotationobj)
                     tsrvanno.save()
@@ -1793,6 +1821,8 @@ def export_to_hydroshare(request):
     username = hs.getUserInfo()
     # print(username)
     abstracttext = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
+    entered_start_date = None
+    entered_end_date = None
     if 'startDate' in request.POST:
         entered_start_date = request.POST['startDate']
         abstracttext += ' data values from: ' + entered_start_date
@@ -1803,12 +1833,13 @@ def export_to_hydroshare(request):
     #
     abstract = abstracttext
     title = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
-    keywords = ('test', 'test 2')
+    keywords = ('ODM2')
     rtype = 'GenericResource'
     fpath = exportdb.DATABASES['default']['NAME']
     # # print(fpath)
     # #metadata = '[{"coverage":{"type":"period", "value":{"start":"'+entered_start_date +'", "end":"'+ entered_end_date +'"}}}, {"creator":{"name":"Miguel Leon"}}]'
-    metadata = '[{"coverage":{"type":"period", "value":{"start":"03/26/2017", "end":"04/25/2017"}}}, {"creator":{"name":"Miguel Leon"}}]'
+    metadata = '[{"coverage":{"type":"period", "value":{"start":"' + entered_start_date +  '", "end":"' + entered_end_date + '"}}}, ' \
+                '{"creator":{"name":"' +user.get_full_name() +'"}}]'
     extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
     #
     # #abstract = 'My abstract'
@@ -2011,7 +2042,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         tmpname = get_name_of_sampling_feature(selected_result)
         name_of_sampling_features.append(tmpname)
         myresultSeries.append(Timeseriesresultvalues.objects.all()
-                              .filter(~Q(datavalue__lte=selectedMResult.variableid.nodatavalue))
+                              .filter(~Q(datavalue__lte=selected_result.variableid.nodatavalue))
                               .filter(valuedatetime__gte=entered_start_date)
                               .filter(valuedatetime__lte=entered_end_date)
                               .filter(resultid=selectedMResult).order_by('-valuedatetime'))
