@@ -108,7 +108,9 @@ color:#dddddd !important;;
                     point.y >= e.yAxis[0].min && point.y <= e.yAxis[0].max) {
 				if(series.options.allowPointSelect=='true'){
 					point.select(true, true);
-					annotationvals.push(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',point.x),point.y); 
+					if (annotationvals.indexOf(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',point.x)) ==-1){
+						annotationvals.push(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',point.x),point.y);
+					}
 				}
             }
         });
