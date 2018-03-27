@@ -65,6 +65,10 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                                      'resultidu=(?P<resultidu>(\d+))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                re_path(
+                   r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
+                          'resultidu=\[(?P<resultidu>\d+(, \d+)*\])/$',
+                   views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
+               re_path(
                    r'^' + 'graphfa/featureaction=(?P<feature_action>(\d+))/'
                                      'resultidu=(?P<resultidu>(\d+))/'
                                      'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/'
@@ -99,7 +103,6 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                    r'^' + 'mappopup/samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.mappopuploader, name="mappopuploader"),
-
                re_path(
                    r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',

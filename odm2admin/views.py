@@ -17,6 +17,7 @@ import time
 import sys
 import os
 import subprocess
+import re
 from datetime import datetime
 from datetime import timedelta
 from time import mktime
@@ -1380,11 +1381,13 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
     datasetAbstract = None
     methods = None
     methodsOnly = 'False'
+    samplingfeatureid= None
     try:
         if not useDataset:
             if useSamplingFeature:
                 samplefeature = Samplingfeatures.objects.\
                     filter(samplingfeatureid=samplingfeature).get()
+                samplingfeatureid = samplefeature.samplingfeatureid
                 featureActions = Featureactions.objects.\
                     filter(samplingfeatureid=samplefeature).\
                     order_by("action__method")
@@ -1404,6 +1407,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                  ).order_by("featureactionid__action__method")
                 featureActions = Featureactions.objects.filter(featureactionid=feature_action).get()
                 featureActionLocation = featureActions.samplingfeatureid.samplingfeaturename
+                samplingfeatureid = featureActions.samplingfeatureid.samplingfeatureid
                 featureActionMethod = featureActions.action.method.methodname
                 actions = Actions.objects.filter(actionid=featureActions.action.actionid).get()
                 methods = Methods.objects.filter(methodid=actions.method.methodid)
@@ -1481,6 +1485,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                                                 'featureActionLocation': featureActionLocation,
                                                 'data_disclaimer': data_disclaimer,
                                                 'datasetTitle': datasetTitle,
+                                                'samplingfeatureid': samplingfeatureid,
                                                 'datasetAbstract': datasetAbstract,
                                                 'useDataset': useDataset, 'startDate': startdate,
                                                 'endDate': enddate,
@@ -1896,6 +1901,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                             dataset='NotSet',
                             resultidu='NotSet', startdate='NotSet', enddate='NotSet',
                             popup='NotSet'):  # ,startdate='',enddate=''
+    mergeResults='false'
     authenticated = True
     if not request.user.is_authenticated:
         # return HttpResponseRedirect('../')
@@ -1914,6 +1920,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     map_config = settings.MAP_CONFIG
     useDataset = False
     useSamplingFeature = False
+    # samplingfeature = None
     # if 'annotation' in request.POST:
     # pass
     # raise ValidationError(request.POST['annotation'])
@@ -1928,8 +1935,15 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         dataset = int(dataset)
 
     if resultidu != 'NotSet':
-        resultidu = int(resultidu)
-
+        try:
+            # print(resultidu)
+            resultidu = [int(resultidu)]
+        except:
+            resultids = re.findall(r'\d+',resultidu)
+            resultidu = []
+            mergeResults = 'true'
+            for results in resultids:
+                resultidu.append(int(results))
     selected_results = []
     name_of_sampling_features = []
     # name_of_variables = []
@@ -1943,6 +1957,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     datasetTitle = None
     datasetAbstract = None
     methods = None
+    resultListGrouped = None
     # print(settings.MAP_CONFIG['result_value_processing_levels_to_display'])
     if not useDataset:
         if useSamplingFeature:
@@ -1951,6 +1966,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             resultList = Results.objects.filter(featureactionid__in=feature_actions).filter(
                  processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
                  ).order_by("featureactionid","resultid")
+            resultListGrouped = groupResultsByVariable(samplefeature)
             actions = Actions.objects.filter(actionid__in=feature_actions.values("action"))
             methods = Methods.objects.filter(methodid__in=actions.values("method"))
             featureActionLocation = samplefeature.samplingfeaturename
@@ -1960,6 +1976,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                  ).order_by("featureactionid","resultid")
             featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
             featureActionLocation = featureAction.samplingfeatureid.samplingfeaturename
+            resultListGrouped = groupResultsByVariable(featureAction.samplingfeatureid)
             featureActionMethod = featureAction.action.method.methodname
             action = Actions.objects.filter(actionid=featureAction.action.actionid).get()
             methods = Methods.objects.filter(methodid=action.method.methodid)
@@ -1973,17 +1990,29 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
     numresults = resultList.count()
     selectedMResultSeries = []
+    mergedResultSets = []
     for i in range(0, numresults):
         selectionStr = str('selection' + str(i))
         # when annotating you can only select a single time series
         # with a radio button
+        if mergeResults == 'true':
+            selectionStr = str('Mergedselection' + str(i))
         if popup == 'Anno':
             selectionStr = str('selection')
         if selectionStr in request.POST:
             # raise ValidationError(request.POST[selectionStr])
-            for result in resultList:
-                if int(request.POST[selectionStr]) == result.resultid:
-                    selectedMResultSeries.append(int(request.POST[selectionStr]))
+            # print(request.POST[selectionStr])
+            if mergeResults =='true':
+                mergedresults = re.findall('\d+', request.POST[selectionStr])
+                mergedResultSets.append(mergedresults)
+                for mergedresult in mergedresults:
+                    for result in resultList:
+                        if int(mergedresult) == result.resultid:
+                            selectedMResultSeries.append(int(mergedresult))
+            else:
+                for result in resultList:
+                    if int(request.POST[selectionStr]) == result.resultid:
+                        selectedMResultSeries.append(int(request.POST[selectionStr]))
         # if we are annotating we only have a single selection to find
         if popup == 'Anno':
             break
@@ -1998,10 +2027,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                 return HttpResponse(html)
         else:
             try:
-                Results.objects.filter(resultid=int(resultidu)).filter(
-                   processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
-                ).get()
-                selectedMResultSeries.append(int(resultidu))
+                for resultid in resultidu:
+                    selectedMResultSeries.append(resultid)
             except ObjectDoesNotExist:
                 html = "<html><body>No Data Available Yet.</body></html>"
                 return HttpResponse(html)
@@ -2033,40 +2060,57 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             entered_start_date = datetime_entered_end_date - timedelta(
                 map_config['time_series_months'] * 365 / 12)  # .strftime('%Y-%m-%d %H:%M')
         entered_start_date = entered_start_date.strftime('%Y-%m-%d %H:%M')
-    for selectedMResult in selectedMResultSeries:
-        i += 1
-        selected_result = Results.objects.filter(resultid=selectedMResult).get()
-        selected_results.append(selected_result)
-        # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
+    if mergeResults == 'false':
+        for selectedMResult in selectedMResultSeries:
+            i += 1
+            selected_result = Results.objects.filter(resultid=selectedMResult).get()
+            selected_results.append(selected_result)
+            # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
 
-        tmpname = get_name_of_sampling_feature(selected_result)
-        name_of_sampling_features.append(tmpname)
-        myresultSeries.append(Timeseriesresultvalues.objects.all()
-                              .filter(~Q(datavalue__lte=selected_result.variableid.nodatavalue))
-                              .filter(valuedatetime__gte=entered_start_date)
-                              .filter(valuedatetime__lte=entered_end_date)
-                              .filter(resultid=selectedMResult).order_by('-valuedatetime'))
+            tmpname = get_name_of_sampling_feature(selected_result)
+            name_of_sampling_features.append(tmpname)
+            myresultSeries.append(Timeseriesresultvalues.objects.all()
+                                  .filter(~Q(datavalue__lte=selected_result.variableid.nodatavalue))
+                                  .filter(valuedatetime__gte=entered_start_date)
+                                  .filter(valuedatetime__lte=entered_end_date)
+                                  .filter(resultid=selectedMResult).order_by('-valuedatetime'))
+            data.update({'datavalue' + str(i): []})
+    else:
+        if len(mergedResultSets) > 0:
+            # print(mergedResultSets)
+            for mergedResultSet in mergedResultSets:
 
-        data.update({'datavalue' + str(i): []})
-    # myresultSeriesExport = None
-    # if 'useDates' in request.POST:
-    #     use_dates = request.POST['useDates']
-    #     myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
-    #             .filter(valuedatetime__gte=entered_start_date) \
-    #             .filter(valuedatetime__lte=entered_end_date) \
-    #             .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
-    #
-    # else:
-    #     myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
-    #             .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
-    # if the user hit the export csv button export the measurement results to csv
-    # emailsent = False
-    # outEmail = ''
-    # if 'outEmail' in request.POST:
-    #         outEmail = request.POST['outEmail']
-    # if 'email_data' in request.POST:
-    #     emailspreadsheet2.after_response(request, myresultSeriesExport, False) # for command str_selectedresultid_ids
-    #     emailsent=True
+                i += 1
+                selected_result = Results.objects.filter(resultid__in=mergedResultSet).first()
+                # print('result set')
+                # print(mergedResultSet)
+                # print(selected_result)
+                selected_results.append(selected_result)
+                # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
+
+                tmpname = get_name_of_sampling_feature(selected_result)
+                name_of_sampling_features.append(tmpname)
+                myresultSeries.append(Timeseriesresultvalues.objects.all()
+                                      .filter(~Q(datavalue__lte=selected_result.variableid.nodatavalue))
+                                      .filter(valuedatetime__gte=entered_start_date)
+                                      .filter(valuedatetime__lte=entered_end_date)
+                                      .filter(resultid__in=mergedResultSet).order_by('-valuedatetime'))
+                data.update({'datavalue' + str(i): []})
+        else:
+            i=1
+            selected_result = Results.objects.filter(resultid__in=selectedMResultSeries).first()
+            selected_results.append(selected_result)
+            # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
+
+            tmpname = get_name_of_sampling_feature(selected_result)
+            name_of_sampling_features.append(tmpname)
+            myresultSeries.append(Timeseriesresultvalues.objects.all()
+                                  .filter(~Q(datavalue__lte=selected_result.variableid.nodatavalue))
+                                  .filter(valuedatetime__gte=entered_start_date)
+                                  .filter(valuedatetime__lte=entered_end_date)
+                                  .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime'))
+            data.update({'datavalue' + str(i): []})
+
 
     i = 0
     annotationsexist = False
@@ -2080,9 +2124,13 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             # print('time series result value annotation count ' + str(tsrvas.count()))
             # (tsrvas.query)
             annotationsexist = True
+    #print('series')
+    #print(myresultSeries)
     for myresults in myresultSeries:
         i += 1
         resultannotationsexist = False
+        # print('1st result')
+        # print(myresults[0])
         for result in myresults:
             start = datetime(1970, 1, 1)
             delta = result.valuedatetime - start
@@ -2091,6 +2139,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                 dataval = 'null'
             else:
                 dataval = result.datavalue
+            # print(data.keys())
             data['datavalue' + str(i)].append(
                 [mills,dataval])
             if popup == 'Anno':
@@ -2119,6 +2168,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     variable = ''
     aggStatistic = ''
     series = []
+    # print('selected result series')
+    # print(selectedMResultSeries)
     r = Results.objects.filter(resultid__in=selectedMResultSeries)\
         .order_by("featureactionid","resultid")  # .order_by("unitsid")
 
@@ -2138,9 +2189,14 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         elif not unit == '':
             seriesStr += ' - ' + str(unit)
             name_of_units.append(str(unit))
+        # print('series unit and var')
+        # print(str(unit) + ' - ' + str(variable))
+        # print(len(mergedResultSets))
         series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
                       str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
                       "data": data['datavalue' + str(i)]})
+        if mergeResults and len(mergedResultSets) <= i:
+            break
 
         if popup == 'Anno':
             relatedresults = Results.objects.filter(
@@ -2209,6 +2265,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                                                 'startDate': entered_start_date,
                                                 'endDate': entered_end_date,
                                                 'popup': popup,
+                                                'mergeResults':mergeResults,
+                                                'resultListGrouped':resultListGrouped,
                                                 # 'emailsent': emailsent,
                                                 # 'outEmail': outEmail,
                                                 'useSamplingFeature': useSamplingFeature,
