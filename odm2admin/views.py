@@ -1324,17 +1324,19 @@ def TimeSeriesGraphing(request, feature_action='All'):
 
 def groupResultsByVariable(sampling_feature):
     fas = Featureactions.objects.filter(samplingfeatureid=sampling_feature)
-    results = Results.objects.filter(featureactionid__in=fas).order_by('variableid__variable_name')
+    results = Results.objects.filter(featureactionid__in=fas).order_by('variableid__variablecode',
+                                                                       'unitsid.unit_type','processing_level')
     lastresult = None
     groupedResults = {}
     firstvar = True
     lastvarname = None
     varname = None
     for result in results:
-        varname = result.variableid.variable_name
+        varname = result.variableid.variablecode
         if lastvarname and lastresult:
-            if  varname == lastvarname and lastresult.unitsid.unit_type == result.unitsid.unit_type:
-                variablename = result.variableid.variable_name
+            if  varname == lastvarname and lastresult.unitsid.unit_type == result.unitsid.unit_type \
+                    and lastresult.processing_level == result.processing_level:
+                variablename = result.variableid.variablecode
                 if firstvar:
                     groupedResults[str(variablename)]=[lastresult.resultid]
                 firstvar = False
