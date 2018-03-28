@@ -1324,27 +1324,36 @@ def TimeSeriesGraphing(request, feature_action='All'):
 
 def groupResultsByVariable(sampling_feature):
     fas = Featureactions.objects.filter(samplingfeatureid=sampling_feature)
-    results = Results.objects.filter(featureactionid__in=fas).order_by('variableid__variablecode',
-                                                                       'unitsid.unit_type','processing_level')
-    lastresult = None
+    results = Results.objects.filter(featureactionid__in=fas)
     groupedResults = {}
-    firstvar = True
-    lastvarname = None
-    varname = None
+
     for result in results:
-        varname = result.variableid.variablecode
-        if lastvarname and lastresult:
-            if  varname == lastvarname and lastresult.unitsid.unit_type == result.unitsid.unit_type \
-                    and lastresult.processing_level == result.processing_level:
-                variablename = result.variableid.variablecode
-                if firstvar:
-                    groupedResults[str(variablename)]=[lastresult.resultid]
-                firstvar = False
-                groupedResults[str(variablename)].append(result.resultid)
-            else:
-                firstvar = True
-        lastvarname = varname
-        lastresult = result
+        # print('id: ' + str(result.featureactionid.featureactionid) +' '+ str(result.featureactionid))
+        #if str(result.variableid.variable_name) == 'Water temperature':
+        #    print('var code: ' + str(result.variableid.variable_name) + ' var id ' + str(
+        #        result.variableid.variableid) + ' unit_type: ' + str(result.unitsid.unit_type) +
+        #          ' processing level: ' + str(result.processing_level) + ' id: ' + str(result.resultid))
+
+        seriesname = str(result.variableid.variable_name) + '; units: ' + str(result.unitsid.unitsabbreviation) +\
+                     '; ' + str(result.processing_level)
+
+        if str(seriesname) in groupedResults:
+            groupedResults[str(seriesname)].append(result.resultid)
+        else:
+            groupedResults[str(seriesname)] = [result.resultid]
+
+    print('grouped results')
+    deletemes = []
+    for groupedResult in groupedResults:
+        print(groupedResult)
+        i = 0
+        for result in groupedResults[groupedResult]:
+            print(result) #,' : ',groupedResults[groupedResult][result]
+            i +=1
+        if i == 1:
+            deletemes.append(groupedResult)
+    for deleteme in deletemes:
+        groupedResults.pop(deleteme)
     return groupedResults
 
 def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', dataset='NotSet',
