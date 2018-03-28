@@ -1342,13 +1342,13 @@ def groupResultsByVariable(sampling_feature):
         else:
             groupedResults[str(seriesname)] = [result.resultid]
 
-    print('grouped results')
+    # print('grouped results')
     deletemes = []
     for groupedResult in groupedResults:
-        print(groupedResult)
+        # print(groupedResult)
         i = 0
         for result in groupedResults[groupedResult]:
-            print(result) #,' : ',groupedResults[groupedResult][result]
+            # print(result) #,' : ',groupedResults[groupedResult][result]
             i +=1
         if i == 1:
             deletemes.append(groupedResult)
