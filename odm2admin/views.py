@@ -1617,12 +1617,13 @@ def addL1timeseries(request):
                         tsrv.valueid = None
                         tsrv.save()
                         tsrva.valueid = tsrv
-                        print(tsrv.valueid)
+                        # print(tsrv.valueid)
                         tsrva.save()
                     except ObjectDoesNotExist:
                         tsrv.valueid = None
                         tsresultTocopyBulk.append(tsrv)
                 newtsrv = Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
+
             elif createorupdateL1 == "update":
                 tsresultL0 = Timeseriesresults.objects.get(resultid=result)
                 resultL0 = Results.objects.get(resultid=result)
@@ -1664,7 +1665,7 @@ def addL1timeseries(request):
                             tsrv.valueid = None
                             tsrv.save()
                             tsrva.valueid = tsrv
-                            print(tsrv.valueid)
+                            # print(tsrv.valueid)
                             tsrva.save()
                         except ObjectDoesNotExist:
                             tsrv.valueid = None
@@ -1678,7 +1679,7 @@ def addL1timeseries(request):
                             tsrv.valueid = None
                             tsrv.save()
                             tsrva.valueid = tsrv
-                            print(tsrv.valueid)
+                            # print(tsrv.valueid)
                             tsrva.save()
                         except ObjectDoesNotExist:
                             tsrv.valueid = None
@@ -2206,7 +2207,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
                       str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
                       "data": data['datavalue' + str(i)]})
-        if mergeResults and len(mergedResultSets) <= i:
+        if mergeResults =='true' and len(mergedResultSets) <= i:
             break
 
         if popup == 'Anno':
