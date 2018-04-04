@@ -214,6 +214,25 @@ class ResultsdataqualityAdmin(ReadOnlyAdmin):
     list_display = ('resultid', 'dataqualityid')
 
 
+class DatasetsResultsInline(admin.StackedInline):
+    model = Datasetsresults
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('datasetid',
+                       'resultid',
+                       )
+        }),
+    )
+    # extra = 0
+
+class ReadOnlyDatasetsResultsInline(DatasetsResultsInline):
+    readonly_fields = DatasetsResultsInline.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
+
 class DatasetsresultsAdminForm(ModelForm):
     resultid = make_ajax_field(Datasetsresults, 'resultid',
                                'result_lookup')
@@ -1432,11 +1451,11 @@ class DatasetsAdminForm(ModelForm):
 class DatasetsAdmin(ReadOnlyAdmin):
     # For readonly usergroup
     user_readonly = [p.name for p in Datasets._meta.get_fields() if not p.one_to_many]
-    user_readonly_inlines = list()
+    user_readonly_inlines = [ReadOnlyDatasetsResultsInline]
 
     # For admin users
     form = DatasetsAdminForm
-    inlines_list = list()
+    inlines_list = [DatasetsResultsInline]
 
     list_display = ['datasetcode', 'datasettitle', 'datasettypecv']
 
