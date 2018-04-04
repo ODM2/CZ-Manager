@@ -214,17 +214,27 @@ class ResultsdataqualityAdmin(ReadOnlyAdmin):
     list_display = ('resultid', 'dataqualityid')
 
 
+
+class DatasetsresultsInlineAdminForm(ModelForm):
+    resultid = AutoCompleteSelectField('result_lookup', required=True,
+                                       help_text='A data result',
+                                       label='Data result',show_help_text =None)
+
+    class Meta:
+        model = Datasetsresults
+        fields = ['datasetid', 'bridgeid', 'resultid']
+
 class DatasetsResultsInline(admin.StackedInline):
     model = Datasetsresults
+    form = DatasetsresultsInlineAdminForm
     fieldsets = (
         ('Details', {
             'classes': ('collapse',),
-            'fields': ('datasetid',
-                       'resultid',
+            'fields': ('datasetid', 'bridgeid', 'resultid'
                        )
         }),
     )
-    # extra = 0
+    extra = 0
 
 class ReadOnlyDatasetsResultsInline(DatasetsResultsInline):
     readonly_fields = DatasetsResultsInline.fieldsets[0][1]['fields']
