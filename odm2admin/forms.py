@@ -1621,7 +1621,10 @@ def createODM2SQLiteFile(results,dataset):
     print(commandstring)
     command = settings.BASE_DIR + '/scripts/create_sqlite_file2.sh' # + dbfile2 + ' %>> ' + settings.BASE_DIR +'/logging/sqlite_export.log'
     st = os.stat(command)
-    os.chmod(command, st.st_mode | stat.S_IEXEC)
+    try:
+        os.chmod(command, st.st_mode | stat.S_IEXEC)
+    except OSError as e:
+        print("can't change file permissions, set files in the script directory to executable")
     # print(command)
     sys.stdout = sysout
     print(commandstring)
