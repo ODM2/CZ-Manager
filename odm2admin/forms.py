@@ -1603,10 +1603,10 @@ def createODM2SQLiteFile(results,dataset):
 
     commandstring += path + '/manageexport.py'
     commandstring += ' create_sqlite_export2 '
-    commandstring += dbfile2
+    commandstring += dbfile2 + ' '
     fixturelist = []
     for x in range(1,fixturecount):
-        tmpfixture1 = ' tmp' + str(x) + '.json'  # + random_string
+        tmpfixture1 = 'tmp' + str(x) + '.json'  # + random_string
         commandstring +=loc + tmpfixture1 + ' '
         fixturelist.append(loc + tmpfixture1)
 
