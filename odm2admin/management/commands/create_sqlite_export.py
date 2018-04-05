@@ -46,5 +46,5 @@ class Command(BaseCommand):
             management.call_command('loaddata',jsonfile1)  # ,database='export'
             management.call_command('loaddata',jsonfile2)
             # print('end data load')
-        except Exception, e:
+        except Exception as e:
             return e
