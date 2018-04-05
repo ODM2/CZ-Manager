@@ -1598,14 +1598,7 @@ def createODM2SQLiteFile(results,dataset):
     #create_sqlite_export
     # sys.stdout = sysout
     commandstring = ''
-    regex = re.compile('.*python3.\d+$')
-    for path in sys.path:
-        # print(path)
-        if re.match(regex,path):
-            pythonpath = path
-            # print('match')
-            # print(path)
-    pythonpath = 'python'
+
     commandstring +=sys.executable + ' '
 
     commandstring += path + '/manageexport.py'
@@ -1613,7 +1606,7 @@ def createODM2SQLiteFile(results,dataset):
     commandstring += dbfile2
     fixturelist = []
     for x in range(1,fixturecount):
-        tmpfixture1 = 'tmp' + str(x) + '.json'  # + random_string
+        tmpfixture1 = ' tmp' + str(x) + '.json'  # + random_string
         commandstring +=loc + tmpfixture1 + ' '
         fixturelist.append(loc + tmpfixture1)
 
@@ -1624,7 +1617,7 @@ def createODM2SQLiteFile(results,dataset):
     try:
         os.chmod(command, st.st_mode | stat.S_IEXEC)
     except OSError as e:
-        print("can't change file permissions, set files in the script directory to executable")
+        pass
     # print(command)
     sys.stdout = sysout
     print(commandstring)
