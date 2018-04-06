@@ -1664,18 +1664,13 @@ def export_to_hydroshare(request,results, datasets):
     # print(username)
     abstracttext = ''
     title = ''
-    datasetcount = datasets.count()
-    for dataset in datasets:
-        if datasetcount > 1:
-            abstracttext += 'ODM2 Admin dataset: ' +  str(dataset.datasettitle) + '; '
-            title += 'ODM2 Admin dataset ' + str(dataset.datasettitle) + ';'
-        else:
-            abstracttext += 'ODM2 Admin dataset: ' + str(dataset.datasettitle)
-            title += 'ODM2 Admin dataset ' + str(dataset.datasettitle)
+
+    abstracttext += 'ODM2 Admin dataset: ' + str(datasets.datasettitle)
+    title += 'ODM2 Admin dataset ' + str(datasets.datasettitle)
     abstract = abstracttext
     keywords = ['ODM2']
     rtype = 'GenericResource'
-    fpath = exportdb.DATABASES['default']['NAME']
+    fpath = str(exportdb.DATABASES['default']['NAME'])
     # # print(fpath)
     # #metadata = '[{"coverage":{"type":"period", "value":{"start":"'+entered_start_date +'", "end":"'+ entered_end_date +'"}}}, {"creator":{"name":"Miguel Leon"}}]'
     metadata = '[{"coverage":{"type":"period", "value":{"start":"' + str(startdate) +  '", "end":"' + str(enddate) + '"}}}, ' \
