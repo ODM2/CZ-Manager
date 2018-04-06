@@ -1673,12 +1673,12 @@ def export_to_hydroshare(request,results, datasets):
             abstracttext += 'ODM2 Admin dataset: ' + str(dataset.datasettitle)
             title += 'ODM2 Admin dataset ' + str(dataset.datasettitle)
     abstract = abstracttext
-    keywords = ('ODM2')
+    keywords = ['ODM2']
     rtype = 'GenericResource'
     fpath = exportdb.DATABASES['default']['NAME']
     # # print(fpath)
     # #metadata = '[{"coverage":{"type":"period", "value":{"start":"'+entered_start_date +'", "end":"'+ entered_end_date +'"}}}, {"creator":{"name":"Miguel Leon"}}]'
-    metadata = '[{"coverage":{"type":"period", "value":{"start":"' + startdate +  '", "end":"' + enddate + '"}}}, ' \
+    metadata = '[{"coverage":{"type":"period", "value":{"start":"' + str(startdate) +  '", "end":"' + str(enddate) + '"}}}, ' \
                 '{"creator":{"name":"' +user.get_full_name() +'"}}]'
     extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
     #
@@ -1689,8 +1689,9 @@ def export_to_hydroshare(request,results, datasets):
     # #fpath = 'C:/Users/leonmi/Google Drive/ODM2AdminLT2/ODM2SQliteBlank.db'
     # #metadata = '[{"coverage":{"type":"period", "value":{"start":"01/01/2000", "end":"12/12/2010"}}}, {"creator":{"name":"John Smith"}}, {"creator":{"name":"Lisa Miller"}}]'
     # #extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
-    resource_id = hs.createResource(rtype, title, resource_file=fpath, keywords=keywords, abstract=abstract,
-                                          metadata=metadata, extra_metadata=extra_metadata)
+    resource_id = hs.createResource(rtype, title, resource_file=fpath,
+                                    resource_filename='ODM2SQLiteDB', keywords=keywords,
+                                    abstract=abstract,metadata=metadata, extra_metadata=extra_metadata)
     # print(resource_id)
     # for resource in hs.getResourceList():
     #     print(resource)
