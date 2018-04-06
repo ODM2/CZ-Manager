@@ -1629,24 +1629,25 @@ def createODM2SQLiteFile(results,dataset):
     return myresultSeriesExport, startdate, enddate,fixturecount
 
 def export_to_hydroshare(request,results, datasets):
+    username = None
+    password = None
+    auth = None
 
     valuestoexport,startdate,enddate,fixturecount = createODM2SQLiteFile(results,datasets)
-
+    if 'hydroshareUsername' in request.POST and 'hydrosharePassword' in request.POST:
+        hs_client_id = settings.SOCIAL_AUTH_HYDROSHARE_UP_KEY
+        hs_client_secret = settings.SOCIAL_AUTH_HYDROSHARE_UP_SECRET
+        username = request.POST['hydroshareUsername']
+        password =  request.POST['hydrosharePassword']
+        auth = HydroShareAuthOAuth2(hs_client_id, hs_client_secret,
+                                    username=username, password=password)
+    # print(username)
+    # print(password)
     export_complete = True
     resource_link = ''
     user = request.user
     # print(request.POST['hydroshareusername'])
-    username = None
-    password = None
-    if 'hydroshareusername' in request.POST and 'hydrosharepassword' in request.POST:
-        hs_client_id = settings.SOCIAL_AUTH_HYDROSHARE_UP_KEY
-        hs_client_secret = settings.SOCIAL_AUTH_HYDROSHARE_UP_SECRET
-        username = request.POST['hydroshareusername']
-        password =  request.POST['hydrosharepassword']
-        auth = HydroShareAuthOAuth2(hs_client_id, hs_client_secret,
-                                    username=username, password=password)
-    print(username)
-    print(password)
+
     #hs = get_oauth_hs(request)
     #userInfo = hs.getUserInfo()
     #
@@ -1659,12 +1660,19 @@ def export_to_hydroshare(request,results, datasets):
     #auth = HydroShareAuthOAuth2(client_id, client_secret,
     #                            username='', password='')
     hs = HydroShare(auth=auth)
-    username = hs.getUserInfo()
+    # username = hs.getUserInfo()
     # print(username)
-    abstracttext = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
-
+    abstracttext = ''
+    title = ''
+    datasetcount = datasets.count()
+    for dataset in datasets:
+        if datasetcount > 1:
+            abstracttext += 'ODM2 Admin dataset: ' +  str(dataset.datasettitle) + '; '
+            title += 'ODM2 Admin dataset ' + str(dataset.datasettitle) + ';'
+        else:
+            abstracttext += 'ODM2 Admin dataset: ' + str(dataset.datasettitle)
+            title += 'ODM2 Admin dataset ' + str(dataset.datasettitle)
     abstract = abstracttext
-    title = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
     keywords = ('ODM2')
     rtype = 'GenericResource'
     fpath = exportdb.DATABASES['default']['NAME']
