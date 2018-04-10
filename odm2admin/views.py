@@ -1511,20 +1511,153 @@ def is_number(s):
     except ValueError:
         return False
 
+def add_shiftvalues(request):
+    shift=None
+    error = None
+    resultid = None
+    shiftvals = None
+    lastshiftval = None
+    firstshiftval = None
+    realshiftvals = []
+    response_data = {}
+    if 'shift' in request.POST:
+        shift = float(request.POST['shift'])
+        # print(offset)
+    if 'shiftvals[]' in request.POST:
+        shiftvals = request.POST.getlist('shiftvals[]')
+        # print(annotationvals)
+    if 'resultidu[]' in request.POST:
+        resultid = request.POST.getlist('resultidu[]')
+        # print('resultid: ' + str(resultid))
+
+    for rid in resultid:
+        intrid = int(rid)
+        # print('result id')
+        # print(rid)
+        firstdate = shiftvals[0]
+        lastdate = shiftvals[-2]
+        # print(firstdate)
+        # print(lastdate)
+        valstochange = []
+        for shiftval in shiftvals:
+            if is_number(shiftval):
+                valstochange.append(float(shiftval))
+        tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valuedatetime__gte=firstdate).filter(
+            valuedatetime__lte=lastdate).filter(datavalue__in=valstochange).order_by('valuedatetime')
+        realshiftvals = tsrvs
+        #
+        # for shiftval in shiftvals:
+        #     # print(offsetval)
+        #     if is_number(shiftval):
+        #         floatval = float(shiftval)
+        #         # print(rid)
+        #         # print(lastshiftval)
+        #         # print(shift)
+        #         # print(floatval)
+        #         tsrvquery = Timeseriesresultvalues.objects.filter(resultid=rid).filter(
+        #             valuedatetime=lastshiftval).filter(datavalue=floatval)
+        #         # print(tsrvquery.query)
+        #         try:
+        #             tsrv = tsrvquery.get()
+        #             realshiftvals.append(tsrv)
+        #             # tsrv.datavalue = tsrv.datavalue + floatval
+        #             # tsrv.save()
+        #         except ObjectDoesNotExist:
+        #             # print('nope')
+        #             pass
+        #         # print(tsrv)
+        #     lastshiftval = shiftval
+    valcount = realshiftvals.count()
+    normshift = shift - realshiftvals.last().datavalue
+    shiftval = normshift / valcount
+    k = 1
+    for tsrv in realshiftvals:
+        if k > 1:
+            tsrv.datavalue = tsrv.datavalue + (shiftval*k)
+            tsrv.save()
+        # print(tsrv.datavalue)
+        k +=1
+
+    return HttpResponse(json.dumps(response_data),content_type='application/json')
+
+
+def add_offset(request):
+    offset=None
+    error = None
+    resultid = None
+    offsetvals = None
+    response_data = {}
+    if 'offset' in request.POST:
+        offset = float(request.POST['offset'])
+        # print(offset)
+    if 'offsetvals[]' in request.POST:
+        offsetvals = request.POST.getlist('offsetvals[]')
+        # print(annotationvals)
+    if 'resultidu[]' in request.POST:
+        resultid = request.POST.getlist('resultidu[]')
+        # print('resultid: ' + str(resultid))
+    valcount = 0
+    for rid in resultid:
+        intrid = int(rid)
+        # print('result id')
+        # print(rid)
+        firstdate = offsetvals[0]
+        lastdate = offsetvals[-2]
+        # print(firstdate)
+        # print(lastdate)
+        valstochange = []
+        for offsetval in offsetvals:
+            if is_number(offsetval):
+                valstochange.append(float(offsetval))
+        tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valuedatetime__gte=firstdate).filter(
+            valuedatetime__lte=lastdate).filter(datavalue__in=valstochange)
+        for tsrv in tsrvs:
+            tsrv.datavalue = tsrv.datavalue + offset
+            tsrv.save()
+            # print(tsrv)
+        # for offsetval in offsetvals:
+        #     # print(offsetval)
+        #     if is_number(offsetval):
+        #         floatval = float(offsetval)
+        #         print(rid)
+        #         print(lastoffsetval)
+        #         print(floatval)
+        #         # print(floatval)
+        #         tsrvquery = Timeseriesresultvalues.objects.filter(resultid=rid).filter(
+        #             valuedatetime=lastoffsetval).filter(datavalue=floatval)
+        #         # print(tsrvquery.query)
+        #         try:
+        #             # print('try')
+        #             tsrv = tsrvquery.get()
+        #             tsrv.datavalue = tsrv.datavalue + offset
+        #             tsrv.save()
+        #             valcount +=1
+        #             print(tsrv)
+        #         except ObjectDoesNotExist as e:
+        #             print(e)
+        #             pass
+        #         # print(tsrv)
+        #     lastoffsetval = offsetval
+    # print('here')
+    response_data['valuesadded'] = valcount
+    return HttpResponse(json.dumps(response_data),content_type='application/json')
+
 def add_annotation(request):
     # print('annotate')
-    resultid = None
     resultid = None
     annotationvals = None
     annotation = None
     setNaNstr = None
     setNaN = False
     cvqualitycode = None
+    response_data = {}
+
     if 'resultidu[]' in request.POST:
         resultid = request.POST.getlist('resultidu[]')
         # print(resultid)
     if 'annotation' in request.POST:
         annotation = str(request.POST['annotation'])
+        response_data['annotation'] = annotation
         # print(annotation)
     # annotationtype
     if 'cvqualitycode' in request.POST:
@@ -1552,40 +1685,45 @@ def add_annotation(request):
         intrid = int(rid)
         # print('result id')
         # print(rid)
+        valstochange = []
         for annotationval in annotationvals:
-            print(annotationval)
             if is_number(annotationval):
-                floatval = float(annotationval)
-                try:
-                    tsrvquery = Timeseriesresultvalues.objects.filter(resultid=intrid).filter(
-                        valuedatetime=lastannotationval).filter(datavalue=floatval)
-                    # print(tsrvquery.query)
-                    tsrv = tsrvquery.get()
-                    if setNaN:
-                        annotation += ' original value was ' + str(tsrv.datavalue)
-                        annotationobj = Annotations(annotationtypecv= annotationtype, annotationcode='',
-                                                    annotationtext=annotation,
-                                                    annotationdatetime=datetime.now(),
-                                                    annotationutcoffset=4)
-                        annotationobj.save()
-                        tsrv.datavalue = float('nan')
-                        tsrv.qualitycodecv = qualitycode
-                        tsrv.save(force_update=True)
-                    elif cvqualitycode:
-                        tsrv.qualitycodecv = qualitycode
-                        tsrv.save(force_update=True)
-                    tsrvanno = Timeseriesresultvalueannotations(valueid=tsrv,
-                                                                annotationid=annotationobj)
-                    tsrvanno.save()
-                except ObjectDoesNotExist:
-                    print('no matching time series result value for query')
-                    print(tsrvquery.query)
-                # tsrvanno.save()
+                valstochange.append(float(annotationval))
+        firstdate = annotationvals[0]
+        lastdate = annotationvals[-2]
+        # print(firstdate)
+        # print(lastdate)
+        tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valuedatetime__gte=firstdate).filter(
+            valuedatetime__lte=lastdate).filter(datavalue__in=valstochange)
+        for tsrv in tsrvs:
+            if setNaN:
+                annotation += ' original value was ' + str(tsrv.datavalue)
+                annotationobj = Annotations(annotationtypecv= annotationtype, annotationcode='',
+                                            annotationtext=annotation,
+                                            annotationdatetime=datetime.now(),
+                                            annotationutcoffset=4)
+                annotationobj.save()
+                tsrv.datavalue = float('nan')
+                tsrv.qualitycodecv = qualitycode
+                tsrv.save(force_update=True)
+                # print(tsrv)
+            elif cvqualitycode:
+                tsrv.qualitycodecv = qualitycode
+                tsrv.save(force_update=True)
+            try:
+                tsrvanno = Timeseriesresultvalueannotations.objects.filter(valueid=tsrv).get()
+                tsrvanno.annotationid = annotationobj
+            except ObjectDoesNotExist:
+                tsrvanno = Timeseriesresultvalueannotations(valueid=tsrv,
+                                                            annotationid=annotationobj)
+            tsrvanno.save()
+            # print(tsrvanno)
+        # tsrvanno.save()
                 # print(tsrvanno.valueid)
-            lastannotationval = annotationval
+        #     lastannotationval = annotationval
     # if resultidu != 'NotSet':
     #    resultidu = int(resultidu)
-    return HttpResponse({'prefixpath': settings.CUSTOM_TEMPLATE_PATH, },content_type='application/json')
+    return HttpResponse(json.dumps(response_data),content_type='application/json')
 
 def addL1timeseries(request):
     resultid = None
@@ -1850,14 +1988,14 @@ def export_to_hydroshare(request):
     #
     abstract = abstracttext
     title = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
-    keywords = ('ODM2')
+    keywords = ['ODM2']
     rtype = 'GenericResource'
     fpath = exportdb.DATABASES['default']['NAME']
     # # print(fpath)
     # #metadata = '[{"coverage":{"type":"period", "value":{"start":"'+entered_start_date +'", "end":"'+ entered_end_date +'"}}}, {"creator":{"name":"Miguel Leon"}}]'
-    metadata = '[{"coverage":{"type":"period", "value":{"start":"' + entered_start_date +  '", "end":"' + entered_end_date + '"}}}, ' \
-                '{"creator":{"name":"' +user.get_full_name() +'"}}]'
-    extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
+    metadata = str('[{"coverage":{"type":"period", "value":{"start":"' + entered_start_date +  '", "end":"' + entered_end_date + '"}}}, ' \
+                '{"creator":{"name":"' +user.get_full_name() +'"}}]')
+    extra_metadata = str('{"key-1": "value-1", "key-2": "value-2"}')
     #
     # #abstract = 'My abstract'
     # #title = 'My resource'
@@ -1883,6 +2021,16 @@ def email_data_from_graph(request):
     myresultSeriesExport = []
     if 'email_data' in request.POST and 'myresultSeriesExport[]' in request.POST:
         selectedMResultSeries = request.POST.getlist('myresultSeriesExport[]')
+        try:
+            # print(resultidu)
+            resultidu = [int(selectedMResultSeries)]
+        except:
+            resultids = re.findall(r'\d+',selectedMResultSeries)
+            resultidu = []
+            mergeResults = 'true'
+            for results in resultids:
+                resultidu.append(int(results))
+        selectedMResultSeries = resultidu
         myresultSeriesExport = None
         if request.POST['useDates'] == 'true':
             useDates = True
@@ -2250,7 +2398,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     csvexport = False
     cvqualitycode = None
     if popup == 'Anno':
-        cvqualitycode = CvQualitycode.objects.all()
+        cvqualitycode = CvQualitycode.objects.all().order_by('definition')
 
         # csvexport = True
         # k=0
