@@ -316,7 +316,7 @@ class Command(BaseCommand):
                                             if row[colnum.columnnum].strip() == "":
                                                 newdatavalue = float('NaN')
                                             else:
-                                                raise
+                                                continue
                                         qualitycode = qualitycodegood
                                         # print(newdatavalue)
                                         if dataqualitybool:
