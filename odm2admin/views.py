@@ -1224,7 +1224,12 @@ def TimeSeriesGraphing(request, feature_action='All'):
                 dataval = 'null'
             else:
                 dataval = result.datavalue
-            data['datavalue' + str(i)].append([mills, dataval])
+            if popup == 'Anno':
+                data['datavalue' + str(i)].append(
+                    {'x': mills, 'y': dataval, 'id': str(result.valueid)})
+            else:
+                data['datavalue' + str(i)].append(
+                    [mills, dataval])
             # data['datavalue' + str(i)].append([mills, result.datavalue])
             # #dumptoMillis(result.valuedatetime)
             # data['datavalue'].extend(tmplist )
@@ -2346,8 +2351,12 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             else:
                 dataval = result.datavalue
             # print(data.keys())
-            data['datavalue' + str(i)].append(
-                {'x': mills, 'y': dataval, 'id': str(result.valueid)})
+            if popup == 'Anno':
+                data['datavalue' + str(i)].append(
+                    {'x': mills, 'y': dataval, 'id': str(result.valueid)})
+            else:
+                data['datavalue' + str(i)].append(
+                    [mills,dataval])
             if popup == 'Anno':
                 for tsrva in tsrvas:
                     if tsrva.valueid == result:
