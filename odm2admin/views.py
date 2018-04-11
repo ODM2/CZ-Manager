@@ -11,6 +11,7 @@ except ValueError: # Already removed
     pass
 
 from io import StringIO
+from decimal import *
 import math
 import json
 import time
@@ -1511,6 +1512,21 @@ def is_number(s):
     except ValueError:
         return False
 
+
+def precision_and_scale(x):
+    max_digits = 14
+    int_part = int(abs(x))
+    magnitude = 1 if int_part == 0 else int(math.log10(int_part)) + 1
+    if magnitude >= max_digits:
+        return (magnitude, 0)
+    frac_part = abs(x) - int_part
+    multiplier = 10 ** (max_digits - magnitude)
+    frac_digits = multiplier + int(multiplier * frac_part + 0.5)
+    while frac_digits % 10 == 0:
+        frac_digits /= 10
+    scale = int(math.log10(frac_digits))
+    return (magnitude + scale, scale)
+
 def add_shiftvalues(request):
     shift=None
     error = None
@@ -1521,7 +1537,7 @@ def add_shiftvalues(request):
     realshiftvals = []
     response_data = {}
     if 'shift' in request.POST:
-        shift = float(request.POST['shift'])
+        shift = Decimal(request.POST['shift'])
         # print(offset)
     if 'shiftvals[]' in request.POST:
         shiftvals = request.POST.getlist('shiftvals[]')
@@ -1534,46 +1550,32 @@ def add_shiftvalues(request):
         intrid = int(rid)
         # print('result id')
         # print(rid)
-        firstdate = shiftvals[0]
-        lastdate = shiftvals[-2]
-        # print(firstdate)
-        # print(lastdate)
-        valstochange = []
-        for shiftval in shiftvals:
-            if is_number(shiftval):
-                valstochange.append(float(shiftval))
-        tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valuedatetime__gte=firstdate).filter(
-            valuedatetime__lte=lastdate).filter(datavalue__in=valstochange).order_by('valuedatetime')
-        realshiftvals = tsrvs
-        #
-        # for shiftval in shiftvals:
-        #     # print(offsetval)
-        #     if is_number(shiftval):
-        #         floatval = float(shiftval)
-        #         # print(rid)
-        #         # print(lastshiftval)
-        #         # print(shift)
-        #         # print(floatval)
-        #         tsrvquery = Timeseriesresultvalues.objects.filter(resultid=rid).filter(
-        #             valuedatetime=lastshiftval).filter(datavalue=floatval)
-        #         # print(tsrvquery.query)
-        #         try:
-        #             tsrv = tsrvquery.get()
-        #             realshiftvals.append(tsrv)
-        #             # tsrv.datavalue = tsrv.datavalue + floatval
-        #             # tsrv.save()
-        #         except ObjectDoesNotExist:
-        #             # print('nope')
-        #             pass
-        #         # print(tsrv)
-        #     lastshiftval = shiftval
+        # firstdate = shiftvals[0]
+        # lastdate = shiftvals[-2]
+        idvals = []
+        i=0
+        for offsetval in shiftvals:
+            # print(offsetval)
+            # if i % 3 == 0:
+            #     datevals.append(datetime.strptime(offsetval, '%Y-%m-%d %H:%M:%S'))
+            if i % 3 == 2:
+                idvals.append(int(offsetval))
+            i += 1
+        try:
+            tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valueid__in=idvals).order_by('valuedatetime') # .filter(valuedatetime__gte=firstdate).filter(
+                # valuedatetime__lte=lastdate).filter(datavalue__in=valstochange).order_by('valuedatetime')
+            realshiftvals = tsrvs
+        except ObjectDoesNotExist:
+            response_data['error'] = 'no values found'
     valcount = realshiftvals.count()
-    normshift = shift - realshiftvals.last().datavalue
+    precision, scale = precision_and_scale(realshiftvals.last().datavalue)
+    getcontext().prec = precision
+    normshift = shift - Decimal(realshiftvals.last().datavalue)
     shiftval = normshift / valcount
     k = 1
     for tsrv in realshiftvals:
         if k > 1:
-            tsrv.datavalue = tsrv.datavalue + (shiftval*k)
+            tsrv.datavalue = float(Decimal(Decimal(tsrv.datavalue) + (shiftval*k)))
             tsrv.save()
         # print(tsrv.datavalue)
         k +=1
@@ -1588,57 +1590,41 @@ def add_offset(request):
     offsetvals = None
     response_data = {}
     if 'offset' in request.POST:
-        offset = float(request.POST['offset'])
+        offset = Decimal(request.POST['offset'])
+        # print('offset')
         # print(offset)
     if 'offsetvals[]' in request.POST:
+        # THESE VALUES ARE NOT ORDERED CORRECTLY
         offsetvals = request.POST.getlist('offsetvals[]')
-        # print(annotationvals)
+        # print(offsetvals)
     if 'resultidu[]' in request.POST:
         resultid = request.POST.getlist('resultidu[]')
         # print('resultid: ' + str(resultid))
     valcount = 0
+    i=0
+    # datevals = []
+    idvals = []
+    for offsetval in offsetvals:
+        # print(offsetval)
+        # if i % 3 == 0:
+        #     datevals.append(datetime.strptime(offsetval, '%Y-%m-%d %H:%M:%S'))
+        if i % 3 == 2:
+            idvals.append(int(offsetval))
+        i+=1
+    # datevals = sorted(datevals)
+    # print(datevals)
+    i = 0
     for rid in resultid:
+
         intrid = int(rid)
-        # print('result id')
-        # print(rid)
-        firstdate = offsetvals[0]
-        lastdate = offsetvals[-2]
-        # print(firstdate)
-        # print(lastdate)
-        valstochange = []
-        for offsetval in offsetvals:
-            if is_number(offsetval):
-                valstochange.append(float(offsetval))
-        tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valuedatetime__gte=firstdate).filter(
-            valuedatetime__lte=lastdate).filter(datavalue__in=valstochange)
+
+        tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valueid__in=idvals)# .filter(datavalue__in=valstochange).filter(valuedatetime__gte=firstdate).filter(
+            # valuedatetime__lte=lastdate).filter(datavalue__in=valstochange)
+        print(tsrvs.query)
         for tsrv in tsrvs:
-            tsrv.datavalue = tsrv.datavalue + offset
+            tsrv.datavalue = Decimal(tsrv.datavalue) + offset
             tsrv.save()
-            # print(tsrv)
-        # for offsetval in offsetvals:
-        #     # print(offsetval)
-        #     if is_number(offsetval):
-        #         floatval = float(offsetval)
-        #         print(rid)
-        #         print(lastoffsetval)
-        #         print(floatval)
-        #         # print(floatval)
-        #         tsrvquery = Timeseriesresultvalues.objects.filter(resultid=rid).filter(
-        #             valuedatetime=lastoffsetval).filter(datavalue=floatval)
-        #         # print(tsrvquery.query)
-        #         try:
-        #             # print('try')
-        #             tsrv = tsrvquery.get()
-        #             tsrv.datavalue = tsrv.datavalue + offset
-        #             tsrv.save()
-        #             valcount +=1
-        #             print(tsrv)
-        #         except ObjectDoesNotExist as e:
-        #             print(e)
-        #             pass
-        #         # print(tsrv)
-        #     lastoffsetval = offsetval
-    # print('here')
+            # print(tsrv.datavalue)
     response_data['valuesadded'] = valcount
     return HttpResponse(json.dumps(response_data),content_type='application/json')
 
@@ -1651,17 +1637,20 @@ def add_annotation(request):
     setNaN = False
     cvqualitycode = None
     response_data = {}
-
+    annotationobj = None
+    anno = None
     if 'resultidu[]' in request.POST:
         resultid = request.POST.getlist('resultidu[]')
         # print(resultid)
     if 'annotation' in request.POST:
-        annotation = str(request.POST['annotation'])
-        response_data['annotation'] = annotation
+        annotationFromUser = str(request.POST['annotation'])
+        response_data['annotation'] = annotationFromUser
         # print(annotation)
     # annotationtype
     if 'cvqualitycode' in request.POST:
         cvqualitycode = str(request.POST['cvqualitycode'])
+        if cvqualitycode == 'Select':
+            cvqualitycode = None
     if 'setNaN' in request.POST:
         setNaNstr = str(request.POST['setNaN'])
         if setNaNstr == 'false':
@@ -1676,47 +1665,100 @@ def add_annotation(request):
     if cvqualitycode:
         qualitycode = CvQualitycode.objects.get(name=cvqualitycode)
     # annotator = People.objects.filter(personfirstname='Miguel').filter(personlastname='Leon')
-    annotationobj = Annotations(annotationtypecv= annotationtype, annotationcode='',
-                                annotationtext=annotation, annotationdatetime=datetime.now(),
-                                annotationutcoffset=4)
-    annotationobj.save()
+
     lastannotationval = None
     for rid in resultid:
         intrid = int(rid)
         # print('result id')
         # print(rid)
-        valstochange = []
+        idvals = []
+        i = 0
         for annotationval in annotationvals:
-            if is_number(annotationval):
-                valstochange.append(float(annotationval))
-        firstdate = annotationvals[0]
-        lastdate = annotationvals[-2]
+            # print(offsetval)
+            # if i % 3 == 0:
+            #     datevals.append(datetime.strptime(offsetval, '%Y-%m-%d %H:%M:%S'))
+            if i % 3 == 2:
+                idvals.append(int(annotationval))
+            i += 1
+
+        # firstdate = annotationvals[0]
+        # lastdate = annotationvals[-2]
         # print(firstdate)
         # print(lastdate)
-        tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valuedatetime__gte=firstdate).filter(
-            valuedatetime__lte=lastdate).filter(datavalue__in=valstochange)
+        # tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valuedatetime__gte=firstdate).filter(
+        #   valuedatetime__lte=lastdate).filter(datavalue__in=valstochange)
+        tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valueid__in=idvals)
         for tsrv in tsrvs:
+            # print(tsrv.datavalue)
+            # print(tsrv.valuedatetime)
             if setNaN:
-                annotation += ' original value was ' + str(tsrv.datavalue)
-                annotationobj = Annotations(annotationtypecv= annotationtype, annotationcode='',
-                                            annotationtext=annotation,
-                                            annotationdatetime=datetime.now(),
-                                            annotationutcoffset=4)
-                annotationobj.save()
+                annotation = annotationFromUser + ' original value was ' + str(tsrv.datavalue)
+                # print(annotation)
+                if len(annotation) > 499:
+                    annotation = annotation[:499]
+                try:
+                    tsrvanno = Timeseriesresultvalueannotations.objects.filter(valueid=tsrv).get()
+                    annotationobj = Annotations.objects.filter(annotationid=tsrvanno.annotationid.annotationid).get()
+                    annotationobj.annotationtypecv = annotationtype
+                    annotationobj.annotationcode = ''
+                    annotationobj.annotationtext = annotation
+                    annotationobj.annotationdatetime = datetime.now()
+                    annotationobj.annotationutcoffset = 4
+                    annotationobj.save()
+                except ObjectDoesNotExist:
+                    # print('error')
+                    #if not annotationobj:
+                    #    print('annotation does not exist')
+                    annotationobj = Annotations(annotationtypecv=annotationtype, annotationcode='',
+                                                annotationtext=annotation, annotationdatetime=datetime.now(),
+                                                annotationutcoffset=4)
+                    annotationobj.save()
+                    tsrvanno = Timeseriesresultvalueannotations(valueid=tsrv,
+                                                                annotationid=annotationobj)
+                    tsrvanno.save()
+                    # print(annotationobj)
+                # print(annotation)
+                # annotationobj.save()
                 tsrv.datavalue = float('nan')
-                tsrv.qualitycodecv = qualitycode
+                if qualitycode:
+                    tsrv.qualitycodecv = qualitycode
                 tsrv.save(force_update=True)
                 # print(tsrv)
             elif cvqualitycode:
                 tsrv.qualitycodecv = qualitycode
                 tsrv.save(force_update=True)
-            try:
-                tsrvanno = Timeseriesresultvalueannotations.objects.filter(valueid=tsrv).get()
-                tsrvanno.annotationid = annotationobj
-            except ObjectDoesNotExist:
-                tsrvanno = Timeseriesresultvalueannotations(valueid=tsrv,
-                                                            annotationid=annotationobj)
-            tsrvanno.save()
+            if not setNaN:
+                annotation = annotationFromUser
+                try:
+                    tsrvanno = Timeseriesresultvalueannotations.objects.filter(valueid=tsrv).get()
+                    anno = Annotations.objects.filter(annotationid=tsrvanno.annotationid.annotationid).get()
+                    anno.annotationtypecv = annotationtype
+                    anno.annotationcode = ''
+                    anno.annotationtext = annotation
+                    anno.annotationdatetime = datetime.now()
+                    anno.annotationutcoffset = 4
+                    anno.save()
+                except ObjectDoesNotExist:
+                    # print('error')
+                    # if not annotationobj:
+                    #print('annotation does not exist')
+                    annotationobj = Annotations(annotationtypecv=annotationtype, annotationcode='',
+                                                annotationtext=annotation, annotationdatetime=datetime.now(),
+                                                annotationutcoffset=4)
+                    annotationobj.save()
+                    tsrvanno = Timeseriesresultvalueannotations(valueid=tsrv,
+                                                                annotationid=annotationobj)
+                    tsrvanno.save()
+                if cvqualitycode:
+                    tsrv.qualitycodecv = qualitycode
+                    tsrv.save(force_update=True)
+                # try:
+            #     tsrvanno = Timeseriesresultvalueannotations.objects.filter(valueid=tsrv).get()
+            #     tsrvanno.annotationid = annotationobj
+            # except ObjectDoesNotExist:
+            #     tsrvanno = Timeseriesresultvalueannotations(valueid=tsrv,
+            #                                                 annotationid=annotationobj)
+            # tsrvanno.save()
             # print(tsrvanno)
         # tsrvanno.save()
                 # print(tsrvanno.valueid)
@@ -2019,13 +2061,14 @@ def email_data_from_graph(request):
     entered_end_date = ''
     entered_start_date = ''
     myresultSeriesExport = []
-    if 'email_data' in request.POST and 'myresultSeriesExport[]' in request.POST:
+    if 'email_data' in request.POST and 'resultidu[]' in request.POST:
         selectedMResultSeries = request.POST.getlist('myresultSeriesExport[]')
+        resultid = request.POST.getlist('resultidu[]')
         try:
             # print(resultidu)
             resultidu = [int(selectedMResultSeries)]
         except:
-            resultids = re.findall(r'\d+',selectedMResultSeries)
+            resultids = re.findall(r'\d+',request.POST.getlist('myresultSeriesExport[]')) # re.findall(r'\d+',request.POST['myresultSeriesExport[]'])
             resultidu = []
             mergeResults = 'true'
             for results in resultids:
@@ -2216,6 +2259,9 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         if popup == 'smll':
             entered_start_date = datetime_entered_end_date - timedelta(
                 settings.SENSOR_DASHBOARD['time_series_days'])
+        elif popup =='Anno':
+            entered_start_date = datetime_entered_end_date - timedelta(
+                settings.SENSOR_DASHBOARD['time_series_days'])
         else:
             entered_start_date = datetime_entered_end_date - timedelta(
                 map_config['time_series_months'] * 365 / 12)  # .strftime('%Y-%m-%d %H:%M')
@@ -2301,7 +2347,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                 dataval = result.datavalue
             # print(data.keys())
             data['datavalue' + str(i)].append(
-                [mills,dataval])
+                {'x': mills, 'y': dataval, 'id': str(result.valueid)})
             if popup == 'Anno':
                 for tsrva in tsrvas:
                     if tsrva.valueid == result:
@@ -2311,7 +2357,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                             resultannotationsexist = True
                             data.update({'datavalueannotated' : []})
                         data['datavalueannotated'].append(
-                        [mills,dataval])
+                            {'x':mills,'y':dataval,'id':str(result.valueid)})
                #{"x": mills, "y": dataval, "z": str(result.valueid)})  # dumptoMillis(result.valuedatetime)
             # data['datavalue'].extend(tmplist )
             # data['valuedatetime'].append(dumptoMillis(result.valuedatetime))
@@ -2354,7 +2400,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         # print(len(mergedResultSets))
         series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
                       str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
-                      "data": data['datavalue' + str(i)]})
+                      "data": data['datavalue' + str(i)], "point": { }})
+
         if mergeResults =='true' and len(mergedResultSets) <= i:
             break
 
@@ -2368,8 +2415,10 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                     L1exists = True
             if annotationsexist:
                 series.append({"name": 'Annotated ' + str(unit) + ' - ' + str(variable) + ' - ' +
-                                str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "false", "yAxis": str(unit),
-                                "data": data['datavalueannotated']})
+                                str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
+                                "data": data['datavalueannotated'], "point": { }})
+
+    # "point": { "events": {'click': 'selectPointsByClick'}}
     i = 0
     titleStr = ''
     # print(series)
