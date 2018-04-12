@@ -198,7 +198,7 @@ $(document).ready(function() {
 				cache:false,
 				success: function(json) {
 					var annotationButton = document.getElementById("annotationButton");
-					clearSelectPoints();
+					//clearSelectPoints();
 					if (typeof json.error  != "undefined"){
 						annotationButton.firstChild.data = "Values added: "+json.error + " reloading page";
 					} else if(setNaN){
