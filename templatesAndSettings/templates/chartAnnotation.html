@@ -112,6 +112,15 @@ color:#dddddd !important;;
 
 		}
 	}
+	function clearSelectPoints(){
+		var chart =Highcharts.charts[1];
+		Highcharts.each(chart.series, function (series) {
+			Highcharts.each(series.points, function (point) {
+					point.select(false, false);
+			});
+		});
+	}
+
 	function selectPointsByDrag(e) {
 
     // Select points
@@ -167,6 +176,7 @@ $(document).ready(function() {
 		var setNaN = document.getElementById('setNaN').checked //$("#setNaN").checked;
 		//console.log('annotate');
 		var selectedResult = {{SelectedResults|safe}};
+		//console.log(selectedResult);
 		//$report.html('annotation \'' + annotation + '\' saved.');
 		//console.log(cvqualitycode);
 		//var annotationButton = document.getElementById("annotationButton"); //$("#email_data");
@@ -188,13 +198,18 @@ $(document).ready(function() {
 				cache:false,
 				success: function(json) {
 					var annotationButton = document.getElementById("annotationButton");
+					clearSelectPoints();
 					if (typeof json.error  != "undefined"){
 						annotationButton.firstChild.data = "Values added: "+json.error + " reloading page";
-					} else{
+					} else if(setNaN){
+						annotationButton.firstChild.data = "reloading page";
+					}else{
 						annotationButton.firstChild.data = "Annotation complete, add another";
 					}
 					annotationButton.disabled = false;
-					//location.reload();
+					if(setNaN){
+						location.reload();
+					}
 				},
 		});
 	});
@@ -235,6 +250,13 @@ $(document).ready(function() {
 		var shift = $("#shiftValues").val();
 		var selectedResult = {{SelectedResults|safe}};
 		var shiftValuesButton = document.getElementById("shiftValuesButton");
+		var radios = document.getElementsByName("shiftdirection");
+		var direction = "forward";
+		for (var i = 0, length = radios.length; i<length; i++){
+			if (radios[i].checked){
+				direction = radios[i].value;
+			}
+		}
 		shiftValuesButton.disabled = true;
 		shiftValuesButton.firstChild.data = "shifting values";
 		$.ajax({
@@ -244,6 +266,7 @@ $(document).ready(function() {
 					'resultidu': selectedResult,
 					'shiftvals': annotationvals,
 					'shift': shift,
+					'direction' : direction,
 					'csrfmiddlewaretoken': '{{ csrf_token }}',
 				},
 				success: function(json) {
@@ -409,7 +432,7 @@ $(document).ready(function() {
   // See https://github.com/highcharts/highcharts/blob/master/errors/errors.xml
   // for error id's
 
-chartErrors.forEach(function(e) {
+	chartErrors.forEach(function(e) {
 		if( e.errorCode == 12){
 		  Highcharts.charts[e.chartIndex].renderer
 			.text('Chart error ' + e.errorCode + ' too many values for annotation. Try Reducing the number of days between the start and end date')
@@ -489,8 +512,10 @@ Method- {{featureActionMethod}}
 				<td><button id="offsetButton">Offset values</button></td></tr>
 
 				<tr><td><input id="shiftValues"  value= "" name="shiftValues" type="text">
-				shift selected points linearly to value </input></td>
-				<td><button id="shiftValuesButton">shift values</button></td></tr>
+				shift selected points linearly to value </input></td><td>
+				<input type="radio" name="shiftdirection" id = "forwardshift" value="forward" checked>Forward</input>
+					<input type="radio" name="shiftdirection" id = "backwardshift" value="backward">Backward</input>
+					<button id="shiftValuesButton">shift values</button></td></tr>
 
 			{% endif %}
 		{% endif %}
