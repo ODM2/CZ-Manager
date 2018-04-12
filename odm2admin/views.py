@@ -1541,6 +1541,10 @@ def add_shiftvalues(request):
     firstshiftval = None
     realshiftvals = []
     response_data = {}
+    forwardshift = True
+    if 'direction' in request.POST:
+        if request.POST['direction'] == 'backward':
+            forwardshift = False
     if 'shift' in request.POST:
         shift = Decimal(request.POST['shift'])
         # print(offset)
@@ -1567,7 +1571,12 @@ def add_shiftvalues(request):
                 idvals.append(int(offsetval))
             i += 1
         try:
-            tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valueid__in=idvals).order_by('valuedatetime') # .filter(valuedatetime__gte=firstdate).filter(
+            order = ''
+            if forwardshift:
+                order = 'valuedatetime'
+            else:
+                order = '-valuedatetime'
+            tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valueid__in=idvals).order_by(order) # .filter(valuedatetime__gte=firstdate).filter(
                 # valuedatetime__lte=lastdate).filter(datavalue__in=valstochange).order_by('valuedatetime')
             realshiftvals = tsrvs
         except ObjectDoesNotExist:
@@ -1640,7 +1649,7 @@ def add_annotation(request):
     annotation = None
     setNaNstr = None
     setNaN = False
-    cvqualitycode = None
+    cvqualitycode = False
     response_data = {}
     annotationobj = None
     anno = None
@@ -1654,8 +1663,9 @@ def add_annotation(request):
     # annotationtype
     if 'cvqualitycode' in request.POST:
         cvqualitycode = str(request.POST['cvqualitycode'])
+        # print(cvqualitycode)
         if cvqualitycode == 'Select':
-            cvqualitycode = None
+            cvqualitycode = False
     if 'setNaN' in request.POST:
         setNaNstr = str(request.POST['setNaN'])
         if setNaNstr == 'false':
@@ -1725,7 +1735,7 @@ def add_annotation(request):
                 # print(annotation)
                 # annotationobj.save()
                 tsrv.datavalue = float('nan')
-                if qualitycode:
+                if cvqualitycode:
                     tsrv.qualitycodecv = qualitycode
                 tsrv.save(force_update=True)
                 # print(tsrv)
