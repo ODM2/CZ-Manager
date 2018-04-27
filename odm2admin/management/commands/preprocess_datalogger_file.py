@@ -34,6 +34,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
         # cmdline = bool(options['cmdline'][0])
         filename = str(options['dataloggerfilelink'][0])
+        print('preprocess')
         filenameparts = filename.split('/')
         filenameout = ''
         i = 0
@@ -53,7 +54,7 @@ class Command(BaseCommand):
         i=0
         # write the header to the new file
         with io.open(file_in, 'rt', encoding='ascii') as f_in:
-            with io.open(file_out, 'wb') as f_out:
+            with io.open(file_out, 'w', encoding='ascii') as f_out:
                 reader =csv.reader(f_in)
                 writer = csv.writer(f_out)
                 for row in reader:
@@ -67,7 +68,7 @@ class Command(BaseCommand):
                         break
         # write the reversed data
         with io.open(file_in, 'rt', encoding='ascii') as f_in:
-            with io.open(file_out, 'ab') as f_out:
+            with io.open(file_out, 'a', encoding='ascii') as f_out:
                 reader = csv.reader(f_in)
                 writer = csv.writer(f_out)
                 row2 = []
@@ -79,4 +80,4 @@ class Command(BaseCommand):
         #shutil.copy(src, dst
         #Replace original file with reversed
         shutil.copy(file_out,file_in)
-
+        return filenameout

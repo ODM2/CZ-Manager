@@ -1330,7 +1330,9 @@ def TimeSeriesGraphing(request, feature_action='All'):
 
 def groupResultsByVariable(sampling_feature):
     fas = Featureactions.objects.filter(samplingfeatureid=sampling_feature)
-    results = Results.objects.filter(featureactionid__in=fas)
+    results = Results.objects.filter(featureactionid__in=fas).filter(
+                 processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
+                 )
     groupedResults = {}
 
     for result in results:

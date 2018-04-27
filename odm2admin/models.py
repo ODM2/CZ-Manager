@@ -1261,8 +1261,8 @@ class ProcessDataloggerfile(models.Model):
                                  on_delete=models.CASCADE)
     processingCode = models.CharField(max_length=255, verbose_name='processing code',
                                       help_text="to setup an FTP file download set the processing" +
-                                      "code as 'x hours between download' where x is how many hours to " +
-                                      "wait between downloading copies of the file from the FTP site. " +
+                                      "code as 'download from ftp or http' to " +
+                                      "download the file from the FTP site. " +
                                       "A datalogger file setup for FTP download must have only 1 " +
                                       "process data logger file record.", default="0")
     databeginson = models.IntegerField(verbose_name="Data begins on this row number", default=2)
@@ -1288,7 +1288,7 @@ class ProcessDataloggerfile(models.Model):
         ftpfile = self.dataloggerfileid.dataloggerfiledescription
         ftpparse = urlparse(ftpfile)
         if len(ftpparse.netloc) > 0:
-            ftpfrequencyhours = re.findall(r'^\D*(\d+)', self.processingCode)[0]
+            ftpfrequencyhours = 24 #re.findall(r'^\D*(\d+)', self.processingCode)[0]
             management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
                                     , str(self.databeginson), str(self.columnheaderson),
                                     str(ftpfrequencyhours), False)
@@ -2200,7 +2200,9 @@ class Pointcoverageresultvalues(models.Model):
 
 class Processinglevels(models.Model):
     processinglevelid = models.AutoField(primary_key=True)
-    processinglevelcode = models.CharField(verbose_name='processing level code', max_length=50)
+    processinglevelcode = models.CharField(verbose_name='processing level code',
+                                           help_text='This should be a number in order to export to hydroshare',
+                                           max_length=50)
     definition = models.CharField(max_length=5000, blank=True)
     explanation = models.CharField(max_length=5000, blank=True)
 
