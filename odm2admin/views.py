@@ -1592,7 +1592,7 @@ def add_shiftvalues(request):
     for tsrv in realshiftvals:
         if k > 1:
             tsrv.datavalue = float(Decimal(Decimal(tsrv.datavalue) + (shiftval*k)))
-            tsrv.save()
+            tsrv.update()
         # print(tsrv.datavalue)
         k +=1
 
@@ -1639,7 +1639,7 @@ def add_offset(request):
         print(tsrvs.query)
         for tsrv in tsrvs:
             tsrv.datavalue = Decimal(tsrv.datavalue) + offset
-            tsrv.save()
+            tsrv.update()
             # print(tsrv.datavalue)
     response_data['valuesadded'] = valcount
     return HttpResponse(json.dumps(response_data),content_type='application/json')
