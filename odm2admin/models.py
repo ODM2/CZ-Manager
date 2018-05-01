@@ -1283,6 +1283,7 @@ class ProcessDataloggerfile(models.Model):
     def save(self, *args, **kwargs):
         # ProcessDataLoggerFile(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid,
         # self.databeginson, self.columnheaderson, False)
+        super(ProcessDataloggerfile, self).save(*args, **kwargs)
         linkname = str(self.dataloggerfileid.dataloggerfilelinkname())
         fileid = self.dataloggerfileid.dataloggerfileid
         ftpfile = self.dataloggerfileid.dataloggerfiledescription
@@ -1296,7 +1297,7 @@ class ProcessDataloggerfile(models.Model):
             management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
                                     , str(self.databeginson), str(self.columnheaderson),
                                     False, False, False)
-        super(ProcessDataloggerfile, self).save(*args, **kwargs)
+
         # def get_actions(self, request):
         #     #Disable delete
         #     actions = super(ProcessDataloggerfile, self).get_actions(request)
