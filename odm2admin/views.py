@@ -1789,6 +1789,7 @@ def addL1timeseries(request):
     response_data = {}
     createorupdateL1 = None
     pl1 = Processinglevels.objects.get(processinglevelid=2)
+    pl0 = Processinglevels.objects.get(processinglevelid=1)
     valuesadded = 0
     tsresultTocopyBulk = []
     if 'createorupdateL1' in request.POST:
@@ -1797,6 +1798,7 @@ def addL1timeseries(request):
         resultid = request.POST.getlist('resultidu[]')
         for result in resultid:
             if createorupdateL1 == "create":
+        #print('create')
                 resultTocopy = Results.objects.get(resultid=result)
                 tsresultTocopy = Timeseriesresults.objects.get(resultid=result)
                 resultTocopy.resultid = None
@@ -1814,7 +1816,7 @@ def addL1timeseries(request):
                         tsrv.valueid = None
                         tsrv.save()
                         tsrva.valueid = tsrv
-                        # print(tsrv.valueid)
+                        print(tsrv.valueid)
                         tsrva.save()
                     except ObjectDoesNotExist:
                         tsrv.valueid = None
@@ -1822,55 +1824,69 @@ def addL1timeseries(request):
                 newtsrv = Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
 
             elif createorupdateL1 == "update":
-                tsresultL0 = Timeseriesresults.objects.get(resultid=result)
-                resultL0 = Results.objects.get(resultid=result)
-                tsrvL0 = Timeseriesresultvalues.objects.filter(resultid=tsresultL0)
+                #print('update')
+                tsresultL1 = Timeseriesresults.objects.get(resultid=result)
+                resultL1 = Results.objects.get(resultid=result)
+                # tsrvL1 = Timeseriesresultvalues.objects.filter(resultid=tsresultL1)
                 tsrvAddToL1Bulk = []
-                relatedL1result = Results.objects.filter(
-                        featureactionid = resultL0.featureactionid).filter(
-                        variableid = resultL0.variableid
-                    ).filter(unitsid = resultL0.unitsid).get(
-                    processing_level=pl1)
-                newresult = relatedL1result.resultid
-                relateL1tsresult = Timeseriesresults.objects.filter(resultid= relatedL1result).get()
-                # print(relateL1tsresult)
+                relatedL0result = Results.objects.filter(
+                        featureactionid = resultL1.featureactionid).filter(
+                        variableid = resultL1.variableid
+                    ).filter(unitsid = resultL1.unitsid).filter(
+                    processing_level=pl0)
+
+                # newresult = relatedL0result.resultid
+                relateL0tsresults = Timeseriesresults.objects.filter(resultid__in= relatedL0result)
+                relateL0tsresult = None
+                for L0result in relateL0tsresults:
+                    if L0result.intendedtimespacing == tsresultL1.intendedtimespacing and L0result.intendedtimespacingunitsid == tsresultL1.intendedtimespacingunitsid:
+                        relateL0tsresult =L0result
+                tsrvL0 = Timeseriesresultvalues.objects.filter(resultid=relateL0tsresult)
+                # print(relateL0tsresult)
                 # maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
                 #        Max('valuedatetime')). \
                 #        order_by('-valuedatetime')
                 # print(relateL1tsresult)
                 # for r in maxtsrvL1:
                 #     print(r)
+                # print('L1 result')
+                # print(tsresultL1)
 
-                maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
+                maxtsrvL0=Timeseriesresultvalues.objects.filter(resultid=relateL0tsresult).annotate(
                         Max('valuedatetime')). \
                         order_by('-valuedatetime')[0].valuedatetime
-                maxtsrvL0=Timeseriesresultvalues.objects.filter(resultid=tsresultL0).annotate(
+                maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=tsresultL1).annotate(
                         Max('valuedatetime')). \
                         order_by('-valuedatetime')[0].valuedatetime
-                mintsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
+                mintsrvL0=Timeseriesresultvalues.objects.filter(resultid=relateL0tsresult).annotate(
                         Min('valuedatetime')). \
                         order_by('valuedatetime')[0].valuedatetime
-                mintsrvL0=Timeseriesresultvalues.objects.filter(resultid=tsresultL0).annotate(
+                mintsrvL1=Timeseriesresultvalues.objects.filter(resultid=tsresultL1).annotate(
                         Min('valuedatetime')). \
                         order_by('valuedatetime')[0].valuedatetime
+                # print('max L0')
+                # print(maxtsrvL0)
+                # print('max L1')
+                # print(maxtsrvL1)
                 if maxtsrvL1 < maxtsrvL0:
                     tsrvAddToL1 = tsrvL0.filter(valuedatetime__gt=maxtsrvL1)
                     for tsrv in tsrvAddToL1:
-                        tsrv.resultid = relateL1tsresult
+                        tsrv.resultid = relateL0tsresult
                         try:
                             tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
                             tsrv.valueid = None
                             tsrv.save()
                             tsrva.valueid = tsrv
-                            # print(tsrv.valueid)
+                            print(tsrv.valueid)
                             tsrva.save()
                         except ObjectDoesNotExist:
+                            print('doesnt exist')
                             tsrv.valueid = None
                             tsresultTocopyBulk.append(tsrv)
                 if mintsrvL1 > mintsrvL0:
                     tsrvAddToL1 = tsrvL0.filter(valuedatetime__lt=mintsrvL1)
                     for tsrv in tsrvAddToL1:
-                        tsrv.resultid = relateL1tsresult
+                        tsrv.resultid = tsresultL1
                         try:
                             tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
                             tsrv.valueid = None
@@ -1881,13 +1897,16 @@ def addL1timeseries(request):
                         except ObjectDoesNotExist:
                             tsrv.valueid = None
                             tsresultTocopyBulk.append(tsrv)
-                newtsrv = Timeseriesresultvalues.objects.bulk_create(tsrvAddToL1Bulk)
+                newtsrv = Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
             valuesadded = newtsrv.__len__()
+            # print(valuesadded)
+            # for tsrv in newtsrv:
+                # print(tsrv.resultid.resultid)
+                # print(tsrv)
             response_data['valuesadded'] = valuesadded
             # response_data['newresultid'] = newresult
             # print(result)
     return HttpResponse(json.dumps(response_data),content_type='application/json')
-
 
 #another approach
 #https://rlskoeser.github.io/2016/03/31/migrating-data-between-databases-with-django/
