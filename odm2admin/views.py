@@ -1401,6 +1401,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
     methods = None
     methodsOnly = 'False'
     samplingfeatureid= None
+    resultListGrouped = None
     try:
         if not useDataset:
             if useSamplingFeature:
@@ -1410,32 +1411,34 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                 featureActions = Featureactions.objects.\
                     filter(samplingfeatureid=samplefeature).\
                     order_by("action__method")
-                resultList = Results.objects.filter(featureactionid__in=featureActions)\
-                     .filter(
-                 processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
-                 ).order_by("featureactionid__action__method")
+                resultList = Results.objects.filter(featureactionid__in=featureActions
+                                                    ).order_by("featureactionid__action__method")
+                #.filter(
+                #    processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
+                #)
                 actions = Actions.objects.filter(actionid__in=featureActions.values("action"))
                 methods = Methods.objects.filter(methodid__in=actions.values("method"))
                 featureActionLocation = samplefeature.samplingfeaturename
                 resultListGrouped = groupResultsByVariable(samplefeature)
                 # print(resultListGrouped)
             else:
-                resultList = Results.objects.filter(featureactionid=feature_action)\
-                    .filter(
-                 processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
-                 ).order_by("featureactionid__action__method")
+                resultList = Results.objects.filter(featureactionid=feature_action
+                                                    ).order_by("featureactionid__action__method")
+                # .filter(
+                # processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display'])
                 featureActions = Featureactions.objects.filter(featureactionid=feature_action).get()
                 featureActionLocation = featureActions.samplingfeatureid.samplingfeaturename
                 samplingfeatureid = featureActions.samplingfeatureid.samplingfeatureid
                 featureActionMethod = featureActions.action.method.methodname
                 actions = Actions.objects.filter(actionid=featureActions.action.actionid).get()
                 methods = Methods.objects.filter(methodid=actions.method.methodid)
+                resultListGrouped = groupResultsByVariable(samplingfeatureid)
         else:
             datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
             resultList = Results.objects.filter(resultid__in=datasetResults.values(
-                "resultid")).filter(
-                 processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
-                 ).order_by("featureactionid__action__method")
+                "resultid")).order_by("featureactionid__action__method") #.filter(
+                 # processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
+                 #)
             datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
             datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
     except(ObjectDoesNotExist) as e:
@@ -1496,6 +1499,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         tsr = Timeseriesresults.objects.filter(resultid=result).get()
         result.timeintervalunits = tsr.intendedtimespacingunitsid
         result.timeinterval = tsr.intendedtimespacing
+    processing_level__in = settings.MAP_CONFIG['result_value_processing_levels_to_display']
     return TemplateResponse(request, template, {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'useSamplingFeature': useSamplingFeature,
                                                 'methodsOnly': methodsOnly,
@@ -1508,6 +1512,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                                                 'datasetAbstract': datasetAbstract,
                                                 'useDataset': useDataset, 'startDate': startdate,
                                                 'endDate': enddate,
+                                                'processing_level__in': processing_level__in,
                                                 'authenticated': authenticated, 'methods': methods,
                                                 'resultList': resultList,
                                                 'resultListGrouped': resultListGrouped}, )
@@ -1816,7 +1821,7 @@ def addL1timeseries(request):
                         tsrv.valueid = None
                         tsrv.save()
                         tsrva.valueid = tsrv
-                        print(tsrv.valueid)
+                        # print(tsrv.valueid)
                         tsrva.save()
                     except ObjectDoesNotExist:
                         tsrv.valueid = None
@@ -1871,21 +1876,22 @@ def addL1timeseries(request):
                 if maxtsrvL1 < maxtsrvL0:
                     tsrvAddToL1 = tsrvL0.filter(valuedatetime__gt=maxtsrvL1)
                     for tsrv in tsrvAddToL1:
-                        tsrv.resultid = relateL0tsresult
+                        tsrv.resultid = tsresultL1
                         try:
                             tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
                             tsrv.valueid = None
                             tsrv.save()
                             tsrva.valueid = tsrv
-                            print(tsrv.valueid)
+                            # print(tsrv.valueid)
                             tsrva.save()
                         except ObjectDoesNotExist:
-                            print('doesnt exist')
+                            # print('doesnt exist')
                             tsrv.valueid = None
                             tsresultTocopyBulk.append(tsrv)
                 if mintsrvL1 > mintsrvL0:
                     tsrvAddToL1 = tsrvL0.filter(valuedatetime__lt=mintsrvL1)
                     for tsrv in tsrvAddToL1:
+                        # print(tsresultL1)
                         tsrv.resultid = tsresultL1
                         try:
                             tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
@@ -1901,8 +1907,8 @@ def addL1timeseries(request):
             valuesadded = newtsrv.__len__()
             # print(valuesadded)
             # for tsrv in newtsrv:
-                # print(tsrv.resultid.resultid)
-                # print(tsrv)
+            #     print(tsrv.resultid.resultid)
+            #     print(tsrv)
             response_data['valuesadded'] = valuesadded
             # response_data['newresultid'] = newresult
             # print(result)

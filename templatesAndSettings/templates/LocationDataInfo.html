@@ -123,16 +123,37 @@ a[target="_blank"]:after {
 						{% endif %}
 						{% assign donut 1 %}
 						{% assign done 1 %}
+						{% assign printedResult 0 %}
+						{% for plevel in processing_level__in %}
+							{% if printedResult == 0 %}
+								{% if authenticated or Result.processing_level.processinglevelid == plevel %}
+									{% assign printedResult 1 %}
 
-						<tr class="row1">
-									<td >{{Result.resultid}}</td>
-									<td >{{Result.variableid.variablecode}}</td>
-									<td >{{Result.unitsid}}</td>
-									<td >{{Result.timeinterval}} {{Result.timeintervalunits}}</td>
-									<td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{ samplingfeatureid }}/resultidu&#61;{{Result.resultid}}"> View Time Series </a></td>
-							<td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}/popup=Anno/"> View Time Series </a></td>
-							<td > {{Result.processing_level}}</td>
-									</tr>
+								<tr class="row1">
+											<td >{{Result.resultid}}</td>
+											<td >{{Result.variableid.variablecode}}</td>
+											<td >{{Result.unitsid}}</td>
+											<td >{{Result.timeinterval}} {{Result.timeintervalunits}}</td>
+											<td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{ samplingfeatureid }}/resultidu&#61;{{Result.resultid}}"> View Time Series </a></td>
+									<td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}/popup=Anno/"> View Time Series </a></td>
+									<td > {{Result.processing_level}}</td>
+											</tr>
+                                {% elif not authenticated %}
+                    		{% assign printedResult 1 %}
+
+								<tr class="row1">
+											<td >{{Result.resultid}}</td>
+											<td >{{Result.variableid.variablecode}}</td>
+											<td >{{Result.unitsid}}</td>
+											<td >{{Result.timeinterval}} {{Result.timeintervalunits}}</td>
+											<td >login to see data</td>
+									<td >login to see data</td>
+									<td > {{Result.processing_level}}</td>
+											</tr>
+
+								{% endif %}
+							{% endif %}
+						{% endfor %}
 					{% endif %}
 				{% endfor %}
 
