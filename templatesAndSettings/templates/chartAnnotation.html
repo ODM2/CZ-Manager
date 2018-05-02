@@ -121,6 +121,16 @@ color:#dddddd !important;;
 		});
 	}
 
+	//function offsetPoints(offset){
+	//	var points =Highcharts.charts[1].getSelectedPoints();
+	//	Highcharts.each(points, function (point, value) {
+	//		var options = point.optionsToObject(point);
+	//		options.y = options.y + offset;
+	//		point.update(options,false);
+	//	});
+	//	Highcharts.charts[1].redraw();
+	//}
+
 	function selectPointsByDrag(e) {
 
     // Select points
@@ -240,8 +250,9 @@ $(document).ready(function() {
 					var offsetButton = document.getElementById("offsetButton");
 					offsetButton.firstChild.data = "reloading page";
 					offsetButton.disabled = false;
+					//offsetPoints(parseFloat(offset));
 					//setTimeout(function(){location.reload();},100);
-					location.reload();
+					//location.reload();
         },
 		});
 	});
@@ -259,6 +270,7 @@ $(document).ready(function() {
 		}
 		shiftValuesButton.disabled = true;
 		shiftValuesButton.firstChild.data = "shifting values";
+
 		$.ajax({
 				url: "{{prefixpath}}../addshiftvals/",
 				type: "POST",
@@ -512,10 +524,10 @@ Method- {{featureActionMethod}}
 				<td><button id="offsetButton">Offset values</button></td></tr>
 
 				<tr><td><input id="shiftValues"  value= "" name="shiftValues" type="text">
-				shift selected points linearly to value </input></td><td>
+				drift correct selected points linearly to value </input></td><td>
 				<input type="radio" name="shiftdirection" id = "forwardshift" value="forward" checked>Forward</input>
 					<input type="radio" name="shiftdirection" id = "backwardshift" value="backward">Backward</input>
-					<button id="shiftValuesButton">shift values</button></td></tr>
+					<button id="shiftValuesButton">drift correct values</button></td></tr>
 
 			{% endif %}
 		{% endif %}
