@@ -18,6 +18,7 @@ from django.db import IntegrityError
 from django.db import transaction
 from django.db.models import Min, Max
 from datetime import datetime
+from djutils.queue.decorators import queue_command
 
 from odm2admin.models import CvCensorcode
 from odm2admin.models import CvQualitycode
@@ -102,6 +103,7 @@ class Command(BaseCommand):
         parser.add_argument('cmdline', nargs=1, type=bool)
         parser.add_argument('reversed', nargs=1, type=bool, default=False)
 
+    @queue_command
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
         # cmdline = bool(options['cmdline'][0])
         filename = str(options['dataloggerfilelink'][0])
@@ -464,7 +466,7 @@ class Command(BaseCommand):
                                                         )
                                                         annotation.save()
                                                         tsvr.save()
-                                                    # print(tsvr)
+                                                    print(tsvr)
                                                     tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                              annotationid=annotation).save()
                                                     emailtext += "Alarm value fell below treshold of " \
@@ -475,7 +477,7 @@ class Command(BaseCommand):
                                             else:
                                                 dataqualityLowerAlarm = False
 
-                                        # print(row[colnum.columnnum])
+                                        print(row[colnum.columnnum])
                                         # check if values are above or below quality bounds
                                         # create an annotation if they are.
                                         # print(dataqualitybool)
@@ -501,7 +503,7 @@ class Command(BaseCommand):
                                                 Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
                                                 del bulktimeseriesvalues[:]
                                                 bulkcount = 0
-                                            # print("saved value")
+                                            print("saved value")
                                     except IntegrityError:
                                         pass
                                         # Timeseriesresultvalues.delete()
