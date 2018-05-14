@@ -102,6 +102,12 @@ def in_field(value):
     return val[0]
 
 
+
+# settings value
+@register.simple_tag
+def settings_value(name):
+    return getattr(settings, name, "")
+
 # https://stackoverflow.com/questions/771890/how-do-i-get-the-class-of-a-object-within-a-django-template
 @register.filter(name='get_class')
 def get_class(value):
