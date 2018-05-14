@@ -18,4 +18,5 @@ django-redis
 django-fixture-magic
 hs_restclient
 social-auth-app-django
-djutils
+# djutils
+# uwsgi

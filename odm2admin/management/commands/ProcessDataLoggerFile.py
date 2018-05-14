@@ -18,7 +18,6 @@ from django.db import IntegrityError
 from django.db import transaction
 from django.db.models import Min, Max
 from datetime import datetime
-from djutils.queue.decorators import queue_command
 
 from odm2admin.models import CvCensorcode
 from odm2admin.models import CvQualitycode
@@ -103,7 +102,7 @@ class Command(BaseCommand):
         parser.add_argument('cmdline', nargs=1, type=bool)
         parser.add_argument('reversed', nargs=1, type=bool, default=False)
 
-    @queue_command
+
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
         # cmdline = bool(options['cmdline'][0])
         filename = str(options['dataloggerfilelink'][0])

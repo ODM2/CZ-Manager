@@ -19,6 +19,7 @@ import sys
 import os
 import subprocess
 import re
+from urllib.parse import urlparse
 from datetime import datetime
 from datetime import timedelta
 from time import mktime
@@ -65,6 +66,7 @@ from .models import Citationextensionpropertyvalues
 from .models import Citations
 from .models import CvQualitycode
 from .models import CvAnnotationtype
+from .models import Dataloggerfiles
 from .models import Datasetcitations
 from .models import Datasets
 from .models import Datasetsresults
@@ -1789,6 +1791,47 @@ def add_annotation(request):
     #    resultidu = int(resultidu)
     return HttpResponse(json.dumps(response_data),content_type='application/json')
 
+def processDataLoggerFile(request):
+    response_data = {}
+    formData = None
+    dataloggerfileid = None
+    processingCode = None
+    databeginson = None
+    columnheaderson = None
+    print('in view')
+    # print(request.POST)
+    if 'dataloggerfileid' in request.POST:
+        dataloggerfileid = int(request.POST['dataloggerfileid'])
+        print(dataloggerfileid)
+    if 'processingCode' in request.POST:
+        processingCode = request.POST['processingCode']
+        print(processingCode)
+    if 'databeginson' in request.POST:
+        databeginson = int(request.POST['databeginson'])
+        print(databeginson)
+    if 'columnheaderson' in request.POST:
+        columnheaderson = int(request.POST['columnheaderson'])
+        print(columnheaderson)
+    print(dataloggerfileid)
+
+    dlf = Dataloggerfiles.objects.get(dataloggerfileid=dataloggerfileid)
+    linkname = str(dlf.dataloggerfilelinkname())
+    fileid = dlf.dataloggerfileid
+    ftpfile = dlf.dataloggerfiledescription
+    ftpparse = urlparse(ftpfile)
+    time.sleep(10)
+    if len(ftpparse.netloc) > 0:
+        ftpfrequencyhours = 24  # re.findall(r'^\D*(\d+)', self.processingCode)[0]
+        management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
+                                , str(databeginson), str(columnheaderson),
+                                str(ftpfrequencyhours), False)
+    else:
+        management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
+                                , str(databeginson), str(columnheaderson),
+                                False, False, False)
+    #response_data['formData'] = formData
+    return HttpResponse(json.dumps(response_data),content_type='application/json')
+
 def addL1timeseries(request):
     resultid = None
     response_data = {}
@@ -1829,7 +1872,7 @@ def addL1timeseries(request):
                 newtsrv = Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
 
             elif createorupdateL1 == "update":
-                #print('update')
+                print('update')
                 tsresultL1 = Timeseriesresults.objects.get(resultid=result)
                 resultL1 = Results.objects.get(resultid=result)
                 # tsrvL1 = Timeseriesresultvalues.objects.filter(resultid=tsresultL1)
@@ -1854,8 +1897,8 @@ def addL1timeseries(request):
                 # print(relateL1tsresult)
                 # for r in maxtsrvL1:
                 #     print(r)
-                # print('L1 result')
-                # print(tsresultL1)
+                print('L1 result')
+                print(tsresultL1)
 
                 maxtsrvL0=Timeseriesresultvalues.objects.filter(resultid=relateL0tsresult).annotate(
                         Max('valuedatetime')). \
@@ -1891,7 +1934,7 @@ def addL1timeseries(request):
                 if mintsrvL1 > mintsrvL0:
                     tsrvAddToL1 = tsrvL0.filter(valuedatetime__lt=mintsrvL1)
                     for tsrv in tsrvAddToL1:
-                        # print(tsresultL1)
+                        print(tsresultL1)
                         tsrv.resultid = tsresultL1
                         try:
                             tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
@@ -1905,7 +1948,7 @@ def addL1timeseries(request):
                             tsresultTocopyBulk.append(tsrv)
                 newtsrv = Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
             valuesadded = newtsrv.__len__()
-            # print(valuesadded)
+            print(valuesadded)
             # for tsrv in newtsrv:
             #     print(tsrv.resultid.resultid)
             #     print(tsrv)

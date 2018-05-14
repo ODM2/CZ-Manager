@@ -19,6 +19,7 @@ from django.db.models import Manager as GeoManager
 from django.contrib.gis.geos import GEOSGeometry
 from django.db import connection
 from django.db import models
+from django.utils import timezone
 # from django.forms import ModelFormWithFileField
 # from .forms import DataloggerprogramfilesAdminForm
 # from odm2testapp.forms import VariablesForm
@@ -1268,7 +1269,7 @@ class ProcessDataloggerfile(models.Model):
     databeginson = models.IntegerField(verbose_name="Data begins on this row number", default=2)
     columnheaderson = models.IntegerField(
         verbose_name="Column headers matching column labels from data logger columns on row")
-    date_processed = models.DateTimeField(auto_now=True)
+    date_processed = models.DateTimeField(editable=False)
 
     def __str__(self):
         s = u"%s" % self.dataloggerfileid
@@ -1283,21 +1284,25 @@ class ProcessDataloggerfile(models.Model):
     def save(self, *args, **kwargs):
         # ProcessDataLoggerFile(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid,
         # self.databeginson, self.columnheaderson, False)
-        super(ProcessDataloggerfile, self).save(*args, **kwargs)
-        linkname = str(self.dataloggerfileid.dataloggerfilelinkname())
-        fileid = self.dataloggerfileid.dataloggerfileid
-        ftpfile = self.dataloggerfileid.dataloggerfiledescription
-        ftpparse = urlparse(ftpfile)
-        if len(ftpparse.netloc) > 0:
-            ftpfrequencyhours = 24 #re.findall(r'^\D*(\d+)', self.processingCode)[0]
-            management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
-                                    , str(self.databeginson), str(self.columnheaderson),
-                                    str(ftpfrequencyhours), False)
-        else:
-            management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
-                                    , str(self.databeginson), str(self.columnheaderson),
-                                    False, False, False)
-
+        # print(self.processdataloggerfileid)
+        if not self.processdataloggerfileid:
+            dlf = ProcessDataloggerfile.objects.filter(dataloggerfileid=self.dataloggerfileid)
+            if dlf.count() ==0:
+                self.date_processed = timezone.now()
+                super(ProcessDataloggerfile, self).save(*args, **kwargs)
+                linkname = str(self.dataloggerfileid.dataloggerfilelinkname())
+                fileid = self.dataloggerfileid.dataloggerfileid
+                ftpfile = self.dataloggerfileid.dataloggerfiledescription
+                ftpparse = urlparse(ftpfile)
+                if len(ftpparse.netloc) > 0:
+                    ftpfrequencyhours = 24 #re.findall(r'^\D*(\d+)', self.processingCode)[0]
+                    #management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
+                    #                        , str(self.databeginson), str(self.columnheaderson),
+                    #                        str(ftpfrequencyhours), False)
+                #else:
+                    #management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
+                    #                        , str(self.databeginson), str(self.columnheaderson),
+                    #                        False, False, False)
         # def get_actions(self, request):
         #     #Disable delete
         #     actions = super(ProcessDataloggerfile, self).get_actions(request)
