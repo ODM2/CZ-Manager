@@ -191,7 +191,7 @@ makerelation = function(relationobs) {
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
-                    "</a>, IGSN: <a target='_blank' href='" +
+                    "</a>, Link: <a target='_blank' href='" +
                     child['samplingfeatureexternalidentifieruri'] + "'>" +
                     child['samplingfeatureexternalidentifier'] +"</a></li>";
             });
@@ -206,7 +206,7 @@ makerelation = function(relationobs) {
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
-                    "</a>, IGSN: <a target='_blank' href='" +
+                    "</a>, Link: <a target='_blank' href='" +
                     child['samplingfeatureexternalidentifieruri'] + "'>" +
                     child['samplingfeatureexternalidentifier'] +"</a></li>";
             });
@@ -221,7 +221,7 @@ makerelation = function(relationobs) {
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
-                    "</a>, IGSN: <a target='_blank' href='" +
+                    "</a>, Link: <a target='_blank' href='" +
                     child['samplingfeatureexternalidentifieruri'] + "'>" +
                     child['samplingfeatureexternalidentifier'] +"</a></li>";
             });
