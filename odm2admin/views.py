@@ -33,10 +33,12 @@ from django.http import HttpResponseRedirect
 from django.http import StreamingHttpResponse
 from django.shortcuts import render
 from django.template import loader
+
 from django.contrib.auth.decorators import login_required
 # from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 # from django.core import mail
+from django.core.management.base import CommandError
 from django.core import serializers
 from django.core.management import settings
 from templatesAndSettings.settings import exportdb
@@ -1798,39 +1800,52 @@ def processDataLoggerFile(request):
     processingCode = None
     databeginson = None
     columnheaderson = None
-    print('in view')
+    check_dates=False
+    # print('in view')
     # print(request.POST)
     if 'dataloggerfileid' in request.POST:
         dataloggerfileid = int(request.POST['dataloggerfileid'])
-        print(dataloggerfileid)
+        # print(dataloggerfileid)
     if 'processingCode' in request.POST:
         processingCode = request.POST['processingCode']
-        print(processingCode)
+        # print(processingCode)
     if 'databeginson' in request.POST:
         databeginson = int(request.POST['databeginson'])
-        print(databeginson)
+        # print(databeginson)
     if 'columnheaderson' in request.POST:
         columnheaderson = int(request.POST['columnheaderson'])
-        print(columnheaderson)
-    print(dataloggerfileid)
+        # print(columnheaderson)
+    if 'check_dates' in request.POST:
+        if bool(request.POST['check_dates']):
+            check_dates = bool(request.POST['check_dates'])
+        # print(check_dates)
+    # print(dataloggerfileid)
 
     dlf = Dataloggerfiles.objects.get(dataloggerfileid=dataloggerfileid)
     linkname = str(dlf.dataloggerfilelinkname())
     fileid = dlf.dataloggerfileid
     ftpfile = dlf.dataloggerfiledescription
     ftpparse = urlparse(ftpfile)
-    time.sleep(10)
-    if len(ftpparse.netloc) > 0:
-        ftpfrequencyhours = 24  # re.findall(r'^\D*(\d+)', self.processingCode)[0]
-        management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
-                                , str(databeginson), str(columnheaderson),
-                                str(ftpfrequencyhours), False)
-    else:
-        management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
-                                , str(databeginson), str(columnheaderson),
-                                False, False, False)
+    response = None
+    try:
+        if len(ftpparse.netloc) > 0:
+            ftpfrequencyhours = 24  # re.findall(r'^\D*(\d+)', self.processingCode)[0]
+            management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
+                                    , str(databeginson), str(columnheaderson),
+                                    str(ftpfrequencyhours), False)
+        else:
+            management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
+                                    , str(databeginson), str(columnheaderson),
+                                    check_dates, False, False)
+            response = HttpResponse(json.dumps(response_data), content_type='application/json')
+    except CommandError as e:
+        response_data['error_message'] = e.with_traceback()
+        response = HttpResponse(json.dumps(response_data), content_type='application/json')
+        response.status_code = 400
     #response_data['formData'] = formData
-    return HttpResponse(json.dumps(response_data),content_type='application/json')
+
+
+    return response
 
 def addL1timeseries(request):
     resultid = None
@@ -2202,6 +2217,10 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         if not authenticated:
             return HttpResponseRedirect(settings.CUSTOM_TEMPLATE_PATH)
         template = loader.get_template('chartAnnotation.html')
+    elif popup == 'hyst':
+        if not authenticated:
+            return HttpResponseRedirect(settings.CUSTOM_TEMPLATE_PATH)
+        template = loader.get_template('hysteresisChart.html')
     else:
         template = loader.get_template('chartpopup.html')
     data_disclaimer = settings.DATA_DISCLAIMER
@@ -2344,7 +2363,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         if popup == 'smll':
             entered_start_date = datetime_entered_end_date - timedelta(
                 settings.SENSOR_DASHBOARD['time_series_days'])
-        elif popup =='Anno':
+        elif popup =='Anno' or popup =='hyst':
             entered_start_date = datetime_entered_end_date - timedelta(
                 settings.SENSOR_DASHBOARD['time_series_days'])
         else:
@@ -2417,36 +2436,87 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             annotationsexist = True
     #print('series')
     #print(myresultSeries)
+
+
     for myresults in myresultSeries:
         i += 1
         resultannotationsexist = False
         # print('1st result')
         # print(myresults[0])
-        for result in myresults:
-            start = datetime(1970, 1, 1)
-            delta = result.valuedatetime - start
-            mills = delta.total_seconds() * 1000
-            if math.isnan(result.datavalue):
-                dataval = 'null'
-            else:
-                dataval = result.datavalue
-            # print(data.keys())
-            if popup == 'Anno':
-                data['datavalue' + str(i)].append(
-                    {'x': mills, 'y': dataval, 'id': str(result.valueid)})
-            else:
-                data['datavalue' + str(i)].append(
-                    [mills,dataval])
-            if popup == 'Anno':
-                for tsrva in tsrvas:
-                    if tsrva.valueid == result:
-                        # print('tsrv annotation value id ' + str(tsrva.valueid))
-                        if not resultannotationsexist:
-                            # print('resultannotationsexist')
-                            resultannotationsexist = True
-                            data.update({'datavalueannotated' : []})
-                        data['datavalueannotated'].append(
-                            {'x':mills,'y':dataval,'id':str(result.valueid)})
+        if popup == 'hyst':
+            result = Results
+            fa = Featureactions.objects.filter(featureactionid=selected_results[0].featureactionid.featureactionid).get()
+            sf = Samplingfeatures.objects.filter(samplingfeatureid=fa.samplingfeatureid.samplingfeatureid).get()
+            fas = Featureactions.objects.filter(samplingfeatureid=sf)
+            units = Units.objects.filter(unit_type='Volumetric flow rate')
+            dischargeRs = Results.objects.filter(featureactionid__in=fas).filter(unitsid__in=units)
+            dischargeR = dischargeRs.first()
+            dischargeTSR = Timeseriesresults.objects.filter(resultid=dischargeR).get()
+            print(dischargeTSR)
+            tsrvdischarge = Timeseriesresultvalues.objects.filter(~Q(datavalue__lte=dischargeR.variableid.nodatavalue))\
+                .filter(valuedatetime__gte=entered_start_date)\
+                .filter(valuedatetime__lte=entered_end_date)\
+                .filter(resultid=dischargeTSR).order_by('-valuedatetime')
+        if not popup=='hyst':
+            for result in myresults:
+                start = datetime(1970, 1, 1)
+                delta = result.valuedatetime - start
+                mills = delta.total_seconds() * 1000
+                if math.isnan(result.datavalue):
+                    dataval = 'null'
+                else:
+                    dataval = result.datavalue
+                # print(data.keys())
+                if popup == 'Anno':
+                    data['datavalue' + str(i)].append(
+                        {'x': mills, 'y': dataval, 'id': result.valueid})
+                else:
+                    data['datavalue' + str(i)].append(
+                        [mills,dataval])
+                if popup == 'Anno':
+                    for tsrva in tsrvas:
+                        if tsrva.valueid == result:
+                            # print('tsrv annotation value id ' + str(tsrva.valueid))
+                            if not resultannotationsexist:
+                                # print('resultannotationsexist')
+                                resultannotationsexist = True
+                                data.update({'datavalueannotated' : []})
+                            data['datavalueannotated'].append(
+                                {'x':mills,'y':dataval,'id':str(result.valueid)})
+        else:
+            colors = ['#00E5C4','#00E17D','#00DD38','#09D900','#49D500','#86D200','#C2CE00','#CA9900','#C65A00','#C21E00','#BF001B']
+            valcount = len(myresults)
+            ii = 0
+            j = 10
+            thresholds = []
+            # print(vals)
+            for result in myresults:
+                ii += 1
+                # print(ii)
+                # print(int(round(vals/j)))
+                if ii == int(round(valcount / j)):
+                    j -= 1
+                    thresholds.append(result.valueid)
+            k=0
+            print(thresholds)
+            threshold = thresholds[0]
+
+            for result, discharge in zip(myresults,tsrvdischarge):
+                if math.isnan(result.datavalue):
+                    dataval = 'null'
+                else:
+                    dataval = result.datavalue
+                if math.isnan(discharge.datavalue):
+                    dischargeval = 'null'
+                else:
+                    dischargeval = discharge.datavalue
+                    data['datavalue' + str(i)].append(
+                   {'x':dischargeval,'y':dataval,'color':colors[k]}) #  [dischargeval,dataval]
+                if threshold == result.valueid:
+                    k+=1
+                    if k < len(thresholds):
+                        threshold = thresholds[k]
+                    print(threshold)
                #{"x": mills, "y": dataval, "z": str(result.valueid)})  # dumptoMillis(result.valuedatetime)
             # data['datavalue'].extend(tmplist )
             # data['valuedatetime'].append(dumptoMillis(result.valuedatetime))
@@ -2487,10 +2557,36 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         # print('series unit and var')
         # print(str(unit) + ' - ' + str(variable))
         # print(len(mergedResultSets))
-        series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
-                      str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
-                      "data": data['datavalue' + str(i)], "point": { }})
+        if not popup=='hyst':
+            series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
+                          str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
+                          "data": data['datavalue' + str(i)], "point": { }})
+        else: # build color zones
+            vals = len(data['datavalue' + str(i)])
+            ii=0
+            j=10
+            thresholds = []
+            # print(vals)
+            for datum in data['datavalue' + str(i)]:
+                ii+=1
+                # print(ii)
+                # print(int(round(vals/j)))
+                if ii== int(round(vals/j)):
+                    j-=1
+                    thresholds.append(datum['y'])
+            zones = []
+            # print(thresholds)
+            for ii in range(1, 10):
+                threshold = thresholds.pop()
+                dict = {'value':float(threshold),'className':'zone-'+str(ii)}
+                zones.append(dict)
 
+            true = 'true'
+            two = 2
+            series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
+                          str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
+                          "lineWidth":two,"data": data['datavalue' + str(i)], "zones": zones})
+            # "plotOptions": {"maker": {"enabled": true},
         if mergeResults =='true' and len(mergedResultSets) <= i:
             break
 
@@ -2524,9 +2620,15 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     chartID = 'chart_id'
     chart = {"renderTo": chartID, "type": 'scatter', "zoomType": 'xy'}
     title2 = {"text": titleStr}
-    xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
-    yAxis = {"title": {"text": seriesStr}}
     graphType = 'scatter'
+    if not popup=='hyst':
+        xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
+    else:
+        xAxis = {"title": {"text": 'Discharge'}}
+        chart = {"renderTo": chartID, "type": 'scatter', "zoomType": 'xy'}
+        graphType = 'scatter'
+    yAxis = {"title": {"text": seriesStr}}
+
 
     int_selectedresultid_ids = []
     str_selectedresultid_ids = []
