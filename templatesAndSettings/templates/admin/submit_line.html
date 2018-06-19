@@ -10,6 +10,12 @@ $(document).ready(function(){
 	$('#process_logger_file_b').click(function(){ //'.submit_row._save'
 	    //console.log('clicked save');
 		var savebutton = $("#process_logger_file_b"); //$("#email_data");
+		var check_dates_box = $("#check_dates"); //$("#email_data");
+		var check_dates = 'False'
+		if(check_dates_box[0].checked == true){
+		    check_dates = 'True'
+		}
+		console.log(savebutton);
 		console.log(savebutton);
         console.log(savebutton[0].value);
         savebutton[0].value= "Processing Data";
@@ -30,9 +36,11 @@ $(document).ready(function(){
             url: "{% settings_value 'CUSTOM_TEMPLATE_PATH' %}../processdlfile/",
             type: "POST",
             timeout: 0,
+            async: false,
             data: {
                 'formData': formData,
                 'dataloggerfileid' : formData[1]['value'],
+                'check_dates'=check_dates,
                 'processingCode': formData[2]['value'],
                 'databeginson': formData[3]['value'],
                 'columnheaderson': formData[4]['value'],
@@ -45,6 +53,9 @@ $(document).ready(function(){
                 savebutton[0].value = "Data ingested";
                // console.log(json);
                 //savebutton.defaultValue = json.dataloggerfileid + " Processed"; //json.dataloggerfileid
+            },
+            error : function(json) {
+                alert(json.error_message);
             },
 		});
 		//console.log('after ajax');
@@ -60,5 +71,6 @@ $(document).ready(function(){
 {% if show_save_and_continue %}<input type="submit" value="{% trans 'Save and continue editing' %}" name="_continue" {{ onclick_attrib }}/>{% endif %}
 {% if opts.model_name == 'processdataloggerfile' %}
 <input type="button" value="{% trans 'Process data' %}" name="process_logger_file_b" id="process_logger_file_b" {{ onclick_attrib }} />
+    <input id="check_dates" class="asdf" type="checkbox" name="check_dates"  {{ onclick_attrib }}>check dates to prevent duplicates? (slower)</input>
     {% endif %}
 </div>

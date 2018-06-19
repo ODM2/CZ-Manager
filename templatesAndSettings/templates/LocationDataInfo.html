@@ -134,8 +134,12 @@ a[target="_blank"]:after {
 											<td >{{Result.variableid.variablecode}}</td>
 											<td >{{Result.unitsid}}</td>
 											<td >{{Result.timeinterval}} {{Result.timeintervalunits}}</td>
-											<td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{ samplingfeatureid }}/resultidu&#61;{{Result.resultid}}"> View Time Series </a></td>
-									<td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}/popup=Anno/"> View Time Series </a></td>
+											<td ><a target="_blank",
+													href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{ samplingfeatureid }}/resultidu&#61;{{Result.resultid}}"> View Time Series </a></td>
+									<td ><a target="_blank",
+											href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}/popup=Anno/"> View Time Series </a></td>
+									<td ><a target="_blank",
+											href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}/popup=hysteresis/"> View discharge concentration hysteresis </a></td>
 									<td > {{Result.processing_level}}</td>
 											</tr>
                                 {% elif not authenticated %}

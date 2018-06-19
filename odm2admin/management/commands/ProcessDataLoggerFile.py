@@ -56,10 +56,14 @@ parser = argparse.ArgumentParser(description='process datalogger file.')
 # .dataloggerfileid,args.databeginson,args.columnheaderson , True)
 
 def getEndDate(results):
-    EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
-    enddate = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
-        propertyid=EndDateProperty).get()
-    return enddate.propertyvalue
+    #EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
+    #enddate = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
+    #    propertyid=EndDateProperty).get()
+    enddate = Timeseriesresultvalues.objects.filter(resultid=results.resultid).annotate(
+        Max('valuedatetime')). \
+        order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M:%S.%f')
+
+    return enddate
 
 
 def updateStartDateEndDate(results, startdate, enddate):
