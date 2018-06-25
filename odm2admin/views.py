@@ -1828,16 +1828,21 @@ def processDataLoggerFile(request):
     ftpparse = urlparse(ftpfile)
     response = None
     try:
-        if len(ftpparse.netloc) > 0:
-            ftpfrequencyhours = 24  # re.findall(r'^\D*(\d+)', self.processingCode)[0]
-            management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
-                                    , str(databeginson), str(columnheaderson),
-                                    str(ftpfrequencyhours), False)
-        else:
-            management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
-                                    , str(databeginson), str(columnheaderson),
-                                    check_dates, False, False)
-            response = HttpResponse(json.dumps(response_data), content_type='application/json')
+        if not dlf.processingCode == 'locked' and not dlf.processingCode=='done':
+            dlf.processingCode = 'locked'
+            dlf.save()
+            if len(ftpparse.netloc) > 0:
+                ftpfrequencyhours = 24  # re.findall(r'^\D*(\d+)', self.processingCode)[0]
+                management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
+                                        , str(databeginson), str(columnheaderson),
+                                        str(ftpfrequencyhours), False)
+            else:
+                management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
+                                        , str(databeginson), str(columnheaderson),
+                                        check_dates, False, False)
+                dlf.processingCode = 'done'
+                dlf.save()
+                response = HttpResponse(json.dumps(response_data), content_type='application/json')
     except CommandError as e:
         response_data['error_message'] = e.with_traceback()
         response = HttpResponse(json.dumps(response_data), content_type='application/json')
@@ -2469,7 +2474,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                 # print(data.keys())
                 if popup == 'Anno':
                     data['datavalue' + str(i)].append(
-                        {'x': mills, 'y': dataval, 'id': result.valueid})
+                        {'x': mills, 'y': dataval, 'id': str(result.valueid)})
                 else:
                     data['datavalue' + str(i)].append(
                         [mills,dataval])
