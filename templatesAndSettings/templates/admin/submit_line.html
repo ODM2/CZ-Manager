@@ -11,13 +11,10 @@ $(document).ready(function(){
 	    //console.log('clicked save');
 		var savebutton = $("#process_logger_file_b"); //$("#email_data");
 		var check_dates_box = $("#check_dates"); //$("#email_data");
-		var check_dates = 'False'
+		var check_dates = 'False';
 		if(check_dates_box[0].checked == true){
-		    check_dates = 'True'
+		    check_dates = 'True';
 		}
-		console.log(savebutton);
-		console.log(savebutton);
-        console.log(savebutton[0].value);
         savebutton[0].value= "Processing Data";
         savebutton[0].disabled = true;
         //var extra = {{extra_context}};
@@ -40,7 +37,7 @@ $(document).ready(function(){
             data: {
                 'formData': formData,
                 'dataloggerfileid' : formData[1]['value'],
-                'check_dates'=check_dates,
+                'check_dates': check_dates,
                 'processingCode': formData[2]['value'],
                 'databeginson': formData[3]['value'],
                 'columnheaderson': formData[4]['value'],
@@ -69,8 +66,13 @@ $(document).ready(function(){
 {% if show_save_as_new %}<input type="submit" value="{% trans 'Save as new' %}" name="_saveasnew" {{ onclick_attrib }}/>{%endif%}
 {% if show_save_and_add_another %}<input type="submit" value="{% trans 'Save and add another' %}" name="_addanother" {{ onclick_attrib }}/>{% endif %}
 {% if show_save_and_continue %}<input type="submit" value="{% trans 'Save and continue editing' %}" name="_continue" {{ onclick_attrib }}/>{% endif %}
+
 {% if opts.model_name == 'processdataloggerfile' %}
-<input type="button" value="{% trans 'Process data' %}" name="process_logger_file_b" id="process_logger_file_b" {{ onclick_attrib }} />
+    {% if "locked" in adminform.form.processingCode.value or "done" in adminform.form.processingCode.value %}
+<input type="button" value="{% trans 'Process data' %}" name="process_logger_file_b" disabled id="process_logger_file_b" {{ onclick_attrib }}  />
+    {% else %}
+    <input type="button" value="{% trans 'Process data' %}" name="process_logger_file_b" id="process_logger_file_b" {{ onclick_attrib }} />
+    {% endif %}
     <input id="check_dates" class="asdf" type="checkbox" name="check_dates"  {{ onclick_attrib }}>check dates to prevent duplicates? (slower)</input>
     {% endif %}
 </div>

@@ -1285,17 +1285,18 @@ class ProcessDataloggerfile(models.Model):
         # ProcessDataLoggerFile(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid,
         # self.databeginson, self.columnheaderson, False)
         # print(self.processdataloggerfileid)
-        if not self.processdataloggerfileid:
-            dlf = ProcessDataloggerfile.objects.filter(dataloggerfileid=self.dataloggerfileid)
-            if dlf.count() ==0:
-                self.date_processed = timezone.now()
-                super(ProcessDataloggerfile, self).save(*args, **kwargs)
-                linkname = str(self.dataloggerfileid.dataloggerfilelinkname())
-                fileid = self.dataloggerfileid.dataloggerfileid
-                ftpfile = self.dataloggerfileid.dataloggerfiledescription
-                ftpparse = urlparse(ftpfile)
-                if len(ftpparse.netloc) > 0:
-                    ftpfrequencyhours = 24 #re.findall(r'^\D*(\d+)', self.processingCode)[0]
+        self.date_processed = timezone.now()
+        super(ProcessDataloggerfile, self).save(*args, **kwargs)
+        # if not self.processdataloggerfileid:
+        #     dlf = ProcessDataloggerfile.objects.filter(dataloggerfileid=self.dataloggerfileid)
+        #     if dlf.count() ==0:
+        #
+        #         linkname = str(self.dataloggerfileid.dataloggerfilelinkname())
+        #         fileid = self.dataloggerfileid.dataloggerfileid
+        #         ftpfile = self.dataloggerfileid.dataloggerfiledescription
+        #         ftpparse = urlparse(ftpfile)
+        #         if len(ftpparse.netloc) > 0:
+        #             ftpfrequencyhours = 24 #re.findall(r'^\D*(\d+)', self.processingCode)[0]
                     #management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
                     #                        , str(self.databeginson), str(self.columnheaderson),
                     #                        str(ftpfrequencyhours), False)
