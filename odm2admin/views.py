@@ -78,6 +78,7 @@ from .models import People
 from .models import Processinglevels
 from .models import Profileresults
 from .models import Profileresultvalues
+from .models import ProcessDataloggerfile
 from .models import Relatedfeatures
 from .models import Results
 from .models import Samplingfeatureextensionpropertyvalues
@@ -1793,7 +1794,7 @@ def add_annotation(request):
     #    resultidu = int(resultidu)
     return HttpResponse(json.dumps(response_data),content_type='application/json')
 
-def processDataLoggerFile(request):
+def procDataLoggerFile(request):
     response_data = {}
     formData = None
     dataloggerfileid = None
@@ -1816,21 +1817,22 @@ def processDataLoggerFile(request):
         columnheaderson = int(request.POST['columnheaderson'])
         # print(columnheaderson)
     if 'check_dates' in request.POST:
-        if bool(request.POST['check_dates']):
-            check_dates = bool(request.POST['check_dates'])
-        # print(check_dates)
+        if request.POST['check_dates'] =='True':
+            check_dates = True
+    # print(check_dates)
     # print(dataloggerfileid)
 
     dlf = Dataloggerfiles.objects.get(dataloggerfileid=dataloggerfileid)
+    pdlf = ProcessDataloggerfile.objects.get(dataloggerfileid=dataloggerfileid)
     linkname = str(dlf.dataloggerfilelinkname())
     fileid = dlf.dataloggerfileid
     ftpfile = dlf.dataloggerfiledescription
     ftpparse = urlparse(ftpfile)
     response = None
     try:
-        if not dlf.processingCode == 'locked' and not dlf.processingCode=='done':
-            dlf.processingCode = 'locked'
-            dlf.save()
+        if not pdlf.processingCode == 'locked' and not pdlf.processingCode=='done':
+            pdlf.processingCode = 'locked'
+            pdlf.save()
             if len(ftpparse.netloc) > 0:
                 ftpfrequencyhours = 24  # re.findall(r'^\D*(\d+)', self.processingCode)[0]
                 management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
@@ -1840,8 +1842,8 @@ def processDataLoggerFile(request):
                 management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
                                         , str(databeginson), str(columnheaderson),
                                         check_dates, False, False)
-                dlf.processingCode = 'done'
-                dlf.save()
+                pdlf.processingCode = 'done'
+                pdlf.save()
                 response = HttpResponse(json.dumps(response_data), content_type='application/json')
     except CommandError as e:
         response_data['error_message'] = e.with_traceback()
