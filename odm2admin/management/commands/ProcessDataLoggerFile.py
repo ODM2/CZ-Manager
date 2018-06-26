@@ -142,7 +142,7 @@ class Command(BaseCommand):
         emailtext = ""
         dateTimeColNum = 0
         pdlf = ProcessDataloggerfile.objects.get(dataloggerfileid=fileid)
-        if not pdlf.processingCode == 'locked' and not pdlf.processingCode == 'done':
+        if not pdlf.processingCode == 'done':
 
             for admin in settings.ADMINS:
                 tolist.append(admin['email'])
@@ -484,7 +484,7 @@ class Command(BaseCommand):
                                                             )
                                                             annotation.save()
                                                             tsvr.save()
-                                                        print(tsvr)
+                                                        # print(tsvr)
                                                         tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                                  annotationid=annotation).save()
                                                         emailtext += "Alarm value fell below treshold of " \
@@ -495,7 +495,7 @@ class Command(BaseCommand):
                                                 else:
                                                     dataqualityLowerAlarm = False
 
-                                            print(row[colnum.columnnum])
+                                            # print(row[colnum.columnnum])
                                             # check if values are above or below quality bounds
                                             # create an annotation if they are.
                                             # print(dataqualitybool)
@@ -521,7 +521,7 @@ class Command(BaseCommand):
                                                     Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
                                                     del bulktimeseriesvalues[:]
                                                     bulkcount = 0
-                                                print("saved value")
+                                                # print("saved value")
                                         except IntegrityError:
                                             pass
                                             # Timeseriesresultvalues.delete()
