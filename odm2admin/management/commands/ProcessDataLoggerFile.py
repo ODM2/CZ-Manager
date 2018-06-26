@@ -111,9 +111,9 @@ class Command(BaseCommand):
         parser.add_argument('dataloggerfileid', nargs=1, type=str)
         parser.add_argument('databeginson', nargs=1, type=str)
         parser.add_argument('columnheaderson', nargs=1, type=str)
-        parser.add_argument('check_dates', nargs=1, type=bool)
-        parser.add_argument('cmdline', nargs=1, type=bool)
-        parser.add_argument('reversed', nargs=1, type=bool, default=False)
+        parser.add_argument('check_dates', nargs=1, type=str)
+        parser.add_argument('cmdline', nargs=1, type=str)
+        parser.add_argument('reversed', nargs=1, type=str, default=False)
 
 
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
@@ -122,8 +122,11 @@ class Command(BaseCommand):
         file = str(settings.MEDIA_ROOT) + filename  # args[0].name
         fileid = int(options['dataloggerfileid'][0])
         fileid = Dataloggerfiles.objects.filter(dataloggerfileid=fileid).get()
-        check_dates = bool(options['check_dates'][0])
-        reversed = bool(options['reversed'][0])
+        check_dates = False
+        if options['check_dates'][0] == 'True':
+            check_dates = True
+        if options['reversed'][0] == 'True':
+            reversed = True
         stop_reading_reversed = False
         databeginson = int(options['databeginson'][0])  # int(databeginson[0])
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
