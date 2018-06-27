@@ -142,8 +142,11 @@ class Command(BaseCommand):
         emailtext = ""
         dateTimeColNum = 0
         pdlf = ProcessDataloggerfile.objects.get(dataloggerfileid=fileid)
-        if not pdlf.processingCode == 'done':
-
+        if not pdlf.processingCode == 'done' and not pdlf.processingCode=='locked':
+            pdlf.processingCode = 'locked'
+            pdlf.save()
+            print(pdlf)
+            print(pdlf.processingCode)
             for admin in settings.ADMINS:
                 tolist.append(admin['email'])
             try:
@@ -309,7 +312,9 @@ class Command(BaseCommand):
                                     qualitycode = None
 
                                     tsvr = None
+
                                     for mresults in Timeseriesresult:
+                                        tsvrbulk = True
                                         # print(mresults)
                                         try:
                                             if value == '':
@@ -367,6 +372,7 @@ class Command(BaseCommand):
                                                         )
                                                         annotation.save()
                                                         tsvr.save()
+                                                        tsvrbulk = False
                                                         tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                                  annotationid=annotation).save()
 
@@ -399,6 +405,7 @@ class Command(BaseCommand):
                                                         )
                                                         annotation.save()
                                                         tsvr.save()
+                                                        tsvrbulk = False
                                                         tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                                  annotationid=annotation).save()
                                                 else:
@@ -441,7 +448,7 @@ class Command(BaseCommand):
                                                             )
                                                             annotation.save()
                                                             tsvr.save()
-
+                                                            tsvrbulk = False
                                                         tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                                 annotationid=annotation).save()
                                                         emailtext += "Alarm value of " + \
@@ -484,6 +491,7 @@ class Command(BaseCommand):
                                                             )
                                                             annotation.save()
                                                             tsvr.save()
+                                                            tsvrbulk = False
                                                         # print(tsvr)
                                                         tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                                  annotationid=annotation).save()
@@ -515,13 +523,14 @@ class Command(BaseCommand):
                                                     timeaggregationintervalunitsid=mresults
                                                     .intendedtimespacingunitsid
                                                 )
-                                                bulktimeseriesvalues.append(tsvr)
-                                                bulkcount +=1
+                                                if tsvrbulk:
+                                                    bulktimeseriesvalues.append(tsvr)
+                                                    bulkcount +=1
                                                 if bulkcount > 20000:
                                                     Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
                                                     del bulktimeseriesvalues[:]
                                                     bulkcount = 0
-                                                # print("saved value")
+                                                    # print("saved value")
                                         except IntegrityError:
                                             pass
                                             # Timeseriesresultvalues.delete()
