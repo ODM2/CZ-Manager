@@ -123,6 +123,7 @@ class Command(BaseCommand):
         fileid = int(options['dataloggerfileid'][0])
         fileid = Dataloggerfiles.objects.filter(dataloggerfileid=fileid).get()
         check_dates = False
+        reversed = False
         if options['check_dates'][0] == 'True':
             check_dates = True
         if options['reversed'][0] == 'True':
