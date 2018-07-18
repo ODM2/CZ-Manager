@@ -19,6 +19,8 @@ import sys
 import os
 import subprocess
 import re
+# from celery import shared_task
+# import odm2admin.tasks as tasks
 from urllib.parse import urlparse
 from datetime import datetime
 from datetime import timedelta
@@ -1794,6 +1796,10 @@ def add_annotation(request):
     #    resultidu = int(resultidu)
     return HttpResponse(json.dumps(response_data),content_type='application/json')
 
+# def on_raw_message(body):
+#    print(body)
+
+# @shared_task
 def procDataLoggerFile(request):
     response_data = {}
     formData = None
@@ -1831,17 +1837,20 @@ def procDataLoggerFile(request):
     response = None
     try:
         if not pdlf.processingCode == 'locked' and not pdlf.processingCode=='done':
-            pdlf.processingCode = 'locked'
-            pdlf.save()
+            #  pdlf.processingCode = 'locked'
+            #  pdlf.save()
             if len(ftpparse.netloc) > 0:
                 ftpfrequencyhours = 24  # re.findall(r'^\D*(\d+)', self.processingCode)[0]
                 management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
                                         , str(databeginson), str(columnheaderson),
                                         str(ftpfrequencyhours), False)
             else:
+                # print('processdataloggerfile')
+                # result = tasks.pdataloggerfile.apply_async((linkname,fileid,databeginson,columnheaderson,check_dates,False))
                 management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
                                         , str(databeginson), str(columnheaderson),
                                         check_dates, False, False)
+                # print(result)
                 pdlf.processingCode = 'done'
                 pdlf.save()
                 response = HttpResponse(json.dumps(response_data), content_type='application/json')
@@ -2207,6 +2216,33 @@ def email_data_from_graph(request):
                                                 'emailsent': emailsent,
                                                 'outEmail': outEmail,},content_type='application/json')
 
+
+
+def hysterisisMetrics(discharge,response):
+    hystdict = {}
+    maxdischarge = discharge.aggregate(Max('datavalue'))
+    hystdict['max_discharge'] = maxdischarge['datavalue__max']
+    print(maxdischarge['datavalue__max'])
+    maxdischargerecord = discharge.order_by('-datavalue')[0]# .get(datavalue=float(maxdischarge['datavalue__max']))
+    discharge = discharge.order_by('valuedatetime')
+    print(maxdischargerecord)
+    print(maxdischargerecord.valuedatetime)
+    raisinglimbresponse = response.filter(valuedatetime__lte=maxdischargerecord.valuedatetime)
+    fallinglimbresponse = response.filter(valuedatetime__gt=maxdischargerecord.valuedatetime)
+    print('falling limb val count:' + str(fallinglimbresponse.count()))
+    raisinglimbmax_response = raisinglimbresponse.aggregate(Max('datavalue'))
+    raisinglimbmin_response = raisinglimbresponse.aggregate(Min('datavalue'))
+    hystdict['max_raising_limb_response'] = raisinglimbmax_response['datavalue__max']
+    hystdict['min_raising_limb_response'] = raisinglimbmin_response['datavalue__min']
+    hystdict['max_raising_loop_width'] = raisinglimbmax_response['datavalue__max'] - raisinglimbmin_response['datavalue__min']
+
+    fallinglimbmax_response = fallinglimbresponse.aggregate(Max('datavalue'))
+    fallinglimbmin_response = fallinglimbresponse.aggregate(Min('datavalue'))
+    hystdict['max_falling_limb_response'] = fallinglimbmax_response['datavalue__max']
+    hystdict['min_falling_limb_response'] = fallinglimbmin_response['datavalue__min']
+    hystdict['max_falling_loop_width'] = fallinglimbmax_response['datavalue__max'] - fallinglimbmin_response['datavalue__min']
+    return hystdict
+
 def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='NotSet',
                             dataset='NotSet',
                             resultidu='NotSet', startdate='NotSet', enddate='NotSet',
@@ -2459,11 +2495,12 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             dischargeRs = Results.objects.filter(featureactionid__in=fas).filter(unitsid__in=units)
             dischargeR = dischargeRs.first()
             dischargeTSR = Timeseriesresults.objects.filter(resultid=dischargeR).get()
-            print(dischargeTSR)
+            # print(dischargeTSR)
             tsrvdischarge = Timeseriesresultvalues.objects.filter(~Q(datavalue__lte=dischargeR.variableid.nodatavalue))\
                 .filter(valuedatetime__gte=entered_start_date)\
                 .filter(valuedatetime__lte=entered_end_date)\
                 .filter(resultid=dischargeTSR).order_by('-valuedatetime')
+            hystdict = hysterisisMetrics(tsrvdischarge,myresults)
         if not popup=='hyst':
             for result in myresults:
                 start = datetime(1970, 1, 1)
@@ -2668,7 +2705,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         tsr = Timeseriesresults.objects.filter(resultid=result).get()
         result.timeintervalunits = tsr.intendedtimespacingunitsid
         result.timeinterval = tsr.intendedtimespacing
-    return TemplateResponse(request, template, {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+
+    responsedict = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'startDate': entered_start_date,
                                                 'endDate': entered_end_date,
                                                 'popup': popup,
@@ -2696,7 +2734,11 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                                                 'title2': title2, 'resultList': resultList,
                                                 'graphType': graphType, 'xAxis': xAxis,
                                                 'yAxis': yAxis,
-                                                'name_of_units': name_of_units}, )
+                                                'name_of_units': name_of_units}
+    z = hystdict.copy()
+    z.update(responsedict)
+    responsedict = z
+    return TemplateResponse(request, template, responsedict, )
 
 
 #
