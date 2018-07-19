@@ -2222,25 +2222,29 @@ def hysterisisMetrics(discharge,response):
     hystdict = {}
     maxdischarge = discharge.aggregate(Max('datavalue'))
     hystdict['max_discharge'] = maxdischarge['datavalue__max']
-    print(maxdischarge['datavalue__max'])
-    maxdischargerecord = discharge.order_by('-datavalue')[0]# .get(datavalue=float(maxdischarge['datavalue__max']))
-    discharge = discharge.order_by('valuedatetime')
-    print(maxdischargerecord)
-    print(maxdischargerecord.valuedatetime)
-    raisinglimbresponse = response.filter(valuedatetime__lte=maxdischargerecord.valuedatetime)
-    fallinglimbresponse = response.filter(valuedatetime__gt=maxdischargerecord.valuedatetime)
-    print('falling limb val count:' + str(fallinglimbresponse.count()))
-    raisinglimbmax_response = raisinglimbresponse.aggregate(Max('datavalue'))
-    raisinglimbmin_response = raisinglimbresponse.aggregate(Min('datavalue'))
-    hystdict['max_raising_limb_response'] = raisinglimbmax_response['datavalue__max']
-    hystdict['min_raising_limb_response'] = raisinglimbmin_response['datavalue__min']
-    hystdict['max_raising_loop_width'] = raisinglimbmax_response['datavalue__max'] - raisinglimbmin_response['datavalue__min']
+    if maxdischarge:
+        print(maxdischarge['datavalue__max'])
+        maxdischargerecord = discharge.order_by('-datavalue')[0]# .get(datavalue=float(maxdischarge['datavalue__max']))
+        discharge = discharge.order_by('valuedatetime')
+        print(maxdischargerecord)
+        print(maxdischargerecord.valuedatetime)
+        raisinglimbresponse = response.filter(valuedatetime__lte=maxdischargerecord.valuedatetime)
+        fallinglimbresponse = response.filter(valuedatetime__gt=maxdischargerecord.valuedatetime)
+        print('falling limb val count: ' + str(fallinglimbresponse.count()))
+        print('raising limb val count: ' + str(raisinglimbresponse.count()))
+        raisinglimbmax_response = raisinglimbresponse.aggregate(Max('datavalue'))
+        raisinglimbmin_response = raisinglimbresponse.aggregate(Min('datavalue'))
+        hystdict['max_raising_limb_response'] = raisinglimbmax_response['datavalue__max']
+        hystdict['min_raising_limb_response'] = raisinglimbmin_response['datavalue__min']
+        if raisinglimbmin_response['datavalue__min'] and raisinglimbmax_response['datavalue__max']:
+            hystdict['max_raising_loop_width'] = raisinglimbmax_response['datavalue__max'] - raisinglimbmin_response['datavalue__min']
 
-    fallinglimbmax_response = fallinglimbresponse.aggregate(Max('datavalue'))
-    fallinglimbmin_response = fallinglimbresponse.aggregate(Min('datavalue'))
-    hystdict['max_falling_limb_response'] = fallinglimbmax_response['datavalue__max']
-    hystdict['min_falling_limb_response'] = fallinglimbmin_response['datavalue__min']
-    hystdict['max_falling_loop_width'] = fallinglimbmax_response['datavalue__max'] - fallinglimbmin_response['datavalue__min']
+        fallinglimbmax_response = fallinglimbresponse.aggregate(Max('datavalue'))
+        fallinglimbmin_response = fallinglimbresponse.aggregate(Min('datavalue'))
+        hystdict['max_falling_limb_response'] = fallinglimbmax_response['datavalue__max']
+        hystdict['min_falling_limb_response'] = fallinglimbmin_response['datavalue__min']
+        if fallinglimbmax_response['datavalue__max'] and fallinglimbmin_response['datavalue__min']:
+            hystdict['max_falling_loop_width'] = fallinglimbmax_response['datavalue__max'] - fallinglimbmin_response['datavalue__min']
     return hystdict
 
 def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='NotSet',
@@ -2620,7 +2624,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                     thresholds.append(datum['y'])
             zones = []
             # print(thresholds)
-            for ii in range(1, 10):
+            for ii in range(1, len(thresholds)):
                 threshold = thresholds.pop()
                 dict = {'value':float(threshold),'className':'zone-'+str(ii)}
                 zones.append(dict)
