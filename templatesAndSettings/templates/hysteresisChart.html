@@ -167,6 +167,26 @@ Method- {{featureActionMethod}}
 {% if useDataset %}
 {{datasetAbstract}}
 {% endif %}
+
+	<table >
+				<tr>
+				<th scope="col"  class="sortable column-resultid">Maximum discharge</th>
+
+				</tr>
+				<tr><td>
+					{{max_discharge}}
+				</td>
+				</tr></table>
+	<table>
+
+{% for hi, values in Hysteresis_Index.items %}
+		<tr><td>{{hi}}</td></tr>
+
+		<tr><td>{{values}}</td></tr>
+
+{% endfor %}
+		</table>
+
 {% include 'StartEndDate.html' %}
 <br><br>
 <p>{{data_disclaimer.text}} <a href={{data_disclaimer.link}} target="_blank"> {{data_disclaimer.linktext}}</a></p>

@@ -13,6 +13,8 @@ requests
 django-recaptcha
 # django-redis
 pyyaml
+numpy
+pandas
 xlrd
 django-redis
 django-fixture-magic
@@ -20,3 +22,4 @@ hs_restclient
 social-auth-app-django
 # djutils
 # uwsgi
+celery
