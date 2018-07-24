@@ -174,15 +174,14 @@ Method- {{featureActionMethod}}
 
 				</tr>
 				<tr><td>
-					{{max_discharge}}
+					{{max_discharge}} {{discharge_units}}
 				</td>
 				</tr></table>
 	<table>
-
+				<tr>
+				<th scope="col"  class="sortable column-resultid">Hysteresis Index</th>
 {% for hi, values in Hysteresis_Index.items %}
-		<tr><td>{{hi}}</td></tr>
-
-		<tr><td>{{values}}</td></tr>
+		<tr><td>{{hi}}: {{values}}</td></tr>
 
 {% endfor %}
 		</table>
