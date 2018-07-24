@@ -2250,8 +2250,8 @@ def hysterisisMetrics(discharge,response):
         responsenormpdf = pd.DataFrame(list(response.values()))
         responsenormpdf['datavalue'] = (responsenormpdf['datavalue']- minresponse.datavalue)/(maxresponse.datavalue - minresponse.datavalue)
         responsenormpdf['valuedatetime'] = responsenormpdf['valuedatetime'].apply(lambda dt: datetime(dt.year, dt.month, dt.day, dt.hour,
-                                                                           15 * round((float(dt.minute) + float(
-                                                                               dt.second) / 60) / 15)))
+                                                                           int(15 * round((float(dt.minute) + float(
+                                                                               dt.second) / 60) / 15))))
         # print(maxdischargerecord)
         # print(maxdischargerecord.valuedatetime)
 
@@ -2328,8 +2328,8 @@ def hysterisisMetrics(discharge,response):
             # print("HI mean: " + str(hystAvg))
             # print("HI standard deviation: " + str(hystStd))
 
-            hystdict['Hysteresis_Index']["HI mean: "] = hystAvg
-            hystdict['Hysteresis_Index']["HI standard deviation: "] = hystStd
+            hystdict["HI_mean"] = hystAvg
+            hystdict["HI_standard_deviation"] = hystStd
             # hystdict['Hysteresis_Index'].append([key + " values: ", values])
             # print(hystdict)
 
