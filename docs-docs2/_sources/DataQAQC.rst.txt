@@ -39,8 +39,8 @@ Our Annotated data will then look something like this:
 
 You can also add or subtract an offset value to a set of points or drift correct them. Drift correcting points will
 apply a linear correction so that the first or last point (depending if you select forward or backward) will have the
-value entered. the remaining values you selected will have an offset added to them proportional to their position in the
-set of points selected.
+value entered. The remaining values you selected will have an offset added to them. This offset is proportional to the
+points position in the set of points selected.
 
   .. image:: /images/offsetanddriftcorrect.png
 
