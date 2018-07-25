@@ -3,7 +3,7 @@ OODM2 Admin Walkthrough
 .. 2017 BiG-CZ / ODM2 Hands-On Workshop, November 15-16, 2017 at UC Riverside, CA.
 ..
 
-Below is a tutorial which explains many of the features of ODM2 Admin. This tutorial was developed for the CUAHSI Tools
+This walthough explains many of the features of ODM2 Admin. This tutorial was developed for the CUAHSI Tools
 and Services for Managing Research Data Workshop at the CUAHSI Biennial Colloquium on July 7-31-2018. It is meant as a
 demonstration of the capabilities of ODM2 Admin and as a use case for ODM2. Links contained here access a demonstartion
 version of ODM2 Admin populated with data from the `Luquillo Critical Zone Observatory <http://criticalzone.org/luquillo/>`_
@@ -40,18 +40,19 @@ ODM2 Admin site administration dashboard
 
 .. image:: /images/AdminDashboard.png
 
-The ODM2 Admin Administration link will take you to a list of all 44 ODM2 entities that can be directly managed in
-ODM2 Admin. See the ODM2 Admin Forms for details about the ODM2 Admin Forms :ref:`ODM2-Administration`.
-
-The recent actions section shows changes you have recently completed in ODM2 Admin such as adding or editing an item
-in the forms. In the example above we can see that a method, a data result and a variable were recently changed.
+The recent actions block of the site administration dashboard shows changes you have recently completed in ODM2 Admin
+such as adding or editing an item in the forms. In the example above we can see that a method, a data result and a
+variable were recently changed.
 
 The Authentication and Authorization link will allow you to create users and groups so others can login to the system.
 
-Additional entities exist within the ODM2 information model these need to be managed with another tool
-Such as with the ODM2PythonAPI. Django models exist for each ODM2 entity so it is also possible to write Python scripts
-using the Django Object relational mapper. See :ref:`Managing-ODM2-With-The-Django-ORM` for details on using the Django
-ORM with ODM2 databases.
+The ODM2 Admin Administration link will take you to a list of all 44 ODM2 entities that can be directly managed in
+ODM2 Admin. See the ODM2 Admin Forms for details about the ODM2 Admin Forms :ref:`ODM2-Administration`.
+
+Some entities described by the ODM2 data model do not have forms associated with them in ODM2 Admin and need to be
+managed with another tool such as with the ODM2PythonAPI. Django models exist for each ODM2 entity so it is also
+possible to write Python scripts using the Django Object relational mapper. See :ref:`Managing-ODM2-With-The-Django-ORM`
+for details on using the Django ORM with ODM2 databases.
 
 
 .. toctree::
