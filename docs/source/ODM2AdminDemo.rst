@@ -1,11 +1,13 @@
 ODM2 Admin Walkthrough
 ======================
+.. 2017 BiG-CZ / ODM2 Hands-On Workshop, November 15-16, 2017 at UC Riverside, CA.
+..
 
-Below is a tutorial which explains many of the features of ODM2 Admin. This tutorial was developed for the 2017
-BiG-CZ / ODM2 Hands-On Workshop, November 15-16, 2017 at UC Riverside, CA. It is meant as a demonstration of the
-capabilities of ODM2 Admin and as a use case for ODM2. Links contained here access a demonstartion
+Below is a tutorial which explains many of the features of ODM2 Admin. This tutorial was developed for the CUAHSI Tools
+and Services for Managing Research Data Workshop at the CUAHSI Biennial Colloquium on July 7-31-2018. It is meant as a
+demonstration of the capabilities of ODM2 Admin and as a use case for ODM2. Links contained here access a demonstartion
 version of ODM2 Admin populated with data from the `Luquillo Critical Zone Observatory <http://criticalzone.org/luquillo/>`_
-and hosted by `CUAHSI <https://www.cuahsi.org/>`_   . If you would like access to the sandbox please email
+and hosted by `CUAHSI <https://www.cuahsi.org/>`_   . If you would like to access the sandbox please email
 leonmi@sas.upenn.edu
 
 You can login to  the sandbox here: https://dev-odm2admin.cuahsi.org/Sandbox/
@@ -33,11 +35,18 @@ Upon logging into ODM2 Admin you will see the below navigation shortcuts across 
 * Fifth, Manage Citations, provides links for managing and exporting citations.
 * Sixth, Graph My Data, provides links for data plotting and a map of your sites.
 
+ODM2 Admin site administration dashboard
+----------------------------------------
+
+.. image:: /images/AdminDashboard.png
 
 The ODM2 Admin Administration link will take you to a list of all 44 ODM2 entities that can be directly managed in
 ODM2 Admin. See the ODM2 Admin Forms for details about the ODM2 Admin Forms :ref:`ODM2-Administration`.
 
-Recent actions show changes you have recently completed in ODM2 Admin such as adding or editing an item in the forms.
+The recent actions section shows changes you have recently completed in ODM2 Admin such as adding or editing an item
+in the forms. In the example above we can see that a method, a data result and a variable were recently changed.
+
+The Authentication and Authorization link will allow you to create users and groups so others can login to the system.
 
 Additional entities exist within the ODM2 information model these need to be managed with another tool
 Such as with the ODM2PythonAPI. Django models exist for each ODM2 entity so it is also possible to write Python scripts
