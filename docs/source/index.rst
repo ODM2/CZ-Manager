@@ -94,8 +94,8 @@ You will need to run ``extrasql.sql`` on a postgreSQL instance of ODM2,
 a blank schema script can be found here:
 https://github.com/ODM2/ODM2/tree/master/src/blank_schema_scripts/postgresql
 
-Six instances of ODM2 Admin have been deployed and are hosted by CUAHSI. If you are interested in an ODM2 Admin instance
-hosted on the CUAHSI cloud contact leonmi@sas.upenn.edu
+Six instances of ODM2 Admin have been deployed and are hosted by CUAHSI. If you are interested in an ODM2 Admin
+instance, hosted on the CUAHSI cloud, contact leonmi@sas.upenn.edu
 
 * http://odm2admin.cuahsi.org/LCZO/mapdata.html
 * http://odm2admin.cuahsi.org/DryCreek/mapdata.html
