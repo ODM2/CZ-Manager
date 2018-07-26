@@ -123,8 +123,9 @@ where your data are viewable.
         "featureactionids": [1699, 1784,1782,1780,1701,1707,1778,1779],
     }
 
-Add sampling feature actions to the sensor dashboard. Feature actions listed here will be present in a drop down list on
-the sensor dashboard page.
+In the Sensor dashboard configuration "featureactionids" add sampling feature actions, related to sensor time series
+results, to the sensor dashboard. Feature actions listed here will be present in a drop down list on the sensor
+dashboard page.
 
 The sensor dashboard can be found by visiting 'Graph My Data' -> 'Sensor Dashboard'.
 
