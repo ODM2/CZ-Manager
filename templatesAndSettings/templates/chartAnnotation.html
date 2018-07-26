@@ -197,6 +197,7 @@ $(document).ready(function() {
 		$.ajax({
 				url: "{{prefixpath}}../addannotation/",
 				type: "POST",
+				timeout: 0,
 				data: {
 					'resultidu': selectedResult,
 					'annotationvals': annotationvals,
@@ -252,7 +253,7 @@ $(document).ready(function() {
 					offsetButton.disabled = false;
 					//offsetPoints(parseFloat(offset));
 					//setTimeout(function(){location.reload();},100);
-					//location.reload();
+					location.reload();
         },
 		});
 	});
