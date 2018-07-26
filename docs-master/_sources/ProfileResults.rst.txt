@@ -3,7 +3,7 @@
 ODM2 Admin Managing Profile Results
 ===================================
 
-Some of the sampling features, accessible from the ODM2 Admin Map contian sampling features such as
+Some of the sampling features, accessible from the ODM2 Admin Map contain sampling features such as
 
    .. image:: /images/FieldArea.png
 
