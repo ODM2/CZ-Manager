@@ -21,6 +21,7 @@ import subprocess
 import re
 import pandas as pd
 import numpy
+from colour import Color
 # from celery import shared_task
 # import odm2admin.tasks as tasks
 from urllib.parse import urlparse
@@ -1606,7 +1607,7 @@ def add_shiftvalues(request):
     for tsrv in realshiftvals:
         if k > 1:
             tsrv.datavalue = float(Decimal(Decimal(tsrv.datavalue) + (shiftval*k)))
-            tsrv.update()
+            tsrv.save()
         # print(tsrv.datavalue)
         k +=1
 
@@ -1653,7 +1654,7 @@ def add_offset(request):
         print(tsrvs.query)
         for tsrv in tsrvs:
             tsrv.datavalue = Decimal(tsrv.datavalue) + offset
-            tsrv.update()
+            tsrv.save()
             # print(tsrv.datavalue)
     response_data['valuesadded'] = valcount
     return HttpResponse(json.dumps(response_data),content_type='application/json')
@@ -2621,10 +2622,14 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                             data['datavalueannotated'].append(
                                 {'x':mills,'y':dataval,'id':str(result.valueid)})
         else:
+
+            #green = Color("green")
+            #colors = list(green.range_to(Color("red"), 20))
+            #print(colors)
             colors = ['#00E5C4','#00E17D','#00DD38','#09D900','#49D500','#86D200','#C2CE00','#CA9900','#C65A00','#C21E00','#BF001B']
             valcount = len(myresults)
             ii = 0
-            j = 10
+            j = 20
             thresholds = []
             # print(vals)
             for result in myresults:
@@ -2715,8 +2720,9 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             # print(thresholds)
             for ii in range(1, len(thresholds)):
                 threshold = thresholds.pop()
-                dict = {'value':float(threshold),'className':'zone-'+str(ii)}
-                zones.append(dict)
+                if not threshold == 'null':
+                    dict = {'value':float(threshold),'className':'zone-'+str(ii)}
+                    zones.append(dict)
 
             true = 'true'
             two = 2
