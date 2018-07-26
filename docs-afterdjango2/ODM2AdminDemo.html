@@ -105,11 +105,11 @@
             
   <div class="section" id="odm2-admin-walkthrough">
 <h1>ODM2 Admin Walkthrough<a class="headerlink" href="#odm2-admin-walkthrough" title="Permalink to this headline">¶</a></h1>
-<p>Below is a tutorial which explains many of the features of ODM2 Admin. This tutorial was developed for the 2017
-BiG-CZ / ODM2 Hands-On Workshop, November 15-16, 2017 at UC Riverside, CA. It is meant as a demonstration of the
-capabilities of ODM2 Admin and as a use case for ODM2. Links contained here access a demonstartion
+<p>Below is a tutorial which explains many of the features of ODM2 Admin. This tutorial was developed for the CUAHSI Tools
+and Services for Managing Research Data Workshop at the CUAHSI Biennial Colloquium on July 7-31-2018. It is meant as a
+demonstration of the capabilities of ODM2 Admin and as a use case for ODM2. Links contained here access a demonstartion
 version of ODM2 Admin populated with data from the <a class="reference external" href="http://criticalzone.org/luquillo/">Luquillo Critical Zone Observatory</a>
-and hosted by <a class="reference external" href="https://www.cuahsi.org/">CUAHSI</a>   . If you would like access to the sandbox please email
+and hosted by <a class="reference external" href="https://www.cuahsi.org/">CUAHSI</a>   . If you would like to access the sandbox please email
 <a class="reference external" href="mailto:leonmi&#37;&#52;&#48;sas&#46;upenn&#46;edu">leonmi<span>&#64;</span>sas<span>&#46;</span>upenn<span>&#46;</span>edu</a></p>
 <p>You can login to  the sandbox here: <a class="reference external" href="https://dev-odm2admin.cuahsi.org/Sandbox/">https://dev-odm2admin.cuahsi.org/Sandbox/</a></p>
 <p>After logging in you will see the ODM2 Admin Home page:</p>
@@ -130,9 +130,15 @@ new sensor data or you want to make changes to information relavent to sensor da
 <li>Fifth, Manage Citations, provides links for managing and exporting citations.</li>
 <li>Sixth, Graph My Data, provides links for data plotting and a map of your sites.</li>
 </ul>
+</div>
+<div class="section" id="odm2-admin-site-administration-dashboard">
+<h2>ODM2 Admin site administration dashboard<a class="headerlink" href="#odm2-admin-site-administration-dashboard" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/AdminDashboard.png" src="_images/AdminDashboard.png" />
 <p>The ODM2 Admin Administration link will take you to a list of all 44 ODM2 entities that can be directly managed in
 ODM2 Admin. See the ODM2 Admin Forms for details about the ODM2 Admin Forms <a class="reference internal" href="ODM2AdminAdministration.html#odm2-administration"><span class="std std-ref">ODM2 Admin Forms</span></a>.</p>
-<p>Recent actions show changes you have recently completed in ODM2 Admin such as adding or editing an item in the forms.</p>
+<p>The recent actions section shows changes you have recently completed in ODM2 Admin such as adding or editing an item
+in the forms. In the example above we can see that a method, a data result and a variable were recently changed.</p>
+<p>The Authentication and Authorization link will allow you to create users and groups so others can login to the system.</p>
 <p>Additional entities exist within the ODM2 information model these need to be managed with another tool
 Such as with the ODM2PythonAPI. Django models exist for each ODM2 entity so it is also possible to write Python scripts
 using the Django Object relational mapper. See <a class="reference internal" href="ManagingODM2WithTheDjangoORM.html#managing-odm2-with-the-django-orm"><span class="std std-ref">The Django ORM and WOFpy</span></a> for details on using the Django

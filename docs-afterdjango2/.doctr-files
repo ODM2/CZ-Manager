@@ -9,6 +9,7 @@ docs-afterdjango2/ODM2AdminDemo.html
 docs-afterdjango2/ODM2AdminSettings.html
 docs-afterdjango2/ODM2Adminbackground.html
 docs-afterdjango2/ProfileResults.html
+docs-afterdjango2/_images/AdminDashboard.png
 docs-afterdjango2/_images/AnnotatedData.png
 docs-afterdjango2/_images/AnnotatingData.png
 docs-afterdjango2/_images/ClusteredSite.png
@@ -28,6 +29,7 @@ docs-afterdjango2/_images/RESSHWaterTemp.png
 docs-afterdjango2/_images/RioEspirituSantoStreamGage.png
 docs-afterdjango2/_images/SelectWaterTempToAnnotate.png
 docs-afterdjango2/_images/SelectingDataWithURLs.png
+docs-afterdjango2/_images/offsetanddriftcorrect.png
 docs-afterdjango2/_sources/DataLoggerFiles.rst.txt
 docs-afterdjango2/_sources/DataQAQC.rst.txt
 docs-afterdjango2/_sources/DataVisualizationTips.rst.txt
