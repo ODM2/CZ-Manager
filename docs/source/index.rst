@@ -106,7 +106,7 @@ hosted on the CUAHSI cloud contact leonmi@sas.upenn.edu
 
 .. image:: /images/CUAHSI-Logo-with-URL---Transparent_(RESIZED).png
 
-Another deployment for demonstration porposes is available, see the ODM2 Admin Walkthrough <ODM2AdminDemo> for more
+Another deployment for demonstration porposes is available, see the :ref:'ODM2AdminDemo' for more
 information:
 
 https://dev-odm2admin.cuahsi.org/Sandbox/
@@ -141,7 +141,7 @@ with detailed descriptions and images from the sandbox. Many of the features of 
 * :ref:`Managing Profile Results With ODM2 Admin <ProfileResults>`
 * :ref:`Time series QA/QC <Data-QA-QC>`
 * :ref:`Data Sharing and Visualization Tips <Data-Visualization>`
-* :ref:`ManagingODM2WithTheDjangoORM <Managing-ODM2-With-The-Django-ORM>`
+* :ref:`Managing ODM2 With The Django ORM <Managing-ODM2-With-The-Django-ORM>`
 
 Docs Home
 ---------
