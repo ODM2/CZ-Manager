@@ -211,7 +211,7 @@ class Command(BaseCommand):
                             # assume date is first column for the moment
                             try:
                                 dateT = time.strptime(row[dateTimeColNum], "%m/%d/%Y %H:%M")  # '1/1/2013 0:10
-                                datestr = time.strftime("%Y-%m-%d %H:%M", dateT)
+                                datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                             except ValueError:
                                 try:
                                     dateT = time.strptime(row[dateTimeColNum], "%m/%d/%Y %H:%M:%S")  # '1/1/2013 0:10
@@ -233,16 +233,21 @@ class Command(BaseCommand):
                                                 datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                                             except ValueError:
                                                 try:
-                                                    if exceldatetime:
-                                                            # deal with excel formatted datetimes
-                                                            tmpdate = float(row[dateTimeColNum])
-                                                            dateTuple = xlrd.xldate_as_tuple(tmpdate, 0)
-                                                            dt_obj = datetime(*dateTuple[0:6])
-                                                            dateT = dt_obj.strptime(row[dateTimeColNum],
-                                                                              "%Y-%m-%d %H:%M:%S.%f")
-                                                            datestr= dt_obj.strftime("%Y-%m-%d %H:%M:%S")
+                                                    dateT = time.strptime(row[dateTimeColNum],
+                                                                          "Y-%m-%d %H:%M %p")  # '1/1/2013 0:10
+                                                    datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                                                 except ValueError:
-                                                    continue
+                                                    try:
+                                                        if exceldatetime:
+                                                                # deal with excel formatted datetimes
+                                                                tmpdate = float(row[dateTimeColNum])
+                                                                dateTuple = xlrd.xldate_as_tuple(tmpdate, 0)
+                                                                dt_obj = datetime(*dateTuple[0:6])
+                                                                dateT = dt_obj.strptime(row[dateTimeColNum],
+                                                                                  "%Y-%m-%d %H:%M:%S.%f")
+                                                                datestr= dt_obj.strftime("%Y-%m-%d %H:%M:%S")
+                                                    except ValueError:
+                                                        continue
                             #if you encounter a blank line continue and try the next one
                             except IndexError:
                                 continue
