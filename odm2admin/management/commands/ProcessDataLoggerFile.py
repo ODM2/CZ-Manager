@@ -207,33 +207,33 @@ class Command(BaseCommand):
                                     # amoung the dloggerfileColumns raise error
 
                         elif i >= databeginson:
-
+                            rawdt = row[dateTimeColNum].strip()
                             # assume date is first column for the moment
                             try:
-                                dateT = time.strptime(row[dateTimeColNum], "%m/%d/%Y %H:%M")  # '1/1/2013 0:10
+                                dateT = time.strptime(rawdt, "%m/%d/%Y %H:%M")  # '1/1/2013 0:10
                                 datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                             except ValueError:
                                 try:
-                                    dateT = time.strptime(row[dateTimeColNum], "%m/%d/%Y %H:%M:%S")  # '1/1/2013 0:10
+                                    dateT = time.strptime(rawdt, "%m/%d/%Y %H:%M:%S")  # '1/1/2013 0:10
                                     datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                                 except ValueError:
                                     try:
-                                        dateT = time.strptime(row[dateTimeColNum],
+                                        dateT = time.strptime(rawdt,
                                                               "%Y-%m-%d %H:%M:%S")  # '1/1/2013 0:10
                                         datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                                     except ValueError:
                                         try:
-                                            dateT = time.strptime(row[dateTimeColNum],
+                                            dateT = time.strptime(rawdt,
                                                                   "%Y-%m-%d %H:%M:%S.%f")  # '1/1/2013 0:10
                                             datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                                         except ValueError:
                                             try:
-                                                dateT = time.strptime(row[dateTimeColNum],
+                                                dateT = time.strptime(rawdt,
                                                                       "%Y/%m/%d %H:%M")  # '1/1/2013 0:10
                                                 datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                                             except ValueError:
                                                 try:
-                                                    dateT = time.strptime(row[dateTimeColNum],
+                                                    dateT = time.strptime(rawdt,
                                                                           "Y-%m-%d %H:%M %p")  # '1/1/2013 0:10
                                                     datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
                                                 except ValueError:
