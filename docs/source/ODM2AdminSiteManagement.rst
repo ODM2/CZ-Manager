@@ -21,6 +21,6 @@ manufacturer onset. The Method Type link will take us to the ODM2 controlled voc
 Click on the method name, this will show us the details about this method.
 
 Here we have a method description, and at the bottom actions. The actions listed here used this method, we can also add
-a new action using this method.
+a new action.
 
 :ref:`3) Using Data Logger Files <DataLoggerFiles>`
