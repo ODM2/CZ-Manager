@@ -181,7 +181,7 @@ External identifier systems
 
 * **External identifier systems:** Such as an IGSN or ORCiD.
 
-:ref:`2) ODM2 Admin Site Management <ODM2 Admin Site Mangement>`
+:ref:`2) ODM2 Admin Site Management <ODM2AdminSiteManagement>`
 
 * :ref:`ODM2 Admin docs home page <ODM2-Admin>`
 * :ref:`Search the docs <search>`
