@@ -59,7 +59,7 @@ for details on using the Django ORM with ODM2 databases.
    :maxdepth: 1
 
    1) The ODM2 Admin Forms <ODM2AdminAdministration>
-   2) ODM2 Admin Field Site Management <ODM2AdminSiteMangement>
+   2) ODM2 Admin Field Site Management <ODM2AdminSiteManagement>
    3) Using Data Logger Files <DataLoggerFiles>
    4) Managing Profile Results With ODM2 Admin <ProfileResults>
    5) Time series QA/QC <DataQAQC>
