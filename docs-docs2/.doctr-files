@@ -7,6 +7,7 @@ docs-docs2/ManagingODM2WithTheDjangoORM.html
 docs-docs2/ODM2AdminAdministration.html
 docs-docs2/ODM2AdminDemo.html
 docs-docs2/ODM2AdminSettings.html
+docs-docs2/ODM2AdminSiteManagement.html
 docs-docs2/ODM2Adminbackground.html
 docs-docs2/ProfileResults.html
 docs-docs2/_images/AdminDashboard.png
@@ -30,6 +31,7 @@ docs-docs2/_images/RESSHWaterTemp.png
 docs-docs2/_images/RioEspirituSantoStreamGage.png
 docs-docs2/_images/SelectWaterTempToAnnotate.png
 docs-docs2/_images/SelectingDataWithURLs.png
+docs-docs2/_images/methods.png
 docs-docs2/_images/offsetanddriftcorrect.png
 docs-docs2/_sources/DataLoggerFiles.rst.txt
 docs-docs2/_sources/DataQAQC.rst.txt
@@ -40,6 +42,7 @@ docs-docs2/_sources/ManagingODM2WithTheDjangoORM.rst.txt
 docs-docs2/_sources/ODM2AdminAdministration.rst.txt
 docs-docs2/_sources/ODM2AdminDemo.rst.txt
 docs-docs2/_sources/ODM2AdminSettings.rst.txt
+docs-docs2/_sources/ODM2AdminSiteManagement.rst.txt
 docs-docs2/_sources/ODM2Adminbackground.rst.txt
 docs-docs2/_sources/ProfileResults.rst.txt
 docs-docs2/_sources/index.rst.txt
