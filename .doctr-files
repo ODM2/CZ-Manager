@@ -7,6 +7,7 @@
 ./ODM2AdminAdministration.html
 ./ODM2AdminDemo.html
 ./ODM2AdminSettings.html
+./ODM2AdminSiteManagement.html
 ./ODM2Adminbackground.html
 ./ProfileResults.html
 ./_images/AdminDashboard.png
@@ -30,6 +31,7 @@
 ./_images/RioEspirituSantoStreamGage.png
 ./_images/SelectWaterTempToAnnotate.png
 ./_images/SelectingDataWithURLs.png
+./_images/methods.png
 ./_images/offsetanddriftcorrect.png
 ./_sources/DataLoggerFiles.rst.txt
 ./_sources/DataQAQC.rst.txt
@@ -40,6 +42,7 @@
 ./_sources/ODM2AdminAdministration.rst.txt
 ./_sources/ODM2AdminDemo.rst.txt
 ./_sources/ODM2AdminSettings.rst.txt
+./_sources/ODM2AdminSiteManagement.rst.txt
 ./_sources/ODM2Adminbackground.rst.txt
 ./_sources/ProfileResults.rst.txt
 ./_sources/index.rst.txt
