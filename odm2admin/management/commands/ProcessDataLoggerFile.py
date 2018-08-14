@@ -112,7 +112,9 @@ class Command(BaseCommand):
         parser.add_argument('databeginson', nargs=1, type=str)
         parser.add_argument('columnheaderson', nargs=1, type=str)
         parser.add_argument('check_dates', nargs=1, type=str)
-        parser.add_argument('cmdline', nargs=1, type=str)
+        parser.add_argument('cmdline', nargs=1, type=str, help='when specifying execution from the' +
+                                               ' file locking does not occur allowing for repeated execution' +
+                                                ' in a cron job or other automation')
         parser.add_argument('reversed', nargs=1, type=str, default=False)
 
 
@@ -124,10 +126,13 @@ class Command(BaseCommand):
         fileid = Dataloggerfiles.objects.filter(dataloggerfileid=fileid).get()
         check_dates = False
         reversed = False
+        cmdline = False
         if options['check_dates'][0] == 'True':
             check_dates = True
         if options['reversed'][0] == 'True':
             reversed = True
+        if options['cmdline'][0] == 'True':
+            cmdline = True
         stop_reading_reversed = False
         databeginson = int(options['databeginson'][0])  # int(databeginson[0])
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
@@ -144,8 +149,9 @@ class Command(BaseCommand):
         dateTimeColNum = 0
         pdlf = ProcessDataloggerfile.objects.get(dataloggerfileid=fileid)
         if not pdlf.processingCode == 'done' and not pdlf.processingCode=='locked':
-            pdlf.processingCode = 'locked'
-            pdlf.save()
+            if not cmdline:
+                pdlf.processingCode = 'locked'
+                pdlf.save()
             print(pdlf)
             print(pdlf.processingCode)
             for admin in settings.ADMINS:
