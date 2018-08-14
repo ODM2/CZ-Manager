@@ -128,7 +128,14 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                                      'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/'
                                      'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
-
+               re_path(
+                   r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
+                          'resultidu=(?P<resultidu>(\d+))/'
+                          'dischargeresult=(?P<resultidu>(\d+))/'
+                          'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/'
+                          'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/'
+                          'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
+                   views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                re_path(r'^' + 'graphfa/dataset=(?P<dataset>(\d+))/$',
                    views.TimeSeriesGraphingShort,
                    name="TimeSeriesGraphingShort"),
