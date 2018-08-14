@@ -422,16 +422,16 @@ def get_name_of_sampling_feature(selected_result):
 
 
 def get_name_of_variable(selected_result):
-    title_variables = Variables.objects.filter(variableid=selected_result.values('variableid'))
-    s = str(title_variables.values_list('variablecode', flat=True))
-    name_of_variable = s.split('\'')[1]
+    title_variables = Variables.objects.filter(variableid=selected_result.variableid)
+    # s = str(title_variables.values_list('variablecode', flat=True))
+    name_of_variable = title_variables.variablecode # s.split('\'')[1]
     return name_of_variable
 
 
 def get_name_of_units(selected_result):
     title_units = Units.objects.filter(unitsid=selected_result.values('unitsid'))
-    s = str(title_units.values_list('unitsname', flat=True))
-    name_of_units = s.split('\'')[1]
+    # s = str(title_units.values_list('unitsname', flat=True))
+    name_of_units = title_units.unitsname # s.split('\'')[1]
     return name_of_units
 
 
@@ -2337,7 +2337,7 @@ def hysterisisMetrics(discharge,response):
     return hystdict
 
 def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='NotSet',
-                            dataset='NotSet',
+                            dataset='NotSet',dischargeresult='NotSet',
                             resultidu='NotSet', startdate='NotSet', enddate='NotSet',
                             popup='NotSet'):  # ,startdate='',enddate=''
     mergeResults='false'
@@ -2586,7 +2586,11 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             sf = Samplingfeatures.objects.filter(samplingfeatureid=fa.samplingfeatureid.samplingfeatureid).get()
             fas = Featureactions.objects.filter(samplingfeatureid=sf)
             units = Units.objects.filter(unit_type='Volumetric flow rate')
-            dischargeRs = Results.objects.filter(featureactionid__in=fas).filter(unitsid__in=units)
+            dischargeRs = None
+            if not dischargeresult == 'NotSet':
+                dischargeRs = Results.objects.filter(resultid=int(dischargeresult))
+            else:
+                dischargeRs = Results.objects.filter(featureactionid__in=fas).filter(unitsid__in=units)
             dischargeR = dischargeRs.first()
             dischargeTSR = Timeseriesresults.objects.filter(resultid=dischargeR).get()
             # print(dischargeTSR)
@@ -2594,6 +2598,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                 .filter(valuedatetime__gte=entered_start_date)\
                 .filter(valuedatetime__lte=entered_end_date)\
                 .filter(resultid=dischargeTSR).order_by('-valuedatetime')
+            # print(tsrvdischarge.count())
             hystdict = hysterisisMetrics(tsrvdischarge,myresults)
         if not popup=='hyst':
             for result in myresults:
@@ -2629,18 +2634,22 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             colors = ['#00E5C4','#00E17D','#00DD38','#09D900','#49D500','#86D200','#C2CE00','#CA9900','#C65A00','#C21E00','#BF001B']
             valcount = len(myresults)
             ii = 0
-            j = 20
+            j = 10
             thresholds = []
-            # print(vals)
+            print(valcount)
             for result in myresults:
                 ii += 1
                 # print(ii)
-                # print(int(round(vals/j)))
+                # print('valcount/j')
+                # print(j)
+                # print(int(round(valcount/j)))
                 if ii == int(round(valcount / j)):
+                    print('here')
                     j -= 1
                     thresholds.append(result.valueid)
             k=0
-            print(thresholds)
+            # print('thresholds')
+            # print(thresholds)
             threshold = thresholds[0]
 
             for result, discharge in zip(myresults,tsrvdischarge):
@@ -2667,7 +2676,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         filter(resultid__in=resultList.values("resultid")).\
         order_by("resultid__variableid", "aggregationstatisticcv")
     # build strings for graph labels
-
+    # print('data')
+    # print(data)
     i = 0
     seriesStr = ''
     unit = ''
@@ -2723,7 +2733,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                 if not threshold == 'null':
                     dict = {'value':float(threshold),'className':'zone-'+str(ii)}
                     zones.append(dict)
-
+            # print('zones')
+            # print(zones)
             true = 'true'
             two = 2
             series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
@@ -3707,8 +3718,10 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
     datasetcitationlinks = {}
     for citation in citations:
         extprop = Citationextensionpropertyvalues.objects.filter(citationid=citation).get(propertyid=linkExtProperty)
-        datasetcitationlinks[citation.title] = extprop.propertyvalue
-
+        try:
+            datasetcitationlinks[citation.title] = extprop.propertyvalue
+        except ObjectDoesNotExist:
+            datasetcitationlinks[citation.title] = ''
     if 'export_data' in request.POST:
         resultValuesSeries = resultValuesSeries.order_by(
             "resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
