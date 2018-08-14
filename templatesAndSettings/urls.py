@@ -131,7 +131,7 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                re_path(
                    r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
                           'resultidu=(?P<resultidu>(\d+))/'
-                          'dischargeresult=(?P<resultidu>(\d+))/'
+                          'dischargeresult=(?P<dischargeresult>(\d+))/'
                           'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/'
                           'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/'
                           'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
