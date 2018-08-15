@@ -2266,9 +2266,9 @@ def hysterisisMetrics(discharge,response):
         if not len(raisinglimbresponse.index) == 0 and not len(fallinglimbresponse.index) == 0:
 
             dischargerange = maxnormdischargerecord- minnormdischargerecord
-            dischargeinterval = dischargerange / 20
+            dischargeinterval = dischargerange / 50
             hystIndex = {}
-            for i in range(1,20):
+            for i in range(1,50):
                 if i == 1:
                     lastinterval = 0
                 else:
@@ -2313,7 +2313,7 @@ def hysterisisMetrics(discharge,response):
                        # print(fallingrow)
                 if not closestraisingrow is None and not closestfallingrow is None:
                     tmp = closestraisingrow['datavalueraising'] - closestfallingrow['datavaluefalling']
-                    hystIndex['HI for ' + str(i*5) + '% discharge'] = tmp
+                    hystIndex['HI for ' + str(i*2) + '% discharge'] = tmp
                 print(hystIndex)
             HIs = []
             for key, values in hystIndex.items():
