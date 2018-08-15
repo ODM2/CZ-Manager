@@ -2336,6 +2336,53 @@ def hysterisisMetrics(discharge,response):
 
     return hystdict
 
+# https://bsou.io/posts/color-gradients-with-python
+def hex_to_RGB(hex):
+  ''' "#FFFFFF" -> [255,255,255] '''
+  # Pass 16 to the integer function for change of base
+  return [int(hex[i:i+2], 16) for i in range(1,6,2)]
+
+def RGB_to_hex(RGB):
+  ''' [255,255,255] -> "#FFFFFF" '''
+  # Components need to be integers for hex to make sense
+  RGB = [int(x) for x in RGB]
+  return "#"+"".join(["0{0:x}".format(v) if v < 16 else
+            "{0:x}".format(v) for v in RGB])
+
+
+def color_dict(gradient):
+  ''' Takes in a list of RGB sub-lists and returns dictionary of
+    colors in RGB and hex form for use in a graphing function
+    defined later on '''
+  return {"hex":[RGB_to_hex(RGB) for RGB in gradient],
+      "r":[RGB[0] for RGB in gradient],
+      "g":[RGB[1] for RGB in gradient],
+      "b":[RGB[2] for RGB in gradient]}
+
+
+def linear_gradient(start_hex, finish_hex="#FFFFFF", n=10):
+  ''' returns a gradient list of (n) colors between
+    two hex colors. start_hex and finish_hex
+    should be the full six-digit color string,
+    inlcuding the number sign ("#FFFFFF") '''
+  # Starting and ending colors in RGB form
+  s = hex_to_RGB(start_hex)
+  f = hex_to_RGB(finish_hex)
+  # Initilize a list of the output colors with the starting color
+  RGB_list = [s]
+  # Calcuate a color at each evenly spaced value of t from 1 to n
+  for t in range(1, n):
+    # Interpolate RGB vector for color at the current value of t
+    curr_vector = [
+      int(s[j] + (float(t)/(n-1))*(f[j]-s[j]))
+      for j in range(3)
+    ]
+    # Add it to our list of output colors
+    RGB_list.append(curr_vector)
+
+  return color_dict(RGB_list)
+
+
 def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='NotSet',
                             dataset='NotSet',dischargeresult='NotSet',
                             resultidu='NotSet', startdate='NotSet', enddate='NotSet',
@@ -2598,6 +2645,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                 .filter(valuedatetime__gte=entered_start_date)\
                 .filter(valuedatetime__lte=entered_end_date)\
                 .filter(resultid=dischargeTSR).order_by('-valuedatetime')
+            # print(tsrvdischarge.query)
             # print(tsrvdischarge.count())
             hystdict = hysterisisMetrics(tsrvdischarge,myresults)
         if not popup=='hyst':
@@ -2628,29 +2676,11 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                                 {'x':mills,'y':dataval,'id':str(result.valueid)})
         else:
 
-            #green = Color("green")
-            #colors = list(green.range_to(Color("red"), 20))
-            #print(colors)
-            colors = ['#00E5C4','#00E17D','#00DD38','#09D900','#49D500','#86D200','#C2CE00','#CA9900','#C65A00','#C21E00','#BF001B']
             valcount = len(myresults)
-            ii = 0
-            j = 10
-            thresholds = []
+            colors = linear_gradient('#BF001B','#00E5C4',n=valcount)# ['#00E5C4','#00E17D','#00DD38','#09D900','#49D500','#86D200','#C2CE00','#CA9900','#C65A00','#C21E00',]
+            hexcolors = colors['hex']
             print(valcount)
-            for result in myresults:
-                ii += 1
-                # print(ii)
-                # print('valcount/j')
-                # print(j)
-                # print(int(round(valcount/j)))
-                if ii == int(round(valcount / j)):
-                    print('here')
-                    j -= 1
-                    thresholds.append(result.valueid)
             k=0
-            # print('thresholds')
-            # print(thresholds)
-            threshold = thresholds[0]
 
             for result, discharge in zip(myresults,tsrvdischarge):
                 if math.isnan(result.datavalue):
@@ -2660,17 +2690,14 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                 if math.isnan(discharge.datavalue):
                     dischargeval = 'null'
                 else:
-                    dischargeval = discharge.datavalue
+                    dischargeval = discharge.datavalue # + " " + str(discharge.valuedatetime)
+                    start = datetime(1970, 1, 1)
+                    delta = discharge.valuedatetime - start
+                    mills = delta.total_seconds() * 1000
                     data['datavalue' + str(i)].append(
-                   {'x':dischargeval,'y':dataval,'color':colors[k]}) #  [dischargeval,dataval]
-                if threshold == result.valueid:
+                   {'x':dischargeval,'y':dataval,'dateTime':mills,'color':hexcolors[k]}) #  [dischargeval,dataval]
+                #if threshold == result.valueid:
                     k+=1
-                    if k < len(thresholds):
-                        threshold = thresholds[k]
-                    print(threshold)
-               #{"x": mills, "y": dataval, "z": str(result.valueid)})  # dumptoMillis(result.valuedatetime)
-            # data['datavalue'].extend(tmplist )
-            # data['valuedatetime'].append(dumptoMillis(result.valuedatetime))
 
     timeseriesresults = Timeseriesresults.objects.\
         filter(resultid__in=resultList.values("resultid")).\
@@ -2778,7 +2805,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     if not popup=='hyst':
         xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
     else:
-        xAxis = {"title": {"text": 'Discharge'}}
+        xAxis = {"title": {"text": 'Discharge'}} # "dateTimeLabelFormats":{}
         chart = {"renderTo": chartID, "type": 'scatter', "zoomType": 'xy'}
         graphType = 'scatter'
     yAxis = {"title": {"text": seriesStr}}

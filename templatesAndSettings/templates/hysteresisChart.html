@@ -135,9 +135,12 @@ $(document).ready(function() {
         backgroundColor: 'white',
         borderWidth: 0,
         borderRadius: 0,
-
         shadow: false,
-        split: false
+        split: false,
+        formatter: function(){
+        	return '<b>discharge: </b>' + this.point.x + '<br> ' +
+        	 '<b> response: </b>' + this.point.y + '<br> <b>Date: </b>'+ Highcharts.dateFormat(' %e-%b-%Y %I:%M %p', this.point.dateTime);
+        },
     },
     });
 
@@ -171,12 +174,20 @@ Method- {{featureActionMethod}}
 	<table >
 				<tr>
 				<th scope="col"  class="sortable column-resultid">Maximum discharge</th>
+				<th scope="col"  class="sortable column-resultid">Start date</th>
+				<th scope="col"  class="sortable column-resultid">End date</th>
 
 				</tr>
 				<tr><td>
 					{{max_discharge}} {{discharge_units}}
 				</td>
-				</tr></table>
+					<td>
+						{{startdate}}
+					</td>
+					<td>
+						{{enddate}}
+					</td>
+	</table>
 	<table>
 				<tr>
 				<th scope="col"  class="sortable column-resultid">Hysteresis Index</th>
