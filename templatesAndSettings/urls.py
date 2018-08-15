@@ -7,6 +7,7 @@ from django.http.response import HttpResponseRedirect
 from django.conf.urls.static import static
 from django.views.decorators.cache import cache_page
 # from ODM2CZOData import views # How can I use config file for this??
+from django.urls import reverse
 import importlib
 
 views = importlib.import_module("{}.views".format(settings.APP_NAME))
@@ -134,6 +135,21 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                           'dischargeresult=(?P<dischargeresult>(\d+))/'
                           'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/'
                           'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/'
+                          'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
+                   views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
+               re_path(
+                   r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
+                          'resultidu=(?P<resultidu>(\d+))/'
+                          'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}\s+\d+:\d+))/'
+                          'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}\s+\d+:\d+))/'
+                          'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
+                   views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
+               re_path(
+                   r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
+                          'resultidu=(?P<resultidu>(\d+))/'
+                          'dischargeresult=(?P<dischargeresult>(\d+))/'
+                          'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}\s+\d+:\d+))/'
+                          'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}\s+\d+:\d+))/'
                           'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                re_path(r'^' + 'graphfa/dataset=(?P<dataset>(\d+))/$',
