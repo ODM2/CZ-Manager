@@ -2227,7 +2227,7 @@ def hysterisisMetrics(discharge,response):
     hystdict['max_discharge'] = maxdischarge['datavalue__max']
     hystdict['discharge_units'] = discharge[0].resultid.resultid.unitsid.unitsabbreviation
     if maxdischarge:
-        print(maxdischarge['datavalue__max'])
+        # print(maxdischarge['datavalue__max'])
         # normalize discharge
         maxdischargerecord = discharge.order_by('-datavalue')[0]# .get(datavalue=float(maxdischarge['datavalue__max']))
         mindischargerecord = discharge.order_by('datavalue')[0]
@@ -2250,9 +2250,19 @@ def hysterisisMetrics(discharge,response):
         # responsenorm = []
         responsenormpdf = pd.DataFrame(list(response.values()))
         responsenormpdf['datavalue'] = (responsenormpdf['datavalue']- minresponse.datavalue)/(maxresponse.datavalue - minresponse.datavalue)
-        responsenormpdf['valuedatetime'] = responsenormpdf['valuedatetime'].apply(lambda dt: datetime(dt.year, dt.month, dt.day, dt.hour,
-                                                                           int(15 * round((float(dt.minute) + float(
-                                                                               dt.second) / 60) / 15))))
+
+        responsetsr = Timeseriesresults.objects.filter(resultid=response[0].resultid.resultid).get()
+        timeagg =responsetsr.intendedtimespacing
+        timeaggunit = responsetsr.intendedtimespacingunitsid.unitsname
+        if 'minute' in timeaggunit:
+            responsenormpdf['valuedatetime'] = responsenormpdf['valuedatetime'].apply(lambda dt: datetime(dt.year, dt.month, dt.day, dt.hour,
+                                                                           int(timeagg * round((float(dt.minute) + float(
+                                                                               dt.second) / 60) / timeagg))))
+        if 'hour' in timeaggunit:
+            timeagg = timeagg * 60
+            responsenormpdf['valuedatetime'] = responsenormpdf['valuedatetime'].apply(lambda dt: datetime(dt.year, dt.month, dt.day, dt.hour,
+                                                                           int(timeagg * round((float(dt.minute) + float(
+                                                                               dt.second) / 60) / timeagg))))
         # print(maxdischargerecord)
         # print(maxdischargerecord.valuedatetime)
 
