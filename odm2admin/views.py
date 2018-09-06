@@ -360,6 +360,7 @@ def AddProfile(request):
         return HttpResponseRedirect('../')
 
 
+
 def RecordAction(request):
     if request.user.is_authenticated:
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
@@ -2245,6 +2246,7 @@ def hysterisisMetrics(discharge,response):
         # print('discharge norm max: ' + str(maxnormdischargerecord))
         # print('discharge norm min: ' + str(minnormdischargerecord))
         # normalize response
+        print(response.count())
         maxresponse = response.order_by('-datavalue')[0]# .get(datavalue=float(maxdischarge['datavalue__max']))
         minresponse = response.order_by('datavalue')[0]
         # responsenorm = []
@@ -2635,6 +2637,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     for myresults in myresultSeries:
         i += 1
         resultannotationsexist = False
+        print('response count ' + str(myresults.count()))
         # print('1st result')
         # print(myresults[0])
         if popup == 'hyst':
@@ -2782,10 +2785,18 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             break
 
         if popup == 'Anno':
-            relatedresults = Results.objects.filter(
-                featureactionid = selectedMResult.featureactionid).filter(
-                variableid = selectedMResult.variableid
-            ).filter(unitsid = selectedMResult.unitsid)
+
+            relatedtsr = Timeseriesresults.objects.select_related('resultid').filter(
+                resultid__featureactionid = selectedMResult.featureactionid).filter(
+                resultid__variableid = selectedMResult.variableid
+            ).filter(resultid__unitsid = selectedMResult.unitsid).filter(intendedtimespacing = tsr.intendedtimespacing
+                                            ).filter(intendedtimespacingunitsid = tsr.intendedtimespacingunitsid)
+            relatedresults = Results.objects.filter(resultid__in=relatedtsr)
+            print(relatedresults)
+            #relatedresults = Results.objects.filter(
+            #    featureactionid = selectedMResult.featureactionid).filter(
+            #    variableid = selectedMResult.variableid
+            #).filter(unitsid = selectedMResult.unitsid)
             for rr in relatedresults:
                 if rr.processing_level.processinglevelid ==2:
                     L1exists = True
