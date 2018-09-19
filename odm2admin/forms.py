@@ -2549,7 +2549,7 @@ class MeasurementresultvalueFileAdmin(ReadOnlyAdmin):
 
 
 class UnitsAdminForm(ModelForm):
-    unit_type = make_ajax_field(Units, 'unit_type', 'cv_unit_type')
+    unit_type = make_ajax_field(Units, 'unit_type', 'cv_units_type')
     unit_type.help_text = u'A vocabulary for describing the type of the Unit or ' \
                           u'the more general quantity that the Unit ' \
                           u'represents. View unit type details here ' \
