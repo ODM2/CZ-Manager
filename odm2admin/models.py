@@ -3598,7 +3598,7 @@ class Timeseriesresultvaluesext(models.Model):
     processinglevelcode = models.CharField(verbose_name='processing level code', max_length=50)
     variablecode = models.CharField(verbose_name='variable code', max_length=50)
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
-    aggregationstatisticname = models.CharField(primary_key=True, max_length=255)
+    aggregationstatisticname = models.CharField(verbose_name='aggregation statistic name', max_length=255)
 
     def __str__(self):
         s = u"%s " % self.resultid
@@ -3684,7 +3684,7 @@ class Timeseriesresultvaluesextwannotations(models.Model):
     processinglevelcode = models.CharField(verbose_name='processing level code', max_length=50)
     variablecode = models.CharField(verbose_name='variable code', max_length=50)
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
-    aggregationstatisticname = models.CharField(primary_key=True, max_length=255)
+    aggregationstatisticname = models.CharField(verbose_name='aggregation statistic name', max_length=255)
     annotationtext = models.CharField(max_length=500)
 
     def __str__(self):
