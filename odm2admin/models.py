@@ -3574,6 +3574,7 @@ class Timeseriesresultvalues(models.Model):
 
 
 class Timeseriesresultvaluesext(models.Model):
+    #test
     valueid = models.AutoField(primary_key=True)
     resultid = models.ForeignKey(Timeseriesresults, db_column='resultid',
                                  on_delete=models.DO_NOTHING)
