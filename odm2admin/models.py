@@ -19,6 +19,8 @@ from django.db.models import Manager as GeoManager
 from django.contrib.gis.geos import GEOSGeometry
 from django.db import connection
 from django.db import models
+from django.core.management import settings
+from django.utils import timezone
 # from django.forms import ModelFormWithFileField
 # from .forms import DataloggerprogramfilesAdminForm
 # from odm2testapp.forms import VariablesForm
@@ -50,7 +52,7 @@ def handle_uploaded_file(f, id):
                 dateT = time.strptime(row[0], "%m/%d/%Y %H:%M")  # '1/1/2013 0:10
                 datestr = time.strftime("%Y-%m-%d %H:%M", dateT)
                 Measurementresultvalues(resultid=id, datavalue=row[1], valuedatetime=datestr,
-                                        valuedatetimeutcoffset=4).save()
+                                        valuedatetimeutcoffset=0).save()
     except IndexError:
         raise ValidationError('encountered a problem with row ' + row)
 
@@ -173,10 +175,10 @@ class Actions(models.Model):
     method = models.ForeignKey('Methods', db_column='methodid', on_delete=models.CASCADE)
     begindatetime = models.DateTimeField(verbose_name='begin date time')
     begindatetimeutcoffset = models.IntegerField(
-        verbose_name='begin date time clock off set (from GMT)', default=4)
+        verbose_name='begin date time clock off set (from GMT)', default=settings.UTC_OFFSET)
     enddatetime = models.DateTimeField(verbose_name='end date time', blank=True, null=True)
     enddatetimeutcoffset = models.IntegerField(
-        verbose_name='end date time clock off set (from GMT)', default=4)
+        verbose_name='end date time clock off set (from GMT)', default=settings.UTC_OFFSET)
     actiondescription = models.CharField(verbose_name='action description', max_length=5000,
                                          blank=True)
     actionfilelink = models.CharField(verbose_name='action file link', max_length=255, blank=True)
@@ -240,7 +242,7 @@ class Annotations(models.Model):
     annotationcode = models.CharField(max_length=50, blank=True)
     annotationtext = models.CharField(max_length=500)
     annotationdatetime = models.DateTimeField(blank=True, null=True)
-    annotationutcoffset = models.IntegerField(blank=True, null=True)
+    annotationutcoffset = models.IntegerField(blank=True, null=True, default=settings.UTC_OFFSET)
     annotationlink = models.CharField(max_length=255, blank=True)
     annotatorid = models.ForeignKey('People', db_column='annotatorid', blank=True, null=True,
                                     on_delete=models.CASCADE)
@@ -1261,8 +1263,8 @@ class ProcessDataloggerfile(models.Model):
                                  on_delete=models.CASCADE)
     processingCode = models.CharField(max_length=255, verbose_name='processing code',
                                       help_text="to setup an FTP file download set the processing" +
-                                      "code as 'x hours between download' where x is how many hours to " +
-                                      "wait between downloading copies of the file from the FTP site. " +
+                                      "code as 'download from ftp or http' to " +
+                                      "download the file from the FTP site. " +
                                       "A datalogger file setup for FTP download must have only 1 " +
                                       "process data logger file record.", default="0")
     databeginson = models.IntegerField(verbose_name="Data begins on this row number", default=2)
@@ -1280,23 +1282,29 @@ class ProcessDataloggerfile(models.Model):
         db_table = r'odm2extra"."processdataloggerfile'
         verbose_name = 'process data logger file'
 
-    def save(self, *args, **kwargs):
+    #def save(self, *args, **kwargs):
         # ProcessDataLoggerFile(self.dataloggerfileid.dataloggerfilelink,self.dataloggerfileid,
         # self.databeginson, self.columnheaderson, False)
-        linkname = str(self.dataloggerfileid.dataloggerfilelinkname())
-        fileid = self.dataloggerfileid.dataloggerfileid
-        ftpfile = self.dataloggerfileid.dataloggerfiledescription
-        ftpparse = urlparse(ftpfile)
-        if len(ftpparse.netloc) > 0:
-            ftpfrequencyhours = re.findall(r'^\D*(\d+)', self.processingCode)[0]
-            management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
-                                    , str(self.databeginson), str(self.columnheaderson),
-                                    str(ftpfrequencyhours), False)
-        else:
-            management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
-                                    , str(self.databeginson), str(self.columnheaderson),
-                                    False, False, False)
-        super(ProcessDataloggerfile, self).save(*args, **kwargs)
+        # print(self.processdataloggerfileid)
+        #    self.date_processed = timezone.now()
+        #     super(ProcessDataloggerfile, self).save(*args, **kwargs)
+        # if not self.processdataloggerfileid:
+        #     dlf = ProcessDataloggerfile.objects.filter(dataloggerfileid=self.dataloggerfileid)
+        #     if dlf.count() ==0:
+        #
+        #         linkname = str(self.dataloggerfileid.dataloggerfilelinkname())
+        #         fileid = self.dataloggerfileid.dataloggerfileid
+        #         ftpfile = self.dataloggerfileid.dataloggerfiledescription
+        #         ftpparse = urlparse(ftpfile)
+        #         if len(ftpparse.netloc) > 0:
+        #             ftpfrequencyhours = 24 #re.findall(r'^\D*(\d+)', self.processingCode)[0]
+                    #management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
+                    #                        , str(self.databeginson), str(self.columnheaderson),
+                    #                        str(ftpfrequencyhours), False)
+                #else:
+                    #management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
+                    #                        , str(self.databeginson), str(self.columnheaderson),
+                    #                        False, False, False)
         # def get_actions(self, request):
         #     #Disable delete
         #     actions = super(ProcessDataloggerfile, self).get_actions(request)
@@ -1792,7 +1800,7 @@ class Measurementresultvalues(models.Model):
     datavalue = models.FloatField(verbose_name='data value')
     valuedatetime = models.DateTimeField(verbose_name='value date time')
     valuedatetimeutcoffset = models.IntegerField(verbose_name='value date time UTC offset',
-                                                 default=4)
+                                                 default=settings.UTC_OFFSET)
 
     def __str__(self):
         s = u"%s " % self.resultid
@@ -2200,7 +2208,9 @@ class Pointcoverageresultvalues(models.Model):
 
 class Processinglevels(models.Model):
     processinglevelid = models.AutoField(primary_key=True)
-    processinglevelcode = models.CharField(verbose_name='processing level code', max_length=50)
+    processinglevelcode = models.CharField(verbose_name='processing level code',
+                                           help_text='This should be a number in order to export to hydroshare',
+                                           max_length=50)
     definition = models.CharField(max_length=5000, blank=True)
     explanation = models.CharField(max_length=5000, blank=True)
 
@@ -2303,7 +2313,7 @@ class Profileresultvalues(models.Model):
     datavalue = models.FloatField(verbose_name='data value')
     valuedatetime = models.DateTimeField(verbose_name='value date and time', blank=True, null=True)
     valuedatetimeutcoffset = models.IntegerField(verbose_name='value date and time UTC offset',
-                                                 blank=True, null=True)
+                                                 blank=True, null=True, default=settings.UTC_OFFSET)
     zlocation = models.FloatField(verbose_name='z location', blank=True, null=True)
     zaggregationinterval = models.FloatField(verbose_name='z aggregation interval', blank=True,
                                              null=True)
@@ -2573,7 +2583,7 @@ class Relatedequipment(models.Model):
     relationshipstartdatetime = models.DateTimeField()
     relationshipstartdatetimeutcoffset = models.IntegerField()
     relationshipenddatetime = models.DateTimeField(blank=True, null=True)
-    relationshipenddatetimeutcoffset = models.IntegerField(blank=True, null=True)
+    relationshipenddatetimeutcoffset = models.IntegerField(blank=True, null=True, default=settings.UTC_OFFSET)
 
     class Meta:
         managed = False
@@ -2759,15 +2769,15 @@ class Results(models.Model):
     resultdatetime = models.DateTimeField(verbose_name='Start result date time', blank=True,
                                           null=True)
     resultdatetimeutcoffset = models.BigIntegerField(
-        verbose_name='Start result date time UTC offset', default=4,
-        null=True)
+        verbose_name='Start result date time UTC offset',
+        null=True, default=settings.UTC_OFFSET)
     # validdatetime>> Date and time for which the result is valid (e.g., for a forecast result).
     # Should probably be expressed as a duration
     validdatetime = models.DateTimeField(
         verbose_name='valid date time- Date and time for which the result is valid',
         blank=True, null=True)
     validdatetimeutcoffset = models.BigIntegerField(verbose_name='valid date time UTC offset',
-                                                    default=4, null=True)
+                                                    null=True, default=settings.UTC_OFFSET)
     statuscv = models.ForeignKey(CvStatus, verbose_name='status', db_column='statuscv', blank=True,
                                  null=True,
                                  on_delete=models.CASCADE)
@@ -3587,7 +3597,7 @@ class Timeseriesresultvaluesext(models.Model):
     processinglevelcode = models.CharField(verbose_name='processing level code', max_length=50)
     variablecode = models.CharField(verbose_name='variable code', max_length=50)
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
-    aggregationstatisticname = models.CharField(primary_key=True, max_length=255)
+    aggregationstatisticname = models.CharField(verbose_name='aggregation statistic name',  max_length=255)
 
     def __str__(self):
         s = u"%s " % self.resultid
@@ -3673,7 +3683,7 @@ class Timeseriesresultvaluesextwannotations(models.Model):
     processinglevelcode = models.CharField(verbose_name='processing level code', max_length=50)
     variablecode = models.CharField(verbose_name='variable code', max_length=50)
     unitsabbreviation = models.CharField(verbose_name='unit abbreviation', max_length=50)
-    aggregationstatisticname = models.CharField(primary_key=True, max_length=255)
+    aggregationstatisticname = models.CharField(verbose_name='aggregation statistic name', max_length=255)
     annotationtext = models.CharField(max_length=500)
 
     def __str__(self):
