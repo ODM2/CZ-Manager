@@ -116,6 +116,7 @@ MAP.prototype.getData = function (url,spinner) {
 			}
         });
         _this.markers.addTo(_this.webmap);
+        console.log('here');
 		spinner.stop();
     })
 

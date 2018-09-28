@@ -3,7 +3,10 @@ from __future__ import unicode_literals
 import argparse
 import os
 #from urlparse import urlparse
-from urllib.parse import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+     from urlparse import urlparse
 
 from django.core.management.base import BaseCommand
 from django.core.management import settings

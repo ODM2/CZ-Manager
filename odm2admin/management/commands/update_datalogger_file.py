@@ -2,7 +2,10 @@ from __future__ import unicode_literals
 
 import argparse
 import os
-from urllib.parse import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+     from urlparse import urlparse
 # import kronos
 import urllib
 import subprocess

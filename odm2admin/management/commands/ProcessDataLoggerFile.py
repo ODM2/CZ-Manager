@@ -507,7 +507,7 @@ class Command(BaseCommand):
                                                         # print(tsvr)
                                                         tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                                  annotationid=annotation).save()
-                                                        emailtext += "Alarm value fell below treshold of " \
+                                                        emailtext += "Alarm value fell below threshold of " \
                                                                      + str(result_lower_bound_alarm.dataqualityvalue) + \
                                                                      " for time series " + str(mresults
                                                         ) + "\n " + "data value " + str(newdatavalue) + " on " \
