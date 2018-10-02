@@ -424,9 +424,9 @@ class Command(BaseCommand):
                                                     dataqualitybool = False
                                             # newdatavalue = float(row[colnum.columnnum])
                                             if dataqualityUpperAlarm:
-                                                sendemail = True
                                                 if newdatavalue > result_upper_bound_alarm.dataqualityvalue:
                                                     with transaction.atomic():
+                                                        sendemail = True
                                                         annotationtext = result_upper_bound_alarm.dataqualitycode + \
                                                                          " of " + str(
                                                             result_upper_bound_alarm.dataqualityvalue) \
@@ -471,9 +471,9 @@ class Command(BaseCommand):
                                                 else:
                                                     dataqualityUpperAlarm = False
                                             if dataqualityLowerAlarm:
-                                                sendemail=True
                                                 if newdatavalue < result_lower_bound_alarm.dataqualityvalue:
                                                     with transaction.atomic():
+                                                        sendemail = True
                                                         annotationtext = "value below "
                                                         annotationtext += str(result_lower_bound_alarm.dataqualitycode) + \
                                                                           " of " + str(
