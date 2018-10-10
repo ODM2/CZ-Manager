@@ -141,6 +141,8 @@ class Command(BaseCommand):
         bulkcount = 0
         upper_bound_quality_type = CvDataqualitytype.objects.get(name='Physical limit upper bound')
         lower_bound_quality_type = CvDataqualitytype.objects.get(name='Physical limit lower bound')
+        result_lower_bound = None
+        result_upper_bound = None
         emailtitle = "ODM2 Admin Alarm"
         tolist = []
         sendemail = False
@@ -426,7 +428,6 @@ class Command(BaseCommand):
                                             if dataqualityUpperAlarm:
                                                 if newdatavalue > result_upper_bound_alarm.dataqualityvalue:
                                                     with transaction.atomic():
-                                                        sendemail = True
                                                         annotationtext = result_upper_bound_alarm.dataqualitycode + \
                                                                          " of " + str(
                                                             result_upper_bound_alarm.dataqualityvalue) \
@@ -442,9 +443,12 @@ class Command(BaseCommand):
                                                         # result upper bound check
 
                                                         # print(dataqualitybool)
-                                                        if newdatavalue > result_upper_bound.dataqualityvalue:
-                                                            annotation.save()
-                                                        else: # already created time series result values in
+                                                        boundexceeded = False
+                                                        if result_upper_bound:
+                                                            if newdatavalue > result_upper_bound.dataqualityvalue:
+                                                                annotation.save()
+                                                                boundexceeded = True
+                                                        elif not boundexceeded: # already created time series result values in
                                                               # result upper bound check
                                                             tsvr = Timeseriesresultvalues(
                                                                 resultid=mresults,
@@ -486,9 +490,12 @@ class Command(BaseCommand):
                                                                                  annotationutcoffset=4,
                                                                                  annotatorid=annotatorid)
                                                         #qualitycode = qualitycodebad
-                                                        if newdatavalue < result_lower_bound.dataqualityvalue:
-                                                            annotation.save()
-                                                        else:
+                                                        boundexceeded = False
+                                                        if result_lower_bound:
+                                                            if newdatavalue < result_lower_bound.dataqualityvalue:
+                                                                annotation.save()
+                                                                boundexceeded = True
+                                                        elif not boundexceeded:
                                                             tsvr = Timeseriesresultvalues(
                                                                 resultid=mresults,
                                                                 datavalue=newdatavalue,
