@@ -325,9 +325,10 @@ class Command(BaseCommand):
                                     qualitycodebad = CvQualitycode.objects.filter(name='Bad').get()
                                     qualitycode = None
 
-                                    tsvr = None
+
 
                                     for mresults in Timeseriesresult:
+                                        tsvr = None
                                         tsvrbulk = True
                                         # print(mresults)
                                         try:
@@ -550,6 +551,20 @@ class Command(BaseCommand):
                                                     del bulktimeseriesvalues[:]
                                                     bulkcount = 0
                                                     # print("saved value")
+                                            if tsvr is None and not tsvrbulk:
+                                                tsvr = Timeseriesresultvalues(
+                                                    resultid=mresults,
+                                                    datavalue=newdatavalue,
+                                                    valuedatetime=datestr,
+                                                    valuedatetimeutcoffset=4,
+                                                    censorcodecv=censorcode,
+                                                    qualitycodecv=qualitycode,
+                                                    timeaggregationinterval=mresults
+                                                    .intendedtimespacing,
+                                                    timeaggregationintervalunitsid=mresults
+                                                    .intendedtimespacingunitsid
+                                                )
+                                                tsvr.save()
                                         except IntegrityError:
                                             pass
                                             # Timeseriesresultvalues.delete()
