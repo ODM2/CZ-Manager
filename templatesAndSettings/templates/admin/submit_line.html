@@ -52,7 +52,7 @@ $(document).ready(function(){
                 //savebutton.defaultValue = json.dataloggerfileid + " Processed"; //json.dataloggerfileid
             },
             error : function(json) {
-                alert(json.error_message);
+                alert(json.responseText);
             },
 		});
 		//console.log('after ajax');

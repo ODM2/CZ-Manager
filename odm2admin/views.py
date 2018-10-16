@@ -1859,7 +1859,7 @@ def procDataLoggerFile(request):
                 pdlf.save()
                 response = HttpResponse(json.dumps(response_data), content_type='application/json')
     except CommandError as e:
-        response_data['error_message'] = e.with_traceback()
+        response_data['error_message'] = str(e) #e.with_traceback()
         response = HttpResponse(json.dumps(response_data), content_type='application/json')
         response.status_code = 400
     #response_data['formData'] = formData
