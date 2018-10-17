@@ -1,7 +1,6 @@
 {% extends "admin/app_index.html" %}
 
 {% load admin_extras %}
-{% load admin_shortcuts_mod %}
 {% load static %}
 {% load i18n admin_static admin_shortcuts_tags %}
 {# django-admin-shortcuts changes these blocks #}
@@ -19,7 +18,7 @@
             </div>
         {% else %}
             <div class="admin_shortcuts">
-                {% admin_shortcuts_filter %}
+                {% admin_shortcuts %}
             </div>
         {% endif %}
         {% endfor %}

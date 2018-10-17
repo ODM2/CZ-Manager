@@ -1,18 +1,19 @@
 {% extends "admin/base.html" %}
 {% load i18n staticfiles admin_shortcuts_tags %}
-
 {% block extrastyle %}
+    <style type="text/css">{% admin_shortcuts_css %}</style>
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}"/>{% endblock %}
 
-{% endblock %}
 
-{% block extrahead %}
+{% block extrahead %}{{ block.super }}{% admin_shortcuts_js %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'djangocms_admin_style/css/djangocms-admin.css' %}" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <script type="text/javascript">
 if (window.self!==window.top) { document.write('<link rel="stylesheet" type="text/css" href="{% static 'djangocms_admin_style/css/djangocms-admin-frontend.css' %}" />'); }
 </script>
-<script src="https://use.fontawesome.com/eb9894ac79.js"></script>
+
 <link rel="stylesheet" href="{% static "css/target_href_style.css" %}" />
 {% include 'admin/inc/extrahead.html' %}{% endblock %}
 

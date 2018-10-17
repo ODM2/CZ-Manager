@@ -174,13 +174,13 @@ INSTALLED_APPS = (
     '{}'.format(APP_NAME),
     'import_export',
     'social_django',
-    'admin_shortcuts',
     'daterange_filter',
     'captcha',
     'fixture_magic',
     # 'dal',
     # 'dal_select2',
     'ajax_select',
+    'admin_shortcuts',
     'django.contrib.admin',
     'django.contrib.gis',
     'django.contrib.auth',
@@ -203,37 +203,37 @@ ADMIN_SHORTCUTS = [
                 'url': CUSTOM_TEMPLATE_PATH,
                 'app_name': '{}'.format(APP_NAME),
                 'title': '{}'.format(VERBOSE_NAME),
-                'class': 'config',
+                'icon': 'cogs',
             },
             {
                 'url': '/' + 'AddSensor',
                 'app_name': '{}'.format(APP_NAME),
                 'title': 'Add Sensor Data',
-                'class': 'tool',
+                'icon': 'wrench', # tool
             },
             {
                 'url': '/' + 'AddProfile',
                 'app_name': '{}'.format(APP_NAME),
                 'title': 'Add Soil Profile Data',
-                'class': 'flag',
+                'icon': 'flag',
             },
             {
                 'url': '/' + 'RecordAction',
                 'app_name': '{}'.format(APP_NAME),
                 'title': 'Record an Action',
-                'class': 'notepad',
+                'icon': 'sticky-note',
             },
             {
                 'url': '/' + 'ManageCitations',
                 'app_name': '{}'.format(APP_NAME),
                 'title': 'Manage Citations',
-                'class': 'pencil',
+                'icon': 'edit',
             },
             {
                 'url': '/' + 'chartIndex',
                 'app_name': '{}'.format(APP_NAME),
-                'title': 'Graph My Data',
-                'class': 'monitor',
+                'title': 'Map My Data',
+                'icon': 'map-marked-alt',
             },
         ]
     },
@@ -241,6 +241,7 @@ ADMIN_SHORTCUTS = [
 ADMIN_SHORTCUTS_SETTINGS = {
     'hide_app_list': False,
     'open_new_window': False,
+    'show_on_all_pages': True,
 }
 """ END ADMIN SHORTCUTS CONFIGURATION """
 

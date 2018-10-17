@@ -5,7 +5,8 @@ django-daterange-filter
 django-import-export
 django-jquery
 # django-kronos
-django==2.1.2
+#django-ajax-selects is not working with django 2.1.2 or 2.1.1
+django==2.0.8
 # Pinned to 0.2.7 to preserve page style.
 djangocms-admin-style==0.2.7
 psycopg2
