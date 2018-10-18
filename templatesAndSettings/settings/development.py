@@ -9,9 +9,11 @@ from .base import *
 DEBUG = True
 """ END DEBUG CONFIGURATION """
 
-""" EXPORTDB FLAG CONFIGURATION - if set to true this will use Camel case table names for SQLite"""
-EXPORTDB = False
-""" EXPORTDB FLAG CONFIGURATION """
+""" EXTRA VARIABLES CONFIGURATION -"""
+EXPORTDB = False #  if set to true this will use Camel case table names for SQLite
+UTC_OFFSET = -4
+PYTHON_PATH = ''
+""" EXTRA VARIABLES CONFIGURATION """
 
 """ TRAVIS CONFIGURATION """
 TRAVIS_ENVIRONMENT = False
