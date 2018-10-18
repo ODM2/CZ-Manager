@@ -46,6 +46,16 @@ before_install:
   - source activate TEST
 #   - pip install --upgrade http://github.com/miguelcleon/django-admin-shortcuts/zipball/master
 
+services:
+  - postgresql
+addons:
+  postgresql: 9.6
+  apt:
+    packages:
+    - postgresql-9.6-postgis-2.3
+before_script:
+  - psql -U postgres -c "create extension postgis"
+
 install:
   - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2admin-${version}.tar.gz && popd
 
