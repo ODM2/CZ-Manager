@@ -13,6 +13,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Data Visualization and URL parameters" href="DataVisualizationTips.html" />
@@ -51,7 +52,7 @@
     
 
 <p>
-<a href="https://travis-ci.org/ODM2/ODM2-Admin">
+<a class="badge" href="https://travis-ci.org/ODM2/ODM2-Admin">
     <img
         alt="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
         src="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
@@ -95,6 +96,14 @@
     </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="documentwrapper">
@@ -105,19 +114,20 @@
             
   <div class="section" id="the-django-orm-and-wofpy">
 <span id="managing-odm2-with-the-django-orm"></span><h1>The Django ORM and WOFpy<a class="headerlink" href="#the-django-orm-and-wofpy" title="Permalink to this headline">¶</a></h1>
-<p>While not all of the ODM2 entities are exposed through the ODM2 Admin interface all of the entities can be managed
-using Python scripts using either ODM2PythonAPI or the Django ORM using the models in ODM2 Admin. Two examples using
-the Django ORM come with the source code of ODM2 Admin.</p>
+<p>While not all of the ODM2 entities are exposed through the ODM2 Admin interface they can all be managed using Python
+scripts using either ODM2PythonAPI or the Django ORM using the models in ODM2 Admin. Two examples using the Django ORM</p>
+<blockquote>
+<div>are included with the source code of ODM2 Admin.</div></blockquote>
 <p>The ODM2PythonAPI can be found here: <a class="reference external" href="https://github.com/ODM2/ODM2PythonAPI">https://github.com/ODM2/ODM2PythonAPI</a></p>
-<p>An example merging data from a csv file to  fill a gap in a time series can be found here:
+<p>An example of merging data from a csv file to  fill a gap in a time series can be found here:
 <a class="reference external" href="https://github.com/ODM2/ODM2-Admin/blob/master/example_scripts/SonadoraNitrateFill.py">https://github.com/ODM2/ODM2-Admin/blob/master/example_scripts/SonadoraNitrateFill.py</a></p>
 <p>An example creating soil profile result values from a file can be found here:
 <a class="reference external" href="https://github.com/ODM2/ODM2-Admin/tree/master/soilsIngestionExample">https://github.com/ODM2/ODM2-Admin/tree/master/soilsIngestionExample</a></p>
 <div class="section" id="wofpy">
 <h2>WOFpy<a class="headerlink" href="#wofpy" title="Permalink to this headline">¶</a></h2>
 <p>ODM2 Admin can also be used with WOFpy and water one flow webservices can be registered with CUAHSI HIS central.</p>
-<p>WOFpy REST API test page:
-<a class="reference external" href="http://odm2admin.cuahsi.org/wofpy/odm2lczo/rest_1_1/">http://odm2admin.cuahsi.org/wofpy/odm2lczo/rest_1_1/</a></p>
+<p>WOFpy REST API test page for the Luquillo CZO:
+<a class="reference external" href="http://dev-odm2admin.cuahsi.org/odm2lczo/odm2lczo/rest_1_1/">http://dev-odm2admin.cuahsi.org/odm2lczo/odm2lczo/rest_1_1/</a></p>
 <p>This is still in testing an initial implementation has been registered with the HIS central QA system:</p>
 <p><a class="reference external" href="http://qa-hiscentral.cuahsi.org/testpage.aspx?n=100002">http://qa-hiscentral.cuahsi.org/testpage.aspx?n=100002</a></p>
 <p>QA HIS client:</p>
@@ -140,8 +150,8 @@ the Django ORM come with the source code of ODM2 Admin.</p>
       &copy;2017, Miguel Leon.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.9</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
       <a href="_sources/ManagingODM2WithTheDjangoORM.rst.txt"

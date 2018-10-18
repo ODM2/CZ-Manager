@@ -31,8 +31,8 @@ Diagram of ODM2 Admin infrastructure:
 
 .. image:: /images/ODM2AdminInfrastructure.png
 
-ODM2 Admin This was developed using a postgresql version of ODM2 data model, additional modifications may be
-needed to make this work with MSSQL or another database.
+ODM2 Admin was initially developed using a postgresql version of the ODM2 data model. ODM2 Admin has also been used with
+Microsoft SQL and SQLite implementations of ODM2.
 
 Extended infrasructure with WOFpy web services and ODM2PythonAPI
 ----------------------------------------------------------------
@@ -94,7 +94,8 @@ You will need to run ``extrasql.sql`` on a postgreSQL instance of ODM2,
 a blank schema script can be found here:
 https://github.com/ODM2/ODM2/tree/master/src/blank_schema_scripts/postgresql
 
-Six instances of ODM2 Admin have been deployed
+Six instances of ODM2 Admin have been deployed and are hosted by CUAHSI. If you are interested in an ODM2 Admin
+instance, hosted on the CUAHSI cloud, contact leonmi@sas.upenn.edu
 
 * http://odm2admin.cuahsi.org/LCZO/mapdata.html
 * http://odm2admin.cuahsi.org/DryCreek/mapdata.html
@@ -103,8 +104,10 @@ Six instances of ODM2 Admin have been deployed
 * http://msu-odm2admin.cuahsi.org/MSU/mapdata.html
 * https://dev-odm2admin.cuahsi.org/CZIMEA/mapdata.html
 
-Another deployment for demonstration porposes is available, the the ODM2 Admin Walkthrough for more information about
-this:
+.. image:: /images/CUAHSI-Logo-with-URL---Transparent_(RESIZED).png
+
+Another deployment for demonstration porposes is available, see the :ref:'ODM2AdminDemo' for more
+information:
 
 https://dev-odm2admin.cuahsi.org/Sandbox/
 
@@ -138,7 +141,7 @@ with detailed descriptions and images from the sandbox. Many of the features of 
 * :ref:`Managing Profile Results With ODM2 Admin <ProfileResults>`
 * :ref:`Time series QA/QC <Data-QA-QC>`
 * :ref:`Data Sharing and Visualization Tips <Data-Visualization>`
-* :ref:`ManagingODM2WithTheDjangoORM <Managing-ODM2-With-The-Django-ORM>`
+* :ref:`Managing ODM2 With The Django ORM <Managing-ODM2-With-The-Django-ORM>`
 
 Docs Home
 ---------

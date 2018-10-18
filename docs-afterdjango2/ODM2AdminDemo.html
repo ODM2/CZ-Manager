@@ -13,6 +13,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ODM2 Admin Forms" href="ODM2AdminAdministration.html" />
@@ -52,7 +53,7 @@
     
 
 <p>
-<a href="https://travis-ci.org/ODM2/ODM2-Admin">
+<a class="badge" href="https://travis-ci.org/ODM2/ODM2-Admin">
     <img
         alt="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
         src="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
@@ -95,6 +96,14 @@
     </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="documentwrapper">
@@ -134,6 +143,10 @@ new sensor data or you want to make changes to information relavent to sensor da
 <div class="section" id="odm2-admin-site-administration-dashboard">
 <h2>ODM2 Admin site administration dashboard<a class="headerlink" href="#odm2-admin-site-administration-dashboard" title="Permalink to this headline">¶</a></h2>
 <img alt="_images/AdminDashboard.png" src="_images/AdminDashboard.png" />
+<p>The recent actions block of the site administration dashboard shows changes you have recently completed in ODM2 Admin
+such as adding or editing an item in the forms. In the example above we can see that a method, a data result and a
+variable were recently changed.</p>
+<p>The Authentication and Authorization link will allow you to create users and groups so others can login to the system.</p>
 <p>The ODM2 Admin Administration link will take you to a list of all 44 ODM2 entities that can be directly managed in
 ODM2 Admin. See the ODM2 Admin Forms for details about the ODM2 Admin Forms <a class="reference internal" href="ODM2AdminAdministration.html#odm2-administration"><span class="std std-ref">ODM2 Admin Forms</span></a>.</p>
 <p>The recent actions section shows changes you have recently completed in ODM2 Admin such as adding or editing an item
@@ -146,11 +159,12 @@ ORM with ODM2 databases.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ODM2AdminAdministration.html">1) The ODM2 Admin Forms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DataLoggerFiles.html">2) Using Data Logger Files</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ProfileResults.html">3) Managing Profile Results With ODM2 Admin</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DataQAQC.html">4) Time series QA/QC</a></li>
-<li class="toctree-l1"><a class="reference internal" href="DataVisualizationTips.html">5) Data visualization and URL parameters</a></li>
-<li class="toctree-l1"><a class="reference internal" href="ManagingODM2WithTheDjangoORM.html">6) Using the Django ORM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ODM2AdminSiteManagement.html">2) ODM2 Admin Field Site Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DataLoggerFiles.html">3) Using Data Logger Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ProfileResults.html">4) Managing Profile Results With ODM2 Admin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DataQAQC.html">5) Time series QA/QC</a></li>
+<li class="toctree-l1"><a class="reference internal" href="DataVisualizationTips.html">6) Data visualization and URL parameters</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ManagingODM2WithTheDjangoORM.html">7) Using the Django ORM</a></li>
 </ul>
 </div>
 <ul class="simple">
@@ -171,8 +185,8 @@ ORM with ODM2 databases.</p>
       &copy;2017, Miguel Leon.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.9</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
       <a href="_sources/ODM2AdminDemo.rst.txt"

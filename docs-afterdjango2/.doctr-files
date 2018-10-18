@@ -7,11 +7,13 @@ docs-afterdjango2/ManagingODM2WithTheDjangoORM.html
 docs-afterdjango2/ODM2AdminAdministration.html
 docs-afterdjango2/ODM2AdminDemo.html
 docs-afterdjango2/ODM2AdminSettings.html
+docs-afterdjango2/ODM2AdminSiteManagement.html
 docs-afterdjango2/ODM2Adminbackground.html
 docs-afterdjango2/ProfileResults.html
 docs-afterdjango2/_images/AdminDashboard.png
 docs-afterdjango2/_images/AnnotatedData.png
 docs-afterdjango2/_images/AnnotatingData.png
+docs-afterdjango2/_images/CUAHSI-Logo-with-URL---Transparent_(RESIZED).png
 docs-afterdjango2/_images/ClusteredSite.png
 docs-afterdjango2/_images/DataLoggerFiles.png
 docs-afterdjango2/_images/DataResultChangeView.png
@@ -29,6 +31,7 @@ docs-afterdjango2/_images/RESSHWaterTemp.png
 docs-afterdjango2/_images/RioEspirituSantoStreamGage.png
 docs-afterdjango2/_images/SelectWaterTempToAnnotate.png
 docs-afterdjango2/_images/SelectingDataWithURLs.png
+docs-afterdjango2/_images/methods.png
 docs-afterdjango2/_images/offsetanddriftcorrect.png
 docs-afterdjango2/_sources/DataLoggerFiles.rst.txt
 docs-afterdjango2/_sources/DataQAQC.rst.txt
@@ -39,6 +42,7 @@ docs-afterdjango2/_sources/ManagingODM2WithTheDjangoORM.rst.txt
 docs-afterdjango2/_sources/ODM2AdminAdministration.rst.txt
 docs-afterdjango2/_sources/ODM2AdminDemo.rst.txt
 docs-afterdjango2/_sources/ODM2AdminSettings.rst.txt
+docs-afterdjango2/_sources/ODM2AdminSiteManagement.rst.txt
 docs-afterdjango2/_sources/ODM2Adminbackground.rst.txt
 docs-afterdjango2/_sources/ProfileResults.rst.txt
 docs-afterdjango2/_sources/index.rst.txt

@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Index &#8212; ODM2-Admin 0.1.0 documentation</title>
+    <title>ODM2 Admin Site Management &#8212; ODM2-Admin 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -15,8 +14,10 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="index" title="Index" href="#" />
+    <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Data Logger Files" href="DataLoggerFiles.html" />
+    <link rel="prev" title="ODM2 Admin Forms" href="ODM2AdminAdministration.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -70,14 +71,18 @@
 <li class="toctree-l1"><a class="reference internal" href="GettingStartedInODM2Admin.html">Getting Started With ODM2 Admin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ODM2AdminSettings.html">configuring ODM2 Admin Settings</a></li>
 </ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="ODM2AdminDemo.html">ODM2 Admin Walkthrough</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ODM2AdminDemo.html">ODM2 Admin Walkthrough</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="ODM2AdminDemo.html">ODM2 Admin Walkthrough</a><ul>
+      <li>Previous: <a href="ODM2AdminAdministration.html" title="previous chapter">ODM2 Admin Forms</a></li>
+      <li>Next: <a href="DataLoggerFiles.html" title="next chapter">Data Logger Files</a></li>
+  </ul></li>
   </ul></li>
 </ul>
 </div>
@@ -109,11 +114,26 @@
 
           <div class="body" role="main">
             
-
-<h1 id="index">Index</h1>
-
-<div class="genindex-jumpbox">
- 
+  <div class="section" id="odm2-admin-site-management">
+<h1>ODM2 Admin Site Management<a class="headerlink" href="#odm2-admin-site-management" title="Permalink to this headline">¶</a></h1>
+<p>One of the principal ways ODM2 improves on the original ODM information model is in accounting for a field sites needs
+for managing field sites. In ODM2 Admin users can track instrument deployments, equipment maintenance, sample collection
+and methods used for these tasks. Users can also track who performed the task, called actions in ODM2, along with field
+or lab notes from the performance of the task.</p>
+<div class="section" id="record-an-action">
+<h2>Record an Action<a class="headerlink" href="#record-an-action" title="Permalink to this headline">¶</a></h2>
+<p>While logged into the ODM2 Admin demo, click the record an action shortcut, then select add a new method.</p>
+<img alt="_images/methods.png" src="_images/methods.png" />
+<p>Here we will see a list of methods for our site. Along with the method name, and method type is a link to documentation.
+This link might be to a web page, dropbox, box or other hosted file describing the method. Types of methods listed here
+include equipment maintenance, specimen analysis, and Instrument deployment. Let’s look at the first method “A quick
+temp-accuracy check (ice bath)”. We can see the documentation link will take us to webpage from an equipment
+manufacturer onset. The Method Type link will take us to the ODM2 controlled vocabulary page for equipment maintenance.
+Click on the method name, this will show us the details about this method.</p>
+<p>Here we have a method description, and at the bottom actions. The actions listed here used this method, we can also add
+a new action.</p>
+<p><a class="reference internal" href="DataLoggerFiles.html#dataloggerfiles"><span class="std std-ref">3) Using Data Logger Files</span></a></p>
+</div>
 </div>
 
 
@@ -130,6 +150,9 @@
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
+      |
+      <a href="_sources/ODM2AdminSiteManagement.rst.txt"
+          rel="nofollow">Page source</a>
     </div>
 
     
