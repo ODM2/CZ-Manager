@@ -16,6 +16,14 @@ env:
 before_cache:
   - rm -rf $HOME/miniconda/envs/TEST
 
+services:
+  - postgresql
+addons:
+  postgresql: "9.5"
+  apt:
+    packages:
+      - postgresql-9.5-postgis-2.3
+
 matrix:
   fast_finish: true
   include:
@@ -29,6 +37,8 @@ matrix:
 
 
 before_install:
+  - psql -U postgres -c "create extension postgis"
+  - psql -c "CREATE DATABASE test;" -U postgres
   - |
     URL="http://bit.ly/miniconda"
     echo ""
@@ -46,20 +56,9 @@ before_install:
   - source activate TEST
 #   - pip install --upgrade http://github.com/miguelcleon/django-admin-shortcuts/zipball/master
 
-services:
-  - postgresql
-addons:
-  postgresql: "9.5"
-  apt:
-    packages:
-      - postgresql-9.5-postgis-2.3
 
 install:
   - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2admin-${version}.tar.gz && popd
-
-before_script:
-- psql -U postgres -c "create extension postgis"
-- psql -c "CREATE DATABASE test;" -U postgres
 
 script:
   - if [[ $TEST_TARGET == 'default' ]]; then
