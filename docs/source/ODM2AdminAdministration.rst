@@ -23,7 +23,7 @@ Many of the below entities use controlled vocabularies which can be found here h
 People and Organizations
 ------------------------
 
-* **Organizations:** Observations and other Actions can be associated with  the Organization responsible for creating
+* **Organizations:** Observations, Sensor deployments retrievals and other Actions can be associated with  the Organization responsible for creating
    or performing them. `see here for ODM2 Organizations doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_organizations.md>`_
 * **People:** ODM2 Core people details can be found `here ODM2 people doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_people.md>`_
 * **Affiliation:** Relates people and organizations
@@ -47,6 +47,8 @@ Methods and Actions
     * Sample preparation methods
     * Sample analysis methods
     * Observation methods
+    * Instrument calibration
+    *Instrument Maintenance
 
     See the `ODM2 Methods doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_methods.md>`_
 * **Actions:** ODM2 Core Action details can be found at the `ODM2 Actions doc  <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_actions.md>`_
@@ -88,7 +90,8 @@ Sampling Features and Sites
 Results
 -------
 
-* **Results:** labeled as data results in ODM2 Admin.
+* **Results:** The outcome of an action, such as sensor deployment or specimen observation. These are labeled as data
+results in ODM2 Admin. For more see `ODM2 Results doc https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_results.md`_
 
 * **Datasets:** The Datasets entity is used to encode information about groups of Results that are logically related.
   A Dataset has a type, title, an abstract, and is the entity in ODM2 that would receive a citation.
@@ -178,7 +181,7 @@ External identifier systems
 
 * **External identifier systems:** Such as an IGSN or ORCiD.
 
-:ref:`2) Using Data Logger Files <DataLoggerFiles>`
+:ref:`2) ODM2 Admin Site Management <ODM2AdminSiteManagement>`
 
 * :ref:`ODM2 Admin docs home page <ODM2-Admin>`
 * :ref:`Search the docs <search>`
