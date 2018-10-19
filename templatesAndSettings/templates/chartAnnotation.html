@@ -72,9 +72,11 @@ color:#dddddd !important;;
     var xAxis = {{ xAxis|safe }};
     var yAxis = {{ yAxis|safe }};
     var series = {{ series|safe }};
+    //console.log(series);
 	var graphType =   '{{graphType|safe }}';
 	var name_of_units = {{name_of_units|safe}};
 	var annotationvals = [];
+	var chartErrors = [];
 
 	//alert(name_of_units.length);
 
@@ -99,6 +101,36 @@ color:#dddddd !important;;
 			chart.toast = chart.toast.destroy();
 		}, 2500);
 	}
+	function selectPointsByClick(e) {
+		//console.log('here');
+		//console.log(this);
+		if (annotationvals.indexOf(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',this.series.points[this.index].x)) ==-1){
+			annotationvals.push(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',this.series.points[this.index].x),this.series.points[this.index].y,this.series.points[this.index].id);
+			//console.log(this.series.points[this.index]);
+			//console.log(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',this.series.points[this.index].x),this.series.points[this.index].y,this.series.points[this.index].id);
+			//Highcharts.fireEvent(this, 'selectedpoints', { points: this.chart.getSelectedPoints() });
+
+		}
+	}
+	function clearSelectPoints(){
+		var chart =Highcharts.charts[1];
+		Highcharts.each(chart.series, function (series) {
+			Highcharts.each(series.points, function (point) {
+					point.select(false, false);
+			});
+		});
+	}
+
+	//function offsetPoints(offset){
+	//	var points =Highcharts.charts[1].getSelectedPoints();
+	//	Highcharts.each(points, function (point, value) {
+	//		var options = point.optionsToObject(point);
+	//		options.y = options.y + offset;
+	//		point.update(options,false);
+	//	});
+	//	Highcharts.charts[1].redraw();
+	//}
+
 	function selectPointsByDrag(e) {
 
     // Select points
@@ -108,17 +140,21 @@ color:#dddddd !important;;
                     point.y >= e.yAxis[0].min && point.y <= e.yAxis[0].max) {
 				if(series.options.allowPointSelect=='true'){
 					point.select(true, true);
-					annotationvals.push(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',point.x),point.y); 
+					if (annotationvals.indexOf(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',point.x)) ==-1){
+						annotationvals.push(Highcharts.dateFormat('%Y-%m-%d %H:%M:%S',point.x),point.y,point.id);
+						//console.log(point);
+					}
 				}
             }
         });
     });
 
     // Fire a custom event
-    Highcharts.fireEvent(this, 'selectedpoints', { points: this.getSelectedPoints() });
+    //Highcharts.fireEvent(this, 'selectedpoints', { points: this.getSelectedPoints() });
 
     return false; // Don't zoom
 	}
+
 
 	/**
 	 * The handler for a custom event, fired from selection event
@@ -150,13 +186,18 @@ $(document).ready(function() {
 		var setNaN = document.getElementById('setNaN').checked //$("#setNaN").checked;
 		//console.log('annotate');
 		var selectedResult = {{SelectedResults|safe}};
-		$report.html('annotation \'' + annotation + '\' saved.');
+		//console.log(selectedResult);
+		//$report.html('annotation \'' + annotation + '\' saved.');
 		//console.log(cvqualitycode);
 		//var annotationButton = document.getElementById("annotationButton"); //$("#email_data");
 		//annotationButton.firstChild.data = "annotation saved";
+		var annotationButton = document.getElementById("annotationButton");
+		annotationButton.disabled = true;
+		annotationButton.firstChild.data = "annotating values";
 		$.ajax({
 				url: "{{prefixpath}}../addannotation/",
 				type: "POST",
+				timeout: 0,
 				data: {
 					'resultidu': selectedResult,
 					'annotationvals': annotationvals,
@@ -166,6 +207,88 @@ $(document).ready(function() {
 					'csrfmiddlewaretoken': '{{ csrf_token }}', 
 				},
 				cache:false,
+				success: function(json) {
+					var annotationButton = document.getElementById("annotationButton");
+					//clearSelectPoints();
+					if (typeof json.error  != "undefined"){
+						annotationButton.firstChild.data = "Values added: "+json.error + " reloading page";
+					} else if(setNaN){
+						annotationButton.firstChild.data = "reloading page";
+					}else{
+						annotationButton.firstChild.data = "Annotation complete, add another";
+					}
+					annotationButton.disabled = false;
+					if(setNaN){
+						location.reload();
+					}
+				},
+		});
+	});
+	$('#offsetButton').click(function () {
+		//console.log('hello');
+		var $report= $('#report');
+		var offset = $("#offset").val();
+		//console.log('annotate');
+		var selectedResult = {{SelectedResults|safe}};
+		//console.log(selectedResult);
+		//$report.html('annotation \'' + annotation + '\' saved.');
+		var offsetButton = document.getElementById("offsetButton");
+		offsetButton.disabled = true;
+		offsetButton.firstChild.data = "offsetting values";
+		//console.log(annotationvals);
+		$.ajax({
+				url: "{{prefixpath}}../addoffset/",
+				type: "POST",
+				cache:false,
+				data: {
+					'resultidu': selectedResult,
+					'offsetvals': annotationvals,
+					'offset': offset,
+					'csrfmiddlewaretoken': '{{ csrf_token }}',
+				},
+				success: function(json) {
+					//console.log("success");
+					var offsetButton = document.getElementById("offsetButton");
+					offsetButton.firstChild.data = "reloading page";
+					offsetButton.disabled = false;
+					//offsetPoints(parseFloat(offset));
+					//setTimeout(function(){location.reload();},100);
+					location.reload();
+        },
+		});
+	});
+	$('#shiftValuesButton').click(function () {
+		var $report= $('#report');
+		var shift = $("#shiftValues").val();
+		var selectedResult = {{SelectedResults|safe}};
+		var shiftValuesButton = document.getElementById("shiftValuesButton");
+		var radios = document.getElementsByName("shiftdirection");
+		var direction = "forward";
+		for (var i = 0, length = radios.length; i<length; i++){
+			if (radios[i].checked){
+				direction = radios[i].value;
+			}
+		}
+		shiftValuesButton.disabled = true;
+		shiftValuesButton.firstChild.data = "shifting values";
+
+		$.ajax({
+				url: "{{prefixpath}}../addshiftvals/",
+				type: "POST",
+				data: {
+					'resultidu': selectedResult,
+					'shiftvals': annotationvals,
+					'shift': shift,
+					'direction' : direction,
+					'csrfmiddlewaretoken': '{{ csrf_token }}',
+				},
+				success: function(json) {
+					//console.log("success");
+					var shiftValuesButton = document.getElementById("shiftValuesButton");
+					shiftValuesButton.firstChild.data = "reloading page";
+					shiftValuesButton.disabled = false;
+					location.reload();
+        		},
 		});
 	});
 	//createL1
@@ -188,10 +311,10 @@ $(document).ready(function() {
 					//console.log(json); // log the returned json to the console
 					//console.log("success"); // another sanity check
 					var createL1Button = document.getElementById("createL1"); //$("#email_data");
-					createL1Button.firstChild.data = "Values added: "+json.valuesadded;
+					createL1Button.firstChild.data = "Values added: "+json.valuesadded + " reloading page";
 					createL1Button.disabled = false;
 					//location.reload();
-        },
+        		},
 		});
 	});
 	//createL1
@@ -211,13 +334,7 @@ $(document).ready(function() {
 					'csrfmiddlewaretoken': '{{ csrf_token }}', 
 				},
 				success : function(json) {
-					//$('#post-text').val(''); // remove the value from the input
-					//console.log(json); // log the returned json to the console
-					//console.log("success"); // another sanity check
-					var updateL1Button = document.getElementById("updateL1"); //$("#email_data");
-					updateL1Button.firstChild.data = json.valuesadded +" values added to L1 from L0";
-					updateL1Button.disabled = false;
-					//location.reload();
+					location.reload();
         },
 		});
 	});
@@ -236,6 +353,7 @@ $(document).ready(function() {
 				data[j][1] = null;
 			}
 			}
+	//console.log(data);
 	data.sort();
 	//data = sortOnKeys(data);
 	}
@@ -264,11 +382,32 @@ $(document).ready(function() {
 		yaxes.push(axi);
 		opposite2 = !opposite2;
 	}
+	Highcharts.error = function (code) {
+	  // See https://github.com/highcharts/highcharts/blob/master/errors/errors.xml
+	  // for error id's
+	  chartErrors.push({"chartIndex": Highcharts.charts.length - 1, "errorCode":code});
+	};
 	//yAxis[1] = yAxis2.replace('"','');
 	//var chart =$('#chartid').Highcharts.stockChart({
 	Highcharts.stockChart('chartid', {
+			plotOptions: {
+        	series:{
+        		turboThreshold:99999
+        		},
+			scatter:{
+			},
+        	}
+	});
+	Highcharts.stockChart('chartid', {
 		chart: {renderTo: chart_id, type:'scatter',
 		zoomType: 'xy',
+		plotOptions: {
+        	series:{
+        		turboThreshold:99999
+        		},
+			scatter:{
+			},
+        	},
 		events: {
 			selection: selectPointsByDrag,
             selectedpoints: selectedPoints,
@@ -296,16 +435,42 @@ $(document).ready(function() {
 		tooltip: {
     formatter: function() {
         return ''+
-                 ' Value: ' + this.y + //' id: ' + this.point.z + 
+                 ' Value: ' + this.y + //' id: ' + this.point.id +
                 '-- Date: '+ Highcharts.dateFormat(' %e-%b-%Y %I:%M %p', this.x);
     }
 },
     });
 	//Highcharts.charts[0].xAxis[0].setExtremes(Highcharts.charts[0].xAxis[0].min, Highcharts.charts[0].xAxis[0].max);
 	//Highcharts.charts[0].yAxis[0].setExtremes(Highcharts.charts[0].yAxis[0].min, Highcharts.charts[0].yAxis[0].max);
-	
-	
+  // See https://github.com/highcharts/highcharts/blob/master/errors/errors.xml
+  // for error id's
+
+	chartErrors.forEach(function(e) {
+		if( e.errorCode == 12){
+		  Highcharts.charts[e.chartIndex].renderer
+			.text('Chart error ' + e.errorCode + ' too many values for annotation. Try Reducing the number of days between the start and end date')
+			.attr({
+			fill: 'red',
+			zIndex: 20
+		  })
+			.add()
+			.align({
+			align: 'center',
+			verticalAlign: 'middle'
+		  }, null, 'plotBox');
+
+		}
 	});
+
+	var chart =Highcharts.charts[1];
+	//console.log(chart);
+	chart.series.forEach(function(s){
+		s.options.point.events = {
+			click: selectPointsByClick
+			}
+		});
+
+});
 	 
 </script>
 
@@ -344,20 +509,31 @@ Method- {{featureActionMethod}}
 				{% else %}
 					<td><button id="updateL1">add new values to Level 1 QA/QC'd series</button> Add values from start or the end of the L0 that don't yet exist in L1. </td>
 {% endif %}
-<td> 
+<td>
 {% for result in resultList %}
 	{% for selectedresult in SelectedResults %}
 		{% if result.resultid == selectedresult %}
 			{% if "L0" in result.processing_level|stringformat:"s" %}
-				<input id="setNaN" type="checkbox" name="setNaN" disabled>set values to NaN (Not a Number)?</input></td>				
+				<input id="setNaN" type="checkbox" name="setNaN" disabled>set values to NaN (Not a Number)?</input></td>
+				<td><button id="annotationButton">Save Annotation</button></td></tr>
 			{% else %}
-				<input id="setNaN" type="checkbox" name="setNaN">set values to NaN (Not a Number)?</input>
-			{% endif %} 
+				<input id="setNaN" type="checkbox" name="setNaN" >set values to NaN (Not a Number)?</input></td>
+				<td><button id="annotationButton">Save Annotation</button></td></tr>
+
+				<tr><td><input id="offset"  value= "" name="offset" type="text">
+				Offset selected points(positive numbers added, negative subtracted)</input></td>
+				<td><button id="offsetButton">Offset values</button></td></tr>
+
+				<tr><td><input id="shiftValues"  value= "" name="shiftValues" type="text">
+				drift correct selected points linearly to value </input></td><td>
+				<input type="radio" name="shiftdirection" id = "forwardshift" value="forward" checked>Forward</input>
+					<input type="radio" name="shiftdirection" id = "backwardshift" value="backward">Backward</input>
+					<button id="shiftValuesButton">drift correct values</button></td></tr>
+
+			{% endif %}
 		{% endif %}
 	{% endfor %}
 {% endfor %}
-</td><td><button id="annotationButton">Save Annotation</button></td></tr>
-
 </table>
 {% include 'StartEndDateAnnotation.html' %}
 <br><br>

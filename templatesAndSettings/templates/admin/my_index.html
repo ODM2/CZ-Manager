@@ -2,12 +2,20 @@
 -->
 
 {% extends "admin/base_site.html" %}
-{% load admin_extras %}
-{% load admin_shortcuts_mod %}
+{% load admin_extras admin_shortcuts_tags %}
 {% load static %}
-{% load i18n  admin_shortcuts_tags %}
+{% load i18n   %}
 
 {# django-admin-shortcuts changes these blocks #}
+
+
+{% block extrastyle %}
+    <style type="text/css">{% admin_shortcuts_css %}</style>
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}"/>{% endblock %}
+
+
+{% block extrahead %}{{ block.super }}{% admin_shortcuts_js %}{% endblock %}
 
 {% block breadcrumbs %}
     {% if not user.groups.all.0 %}
@@ -22,28 +30,12 @@
             </div>
         {% else %}
             <div class="admin_shortcuts">
-                {% admin_shortcuts_filter %}
+                {% admin_shortcuts %}
             </div>
         {% endif %}
-    {% endfor %}
+        {% endfor %}
     {% endif %}
 {% endblock %}
-
-{% block extrastyle %}
-    <style type="text/css">{% admin_shortcuts_css %}</style>
-    {{ block.super }}
-    <link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}"/>
-    <style type="text/css">
-    .dashboard #container #content-related .module{
-        margin-left: 0 !important;
-        margin-bottom: 0 !important;
-    }
-</style>
-{% endblock %}
-
-
-{% block extrahead %}{{ block.super }}{% admin_shortcuts_js %}{% endblock %}
-
 {# end changes #}
 
 {% block coltype %}colM{% endblock %}

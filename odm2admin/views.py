@@ -1,10 +1,30 @@
+import sys
+from pathlib import Path # if you haven't already done so
+file = Path(__file__).resolve()
+parent, root = file.parent, file.parents[1]
+sys.path.append(str(root))
+
+# Additionally remove the current file's directory from sys.path
+try:
+    sys.path.remove(str(parent))
+except ValueError: # Already removed
+    pass
+
 from io import StringIO
+from decimal import *
 import math
 import json
 import time
 import sys
 import os
 import subprocess
+import re
+import pandas as pd
+import numpy
+from colour import Color
+# from celery import shared_task
+# import odm2admin.tasks as tasks
+from urllib.parse import urlparse
 from datetime import datetime
 from datetime import timedelta
 from time import mktime
@@ -18,10 +38,12 @@ from django.http import HttpResponseRedirect
 from django.http import StreamingHttpResponse
 from django.shortcuts import render
 from django.template import loader
+
 from django.contrib.auth.decorators import login_required
 # from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 # from django.core import mail
+from django.core.management.base import CommandError
 from django.core import serializers
 from django.core.management import settings
 from templatesAndSettings.settings import exportdb
@@ -51,6 +73,8 @@ from .models import Citationextensionpropertyvalues
 from .models import Citations
 from .models import CvQualitycode
 from .models import CvAnnotationtype
+from .models import Dataloggerfiles
+from .models import Datasetcitations
 from .models import Datasets
 from .models import Datasetsresults
 from .models import Featureactions
@@ -59,6 +83,7 @@ from .models import People
 from .models import Processinglevels
 from .models import Profileresults
 from .models import Profileresultvalues
+from .models import ProcessDataloggerfile
 from .models import Relatedfeatures
 from .models import Results
 from .models import Samplingfeatureextensionpropertyvalues
@@ -335,6 +360,7 @@ def AddProfile(request):
         return HttpResponseRedirect('../')
 
 
+
 def RecordAction(request):
     if request.user.is_authenticated:
         context = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'name': request.user,
@@ -389,25 +415,24 @@ def ManageCitations(request):
 
 def get_name_of_sampling_feature(selected_result):
     title_feature_action = Featureactions.objects.filter(
-        featureactionid=selected_result.values('featureactionid'))
+        featureactionid=selected_result.featureactionid.featureactionid).get()
     title_sampling_feature = Samplingfeatures.objects.filter(
-        samplingfeatureid=title_feature_action.values('samplingfeatureid'))
-    s = str(title_sampling_feature.values_list('samplingfeaturename', flat=True))
-    name_of_sampling_feature = s.split('\'')[1]
-    return name_of_sampling_feature
+        samplingfeatureid=title_feature_action.samplingfeatureid.samplingfeatureid).get()
+    s = str(title_sampling_feature.samplingfeaturename)
+    return s
 
 
 def get_name_of_variable(selected_result):
-    title_variables = Variables.objects.filter(variableid=selected_result.values('variableid'))
-    s = str(title_variables.values_list('variablecode', flat=True))
-    name_of_variable = s.split('\'')[1]
+    title_variables = Variables.objects.filter(variableid=selected_result.variableid)
+    # s = str(title_variables.values_list('variablecode', flat=True))
+    name_of_variable = title_variables.variablecode # s.split('\'')[1]
     return name_of_variable
 
 
 def get_name_of_units(selected_result):
     title_units = Units.objects.filter(unitsid=selected_result.values('unitsid'))
-    s = str(title_units.values_list('unitsname', flat=True))
-    name_of_units = s.split('\'')[1]
+    # s = str(title_units.values_list('unitsname', flat=True))
+    name_of_units = title_units.unitsname # s.split('\'')[1]
     return name_of_units
 
 
@@ -877,8 +902,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
         recordedenddate = Resultextensionpropertyvalues.objects.\
             filter(resultid=selected_resultid).filter(propertyid=EndDateProperty.propertyid).get()
         end_date = recordedenddate.propertyvalue
-        enddt = time.strptime(end_date, "%Y-%m-%d %H:%M")
-        print(enddt)
+        enddt = time.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f")
         dt = datetime.fromtimestamp(mktime(enddt))
         last_day_previous_month = dt - timedelta(days=30)
         entered_start_date = last_day_previous_month.strftime('%Y-%m-%d %H:%M')
@@ -897,7 +921,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
         recordedenddate = Resultextensionpropertyvalues.objects.\
             filter(resultid=selected_resultid).filter(propertyid=EndDateProperty.propertyid).get()
         end_date = recordedenddate.propertyvalue
-        enddt = time.strptime(end_date, "%Y-%m-%d %H:%M")
+        enddt = time.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f")
         dt = datetime.fromtimestamp(mktime(enddt))
         last_day_previous_month = dt - timedelta(days=30)
         entered_start_date = last_day_previous_month.strftime('%Y-%m-%d %H:%M')
@@ -914,7 +938,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
 
     for selectedMResult in selectedMResultSeries:
         i += 1
-        selected_result = Results.objects.filter(resultid=selectedMResult)
+        selected_result = Results.objects.filter(resultid=selectedMResult).get()
         selected_results.append(selected_result)
         # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
 
@@ -1154,7 +1178,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
 
     for selectedMResult in selectedMResultSeries:
         i += 1
-        selected_result = Results.objects.filter(resultid=selectedMResult)
+        selected_result = Results.objects.filter(resultid=selectedMResult).get()
         selected_results.append(selected_result)
         # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
 
@@ -1211,7 +1235,12 @@ def TimeSeriesGraphing(request, feature_action='All'):
                 dataval = 'null'
             else:
                 dataval = result.datavalue
-            data['datavalue' + str(i)].append([mills, dataval])
+            if popup == 'Anno':
+                data['datavalue' + str(i)].append(
+                    {'x': mills, 'y': dataval, 'id': str(result.valueid)})
+            else:
+                data['datavalue' + str(i)].append(
+                    [mills, dataval])
             # data['datavalue' + str(i)].append([mills, result.datavalue])
             # #dumptoMillis(result.valuedatetime)
             # data['datavalue'].extend(tmplist )
@@ -1310,6 +1339,41 @@ def TimeSeriesGraphing(request, feature_action='All'):
                                  'site_header': admin.site.site_header,
                                  'short_title': 'Time Series'}, )
 
+def groupResultsByVariable(sampling_feature):
+    fas = Featureactions.objects.filter(samplingfeatureid=sampling_feature)
+    results = Results.objects.filter(featureactionid__in=fas).filter(
+                 processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
+                 )
+    groupedResults = {}
+
+    for result in results:
+        # print('id: ' + str(result.featureactionid.featureactionid) +' '+ str(result.featureactionid))
+        #if str(result.variableid.variable_name) == 'Water temperature':
+        #    print('var code: ' + str(result.variableid.variable_name) + ' var id ' + str(
+        #        result.variableid.variableid) + ' unit_type: ' + str(result.unitsid.unit_type) +
+        #          ' processing level: ' + str(result.processing_level) + ' id: ' + str(result.resultid))
+
+        seriesname = str(result.variableid.variable_name) + '; units: ' + str(result.unitsid.unitsabbreviation) +\
+                     '; ' + str(result.processing_level)
+
+        if str(seriesname) in groupedResults:
+            groupedResults[str(seriesname)].append(result.resultid)
+        else:
+            groupedResults[str(seriesname)] = [result.resultid]
+
+    # print('grouped results')
+    deletemes = []
+    for groupedResult in groupedResults:
+        # print(groupedResult)
+        i = 0
+        for result in groupedResults[groupedResult]:
+            # print(result) #,' : ',groupedResults[groupedResult][result]
+            i +=1
+        if i == 1:
+            deletemes.append(groupedResult)
+    for deleteme in deletemes:
+        groupedResults.pop(deleteme)
+    return groupedResults
 
 def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', dataset='NotSet',
                    resultidu='NotSet',
@@ -1347,37 +1411,45 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
     datasetAbstract = None
     methods = None
     methodsOnly = 'False'
+    samplingfeatureid= None
+    resultListGrouped = None
     try:
         if not useDataset:
             if useSamplingFeature:
                 samplefeature = Samplingfeatures.objects.\
                     filter(samplingfeatureid=samplingfeature).get()
+                samplingfeatureid = samplefeature.samplingfeatureid
                 featureActions = Featureactions.objects.\
                     filter(samplingfeatureid=samplefeature).\
                     order_by("action__method")
-                resultList = Results.objects.filter(featureactionid__in=featureActions)\
-                     .filter(
-                 processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
-                 ).order_by("featureactionid__action__method")
+                resultList = Results.objects.filter(featureactionid__in=featureActions
+                                                    ).order_by("featureactionid__action__method")
+                #.filter(
+                #    processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
+                #)
                 actions = Actions.objects.filter(actionid__in=featureActions.values("action"))
                 methods = Methods.objects.filter(methodid__in=actions.values("method"))
                 featureActionLocation = samplefeature.samplingfeaturename
+                resultListGrouped = groupResultsByVariable(samplefeature)
+                # print(resultListGrouped)
             else:
-                resultList = Results.objects.filter(featureactionid=feature_action)\
-                    .filter(
-                 processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
-                 ).order_by("featureactionid__action__method")
+                resultList = Results.objects.filter(featureactionid=feature_action
+                                                    ).order_by("featureactionid__action__method")
+                # .filter(
+                # processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display'])
                 featureActions = Featureactions.objects.filter(featureactionid=feature_action).get()
                 featureActionLocation = featureActions.samplingfeatureid.samplingfeaturename
+                samplingfeatureid = featureActions.samplingfeatureid.samplingfeatureid
                 featureActionMethod = featureActions.action.method.methodname
                 actions = Actions.objects.filter(actionid=featureActions.action.actionid).get()
                 methods = Methods.objects.filter(methodid=actions.method.methodid)
+                resultListGrouped = groupResultsByVariable(samplingfeatureid)
         else:
             datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
             resultList = Results.objects.filter(resultid__in=datasetResults.values(
-                "resultid")).filter(
-                 processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
-                 ).order_by("featureactionid__action__method")
+                "resultid")).order_by("featureactionid__action__method") #.filter(
+                 # processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
+                 #)
             datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
             datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
     except(ObjectDoesNotExist) as e:
@@ -1438,6 +1510,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         tsr = Timeseriesresults.objects.filter(resultid=result).get()
         result.timeintervalunits = tsr.intendedtimespacingunitsid
         result.timeinterval = tsr.intendedtimespacing
+    processing_level__in = settings.MAP_CONFIG['result_value_processing_levels_to_display']
     return TemplateResponse(request, template, {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'useSamplingFeature': useSamplingFeature,
                                                 'methodsOnly': methodsOnly,
@@ -1446,11 +1519,14 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                                                 'featureActionLocation': featureActionLocation,
                                                 'data_disclaimer': data_disclaimer,
                                                 'datasetTitle': datasetTitle,
+                                                'samplingfeatureid': samplingfeatureid,
                                                 'datasetAbstract': datasetAbstract,
                                                 'useDataset': useDataset, 'startDate': startdate,
                                                 'endDate': enddate,
+                                                'processing_level__in': processing_level__in,
                                                 'authenticated': authenticated, 'methods': methods,
-                                                'resultList': resultList}, )
+                                                'resultList': resultList,
+                                                'resultListGrouped': resultListGrouped}, )
 
 def is_number(s):
     try:
@@ -1459,24 +1535,155 @@ def is_number(s):
     except ValueError:
         return False
 
+
+def precision_and_scale(x):
+    max_digits = 14
+    int_part = int(abs(x))
+    magnitude = 1 if int_part == 0 else int(math.log10(int_part)) + 1
+    if magnitude >= max_digits:
+        return (magnitude, 0)
+    frac_part = abs(x) - int_part
+    multiplier = 10 ** (max_digits - magnitude)
+    frac_digits = multiplier + int(multiplier * frac_part + 0.5)
+    while frac_digits % 10 == 0:
+        frac_digits /= 10
+    scale = int(math.log10(frac_digits))
+    return (magnitude + scale, scale)
+
+def add_shiftvalues(request):
+    shift=None
+    error = None
+    resultid = None
+    shiftvals = None
+    lastshiftval = None
+    firstshiftval = None
+    realshiftvals = []
+    response_data = {}
+    forwardshift = True
+    if 'direction' in request.POST:
+        if request.POST['direction'] == 'backward':
+            forwardshift = False
+    if 'shift' in request.POST:
+        shift = Decimal(request.POST['shift'])
+        # print(offset)
+    if 'shiftvals[]' in request.POST:
+        shiftvals = request.POST.getlist('shiftvals[]')
+        # print(annotationvals)
+    if 'resultidu[]' in request.POST:
+        resultid = request.POST.getlist('resultidu[]')
+        # print('resultid: ' + str(resultid))
+
+    for rid in resultid:
+        intrid = int(rid)
+        # print('result id')
+        # print(rid)
+        # firstdate = shiftvals[0]
+        # lastdate = shiftvals[-2]
+        idvals = []
+        i=0
+        for offsetval in shiftvals:
+            # print(offsetval)
+            # if i % 3 == 0:
+            #     datevals.append(datetime.strptime(offsetval, '%Y-%m-%d %H:%M:%S'))
+            if i % 3 == 2:
+                idvals.append(int(offsetval))
+            i += 1
+        try:
+            order = ''
+            if forwardshift:
+                order = 'valuedatetime'
+            else:
+                order = '-valuedatetime'
+            tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valueid__in=idvals).order_by(order) # .filter(valuedatetime__gte=firstdate).filter(
+                # valuedatetime__lte=lastdate).filter(datavalue__in=valstochange).order_by('valuedatetime')
+            realshiftvals = tsrvs
+        except ObjectDoesNotExist:
+            response_data['error'] = 'no values found'
+    valcount = realshiftvals.count()
+    precision, scale = precision_and_scale(realshiftvals.last().datavalue)
+    getcontext().prec = precision
+    normshift = shift - Decimal(realshiftvals.last().datavalue)
+    shiftval = normshift / valcount
+    k = 1
+    for tsrv in realshiftvals:
+        if k > 1:
+            tsrv.datavalue = float(Decimal(Decimal(tsrv.datavalue) + (shiftval*k)))
+            tsrv.save()
+        # print(tsrv.datavalue)
+        k +=1
+
+    return HttpResponse(json.dumps(response_data),content_type='application/json')
+
+
+def add_offset(request):
+    offset=None
+    error = None
+    resultid = None
+    offsetvals = None
+    response_data = {}
+    if 'offset' in request.POST:
+        offset = Decimal(request.POST['offset'])
+        # print('offset')
+        # print(offset)
+    if 'offsetvals[]' in request.POST:
+        # THESE VALUES ARE NOT ORDERED CORRECTLY
+        offsetvals = request.POST.getlist('offsetvals[]')
+        # print(offsetvals)
+    if 'resultidu[]' in request.POST:
+        resultid = request.POST.getlist('resultidu[]')
+        # print('resultid: ' + str(resultid))
+    valcount = 0
+    i=0
+    # datevals = []
+    idvals = []
+    for offsetval in offsetvals:
+        # print(offsetval)
+        # if i % 3 == 0:
+        #     datevals.append(datetime.strptime(offsetval, '%Y-%m-%d %H:%M:%S'))
+        if i % 3 == 2:
+            idvals.append(int(offsetval))
+        i+=1
+    # datevals = sorted(datevals)
+    # print(datevals)
+    i = 0
+    for rid in resultid:
+
+        intrid = int(rid)
+
+        tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valueid__in=idvals)# .filter(datavalue__in=valstochange).filter(valuedatetime__gte=firstdate).filter(
+            # valuedatetime__lte=lastdate).filter(datavalue__in=valstochange)
+        print(tsrvs.query)
+        for tsrv in tsrvs:
+            tsrv.datavalue = Decimal(tsrv.datavalue) + offset
+            tsrv.save()
+            # print(tsrv.datavalue)
+    response_data['valuesadded'] = valcount
+    return HttpResponse(json.dumps(response_data),content_type='application/json')
+
 def add_annotation(request):
     # print('annotate')
-    resultid = None
     resultid = None
     annotationvals = None
     annotation = None
     setNaNstr = None
     setNaN = False
-    cvqualitycode = None
+    cvqualitycode = False
+    response_data = {}
+    annotationobj = None
+    anno = None
     if 'resultidu[]' in request.POST:
         resultid = request.POST.getlist('resultidu[]')
         # print(resultid)
     if 'annotation' in request.POST:
-        annotation = str(request.POST['annotation'])
+        annotationFromUser = str(request.POST['annotation'])
+        response_data['annotation'] = annotationFromUser
         # print(annotation)
     # annotationtype
     if 'cvqualitycode' in request.POST:
         cvqualitycode = str(request.POST['cvqualitycode'])
+        # print(cvqualitycode)
+        if cvqualitycode == 'Select':
+            cvqualitycode = False
     if 'setNaN' in request.POST:
         setNaNstr = str(request.POST['setNaN'])
         if setNaNstr == 'false':
@@ -1491,52 +1698,181 @@ def add_annotation(request):
     if cvqualitycode:
         qualitycode = CvQualitycode.objects.get(name=cvqualitycode)
     # annotator = People.objects.filter(personfirstname='Miguel').filter(personlastname='Leon')
-    annotationobj = Annotations(annotationtypecv= annotationtype, annotationcode='',
-                                annotationtext=annotation, annotationdatetime=datetime.now(),
-                                annotationutcoffset=4)
-    annotationobj.save()
+
     lastannotationval = None
     for rid in resultid:
         intrid = int(rid)
+        # print('result id')
+        # print(rid)
+        idvals = []
+        i = 0
         for annotationval in annotationvals:
-            if is_number(annotationval):
-                floatval = float(annotationval)
+            # print(offsetval)
+            # if i % 3 == 0:
+            #     datevals.append(datetime.strptime(offsetval, '%Y-%m-%d %H:%M:%S'))
+            if i % 3 == 2:
+                idvals.append(int(annotationval))
+            i += 1
+
+        # firstdate = annotationvals[0]
+        # lastdate = annotationvals[-2]
+        # print(firstdate)
+        # print(lastdate)
+        # tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valuedatetime__gte=firstdate).filter(
+        #   valuedatetime__lte=lastdate).filter(datavalue__in=valstochange)
+        tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valueid__in=idvals)
+        for tsrv in tsrvs:
+            # print(tsrv.datavalue)
+            # print(tsrv.valuedatetime)
+            if setNaN:
+                annotation = annotationFromUser + ' original value was ' + str(tsrv.datavalue)
+                # print(annotation)
+                if len(annotation) > 499:
+                    annotation = annotation[:499]
                 try:
-                    tsrvquery = Timeseriesresultvalues.objects.filter(resultid=intrid).filter(
-                        valuedatetime=lastannotationval).filter(datavalue=floatval)
-                    # print(tsrvquery.query)
-                    tsrv = tsrvquery.get()
-                    if setNaN:
-                        annotation += ' original value was ' + str(tsrv.datavalue)
-                        annotationobj = Annotations(annotationtypecv= annotationtype, annotationcode='',
-                                                    annotationtext=annotation,
-                                                    annotationdatetime=datetime.now(),
-                                                    annotationutcoffset=4)
-                        annotationobj.save()
-                        tsrv.datavalue = float('nan')
-                        tsrv.qualitycodecv = qualitycode
-                        tsrv.save()
-                    elif cvqualitycode:
-                        tsrv.qualitycodecv = qualitycode
-                        tsrv.save()
+                    tsrvanno = Timeseriesresultvalueannotations.objects.filter(valueid=tsrv).get()
+                    annotationobj = Annotations.objects.filter(annotationid=tsrvanno.annotationid.annotationid).get()
+                    annotationobj.annotationtypecv = annotationtype
+                    annotationobj.annotationcode = ''
+                    annotationobj.annotationtext = annotation
+                    annotationobj.annotationdatetime = datetime.now()
+                    annotationobj.annotationutcoffset = 4
+                    annotationobj.save()
+                except ObjectDoesNotExist:
+                    # print('error')
+                    #if not annotationobj:
+                    #    print('annotation does not exist')
+                    annotationobj = Annotations(annotationtypecv=annotationtype, annotationcode='',
+                                                annotationtext=annotation, annotationdatetime=datetime.now(),
+                                                annotationutcoffset=4)
+                    annotationobj.save()
                     tsrvanno = Timeseriesresultvalueannotations(valueid=tsrv,
                                                                 annotationid=annotationobj)
                     tsrvanno.save()
+                    # print(annotationobj)
+                # print(annotation)
+                # annotationobj.save()
+                tsrv.datavalue = float('nan')
+                if cvqualitycode:
+                    tsrv.qualitycodecv = qualitycode
+                tsrv.save(force_update=True)
+                # print(tsrv)
+            elif cvqualitycode:
+                tsrv.qualitycodecv = qualitycode
+                tsrv.save(force_update=True)
+            if not setNaN:
+                annotation = annotationFromUser
+                try:
+                    tsrvanno = Timeseriesresultvalueannotations.objects.filter(valueid=tsrv).get()
+                    anno = Annotations.objects.filter(annotationid=tsrvanno.annotationid.annotationid).get()
+                    anno.annotationtypecv = annotationtype
+                    anno.annotationcode = ''
+                    anno.annotationtext = annotation
+                    anno.annotationdatetime = datetime.now()
+                    anno.annotationutcoffset = 4
+                    anno.save()
                 except ObjectDoesNotExist:
-                    print('no matching time series result value for query')
-                    print(tsrvquery.query)
-                # tsrvanno.save()
+                    # print('error')
+                    # if not annotationobj:
+                    #print('annotation does not exist')
+                    annotationobj = Annotations(annotationtypecv=annotationtype, annotationcode='',
+                                                annotationtext=annotation, annotationdatetime=datetime.now(),
+                                                annotationutcoffset=4)
+                    annotationobj.save()
+                    tsrvanno = Timeseriesresultvalueannotations(valueid=tsrv,
+                                                                annotationid=annotationobj)
+                    tsrvanno.save()
+                if cvqualitycode:
+                    tsrv.qualitycodecv = qualitycode
+                    tsrv.save(force_update=True)
+                # try:
+            #     tsrvanno = Timeseriesresultvalueannotations.objects.filter(valueid=tsrv).get()
+            #     tsrvanno.annotationid = annotationobj
+            # except ObjectDoesNotExist:
+            #     tsrvanno = Timeseriesresultvalueannotations(valueid=tsrv,
+            #                                                 annotationid=annotationobj)
+            # tsrvanno.save()
+            # print(tsrvanno)
+        # tsrvanno.save()
                 # print(tsrvanno.valueid)
-            lastannotationval = annotationval
+        #     lastannotationval = annotationval
     # if resultidu != 'NotSet':
     #    resultidu = int(resultidu)
-    return HttpResponse({'prefixpath': settings.CUSTOM_TEMPLATE_PATH, },content_type='application/json')
+    return HttpResponse(json.dumps(response_data),content_type='application/json')
+
+# def on_raw_message(body):
+#    print(body)
+
+# @shared_task
+def procDataLoggerFile(request):
+    response_data = {}
+    formData = None
+    dataloggerfileid = None
+    processingCode = None
+    databeginson = None
+    columnheaderson = None
+    check_dates=False
+    # print('in view')
+    # print(request.POST)
+    if 'dataloggerfileid' in request.POST:
+        dataloggerfileid = int(request.POST['dataloggerfileid'])
+        # print(dataloggerfileid)
+    if 'processingCode' in request.POST:
+        processingCode = request.POST['processingCode']
+        # print(processingCode)
+    if 'databeginson' in request.POST:
+        databeginson = int(request.POST['databeginson'])
+        # print(databeginson)
+    if 'columnheaderson' in request.POST:
+        columnheaderson = int(request.POST['columnheaderson'])
+        # print(columnheaderson)
+    if 'check_dates' in request.POST:
+        if request.POST['check_dates'] =='True':
+            check_dates = True
+    # print(check_dates)
+    # print(dataloggerfileid)
+
+    dlf = Dataloggerfiles.objects.get(dataloggerfileid=dataloggerfileid)
+    pdlf = ProcessDataloggerfile.objects.get(dataloggerfileid=dataloggerfileid)
+    linkname = str(dlf.dataloggerfilelinkname())
+    fileid = dlf.dataloggerfileid
+    ftpfile = dlf.dataloggerfiledescription
+    ftpparse = urlparse(ftpfile)
+    response = None
+    try:
+        if not pdlf.processingCode == 'locked' and not pdlf.processingCode=='done':
+            #  pdlf.processingCode = 'locked'
+            #  pdlf.save()
+            if len(ftpparse.netloc) > 0:
+                ftpfrequencyhours = 24  # re.findall(r'^\D*(\d+)', self.processingCode)[0]
+                management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
+                                        , str(databeginson), str(columnheaderson),
+                                        str(ftpfrequencyhours), False)
+            else:
+                # print('processdataloggerfile')
+                # result = tasks.pdataloggerfile.apply_async((linkname,fileid,databeginson,columnheaderson,check_dates,False))
+                management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
+                                        , str(databeginson), str(columnheaderson),
+                                        check_dates, False, False)
+                # print(result)
+                pdlf.processingCode = 'done'
+                pdlf.save()
+                response = HttpResponse(json.dumps(response_data), content_type='application/json')
+    except CommandError as e:
+        response_data['error_message'] = str(e) #e.with_traceback()
+        response = HttpResponse(json.dumps(response_data), content_type='application/json')
+        response.status_code = 400
+    #response_data['formData'] = formData
+
+
+    return response
 
 def addL1timeseries(request):
     resultid = None
     response_data = {}
     createorupdateL1 = None
     pl1 = Processinglevels.objects.get(processinglevelid=2)
+    pl0 = Processinglevels.objects.get(processinglevelid=1)
     valuesadded = 0
     tsresultTocopyBulk = []
     if 'createorupdateL1' in request.POST:
@@ -1545,6 +1881,7 @@ def addL1timeseries(request):
         resultid = request.POST.getlist('resultidu[]')
         for result in resultid:
             if createorupdateL1 == "create":
+        #print('create')
                 resultTocopy = Results.objects.get(resultid=result)
                 tsresultTocopy = Timeseriesresults.objects.get(resultid=result)
                 resultTocopy.resultid = None
@@ -1562,79 +1899,98 @@ def addL1timeseries(request):
                         tsrv.valueid = None
                         tsrv.save()
                         tsrva.valueid = tsrv
-                        print(tsrv.valueid)
+                        # print(tsrv.valueid)
                         tsrva.save()
                     except ObjectDoesNotExist:
                         tsrv.valueid = None
                         tsresultTocopyBulk.append(tsrv)
                 newtsrv = Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
+
             elif createorupdateL1 == "update":
-                tsresultL0 = Timeseriesresults.objects.get(resultid=result)
-                resultL0 = Results.objects.get(resultid=result)
-                tsrvL0 = Timeseriesresultvalues.objects.filter(resultid=tsresultL0)
+                print('update')
+                tsresultL1 = Timeseriesresults.objects.get(resultid=result)
+                resultL1 = Results.objects.get(resultid=result)
+                # tsrvL1 = Timeseriesresultvalues.objects.filter(resultid=tsresultL1)
                 tsrvAddToL1Bulk = []
-                relatedL1result = Results.objects.filter(
-                        featureactionid = resultL0.featureactionid).filter(
-                        variableid = resultL0.variableid
-                    ).filter(unitsid = resultL0.unitsid).get(
-                    processing_level=pl1)
-                newresult = relatedL1result.resultid
-                relateL1tsresult = Timeseriesresults.objects.filter(resultid= relatedL1result).get()
-                # print(relateL1tsresult)
+                relatedL0result = Results.objects.filter(
+                        featureactionid = resultL1.featureactionid).filter(
+                        variableid = resultL1.variableid
+                    ).filter(unitsid = resultL1.unitsid).filter(
+                    processing_level=pl0)
+
+                # newresult = relatedL0result.resultid
+                relateL0tsresults = Timeseriesresults.objects.filter(resultid__in= relatedL0result)
+                relateL0tsresult = None
+                for L0result in relateL0tsresults:
+                    if L0result.intendedtimespacing == tsresultL1.intendedtimespacing and L0result.intendedtimespacingunitsid == tsresultL1.intendedtimespacingunitsid:
+                        relateL0tsresult =L0result
+                tsrvL0 = Timeseriesresultvalues.objects.filter(resultid=relateL0tsresult)
+                # print(relateL0tsresult)
                 # maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
                 #        Max('valuedatetime')). \
                 #        order_by('-valuedatetime')
                 # print(relateL1tsresult)
                 # for r in maxtsrvL1:
                 #     print(r)
+                print('L1 result')
+                print(tsresultL1)
 
-                maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
+                maxtsrvL0=Timeseriesresultvalues.objects.filter(resultid=relateL0tsresult).annotate(
                         Max('valuedatetime')). \
                         order_by('-valuedatetime')[0].valuedatetime
-                maxtsrvL0=Timeseriesresultvalues.objects.filter(resultid=tsresultL0).annotate(
+                maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=tsresultL1).annotate(
                         Max('valuedatetime')). \
                         order_by('-valuedatetime')[0].valuedatetime
-                mintsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
+                mintsrvL0=Timeseriesresultvalues.objects.filter(resultid=relateL0tsresult).annotate(
                         Min('valuedatetime')). \
                         order_by('valuedatetime')[0].valuedatetime
-                mintsrvL0=Timeseriesresultvalues.objects.filter(resultid=tsresultL0).annotate(
+                mintsrvL1=Timeseriesresultvalues.objects.filter(resultid=tsresultL1).annotate(
                         Min('valuedatetime')). \
                         order_by('valuedatetime')[0].valuedatetime
+                # print('max L0')
+                # print(maxtsrvL0)
+                # print('max L1')
+                # print(maxtsrvL1)
                 if maxtsrvL1 < maxtsrvL0:
                     tsrvAddToL1 = tsrvL0.filter(valuedatetime__gt=maxtsrvL1)
                     for tsrv in tsrvAddToL1:
-                        tsrv.resultid = relateL1tsresult
+                        tsrv.resultid = tsresultL1
                         try:
                             tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
                             tsrv.valueid = None
                             tsrv.save()
                             tsrva.valueid = tsrv
-                            print(tsrv.valueid)
+                            # print(tsrv.valueid)
                             tsrva.save()
                         except ObjectDoesNotExist:
+                            # print('doesnt exist')
                             tsrv.valueid = None
                             tsresultTocopyBulk.append(tsrv)
                 if mintsrvL1 > mintsrvL0:
                     tsrvAddToL1 = tsrvL0.filter(valuedatetime__lt=mintsrvL1)
                     for tsrv in tsrvAddToL1:
-                        tsrv.resultid = relateL1tsresult
+                        print(tsresultL1)
+                        tsrv.resultid = tsresultL1
                         try:
                             tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
                             tsrv.valueid = None
                             tsrv.save()
                             tsrva.valueid = tsrv
-                            print(tsrv.valueid)
+                            # print(tsrv.valueid)
                             tsrva.save()
                         except ObjectDoesNotExist:
                             tsrv.valueid = None
                             tsresultTocopyBulk.append(tsrv)
-                newtsrv = Timeseriesresultvalues.objects.bulk_create(tsrvAddToL1Bulk)
+                newtsrv = Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
             valuesadded = newtsrv.__len__()
+            print(valuesadded)
+            # for tsrv in newtsrv:
+            #     print(tsrv.resultid.resultid)
+            #     print(tsrv)
             response_data['valuesadded'] = valuesadded
             # response_data['newresultid'] = newresult
             # print(result)
     return HttpResponse(json.dumps(response_data),content_type='application/json')
-
 
 #another approach
 #https://rlskoeser.github.io/2016/03/31/migrating-data-between-databases-with-django/
@@ -1766,7 +2122,7 @@ def export_to_hydroshare(request):
         print(social.extra_data)
         print(token)
         auth = HydroShareAuthOAuth2(hs_client_id, hs_client_secret,
-                                    token=social.extra_data)
+                                     token=social.extra_data)
     #hs = get_oauth_hs(request)
     #userInfo = hs.getUserInfo()
     #
@@ -1777,39 +2133,42 @@ def export_to_hydroshare(request):
     #print('expires in ' + str(token['expires_in']))
 
     #auth = HydroShareAuthOAuth2(client_id, client_secret,
-    #                            username='miguelcleon', password='7jmftUpata')
+    #                            username='', password='')
     hs = HydroShare(auth=auth)
     username = hs.getUserInfo()
-    print(username)
+    # print(username)
     abstracttext = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
+    entered_start_date = None
+    entered_end_date = None
     if 'startDate' in request.POST:
         entered_start_date = request.POST['startDate']
         abstracttext += ' data values from: ' + entered_start_date
     if 'endDate' in request.POST:
-        # print(entered_end_date)
+    #     # print(entered_end_date)
         entered_end_date = request.POST['endDate']
         abstracttext += ' ending on: ' + entered_end_date
-
+    #
     abstract = abstracttext
     title = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
-    keywords = ('test', 'test 2')
+    keywords = ['ODM2']
     rtype = 'GenericResource'
     fpath = exportdb.DATABASES['default']['NAME']
-    # print(fpath)
-    #metadata = '[{"coverage":{"type":"period", "value":{"start":"'+entered_start_date +'", "end":"'+ entered_end_date +'"}}}, {"creator":{"name":"Miguel Leon"}}]'
-    metadata = '[{"coverage":{"type":"period", "value":{"start":"03/26/2017", "end":"04/25/2017"}}}, {"creator":{"name":"Miguel Leon"}}]'
-    extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
-
-    #abstract = 'My abstract'
-    #title = 'My resource'
-    #keywords = ('my keyword 1', 'my keyword 2')
-    #rtype = 'GenericResource'
-    #fpath = 'C:/Users/leonmi/Google Drive/ODM2AdminLT2/ODM2SQliteBlank.db'
-    #metadata = '[{"coverage":{"type":"period", "value":{"start":"01/01/2000", "end":"12/12/2010"}}}, {"creator":{"name":"John Smith"}}, {"creator":{"name":"Lisa Miller"}}]'
-    #extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
+    # # print(fpath)
+    # #metadata = '[{"coverage":{"type":"period", "value":{"start":"'+entered_start_date +'", "end":"'+ entered_end_date +'"}}}, {"creator":{"name":"Miguel Leon"}}]'
+    metadata = str('[{"coverage":{"type":"period", "value":{"start":"' + entered_start_date +  '", "end":"' + entered_end_date + '"}}}, ' \
+                '{"creator":{"name":"' +user.get_full_name() +'"}}]')
+    extra_metadata = str('{"key-1": "value-1", "key-2": "value-2"}')
+    #
+    # #abstract = 'My abstract'
+    # #title = 'My resource'
+    # #keywords = ('my keyword 1', 'my keyword 2')
+    # #rtype = 'GenericResource'
+    # #fpath = 'C:/Users/leonmi/Google Drive/ODM2AdminLT2/ODM2SQliteBlank.db'
+    # #metadata = '[{"coverage":{"type":"period", "value":{"start":"01/01/2000", "end":"12/12/2010"}}}, {"creator":{"name":"John Smith"}}, {"creator":{"name":"Lisa Miller"}}]'
+    # #extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
     resource_id = hs.createResource(rtype, title, resource_file=fpath, keywords=keywords, abstract=abstract,
-                                         metadata=metadata, extra_metadata=extra_metadata)
-    print(resource_id)
+                                          metadata=metadata, extra_metadata=extra_metadata)
+    # print(resource_id)
     # for resource in hs.getResourceList():
     #     print(resource)
     return HttpResponse({'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
@@ -1822,8 +2181,19 @@ def email_data_from_graph(request):
     entered_end_date = ''
     entered_start_date = ''
     myresultSeriesExport = []
-    if 'email_data' in request.POST and 'myresultSeriesExport[]' in request.POST:
+    if 'email_data' in request.POST and 'resultidu[]' in request.POST:
         selectedMResultSeries = request.POST.getlist('myresultSeriesExport[]')
+        resultid = request.POST.getlist('resultidu[]')
+        try:
+            # print(resultidu)
+            resultidu = [int(selectedMResultSeries)]
+        except:
+            resultids = re.findall(r'\d+',request.POST.getlist('myresultSeriesExport[]')) # re.findall(r'\d+',request.POST['myresultSeriesExport[]'])
+            resultidu = []
+            mergeResults = 'true'
+            for results in resultids:
+                resultidu.append(int(results))
+        selectedMResultSeries = resultidu
         myresultSeriesExport = None
         if request.POST['useDates'] == 'true':
             useDates = True
@@ -1850,11 +2220,188 @@ def email_data_from_graph(request):
                                                 'emailsent': emailsent,
                                                 'outEmail': outEmail,},content_type='application/json')
 
+
+
+def hysterisisMetrics(discharge,response):
+    hystdict = {}
+    maxdischarge = discharge.aggregate(Max('datavalue'))
+    hystdict['max_discharge'] = maxdischarge['datavalue__max']
+    hystdict['discharge_units'] = discharge[0].resultid.resultid.unitsid.unitsabbreviation
+    if maxdischarge:
+        # print(maxdischarge['datavalue__max'])
+        # normalize discharge
+        maxdischargerecord = discharge.order_by('-datavalue')[0]# .get(datavalue=float(maxdischarge['datavalue__max']))
+        mindischargerecord = discharge.order_by('datavalue')[0]
+        # dischargenorm = []
+        dischargepdf = pd.DataFrame(list(discharge.values()))
+        dischargepdf['datavalue'] = (dischargepdf['datavalue']- mindischargerecord.datavalue)/(maxdischargerecord.datavalue - mindischargerecord.datavalue)
+        # print(dischargepdf['datavalue'])
+        maxdisrow = dischargepdf.loc[dischargepdf['datavalue'].idxmax()]
+        mindisrow = dischargepdf.loc[dischargepdf['datavalue'].idxmin()]
+        maxnormdischargerecord = maxdisrow['datavalue']
+        maxnormdischargedate = maxdisrow['valuedatetime']
+        minnormdischargerecord = mindisrow['datavalue']
+        minnormdischargedate = mindisrow['valuedatetime']
+
+        # print('discharge norm max: ' + str(maxnormdischargerecord))
+        # print('discharge norm min: ' + str(minnormdischargerecord))
+        # normalize response
+        print(response.count())
+        maxresponse = response.order_by('-datavalue')[0]# .get(datavalue=float(maxdischarge['datavalue__max']))
+        minresponse = response.order_by('datavalue')[0]
+        # responsenorm = []
+        responsenormpdf = pd.DataFrame(list(response.values()))
+        responsenormpdf['datavalue'] = (responsenormpdf['datavalue']- minresponse.datavalue)/(maxresponse.datavalue - minresponse.datavalue)
+
+        responsetsr = Timeseriesresults.objects.filter(resultid=response[0].resultid.resultid).get()
+        timeagg =responsetsr.intendedtimespacing
+        timeaggunit = responsetsr.intendedtimespacingunitsid.unitsname
+        if 'minute' in timeaggunit:
+            responsenormpdf['valuedatetime'] = responsenormpdf['valuedatetime'].apply(lambda dt: datetime(dt.year, dt.month, dt.day, dt.hour,
+                                                                           int(timeagg * round((float(dt.minute) + float(
+                                                                               dt.second) / 60) / timeagg))))
+        if 'hour' in timeaggunit:
+            timeagg = timeagg * 60
+            responsenormpdf['valuedatetime'] = responsenormpdf['valuedatetime'].apply(lambda dt: datetime(dt.year, dt.month, dt.day, dt.hour,
+                                                                           int(timeagg * round((float(dt.minute) + float(
+                                                                               dt.second) / 60) / timeagg))))
+        # print(maxdischargerecord)
+        # print(maxdischargerecord.valuedatetime)
+
+        raisinglimbresponse = responsenormpdf[(responsenormpdf['valuedatetime'] <= maxnormdischargedate)] # response.filter(valuedatetime__lte=maxdischargerecord.valuedatetime)
+        fallinglimbresponse = responsenormpdf[(responsenormpdf['valuedatetime'] > maxnormdischargedate)]  # response.filter(valuedatetime__gt=maxdischargerecord.valuedatetime)
+        # pd.DataFrame(list(raisinglimbresponse.values()))
+        # print('falling limb val count: ' + str(len(fallinglimbresponse.index)))
+        # print('raising limb val count: ' + str(len(raisinglimbresponse.index)))
+        hystIndex = []
+        # 5% intervals of discharge for hysteresis index 20 buckets
+        if not len(raisinglimbresponse.index) == 0 and not len(fallinglimbresponse.index) == 0:
+
+            dischargerange = maxnormdischargerecord- minnormdischargerecord
+            dischargeinterval = dischargerange / 50
+            hystIndex = {}
+            for i in range(1,50):
+                if i == 1:
+                    lastinterval = 0
+                else:
+                    lastinterval = interval
+                interval = dischargeinterval*i
+                #dischargeintervalvals = discharge.filter(datavalue__lte=interval).filter(datavalue__gte=lastinterval)
+                dischargeintervalvals = dischargepdf[(dischargepdf['datavalue'] <= interval) & (dischargepdf['datavalue'] > lastinterval)]
+                # find matching response records
+                # keys = list(dischargeintervalvals['valuedatetime'])
+                dischargeandraisingresponse = pd.merge(dischargeintervalvals, raisinglimbresponse, on='valuedatetime', how='left', suffixes=('dis','raising'))
+                dischargeandfallingresponse = pd.merge(dischargeintervalvals, fallinglimbresponse, on='valuedatetime', how='left', suffixes=('dis','falling'))
+                # print('for interval: ' + str(interval))
+                # print('raising response ' + str(len(dischargeandraisingresponse.index)))
+                # print(dischargeandraisingresponse['datavalueraising'])
+                # print(dischargeandraisingresponse.head(1))
+                # print('falling response ' + str(len(dischargeandfallingresponse.index)))
+                # print(dischargeandfallingresponse['datavaluefalling'])
+                closestraisingrow = None
+                closestfallingrow = None
+                closestraisingdistance = None
+                closestfallingdistance = None
+                for index, raisingrow in dischargeandraisingresponse.iterrows():
+                    # print(raisingrow)
+                    if raisingrow['datavalueraising'] > 0:
+                        if closestraisingdistance:
+                            if abs(interval - raisingrow['datavaluedis']) < closestraisingdistance:
+                                closestraisingdistance =  abs(interval - raisingrow['datavaluedis'])
+                                closestraisingrow = raisingrow
+                        else:
+                            closestraisingdistance =  abs(interval - raisingrow['datavaluedis'])
+                            closestraisingrow = raisingrow
+                for index2, fallingrow in dischargeandfallingresponse.iterrows():
+                    if fallingrow['datavaluefalling'] > 0: #and raisingrow['datavalueraising'] == fallingrow['datavaluefalling'] :
+                        if closestfallingdistance:
+                            if abs(interval - fallingrow['datavaluedis']) < closestfallingdistance:
+                                closestfallingdistance = abs(interval - raisingrow['datavaluedis'])
+                                closestfallingrow = fallingrow
+                        else:
+                            closestfallingdistance = abs(interval - raisingrow['datavaluedis'])
+                            closestfallingrow = fallingrow
+                       # print(raisingrow)
+                       # print(fallingrow)
+                if not closestraisingrow is None and not closestfallingrow is None:
+                    tmp = closestraisingrow['datavalueraising'] - closestfallingrow['datavaluefalling']
+                    hystIndex['HI for ' + str(i*2) + '% discharge'] = tmp
+                print(hystIndex)
+            HIs = []
+            for key, values in hystIndex.items():
+                HIs.append(values)
+                if 'Hysteresis_Index' in hystdict:
+                    hystdict['Hysteresis_Index'][key] = values
+                else:
+                    tmpdict = {}
+                    tmpdict[key ] = values
+                    hystdict['Hysteresis_Index'] = tmpdict
+            hystAvg = numpy.mean(HIs) #sum(values) / float(len(values))
+            hystStd = numpy.std(HIs)
+            # print("HI mean: " + str(hystAvg))
+            # print("HI standard deviation: " + str(hystStd))
+
+            hystdict["HI_mean"] = hystAvg
+            hystdict["HI_standard_deviation"] = hystStd
+            # hystdict['Hysteresis_Index'].append([key + " values: ", values])
+            # print(hystdict)
+
+    return hystdict
+
+# https://bsou.io/posts/color-gradients-with-python
+def hex_to_RGB(hex):
+  ''' "#FFFFFF" -> [255,255,255] '''
+  # Pass 16 to the integer function for change of base
+  return [int(hex[i:i+2], 16) for i in range(1,6,2)]
+
+def RGB_to_hex(RGB):
+  ''' [255,255,255] -> "#FFFFFF" '''
+  # Components need to be integers for hex to make sense
+  RGB = [int(x) for x in RGB]
+  return "#"+"".join(["0{0:x}".format(v) if v < 16 else
+            "{0:x}".format(v) for v in RGB])
+
+
+def color_dict(gradient):
+  ''' Takes in a list of RGB sub-lists and returns dictionary of
+    colors in RGB and hex form for use in a graphing function
+    defined later on '''
+  return {"hex":[RGB_to_hex(RGB) for RGB in gradient],
+      "r":[RGB[0] for RGB in gradient],
+      "g":[RGB[1] for RGB in gradient],
+      "b":[RGB[2] for RGB in gradient]}
+
+
+def linear_gradient(start_hex, finish_hex="#FFFFFF", n=10):
+  ''' returns a gradient list of (n) colors between
+    two hex colors. start_hex and finish_hex
+    should be the full six-digit color string,
+    inlcuding the number sign ("#FFFFFF") '''
+  # Starting and ending colors in RGB form
+  s = hex_to_RGB(start_hex)
+  f = hex_to_RGB(finish_hex)
+  # Initilize a list of the output colors with the starting color
+  RGB_list = [s]
+  # Calcuate a color at each evenly spaced value of t from 1 to n
+  for t in range(1, n):
+    # Interpolate RGB vector for color at the current value of t
+    curr_vector = [
+      int(s[j] + (float(t)/(n-1))*(f[j]-s[j]))
+      for j in range(3)
+    ]
+    # Add it to our list of output colors
+    RGB_list.append(curr_vector)
+
+  return color_dict(RGB_list)
+
+
 def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='NotSet',
-                            dataset='NotSet',
+                            dataset='NotSet',dischargeresult='NotSet',
                             resultidu='NotSet', startdate='NotSet', enddate='NotSet',
                             popup='NotSet'):  # ,startdate='',enddate=''
+    mergeResults='false'
     authenticated = True
+    hystdict = None
     if not request.user.is_authenticated:
         # return HttpResponseRedirect('../')
         authenticated = False
@@ -1866,12 +2413,17 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         if not authenticated:
             return HttpResponseRedirect(settings.CUSTOM_TEMPLATE_PATH)
         template = loader.get_template('chartAnnotation.html')
+    elif popup == 'hyst':
+        if not authenticated:
+            return HttpResponseRedirect(settings.CUSTOM_TEMPLATE_PATH)
+        template = loader.get_template('hysteresisChart.html')
     else:
         template = loader.get_template('chartpopup.html')
     data_disclaimer = settings.DATA_DISCLAIMER
     map_config = settings.MAP_CONFIG
     useDataset = False
     useSamplingFeature = False
+    # samplingfeature = None
     # if 'annotation' in request.POST:
     # pass
     # raise ValidationError(request.POST['annotation'])
@@ -1886,8 +2438,15 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         dataset = int(dataset)
 
     if resultidu != 'NotSet':
-        resultidu = int(resultidu)
-
+        try:
+            # print(resultidu)
+            resultidu = [int(resultidu)]
+        except:
+            resultids = re.findall(r'\d+',resultidu)
+            resultidu = []
+            mergeResults = 'true'
+            for results in resultids:
+                resultidu.append(int(results))
     selected_results = []
     name_of_sampling_features = []
     # name_of_variables = []
@@ -1901,6 +2460,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     datasetTitle = None
     datasetAbstract = None
     methods = None
+    resultListGrouped = None
     # print(settings.MAP_CONFIG['result_value_processing_levels_to_display'])
     if not useDataset:
         if useSamplingFeature:
@@ -1909,6 +2469,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             resultList = Results.objects.filter(featureactionid__in=feature_actions).filter(
                  processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
                  ).order_by("featureactionid","resultid")
+            resultListGrouped = groupResultsByVariable(samplefeature)
             actions = Actions.objects.filter(actionid__in=feature_actions.values("action"))
             methods = Methods.objects.filter(methodid__in=actions.values("method"))
             featureActionLocation = samplefeature.samplingfeaturename
@@ -1918,6 +2479,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                  ).order_by("featureactionid","resultid")
             featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
             featureActionLocation = featureAction.samplingfeatureid.samplingfeaturename
+            resultListGrouped = groupResultsByVariable(featureAction.samplingfeatureid)
             featureActionMethod = featureAction.action.method.methodname
             action = Actions.objects.filter(actionid=featureAction.action.actionid).get()
             methods = Methods.objects.filter(methodid=action.method.methodid)
@@ -1931,17 +2493,29 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
     numresults = resultList.count()
     selectedMResultSeries = []
+    mergedResultSets = []
     for i in range(0, numresults):
         selectionStr = str('selection' + str(i))
         # when annotating you can only select a single time series
         # with a radio button
+        if mergeResults == 'true':
+            selectionStr = str('Mergedselection' + str(i))
         if popup == 'Anno':
             selectionStr = str('selection')
         if selectionStr in request.POST:
             # raise ValidationError(request.POST[selectionStr])
-            for result in resultList:
-                if int(request.POST[selectionStr]) == result.resultid:
-                    selectedMResultSeries.append(int(request.POST[selectionStr]))
+            # print(request.POST[selectionStr])
+            if mergeResults =='true':
+                mergedresults = re.findall('\d+', request.POST[selectionStr])
+                mergedResultSets.append(mergedresults)
+                for mergedresult in mergedresults:
+                    for result in resultList:
+                        if int(mergedresult) == result.resultid:
+                            selectedMResultSeries.append(int(mergedresult))
+            else:
+                for result in resultList:
+                    if int(request.POST[selectionStr]) == result.resultid:
+                        selectedMResultSeries.append(int(request.POST[selectionStr]))
         # if we are annotating we only have a single selection to find
         if popup == 'Anno':
             break
@@ -1956,10 +2530,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                 return HttpResponse(html)
         else:
             try:
-                Results.objects.filter(resultid=int(resultidu)).filter(
-                   processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
-                ).get()
-                selectedMResultSeries.append(int(resultidu))
+                for resultid in resultidu:
+                    selectedMResultSeries.append(resultid)
             except ObjectDoesNotExist:
                 html = "<html><body>No Data Available Yet.</body></html>"
                 return HttpResponse(html)
@@ -1987,44 +2559,64 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         if popup == 'smll':
             entered_start_date = datetime_entered_end_date - timedelta(
                 settings.SENSOR_DASHBOARD['time_series_days'])
+        elif popup =='Anno' or popup =='hyst':
+            entered_start_date = datetime_entered_end_date - timedelta(
+                settings.SENSOR_DASHBOARD['time_series_days'])
         else:
             entered_start_date = datetime_entered_end_date - timedelta(
                 map_config['time_series_months'] * 365 / 12)  # .strftime('%Y-%m-%d %H:%M')
         entered_start_date = entered_start_date.strftime('%Y-%m-%d %H:%M')
-    for selectedMResult in selectedMResultSeries:
-        i += 1
-        selected_result = Results.objects.filter(resultid=selectedMResult)
-        selected_results.append(selected_result)
-        # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
+    if mergeResults == 'false':
+        for selectedMResult in selectedMResultSeries:
+            i += 1
+            selected_result = Results.objects.filter(resultid=selectedMResult).get()
+            selected_results.append(selected_result)
+            # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
 
-        tmpname = get_name_of_sampling_feature(selected_result)
-        name_of_sampling_features.append(tmpname)
-        myresultSeries.append(Timeseriesresultvalues.objects.all()
-                              .filter(~Q(datavalue__lte=-6999))
-                              .filter(valuedatetime__gt=entered_start_date)
-                              .filter(valuedatetime__lt=entered_end_date)
-                              .filter(resultid=selectedMResult).order_by('-valuedatetime'))
+            tmpname = get_name_of_sampling_feature(selected_result)
+            name_of_sampling_features.append(tmpname)
+            myresultSeries.append(Timeseriesresultvalues.objects.all()
+                                  .filter(~Q(datavalue__lte=selected_result.variableid.nodatavalue))
+                                  .filter(valuedatetime__gte=entered_start_date)
+                                  .filter(valuedatetime__lte=entered_end_date)
+                                  .filter(resultid=selectedMResult).order_by('-valuedatetime'))
+            data.update({'datavalue' + str(i): []})
+    else:
+        if len(mergedResultSets) > 0:
+            # print(mergedResultSets)
+            for mergedResultSet in mergedResultSets:
 
-        data.update({'datavalue' + str(i): []})
-    # myresultSeriesExport = None
-    # if 'useDates' in request.POST:
-    #     use_dates = request.POST['useDates']
-    #     myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
-    #             .filter(valuedatetime__gte=entered_start_date) \
-    #             .filter(valuedatetime__lte=entered_end_date) \
-    #             .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
-    #
-    # else:
-    #     myresultSeriesExport = Timeseriesresultvaluesext.objects.all() \
-    #             .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
-    # if the user hit the export csv button export the measurement results to csv
-    # emailsent = False
-    # outEmail = ''
-    # if 'outEmail' in request.POST:
-    #         outEmail = request.POST['outEmail']
-    # if 'email_data' in request.POST:
-    #     emailspreadsheet2.after_response(request, myresultSeriesExport, False) # for command str_selectedresultid_ids
-    #     emailsent=True
+                i += 1
+                selected_result = Results.objects.filter(resultid__in=mergedResultSet).first()
+                # print('result set')
+                # print(mergedResultSet)
+                # print(selected_result)
+                selected_results.append(selected_result)
+                # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
+
+                tmpname = get_name_of_sampling_feature(selected_result)
+                name_of_sampling_features.append(tmpname)
+                myresultSeries.append(Timeseriesresultvalues.objects.all()
+                                      .filter(~Q(datavalue__lte=selected_result.variableid.nodatavalue))
+                                      .filter(valuedatetime__gte=entered_start_date)
+                                      .filter(valuedatetime__lte=entered_end_date)
+                                      .filter(resultid__in=mergedResultSet).order_by('-valuedatetime'))
+                data.update({'datavalue' + str(i): []})
+        else:
+            i=1
+            selected_result = Results.objects.filter(resultid__in=selectedMResultSeries).first()
+            selected_results.append(selected_result)
+            # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
+
+            tmpname = get_name_of_sampling_feature(selected_result)
+            name_of_sampling_features.append(tmpname)
+            myresultSeries.append(Timeseriesresultvalues.objects.all()
+                                  .filter(~Q(datavalue__lte=selected_result.variableid.nodatavalue))
+                                  .filter(valuedatetime__gte=entered_start_date)
+                                  .filter(valuedatetime__lte=entered_end_date)
+                                  .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime'))
+            data.update({'datavalue' + str(i): []})
+
 
     i = 0
     annotationsexist = False
@@ -2038,38 +2630,94 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             # print('time series result value annotation count ' + str(tsrvas.count()))
             # (tsrvas.query)
             annotationsexist = True
+    #print('series')
+    #print(myresultSeries)
+
+
     for myresults in myresultSeries:
         i += 1
         resultannotationsexist = False
-        for result in myresults:
-            start = datetime(1970, 1, 1)
-            delta = result.valuedatetime - start
-            mills = delta.total_seconds() * 1000
-            if math.isnan(result.datavalue):
-                dataval = 'null'
+        print('response count ' + str(myresults.count()))
+        # print('1st result')
+        # print(myresults[0])
+        if popup == 'hyst':
+            result = Results
+            fa = Featureactions.objects.filter(featureactionid=selected_results[0].featureactionid.featureactionid).get()
+            sf = Samplingfeatures.objects.filter(samplingfeatureid=fa.samplingfeatureid.samplingfeatureid).get()
+            fas = Featureactions.objects.filter(samplingfeatureid=sf)
+            units = Units.objects.filter(unit_type='Volumetric flow rate')
+            dischargeRs = None
+            if not dischargeresult == 'NotSet':
+                dischargeRs = Results.objects.filter(resultid=int(dischargeresult))
             else:
-                dataval = result.datavalue
-            data['datavalue' + str(i)].append(
-                [mills,dataval])
-            if popup == 'Anno':
-                for tsrva in tsrvas:
-                    if tsrva.valueid == result:
-                        # print('tsrv annotation value id ' + str(tsrva.valueid))
-                        if not resultannotationsexist:
-                            # print('resultannotationsexist')
-                            resultannotationsexist = True
-                            data.update({'datavalueannotated' : []})
-                        data['datavalueannotated'].append(
+                dischargeRs = Results.objects.filter(featureactionid__in=fas).filter(unitsid__in=units)
+            dischargeR = dischargeRs.first()
+            dischargeTSR = Timeseriesresults.objects.filter(resultid=dischargeR).get()
+            # print(dischargeTSR)
+            tsrvdischarge = Timeseriesresultvalues.objects.filter(~Q(datavalue__lte=dischargeR.variableid.nodatavalue))\
+                .filter(valuedatetime__gte=entered_start_date)\
+                .filter(valuedatetime__lte=entered_end_date)\
+                .filter(resultid=dischargeTSR).order_by('-valuedatetime')
+            # print(tsrvdischarge.query)
+            # print(tsrvdischarge.count())
+            hystdict = hysterisisMetrics(tsrvdischarge,myresults)
+        if not popup=='hyst':
+            for result in myresults:
+                start = datetime(1970, 1, 1)
+                delta = result.valuedatetime - start
+                mills = delta.total_seconds() * 1000
+                if math.isnan(result.datavalue):
+                    dataval = 'null'
+                else:
+                    dataval = result.datavalue
+                # print(data.keys())
+                if popup == 'Anno':
+                    data['datavalue' + str(i)].append(
+                        {'x': mills, 'y': dataval, 'id': str(result.valueid)})
+                else:
+                    data['datavalue' + str(i)].append(
                         [mills,dataval])
-               #{"x": mills, "y": dataval, "z": str(result.valueid)})  # dumptoMillis(result.valuedatetime)
-            # data['datavalue'].extend(tmplist )
-            # data['valuedatetime'].append(dumptoMillis(result.valuedatetime))
+                if popup == 'Anno':
+                    for tsrva in tsrvas:
+                        if tsrva.valueid == result:
+                            # print('tsrv annotation value id ' + str(tsrva.valueid))
+                            if not resultannotationsexist:
+                                # print('resultannotationsexist')
+                                resultannotationsexist = True
+                                data.update({'datavalueannotated' : []})
+                            data['datavalueannotated'].append(
+                                {'x':mills,'y':dataval,'id':str(result.valueid)})
+        else:
+
+            valcount = len(myresults)
+            colors = linear_gradient('#BF001B','#00E5C4',n=valcount)# ['#00E5C4','#00E17D','#00DD38','#09D900','#49D500','#86D200','#C2CE00','#CA9900','#C65A00','#C21E00',]
+            hexcolors = colors['hex']
+            print(valcount)
+            k=0
+
+            for result, discharge in zip(myresults,tsrvdischarge):
+                if math.isnan(result.datavalue):
+                    dataval = 'null'
+                else:
+                    dataval = result.datavalue
+                if math.isnan(discharge.datavalue):
+                    dischargeval = 'null'
+                else:
+                    dischargeval = discharge.datavalue # + " " + str(discharge.valuedatetime)
+                    start = datetime(1970, 1, 1)
+                    delta = discharge.valuedatetime - start
+                    mills = delta.total_seconds() * 1000
+                    data['datavalue' + str(i)].append(
+                   {'x':dischargeval,'y':dataval,'dateTime':mills,'color':hexcolors[k]}) #  [dischargeval,dataval]
+                #if threshold == result.valueid:
+                    k+=1
 
     timeseriesresults = Timeseriesresults.objects.\
         filter(resultid__in=resultList.values("resultid")).\
         order_by("resultid__variableid", "aggregationstatisticcv")
     # build strings for graph labels
-
+    # print('data')
+    # print(data)
     i = 0
     seriesStr = ''
     unit = ''
@@ -2077,6 +2725,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     variable = ''
     aggStatistic = ''
     series = []
+    # print('selected result series')
+    # print(selectedMResultSeries)
     r = Results.objects.filter(resultid__in=selectedMResultSeries)\
         .order_by("featureactionid","resultid")  # .order_by("unitsid")
 
@@ -2096,22 +2746,66 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         elif not unit == '':
             seriesStr += ' - ' + str(unit)
             name_of_units.append(str(unit))
-        series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
-                      str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
-                      "data": data['datavalue' + str(i)]})
+        # print('series unit and var')
+        # print(str(unit) + ' - ' + str(variable))
+        # print(len(mergedResultSets))
+        if not popup=='hyst':
+            series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
+                          str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
+                          "data": data['datavalue' + str(i)], "point": { }})
+        else: # build color zones
+            vals = len(data['datavalue' + str(i)])
+            ii=0
+            j=10
+            thresholds = []
+            # print(vals)
+            for datum in data['datavalue' + str(i)]:
+                ii+=1
+                # print(ii)
+                # print(int(round(vals/j)))
+                if ii== int(round(vals/j)):
+                    j-=1
+                    thresholds.append(datum['y'])
+            zones = []
+            # print(thresholds)
+            for ii in range(1, len(thresholds)):
+                threshold = thresholds.pop()
+                if not threshold == 'null':
+                    dict = {'value':float(threshold),'className':'zone-'+str(ii)}
+                    zones.append(dict)
+            # print('zones')
+            # print(zones)
+            true = 'true'
+            two = 2
+            series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
+                          str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
+                          "lineWidth":two,"data": data['datavalue' + str(i)], "zones": zones})
+            # "plotOptions": {"maker": {"enabled": true},
+        if mergeResults =='true' and len(mergedResultSets) <= i:
+            break
 
         if popup == 'Anno':
-            relatedresults = Results.objects.filter(
-                featureactionid = selectedMResult.featureactionid).filter(
-                variableid = selectedMResult.variableid
-            ).filter(unitsid = selectedMResult.unitsid)
+
+            relatedtsr = Timeseriesresults.objects.select_related('resultid').filter(
+                resultid__featureactionid = selectedMResult.featureactionid).filter(
+                resultid__variableid = selectedMResult.variableid
+            ).filter(resultid__unitsid = selectedMResult.unitsid).filter(intendedtimespacing = tsr.intendedtimespacing
+                                            ).filter(intendedtimespacingunitsid = tsr.intendedtimespacingunitsid)
+            relatedresults = Results.objects.filter(resultid__in=relatedtsr)
+            print(relatedresults)
+            #relatedresults = Results.objects.filter(
+            #    featureactionid = selectedMResult.featureactionid).filter(
+            #    variableid = selectedMResult.variableid
+            #).filter(unitsid = selectedMResult.unitsid)
             for rr in relatedresults:
                 if rr.processing_level.processinglevelid ==2:
                     L1exists = True
             if annotationsexist:
                 series.append({"name": 'Annotated ' + str(unit) + ' - ' + str(variable) + ' - ' +
-                                str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "false", "yAxis": str(unit),
-                                "data": data['datavalueannotated']})
+                                str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
+                                "data": data['datavalueannotated'], "point": { }})
+
+    # "point": { "events": {'click': 'selectPointsByClick'}}
     i = 0
     titleStr = ''
     # print(series)
@@ -2128,9 +2822,15 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     chartID = 'chart_id'
     chart = {"renderTo": chartID, "type": 'scatter', "zoomType": 'xy'}
     title2 = {"text": titleStr}
-    xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
-    yAxis = {"title": {"text": seriesStr}}
     graphType = 'scatter'
+    if not popup=='hyst':
+        xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
+    else:
+        xAxis = {"title": {"text": 'Discharge'}} # "dateTimeLabelFormats":{}
+        chart = {"renderTo": chartID, "type": 'scatter', "zoomType": 'xy'}
+        graphType = 'scatter'
+    yAxis = {"title": {"text": seriesStr}}
+
 
     int_selectedresultid_ids = []
     str_selectedresultid_ids = []
@@ -2140,7 +2840,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     csvexport = False
     cvqualitycode = None
     if popup == 'Anno':
-        cvqualitycode = CvQualitycode.objects.all()
+        cvqualitycode = CvQualitycode.objects.all().order_by('definition')
 
         # csvexport = True
         # k=0
@@ -2163,10 +2863,13 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         tsr = Timeseriesresults.objects.filter(resultid=result).get()
         result.timeintervalunits = tsr.intendedtimespacingunitsid
         result.timeinterval = tsr.intendedtimespacing
-    return TemplateResponse(request, template, {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+
+    responsedict = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'startDate': entered_start_date,
                                                 'endDate': entered_end_date,
                                                 'popup': popup,
+                                                'mergeResults':mergeResults,
+                                                'resultListGrouped':resultListGrouped,
                                                 # 'emailsent': emailsent,
                                                 # 'outEmail': outEmail,
                                                 'useSamplingFeature': useSamplingFeature,
@@ -2189,7 +2892,12 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                                                 'title2': title2, 'resultList': resultList,
                                                 'graphType': graphType, 'xAxis': xAxis,
                                                 'yAxis': yAxis,
-                                                'name_of_units': name_of_units}, )
+                                                'name_of_units': name_of_units}
+    if hystdict:
+        z = hystdict.copy()
+        z.update(responsedict)
+        responsedict = z
+    return TemplateResponse(request, template, responsedict, )
 
 
 #
@@ -2917,22 +3625,22 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
     selectedMResultsSeries = sortedResults
     for selectedMResult in selectedMResultsSeries:
         i += 1
-        selected_result = Results.objects.filter(resultid=selectedMResult.resultid)
+        selected_result = Results.objects.filter(resultid=selectedMResult.resultid).get()
         # if 'update_result_on_related_feature' in request.POST:
         # raise ValidationError(selected_result)
         selected_results.append(selected_result)
         # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
 
-        tmpname = get_name_of_sampling_feature(selected_result)
+        tmpname = selected_result.featureactionid.samplingfeatureid.samplingfeaturename # get_name_of_sampling_feature(selected_result)
         tmpLocName = tmpname
 
-        tmpname = get_name_of_variable(selected_result)
+        tmpname = selected_result.variableid.variablecode # get_name_of_variable(selected_result)
         unitAndVariable = tmpname
         if name_of_variables.__len__() > 0:
             name_of_variables.append(tmpname)
         else:
             name_of_variables.append(tmpname)
-        tmpname = get_name_of_units(selected_result)
+        tmpname = selected_result.unitsid.unitsname # get_name_of_units(selected_result)
         # if(selectedMResult.resultid==2072):
         # raise ValidationError(tmpname)
         unitAndVariable = unitAndVariable + " " + tmpname
@@ -3049,6 +3757,19 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
     for int_selectedvariableid in selectedMVariableSeries:
         int_selectedvariable_ids.append(int(int_selectedvariableid))
     # if the user hit the export csv button export the measurement results to csv
+    linkExtProperty = Extensionproperties.objects.filter(propertyname="DatasetFileLink").get()
+    datasetresults = Datasetsresults.objects.filter(resultid__in=selectedMResultsSeries)
+    datasets = Datasets.objects.filter(datasetid__in=datasetresults.values("datasetid"))
+    datasetcitations = Datasetcitations.objects.filter(datasetid__in=datasets)
+    citations = Citations.objects.filter(citationid__in=datasetcitations.values("citationid"))
+
+    datasetcitationlinks = {}
+    for citation in citations:
+        extprop = Citationextensionpropertyvalues.objects.filter(citationid=citation).get(propertyid=linkExtProperty)
+        try:
+            datasetcitationlinks[citation.title] = extprop.propertyvalue
+        except ObjectDoesNotExist:
+            datasetcitationlinks[citation.title] = ''
     if 'export_data' in request.POST:
         resultValuesSeries = resultValuesSeries.order_by(
             "resultid__resultid__featureactionid__samplingfeatureid__samplingfeaturecode",
@@ -3062,6 +3783,7 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
         # raise ValidationError(relatedFeatureList)
         return TemplateResponse(request, template,
                                 {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+                                 'datasetcitationlinks': datasetcitationlinks,
                                  'variableList': variableList,
                                  'SelectedVariables': int_selectedvariable_ids,
                                  'authenticated': authenticated, 'data_disclaimer': data_disclaimer,
@@ -3073,4 +3795,5 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
                                  'SelectedRelatedFeature': selected_relatedfeatid,
                                  'name': request.user, 'site_title': admin.site.site_title,
                                  'site_header': admin.site.site_header,
-                                 'short_title': 'Soils Data'}, )
+                                 'short_title': 'Soils Data'
+                                 }, )

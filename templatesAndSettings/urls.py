@@ -7,6 +7,7 @@ from django.http.response import HttpResponseRedirect
 from django.conf.urls.static import static
 from django.views.decorators.cache import cache_page
 # from ODM2CZOData import views # How can I use config file for this??
+from django.urls import reverse
 import importlib
 
 views = importlib.import_module("{}.views".format(settings.APP_NAME))
@@ -22,7 +23,7 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                re_path(r'^lookups/(?P<channel>[-\w]+)$',ajax_select_views.ajax_lookup,name='ajax_lookup'),
                # url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
                # url(r'^oauthview$', views.oauth_view, name='oauth_view'),
-               re_path('', include('social_django.urls', namespace='social')),
+               # re_path('', include('social_django.urls', namespace='social')),
                # url(r'^login/$', auth_views.login, name='login'),
                # url(r'^logout/$', auth_views.logout, name='logout'),
                re_path(r'^oauth/', include('social_django.urls', namespace='social')),
@@ -48,7 +49,10 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                re_path(r'^' + 'emaildata/$', views.email_data_from_graph),
                re_path(r'^' + 'export_to_hydroshare/$', views.export_to_hydroshare),
                re_path(r'^' + 'addannotation/$', views.add_annotation),
+               re_path(r'^' + 'addoffset/$', views.add_offset),
+               re_path(r'^' + 'addshiftvals/$', views.add_shiftvalues),
                re_path(r'^' + 'addL1timeseries/$', views.addL1timeseries),
+               re_path(r'^' + 'processdlfile/$', views.procDataLoggerFile),
                re_path(r'^' + 'sensordashboard/featureaction=(?P<feature_action>(\d+))/', views.sensor_dashboard),
                re_path(r'^' + 'sensordashboard/samplingfeature=(?P<sampling_feature>(\d+))/', views.sensor_dashboard),
                re_path(r'^' + 'sensordashboard/$', views.sensor_dashboard),
@@ -63,6 +67,10 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                re_path(
                    r'^' + 'graphfa/featureaction=(?P<feature_action>(\d+))/'
                                      'resultidu=(?P<resultidu>(\d+))/$',
+                   views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
+               re_path(
+                   r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
+                          'resultidu=\[(?P<resultidu>\d+(, \d+)*\])/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                re_path(
                    r'^' + 'graphfa/featureaction=(?P<feature_action>(\d+))/'
@@ -99,7 +107,6 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                    r'^' + 'mappopup/samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.mappopuploader, name="mappopuploader"),
-
                re_path(
                    r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
                                      'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
@@ -122,7 +129,29 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                                      'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/'
                                      'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
-
+               re_path(
+                   r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
+                          'resultidu=(?P<resultidu>(\d+))/'
+                          'dischargeresult=(?P<dischargeresult>(\d+))/'
+                          'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}))/'
+                          'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}))/'
+                          'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
+                   views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
+               re_path(
+                   r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
+                          'resultidu=(?P<resultidu>(\d+))/'
+                          'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}\s+\d+:\d+))/'
+                          'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}\s+\d+:\d+))/'
+                          'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
+                   views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
+               re_path(
+                   r'^' + 'graphfa/samplingfeature=(?P<samplingfeature>(\d+))/'
+                          'resultidu=(?P<resultidu>(\d+))/'
+                          'dischargeresult=(?P<dischargeresult>(\d+))/'
+                          'startdate=(?P<startdate>(\d{4}-\d{2}-\d{2}\s+\d+:\d+))/'
+                          'enddate=(?P<enddate>(\d{4}-\d{2}-\d{2}\s+\d+:\d+))/'
+                          'popup=(?P<popup>(([a-zA-Z][a-zA-Z][a-zA-Z][a-zA-Z])))/$',
+                   views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                re_path(r'^' + 'graphfa/dataset=(?P<dataset>(\d+))/$',
                    views.TimeSeriesGraphingShort,
                    name="TimeSeriesGraphingShort"),

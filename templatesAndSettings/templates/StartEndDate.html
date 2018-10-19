@@ -77,10 +77,6 @@ $(document).ready(function(){
 			console.log($(this).val());
 			resultSeriesExport.push($(this).val());
 		});
-		console.log(startDate);
-		console.log(username);
-		console.log(password);
-		console.log(resultSeriesExport);
 		$.ajax({
 				url: "{{prefixpath}}../export_to_hydroshare/",
 				type: "POST",
@@ -142,8 +138,7 @@ $(document).ready(function(){
 <br>
     
 	<form action="" method="post">
-	{% csrf_token %} 
-	<a href="{% url "social:begin" "hydroshare" %}?next={{ request.path }}">Login to Hydroshare</a>
+	{% csrf_token %}
 	<table >
 	{% for method in methods %}
 	<tr><td>
@@ -179,10 +174,48 @@ $(document).ready(function(){
 {% if emailsent %}
 <p>Email request received, email will be delivered to {{outEmail}}</p>			
 {% endif %}
-
+{% ifequal methodsOnly "False" %}
+	<p> Data available from: {{startDate}} to: {{endDate}} </p>
+{% endifequal %}
 	</td></tr></table>
 
 	<div id="" style="overflow:scroll; height:400px;">
+	{% if mergeResults %}
+		<p> graph by variable </p>
+		<table >
+
+			<table >
+			{% for varname,results in resultListGrouped.items %}
+
+
+
+				<tr >
+					{% for result in results %}
+					{% if not done == 1 %}
+						{% for Result in resultList %}
+								{% if result == Result.resultid %}
+
+											<th ><input type="checkbox" class="action-checkbox-column" id="sMerged"
+											{% for SelectedResult in SelectedResults %}
+												{% if Result.resultid == SelectedResult %}
+													checked
+												{% endif %}
+											{% endfor %}
+											name="Mergedselection{{ forloop.counter0 }}" value="{{ results }}">{{ Result.feature_action }} </input><br></th>
+
+								{% endif %}
+						{% endfor %}
+
+					<th scope="col">Result IDs: {{results}}</th>
+				<th scope="col">Variable: {{varname}}</th></tr>
+						{% endif %}
+					{% assign done 1 %}
+
+					{% endfor %}
+
+			{% endfor %}
+			</table>
+		{% endif %}
 	<table >
 				<tr ><th scope="col" class="section">Result Series</td>
 				<th scope="col"  class="sortable column-resultid">id</th>

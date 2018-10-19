@@ -1,0 +1,214 @@
+<!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/
+
+
+
+
+-->
+
+{% extends "admin/base_site.html" %}
+{% load admin_extras %}
+{% load static %}
+{% load i18n admin_static admin_shortcuts_tags %}
+
+{# django-admin-shortcuts changes these blocks #}
+
+
+
+ {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}
+</style>
+{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+{% block title %}
+    Time Series | {{ "site_title"|get_title:6 }}
+{% endblock %}
+
+{% block branding%}
+    <h1>{{ "site_header"|get_title:6 }}</h1>
+{% endblock %}
+
+{% block nav-global %}
+    {% if authenticated %}
+        {% include 'user-tools.html' %}
+    {% endif %}
+{% endblock %}
+{% block breadcrumbs %}
+{% if authenticated %}
+	<div class="admin_shortcuts">
+		{% admin_shortcuts %}
+	</div>
+	{% endif %}
+{% endblock %}
+{% block extrahead %}
+{{ block.super }}
+ <script src='https://www.google.com/recaptcha/api.js'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+
+{% admin_shortcuts_js %}{% endblock %}
+
+{# end changes #}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+
+
+
+{% block content %}
+	<script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/highcharts-more.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
+	 <script src="https://rawgithub.com/RolandBanguiran/highcharts-scalable-yaxis/master/scalable-yaxis.js"></script>
+	 <script src="https://highcharts.github.io/export-csv/export-csv.js"></script>
+
+	<script>
+    var chart_id = 'chartid';
+    var chart = {{ chart|safe }};
+    var title2 = {{ title2|safe }};
+    var xAxis = {{ xAxis|safe }};
+    var yAxis = {{ yAxis|safe }};
+    var series = {{ series|safe }};
+	var graphType =   '{{graphType|safe }}';
+	var name_of_units = {{name_of_units|safe}};
+
+$(document).ready(function() {
+
+	var opposite2 = false;
+	yaxes = [];
+
+	for (var i=0; i<series.length; i++){
+	data = series[i].data;
+		for(var j=0; j<data.length; j++){
+			if(data[j][1]=='null'){
+				data[j][1] = null;
+			}
+			}
+	data.sort();
+	}
+
+	for (var i=0; i<name_of_units.length; i++) {
+		name = name_of_units[i];
+		//alert(name);
+
+		axi = {id: name,
+		scrollbar: {
+        enabled: false
+    },
+		labels: {
+                format: '{value}',
+                style: {
+                    color: Highcharts.getOptions().colors[i]
+                }
+            },
+		title: {
+			text: name
+		},
+		//lineWidth: 2,
+        //lineColor: Highcharts.getOptions().colors[i],
+		opposite: opposite2
+		};
+		yaxes.push(axi);
+		//opposite2 = !opposite2;
+	}
+	//yAxis[1] = yAxis2.replace('"','');
+	var chart =$('#chartid').highcharts({
+		chart: {renderTo: chart_id,
+		type: graphType,  zoomType: 'xy',},
+		legend: {
+                            enabled: true,
+                            layout: 'vertical',
+                            align: 'center',
+                            verticalAlign: 'top',
+                            x: 0,
+                            y: 10,
+                            borderWidth: 0
+                        },
+        title: title2,
+		rangeSelector: {
+            allButtonsEnabled: false,
+            selected: 2
+        },
+        xAxis: xAxis,
+        yAxis:yaxes,
+        series: series,
+    tooltip: {
+        backgroundColor: 'white',
+        borderWidth: 0,
+        borderRadius: 0,
+        shadow: false,
+        split: false,
+        formatter: function(){
+        	return '<b>discharge: </b>' + this.point.x + '<br> ' +
+        	 '<b> response: </b>' + this.point.y + '<br> <b>Date: </b>'+ Highcharts.dateFormat(' %e-%b-%Y %I:%M %p', this.point.dateTime);
+        },
+    },
+    });
+
+	//alert(name_of_units.length);
+
+
+
+	});
+
+</script>
+
+<p><h1>
+{% if useDataset %}
+{{datasetTitle}}
+{% else %}
+Location - {{featureActionLocation}}<br>
+{% endif %}
+{% if not useSamplingFeature and not useDataset %}
+Method- {{featureActionMethod}}
+{% endif %}
+</h1>
+    <div id='content-main'> {% csrf_token %}
+	 </div>
+	<div id='chartid' class="chart" style="height:100%; width:100%; margin: 0 auto;"></div>
+
+<br>
+{% if useDataset %}
+{{datasetAbstract}}
+{% endif %}
+
+	<table >
+				<tr>
+				<th scope="col"  class="sortable column-resultid">Maximum discharge</th>
+				<th scope="col"  class="sortable column-resultid">Start date</th>
+				<th scope="col"  class="sortable column-resultid">End date</th>
+
+				</tr>
+				<tr><td>
+					{{max_discharge}} {{discharge_units}}
+				</td>
+					<td>
+						{{startdate}}
+					</td>
+					<td>
+						{{enddate}}
+					</td>
+	</table>
+	<table>
+				<tr>
+				<th scope="col"  class="sortable column-resultid">Hysteresis Index</th>
+{% for hi, values in Hysteresis_Index.items %}
+		<tr><td>{{hi}}: {{values}}</td></tr>
+
+{% endfor %}
+		<tr><td>HI mean: {{HI_mean}}</td></tr>
+		<tr><td>HI standard deviation: {{HI_standard_deviation}}</td></tr>
+		</table>
+
+{% include 'StartEndDate.html' %}
+<br><br>
+<p>{{data_disclaimer.text}} <a href={{data_disclaimer.link}} target="_blank"> {{data_disclaimer.linktext}}</a></p>
+{% endblock %}
+
+
+{% block overwrite %}
+<!-- Overwrite the base.html jQuery load and put in head for Highcharts to work -->
+{% endblock %}
+{% block extrajs %}
+<!-- Maps the Python template context variables from views.py to the Highchart js variables -->
+
+{% endblock %}

@@ -9,9 +9,11 @@ from .base import *
 DEBUG = True
 """ END DEBUG CONFIGURATION """
 
-""" EXPORTDB FLAG CONFIGURATION - if set to true this will use Camel case table names for SQLite"""
-EXPORTDB = False
-""" EXPORTDB FLAG CONFIGURATION """
+""" EXTRA VARIABLES CONFIGURATION -"""
+EXPORTDB = False #  if set to true this will use Camel case table names for SQLite
+UTC_OFFSET = -4
+PYTHON_PATH = ''
+""" EXTRA VARIABLES CONFIGURATION """
 
 """ TRAVIS CONFIGURATION """
 TRAVIS_ENVIRONMENT = False
@@ -50,9 +52,25 @@ if TRAVIS_ENVIRONMENT:
 else:
 
     DATABASES = {
-        'default': {
+        'export': {  # export
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': 'ODM2SQliteBlank.db',
+        },
+            'default': {
+                'ENGINE': 'django.contrib.gis.db.backends.postgis',
+                'NAME': 'db_name',
+                'USER': 'user',
+                'PASSWORD': 'password',
+                'HOST': 'localhost',
+                'PORT': '5432',
+                'OPTIONS': {
+                    'options': '-c search_path=public,admin,odm2,odm2extra'
+                }
+
+        },
+        'published': {
             'ENGINE': 'django.contrib.gis.db.backends.postgis',
-            'NAME': 'db_name',
+            'NAME': 'db_name_published',
             'USER': 'user',
             'PASSWORD': 'password',
             'HOST': 'localhost',

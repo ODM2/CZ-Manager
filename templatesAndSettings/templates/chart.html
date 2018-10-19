@@ -7,32 +7,17 @@
 
 {% extends "admin/base_site.html" %}
 {% load admin_extras %}
-{% load admin_shortcuts_mod %}
 {% load static %}
 {% load i18n admin_static admin_shortcuts_tags %}
 
 {# django-admin-shortcuts changes these blocks #}
 
 {% block breadcrumbs %}
-{% if authenticated %}
-    {% if not user.groups.all.0 %}
+ {% if authenticated %}
         <div class="admin_shortcuts">
             {% admin_shortcuts %}
         </div>
-    {% else %}
-        {% for group in user.groups.all %}
-        {% if group.name != 'readonly' %}
-            <div class="admin_shortcuts">
-                {% admin_shortcuts %}
-            </div>
-        {% else %}
-            <div class="admin_shortcuts">
-                {% admin_shortcuts_filter %}
-            </div>
-        {% endif %}
-    {% endfor %}
     {% endif %}
-{% endif %}
 {% endblock %}
 
  {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>

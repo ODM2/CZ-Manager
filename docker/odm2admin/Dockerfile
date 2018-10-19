@@ -18,14 +18,15 @@ RUN apt-get update --fix-missing && apt-get install --yes apt-utils postgresql-c
 
 EXPOSE 8000
 
-RUN git clone "https://github.com/miguelcleon/ODM2-Admin"
-RUN cd ODM2-Admin && latest=$(git describe --tags) && git checkout ${latest}
+# && latest=$(git describe --tags) && git checkout ${latest}
+RUN git clone -b django2 "https://github.com/ODM2/ODM2-Admin"
+RUN cd ODM2-Admin
 
 WORKDIR /ODM2-Admin
 
 VOLUME templatesAndSettings/settings/
 
-RUN conda create --yes -n odm2adminenv -c conda-forge python=2.7 pytz gdal --file requirements.txt
+RUN conda create --yes -n odm2adminenv -c conda-forge python=3.6 libgdal boost pytz gdal --file requirements.txt
 
 COPY odm2database/odm2adminDB.sql /odm2adminDB.sql
 COPY odm2database/cvload.py /cvload.py

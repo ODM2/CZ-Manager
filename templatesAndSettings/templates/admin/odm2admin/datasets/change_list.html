@@ -1,0 +1,14 @@
+{% extends "admin/change_list.html" %}
+{% block content %}
+<form action="" method="post">
+<p>Enter your Hydroshare username and password</p>
+<p>
+Username: <input id="hydroshareUsername" maxlength="100" name="hydroshareUsername" type="text"></input>
+			Password: <input id="hydrosharePassword" maxlength="100" name="hydrosharePassword" type="password"></input>
+</p>   
+
+   {{ block.super }}
+</form>
+
+
+{% endblock %}

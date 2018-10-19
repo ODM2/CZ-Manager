@@ -1,0 +1,78 @@
+{% load i18n admin_urls %}
+{% load admin_extras %}
+{% load staticfiles %}
+
+<script src="{% static "spin.js/spin.min.js" %}"></script>
+
+<script>
+    var $ = django.jQuery;
+$(document).ready(function(){
+	$('#process_logger_file_b').click(function(){ //'.submit_row._save'
+	    //console.log('clicked save');
+		var savebutton = $("#process_logger_file_b"); //$("#email_data");
+		var check_dates_box = $("#check_dates"); //$("#email_data");
+		var check_dates = 'False';
+		if(check_dates_box[0].checked == true){
+		    check_dates = 'True';
+		}
+        savebutton[0].value= "Processing Data";
+        savebutton[0].disabled = true;
+        //var extra = {{extra_context}};
+        spinner = new Spinner().spin();
+		spin=document.getElementById("spinner");
+		spin.appendChild(spinner.el);
+        var $self = $(this);
+        //console.log($self);
+        var $thisForm = $self.parents('form:first');
+        var formData = $thisForm.serializeArray();
+        formData[$self.attr('name')] = $self.attr('value');
+        formData.push({name: $self.attr('name'), value: $self.attr('value')});
+        //formData.push({$self.attr('name'): $self.attr('value')});
+        //console.log(formData);
+        $.ajax({
+            url: "{% settings_value 'CUSTOM_TEMPLATE_PATH' %}../processdlfile/",
+            type: "POST",
+            timeout: 0,
+            async: false,
+            data: {
+                'formData': formData,
+                'dataloggerfileid' : formData[1]['value'],
+                'check_dates': check_dates,
+                'processingCode': formData[2]['value'],
+                'databeginson': formData[3]['value'],
+                'columnheaderson': formData[4]['value'],
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+            },
+            success : function(json) {
+                spinner.stop();
+                //console.log('success');
+                var savebutton = $("#process_logger_file_b"); //$("#email_data");
+                savebutton[0].value = "Data ingested";
+               // console.log(json);
+                //savebutton.defaultValue = json.dataloggerfileid + " Processed"; //json.dataloggerfileid
+            },
+            error : function(json) {
+                alert(json.responseText);
+            },
+		});
+		//console.log('after ajax');
+		});
+		});
+       </script>
+
+<div class="submit-row">
+{% if show_save %}<input type="submit" value="{% trans 'Save' %}"   class="default" id="save" name="_save" {{ onclick_attrib }}/>{% endif %}
+{% if show_delete_link %}<p class="deletelink-box"><a href="{% url opts|admin_urlname:'delete' original.pk|admin_urlquote %}"     class="deletelink">{% trans "Delete" %}</a></p>{% endif %}
+{% if show_save_as_new %}<input type="submit" value="{% trans 'Save as new' %}" name="_saveasnew" {{ onclick_attrib }}/>{%endif%}
+{% if show_save_and_add_another %}<input type="submit" value="{% trans 'Save and add another' %}" name="_addanother" {{ onclick_attrib }}/>{% endif %}
+{% if show_save_and_continue %}<input type="submit" value="{% trans 'Save and continue editing' %}" name="_continue" {{ onclick_attrib }}/>{% endif %}
+
+{% if opts.model_name == 'processdataloggerfile' %}
+    {% if "locked" in adminform.form.processingCode.value or "done" in adminform.form.processingCode.value %}
+<input type="button" value="{% trans 'Process data' %}" name="process_logger_file_b" disabled id="process_logger_file_b" {{ onclick_attrib }}  />
+    {% else %}
+    <input type="button" value="{% trans 'Process data' %}" name="process_logger_file_b" id="process_logger_file_b" {{ onclick_attrib }} />
+    {% endif %}
+    <input id="check_dates" class="asdf" type="checkbox" name="check_dates"  {{ onclick_attrib }}>check dates to prevent duplicates? (slower)</input>
+    {% endif %}
+</div>

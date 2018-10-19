@@ -116,6 +116,7 @@ MAP.prototype.getData = function (url,spinner) {
 			}
         });
         _this.markers.addTo(_this.webmap);
+        console.log('here');
 		spinner.stop();
     })
 
@@ -191,7 +192,7 @@ makerelation = function(relationobs) {
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
-                    "</a>, IGSN: <a target='_blank' href='" +
+                    "</a>, Link: <a target='_blank' href='" +
                     child['samplingfeatureexternalidentifieruri'] + "'>" +
                     child['samplingfeatureexternalidentifier'] +"</a></li>";
             });
@@ -206,7 +207,7 @@ makerelation = function(relationobs) {
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
-                    "</a>, IGSN: <a target='_blank' href='" +
+                    "</a>, Link: <a target='_blank' href='" +
                     child['samplingfeatureexternalidentifieruri'] + "'>" +
                     child['samplingfeatureexternalidentifier'] +"</a></li>";
             });
@@ -221,7 +222,7 @@ makerelation = function(relationobs) {
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
-                    "</a>, IGSN: <a target='_blank' href='" +
+                    "</a>, Link: <a target='_blank' href='" +
                     child['samplingfeatureexternalidentifieruri'] + "'>" +
                     child['samplingfeatureexternalidentifier'] +"</a></li>";
             });

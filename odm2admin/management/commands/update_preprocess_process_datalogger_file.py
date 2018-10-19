@@ -2,8 +2,11 @@ from __future__ import unicode_literals
 
 import argparse
 import os
-from urlparse import urlparse
-import urllib
+#from urlparse import urlparse
+try:
+    from urllib.parse import urlparse
+except ImportError:
+     from urlparse import urlparse
 
 from django.core.management.base import BaseCommand
 from django.core.management import settings
@@ -36,7 +39,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
         setupcomplete = str(options['setupcomplete'][0])
+        print(setupcomplete)
         filename = str(options['dataloggerfilelink'][0])
+        print(filename)
         fileid = int(options['dataloggerfileid'][0])
         databeginson = int(options['databeginson'][0])  # int(databeginson[0])
         ftpfrequencyhours = int(options['ftpfrequencyhours'][0])
@@ -52,14 +57,16 @@ class Command(BaseCommand):
                                                                      ).get()
                 raise ValidationError("This data logger file has already been setup for FTP.")
             except ObjectDoesNotExist:
+                print('setup cron')
+                ftpfile = dlf.dataloggerfiledescription
                 management.call_command('update_datalogger_file', filename,str(fileid)
-                                        , str(databeginson), str(columnheaderson),str(ftpfrequencyhours),
+                                        , str(databeginson), str(columnheaderson),str(ftpfrequencyhours),ftpfile,
                                         True, False, True)
         else:
-            management.call_command('preprocess_datalogger_file', filename, str(fileid)
+            filenameout = management.call_command('preprocess_datalogger_file', filename, str(fileid)
                                     , str(databeginson), str(columnheaderson),
                                     True)
 
-            management.call_command('ProcessDataLoggerFile', filename, str(fileid)
+            management.call_command('ProcessDataLoggerFile', filenameout, str(fileid)
                                     , str(databeginson), str(columnheaderson),
                                     True, False, True)

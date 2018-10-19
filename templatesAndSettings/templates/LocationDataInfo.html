@@ -21,18 +21,36 @@ a[target="_blank"]:after {
 
     
 	<form action="" method="post">
-	{% csrf_token %} 
+	{% csrf_token %}
 	<table >
 	{% ifequal methodsOnly "False" %}
 		<p>Data available from: {{startDate}} to: {{endDate}} </p>
+        <table >
+        {% for varname,results in resultListGrouped.items %}
+                {% if not done == 1 %}
+
+
+            <tr ><th scope="col" class="section">Result Series</td>
+            <th scope="col"  class="sortable column-resultid">Variable</th>
+            <th scope="col"  class="sortable column-resultid">Graph Data</th></tr>
+                {% endif %}
+                {% assign done 1 %}
+                <tr class="row1">
+                            <td width="20%">{{results}}</td>
+                            <td width="40%">{{varname}}</td>
+                            <td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{samplingfeatureid}}/resultidu&#61;{{results}}"> View Time Series </a></td>
+                </tr>
+        {% endfor %}
+        </table>
 	{% endifequal %}
-	<p>Collection methods include:</p>
+
 	{% assign done 0 %}
 	{% assign done2 0 %}
 	{% for featureAction in featureActions %}
 		{% if not useDataset %}
-			
+
 			{% ifequal methodsOnly "True" %}
+        	<p>Collection methods include:</p>
 				{% if not lastMethod == featureAction.action.method   %}
 					<th scope="col"  class="sortable column-resultid">method name</th>
 					<th scope="col"  class="sortable column-resultid">description</th>
@@ -83,39 +101,66 @@ a[target="_blank"]:after {
 			{% else %}
                 {% if not done2 == 1 %}
                                 <br><a  target="_blank" href="{{prefixpath}}../graphfa/samplingfeature&#61;{{featureAction.samplingfeatureid.samplingfeatureid}}">view times series data for all methods in new page</a></br>
-                {% endif %}
+					{% endif %}
                 {% assign done2 1 %}
 				<table >
                 {% assign done 0 %}
 				{% for Result in resultList %}
 					{% if featureAction.action.method.methodname == Result.featureactionid.action.method.methodname  %}
 						{% if not done == 1 %}
-                            
-						
+
+
 							 <p><a target="_blank", href="{{prefixpath}}../graphfa/featureaction&#61;{{Result.featureactionid.featureactionid}} ">{{featureAction.action.method.methodname}}</a></p>
 
-					
+
 					<tr ><th scope="col" class="section">Result Series</td>
 					<th scope="col"  class="sortable column-resultid">Variable</th>
 					<th scope="col"  class="sortable column-resultid">Units</th>
 					<th scope="col"  class="sortable column-resultid">Time Interval</th>
 					<th scope="col"  class="sortable column-resultid">Graph Data</th>
-					<th scope="col"  class="sortable column-resultid">Annotate Data</th>
+						<th scope="col"  class="sortable column-resultid">Annotate Data</th>
 					<th scope="col"  class="sortable column-resultid">Processing Level</th></tr>
 						{% endif %}
 						{% assign donut 1 %}
 						{% assign done 1 %}
-						<tr class="row1">
-									<td >{{Result.resultid}}</td>
-									<td >{{Result.variableid.variablecode}}</td>
-									<td >{{Result.unitsid}}</td>
-									<td >{{Result.timeinterval}} {{Result.timeintervalunits}}</td>
-									<td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}"> View Time Series </a></td>
-									<td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}/popup=Anno/"> View Time Series </a></td>
+						{% assign printedResult 0 %}
+						{% for plevel in processing_level__in %}
+							{% if printedResult == 0 %}
+								{% if authenticated or Result.processing_level.processinglevelid == plevel %}
+									{% assign printedResult 1 %}
+
+								<tr class="row1">
+											<td >{{Result.resultid}}</td>
+											<td >{{Result.variableid.variablecode}}</td>
+											<td >{{Result.unitsid}}</td>
+											<td >{{Result.timeinterval}} {{Result.timeintervalunits}}</td>
+											<td ><a target="_blank",
+													href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{ samplingfeatureid }}/resultidu&#61;{{Result.resultid}}"> View Time Series </a></td>
+									<td ><a target="_blank",
+											href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}/popup=Anno/"> View Time Series </a></td>
+									<td ><a target="_blank",
+											href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{Result.featureactionid.samplingfeatureid.samplingfeatureid}}/resultidu&#61;{{Result.resultid}}/popup=hysteresis/"> View discharge concentration hysteresis </a></td>
 									<td > {{Result.processing_level}}</td>
-									</tr>
-					{% endif %} 
+											</tr>
+                                {% elif not authenticated %}
+                    		{% assign printedResult 1 %}
+
+								<tr class="row1">
+											<td >{{Result.resultid}}</td>
+											<td >{{Result.variableid.variablecode}}</td>
+											<td >{{Result.unitsid}}</td>
+											<td >{{Result.timeinterval}} {{Result.timeintervalunits}}</td>
+											<td >login to see data</td>
+									<td >login to see data</td>
+									<td > {{Result.processing_level}}</td>
+											</tr>
+
+								{% endif %}
+							{% endif %}
+						{% endfor %}
+					{% endif %}
 				{% endfor %}
+
 			 </table>	
 		{% endifequal %}
 	{% endif %}
@@ -123,6 +168,7 @@ a[target="_blank"]:after {
 {% assign lastMethod featureAction.action.method %}
 {% endfor %}
 </table>
+
 
 
 			<br>
