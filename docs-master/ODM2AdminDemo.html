@@ -6,13 +6,14 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>OODM2 Admin Walkthrough &#8212; ODM2-Admin 0.1.0 documentation</title>
+    <title>ODM2 Admin Walkthrough &#8212; ODM2-Admin 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="ODM2 Admin Forms" href="ODM2AdminAdministration.html" />
@@ -52,7 +53,7 @@
     
 
 <p>
-<a href="https://travis-ci.org/ODM2/ODM2-Admin">
+<a class="badge" href="https://travis-ci.org/ODM2/ODM2-Admin">
     <img
         alt="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
         src="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
@@ -95,6 +96,14 @@
     </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
         </div>
       </div>
       <div class="documentwrapper">
@@ -103,9 +112,9 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="oodm2-admin-walkthrough">
-<h1>OODM2 Admin Walkthrough<a class="headerlink" href="#oodm2-admin-walkthrough" title="Permalink to this headline">¶</a></h1>
-<p>This walthough explains many of the features of ODM2 Admin. This tutorial was developed for the CUAHSI Tools
+  <div class="section" id="odm2-admin-walkthrough">
+<h1>ODM2 Admin Walkthrough<a class="headerlink" href="#odm2-admin-walkthrough" title="Permalink to this headline">¶</a></h1>
+<p>Below is a tutorial which explains many of the features of ODM2 Admin. This tutorial was developed for the CUAHSI Tools
 and Services for Managing Research Data Workshop at the CUAHSI Biennial Colloquium on July 7-31-2018. It is meant as a
 demonstration of the capabilities of ODM2 Admin and as a use case for ODM2. Links contained here access a demonstartion
 version of ODM2 Admin populated with data from the <a class="reference external" href="http://criticalzone.org/luquillo/">Luquillo Critical Zone Observatory</a>
@@ -140,10 +149,13 @@ variable were recently changed.</p>
 <p>The Authentication and Authorization link will allow you to create users and groups so others can login to the system.</p>
 <p>The ODM2 Admin Administration link will take you to a list of all 44 ODM2 entities that can be directly managed in
 ODM2 Admin. See the ODM2 Admin Forms for details about the ODM2 Admin Forms <a class="reference internal" href="ODM2AdminAdministration.html#odm2-administration"><span class="std std-ref">ODM2 Admin Forms</span></a>.</p>
-<p>Some entities described by the ODM2 data model do not have forms associated with them in ODM2 Admin and need to be
-managed with another tool such as with the ODM2PythonAPI. Django models exist for each ODM2 entity so it is also
-possible to write Python scripts using the Django Object relational mapper. See <a class="reference internal" href="ManagingODM2WithTheDjangoORM.html#managing-odm2-with-the-django-orm"><span class="std std-ref">The Django ORM and WOFpy</span></a>
-for details on using the Django ORM with ODM2 databases.</p>
+<p>The recent actions section shows changes you have recently completed in ODM2 Admin such as adding or editing an item
+in the forms. In the example above we can see that a method, a data result and a variable were recently changed.</p>
+<p>The Authentication and Authorization link will allow you to create users and groups so others can login to the system.</p>
+<p>Additional entities exist within the ODM2 information model these need to be managed with another tool
+Such as with the ODM2PythonAPI. Django models exist for each ODM2 entity so it is also possible to write Python scripts
+using the Django Object relational mapper. See <a class="reference internal" href="ManagingODM2WithTheDjangoORM.html#managing-odm2-with-the-django-orm"><span class="std std-ref">The Django ORM and WOFpy</span></a> for details on using the Django
+ORM with ODM2 databases.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="ODM2AdminAdministration.html">1) The ODM2 Admin Forms</a></li>
@@ -173,8 +185,8 @@ for details on using the Django ORM with ODM2 databases.</p>
       &copy;2017, Miguel Leon.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.5</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
       <a href="_sources/ODM2AdminDemo.rst.txt"
