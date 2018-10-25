@@ -91,7 +91,7 @@ import re
 
 from .readonlyadmin import ReadOnlyAdmin
 from .listfilters import SamplingFeatureTypeListFilter
-
+# import pyproj
 
 # from .admin import MeasurementresultvaluesResource
 # AffiliationsChoiceField(People.objects.all().order_by('personlastname'),
@@ -787,10 +787,12 @@ class SamplingfeaturesAdminForm(ModelForm):
                                 u'here: <a href="http://vocabulary.odm2.org/elevationdatum/" ' \
                                 u'target="_blank">http://vocabulary.odm2.org/elevationdatum/</a>'
     elevation_datum.allow_tags = True
-    featuregeometry = forms.PointField(label='Featuregeometry',
-                                       widget=forms.OpenLayersWidget(), required=False)
+    # featuregeometry is not working in production I think GDAL_DATA setting is needed but I'm not sure what to point
+    # it to. This was not working well in either case though.
+    # featuregeometry = forms.PointField(label='Featuregeometry',
+    #                                    widget=forms.OSMWidget(), required=False)
 
-    featuregeometry.initial = GEOSGeometry("POINT(0 0)")
+    # featuregeometry.initial = GEOSGeometry("POINT(0 0)")
 
 
 class SitesInline(admin.StackedInline):
