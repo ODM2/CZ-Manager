@@ -3,7 +3,7 @@
 Data Visualization and URL parameters
 =====================================
 
-Graphs presenting ODM2 Time Series can be easily shared with formatted URL parameters. if we return to the example we
+Graphs presenting ODM2 Time Series can be easily shared with formatted URL parameters. Let's we return to the example we
 used in :ref:`Data QAQC doc<Data-QA-QC>`
 
 * We looked at a timeseries with the following link: https://dev-odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=16657/popup=Anno/

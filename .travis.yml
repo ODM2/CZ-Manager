@@ -16,6 +16,14 @@ env:
 before_cache:
   - rm -rf $HOME/miniconda/envs/TEST
 
+services:
+  - postgresql
+addons:
+  postgresql: "9.5"
+  apt:
+    packages:
+      - postgresql-9.5-postgis-2.3
+
 matrix:
   fast_finish: true
   include:
@@ -29,6 +37,8 @@ matrix:
 
 
 before_install:
+  - psql -U postgres -c "create extension postgis"
+  - psql -c "CREATE DATABASE test;" -U postgres
   - |
     URL="http://bit.ly/miniconda"
     echo ""
@@ -42,16 +52,13 @@ before_install:
   - conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
   - conda update conda
   - conda config --add channels conda-forge --force
-  - conda config --add channels odm2 --force
-  - conda create --name TEST python=$TRAVIS_PYTHON_VERSION libgdal boost --file requirements.txt --file requirements-dev.txt
+  - conda create --name TEST python=$TRAVIS_PYTHON_VERSION libgdal --file requirements.txt --file requirements-dev.txt
   - source activate TEST
-  - pip install --upgrade http://github.com/miguelcleon/django-admin-shortcuts/zipball/master
+#   - pip install --upgrade http://github.com/miguelcleon/django-admin-shortcuts/zipball/master
+
 
 install:
   - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2admin-${version}.tar.gz && popd
-
-before_script:
-- psql -c "CREATE DATABASE test;" -U postgres
 
 script:
   - if [[ $TEST_TARGET == 'default' ]]; then

@@ -4045,12 +4045,3 @@ class Variables(models.Model):
         else:
             db_table = r'variables'
         verbose_name = 'variable'
-
-
-
-
-
-
-
-
-

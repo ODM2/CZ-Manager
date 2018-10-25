@@ -40,6 +40,12 @@ ODM2 Admin site administration dashboard
 
 .. image:: /images/AdminDashboard.png
 
+The recent actions block of the site administration dashboard shows changes you have recently completed in ODM2 Admin
+such as adding or editing an item in the forms. In the example above we can see that a method, a data result and a
+variable were recently changed.
+
+The Authentication and Authorization link will allow you to create users and groups so others can login to the system.
+
 The ODM2 Admin Administration link will take you to a list of all 44 ODM2 entities that can be directly managed in
 ODM2 Admin. See the ODM2 Admin Forms for details about the ODM2 Admin Forms :ref:`ODM2-Administration`.
 
@@ -58,13 +64,13 @@ ORM with ODM2 databases.
    :maxdepth: 1
 
    1) The ODM2 Admin Forms <ODM2AdminAdministration>
-   2) Using Data Logger Files <DataLoggerFiles>
-   3) Managing Profile Results With ODM2 Admin <ProfileResults>
-   4) Time series QA/QC <DataQAQC>
-   5) Data visualization and URL parameters <DataVisualizationTips>
-   6) Using the Django ORM <ManagingODM2WithTheDjangoORM>
+   2) ODM2 Admin Field Site Management <ODM2AdminSiteManagement>
+   3) Using Data Logger Files <DataLoggerFiles>
+   4) Managing Profile Results With ODM2 Admin <ProfileResults>
+   5) Time series QA/QC <DataQAQC>
+   6) Data visualization and URL parameters <DataVisualizationTips>
+   7) Using the Django ORM <ManagingODM2WithTheDjangoORM>
 
 
 * :ref:`ODM2 Admin docs home page <ODM2-Admin>`
 * :ref:`Search the docs <search>`
-
