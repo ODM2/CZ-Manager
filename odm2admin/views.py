@@ -627,21 +627,27 @@ def get_features(request, sf_type="all", ds_ids="all"):
 
         # Get Site Attr
         if sf.sampling_feature_type.name == 'Site':
-            site = Sites.objects.get(samplingfeatureid=sf.samplingfeatureid)
-            feat.update({
-                'sitetype': site.sitetypecv.name,
-                'sitetypeurl': site.sitetypecv.sourcevocabularyuri
-            })
+            try:
+                site = Sites.objects.get(samplingfeatureid=sf.samplingfeatureid)
+                feat.update({
+                    'sitetype': site.sitetypecv.name,
+                    'sitetypeurl': site.sitetypecv.sourcevocabularyuri
+                })
+            except Sites.DoesNotExist:
+                site = None
 
         # Get Specimen Attr
         if sf.sampling_feature_type.name == 'Specimen':
-            specimen = Specimens.objects.get(samplingfeatureid=sf.samplingfeatureid)
-            feat.update({
-                'specimentype': specimen.specimentypecv.name,
-                'specimentypeurl': specimen.specimentypecv.sourcevocabularyuri,
-                'specimenmedium': specimen.specimenmediumcv.name,
-                'specimenmediumurl': specimen.specimenmediumcv.sourcevocabularyuri,
-            })
+            try:
+                specimen = Specimens.objects.get(samplingfeatureid=sf.samplingfeatureid)
+                feat.update({
+                    'specimentype': specimen.specimentypecv.name,
+                    'specimentypeurl': specimen.specimentypecv.sourcevocabularyuri,
+                    'specimenmedium': specimen.specimenmediumcv.name,
+                    'specimenmediumurl': specimen.specimenmediumcv.sourcevocabularyuri,
+                })
+            except Specimens.DoesNotExist:
+                specimen = None
         # Get Relations
         relationship = get_relations(sf)
         if all(value == [] for value in relationship.values()):
