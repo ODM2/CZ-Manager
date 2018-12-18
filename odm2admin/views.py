@@ -19,8 +19,8 @@ import sys
 import os
 import subprocess
 import re
-import pandas as pd
-import numpy
+# import pandas as pd
+# import numpy
 from colour import Color
 # from celery import shared_task
 # import odm2admin.tasks as tasks
@@ -2230,127 +2230,6 @@ def email_data_from_graph(request):
 
 def hysterisisMetrics(discharge,response):
     hystdict = {}
-    maxdischarge = discharge.aggregate(Max('datavalue'))
-    hystdict['max_discharge'] = maxdischarge['datavalue__max']
-    hystdict['discharge_units'] = discharge[0].resultid.resultid.unitsid.unitsabbreviation
-    if maxdischarge:
-        # print(maxdischarge['datavalue__max'])
-        # normalize discharge
-        maxdischargerecord = discharge.order_by('-datavalue')[0]# .get(datavalue=float(maxdischarge['datavalue__max']))
-        mindischargerecord = discharge.order_by('datavalue')[0]
-        # dischargenorm = []
-        dischargepdf = pd.DataFrame(list(discharge.values()))
-        dischargepdf['datavalue'] = (dischargepdf['datavalue']- mindischargerecord.datavalue)/(maxdischargerecord.datavalue - mindischargerecord.datavalue)
-        # print(dischargepdf['datavalue'])
-        maxdisrow = dischargepdf.loc[dischargepdf['datavalue'].idxmax()]
-        mindisrow = dischargepdf.loc[dischargepdf['datavalue'].idxmin()]
-        maxnormdischargerecord = maxdisrow['datavalue']
-        maxnormdischargedate = maxdisrow['valuedatetime']
-        minnormdischargerecord = mindisrow['datavalue']
-        minnormdischargedate = mindisrow['valuedatetime']
-
-        # print('discharge norm max: ' + str(maxnormdischargerecord))
-        # print('discharge norm min: ' + str(minnormdischargerecord))
-        # normalize response
-        print(response.count())
-        maxresponse = response.order_by('-datavalue')[0]# .get(datavalue=float(maxdischarge['datavalue__max']))
-        minresponse = response.order_by('datavalue')[0]
-        # responsenorm = []
-        responsenormpdf = pd.DataFrame(list(response.values()))
-        responsenormpdf['datavalue'] = (responsenormpdf['datavalue']- minresponse.datavalue)/(maxresponse.datavalue - minresponse.datavalue)
-
-        responsetsr = Timeseriesresults.objects.filter(resultid=response[0].resultid.resultid).get()
-        timeagg =responsetsr.intendedtimespacing
-        timeaggunit = responsetsr.intendedtimespacingunitsid.unitsname
-        if 'minute' in timeaggunit:
-            responsenormpdf['valuedatetime'] = responsenormpdf['valuedatetime'].apply(lambda dt: datetime(dt.year, dt.month, dt.day, dt.hour,
-                                                                           int(timeagg * round((float(dt.minute) + float(
-                                                                               dt.second) / 60) / timeagg))))
-        if 'hour' in timeaggunit:
-            timeagg = timeagg * 60
-            responsenormpdf['valuedatetime'] = responsenormpdf['valuedatetime'].apply(lambda dt: datetime(dt.year, dt.month, dt.day, dt.hour,
-                                                                           int(timeagg * round((float(dt.minute) + float(
-                                                                               dt.second) / 60) / timeagg))))
-        # print(maxdischargerecord)
-        # print(maxdischargerecord.valuedatetime)
-
-        raisinglimbresponse = responsenormpdf[(responsenormpdf['valuedatetime'] <= maxnormdischargedate)] # response.filter(valuedatetime__lte=maxdischargerecord.valuedatetime)
-        fallinglimbresponse = responsenormpdf[(responsenormpdf['valuedatetime'] > maxnormdischargedate)]  # response.filter(valuedatetime__gt=maxdischargerecord.valuedatetime)
-        # pd.DataFrame(list(raisinglimbresponse.values()))
-        # print('falling limb val count: ' + str(len(fallinglimbresponse.index)))
-        # print('raising limb val count: ' + str(len(raisinglimbresponse.index)))
-        hystIndex = []
-        # 5% intervals of discharge for hysteresis index 20 buckets
-        if not len(raisinglimbresponse.index) == 0 and not len(fallinglimbresponse.index) == 0:
-
-            dischargerange = maxnormdischargerecord- minnormdischargerecord
-            dischargeinterval = dischargerange / 50
-            hystIndex = {}
-            for i in range(1,50):
-                if i == 1:
-                    lastinterval = 0
-                else:
-                    lastinterval = interval
-                interval = dischargeinterval*i
-                #dischargeintervalvals = discharge.filter(datavalue__lte=interval).filter(datavalue__gte=lastinterval)
-                dischargeintervalvals = dischargepdf[(dischargepdf['datavalue'] <= interval) & (dischargepdf['datavalue'] > lastinterval)]
-                # find matching response records
-                # keys = list(dischargeintervalvals['valuedatetime'])
-                dischargeandraisingresponse = pd.merge(dischargeintervalvals, raisinglimbresponse, on='valuedatetime', how='left', suffixes=('dis','raising'))
-                dischargeandfallingresponse = pd.merge(dischargeintervalvals, fallinglimbresponse, on='valuedatetime', how='left', suffixes=('dis','falling'))
-                # print('for interval: ' + str(interval))
-                # print('raising response ' + str(len(dischargeandraisingresponse.index)))
-                # print(dischargeandraisingresponse['datavalueraising'])
-                # print(dischargeandraisingresponse.head(1))
-                # print('falling response ' + str(len(dischargeandfallingresponse.index)))
-                # print(dischargeandfallingresponse['datavaluefalling'])
-                closestraisingrow = None
-                closestfallingrow = None
-                closestraisingdistance = None
-                closestfallingdistance = None
-                for index, raisingrow in dischargeandraisingresponse.iterrows():
-                    # print(raisingrow)
-                    if raisingrow['datavalueraising'] > 0:
-                        if closestraisingdistance:
-                            if abs(interval - raisingrow['datavaluedis']) < closestraisingdistance:
-                                closestraisingdistance =  abs(interval - raisingrow['datavaluedis'])
-                                closestraisingrow = raisingrow
-                        else:
-                            closestraisingdistance =  abs(interval - raisingrow['datavaluedis'])
-                            closestraisingrow = raisingrow
-                for index2, fallingrow in dischargeandfallingresponse.iterrows():
-                    if fallingrow['datavaluefalling'] > 0: #and raisingrow['datavalueraising'] == fallingrow['datavaluefalling'] :
-                        if closestfallingdistance:
-                            if abs(interval - fallingrow['datavaluedis']) < closestfallingdistance:
-                                closestfallingdistance = abs(interval - raisingrow['datavaluedis'])
-                                closestfallingrow = fallingrow
-                        else:
-                            closestfallingdistance = abs(interval - raisingrow['datavaluedis'])
-                            closestfallingrow = fallingrow
-                       # print(raisingrow)
-                       # print(fallingrow)
-                if not closestraisingrow is None and not closestfallingrow is None:
-                    tmp = closestraisingrow['datavalueraising'] - closestfallingrow['datavaluefalling']
-                    hystIndex['HI for ' + str(i*2) + '% discharge'] = tmp
-                print(hystIndex)
-            HIs = []
-            for key, values in hystIndex.items():
-                HIs.append(values)
-                if 'Hysteresis_Index' in hystdict:
-                    hystdict['Hysteresis_Index'][key] = values
-                else:
-                    tmpdict = {}
-                    tmpdict[key ] = values
-                    hystdict['Hysteresis_Index'] = tmpdict
-            hystAvg = numpy.mean(HIs) #sum(values) / float(len(values))
-            hystStd = numpy.std(HIs)
-            # print("HI mean: " + str(hystAvg))
-            # print("HI standard deviation: " + str(hystStd))
-
-            hystdict["HI_mean"] = hystAvg
-            hystdict["HI_standard_deviation"] = hystStd
-            # hystdict['Hysteresis_Index'].append([key + " values: ", values])
-            # print(hystdict)
 
     return hystdict
 
