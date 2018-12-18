@@ -1517,9 +1517,12 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
             # return HttpResponse(html)
             methodsOnly = 'True'
     for result in resultList:
-        tsr = Timeseriesresults.objects.filter(resultid=result).get()
-        result.timeintervalunits = tsr.intendedtimespacingunitsid
-        result.timeinterval = tsr.intendedtimespacing
+        try:
+            tsr = Timeseriesresults.objects.filter(resultid=result).get()
+            result.timeintervalunits = tsr.intendedtimespacingunitsid
+            result.timeinterval = tsr.intendedtimespacing
+        except:
+            pass
     processing_level__in = settings.MAP_CONFIG['result_value_processing_levels_to_display']
     return TemplateResponse(request, template, {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'useSamplingFeature': useSamplingFeature,
