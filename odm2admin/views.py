@@ -1499,15 +1499,19 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         except IndexError as e:
             # html = "<html><body>No Data Available Yet.</body></html>"
             # return HttpResponse(html)
-            startdate = Timeseriesresultvalues.objects.\
-                filter(resultid__in=resultList.values("resultid")).\
-                annotate(Min('valuedatetime')).\
-                order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-            enddate = Timeseriesresultvalues.objects.\
-                filter(resultid__in=resultList.values("resultid")).\
-                annotate(Max('valuedatetime')).\
-                order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-            methodsOnly = 'True'
+            try:
+                startdate = Timeseriesresultvalues.objects.\
+                    filter(resultid__in=resultList.values("resultid")).\
+                    annotate(Min('valuedatetime')).\
+                    order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+                enddate = Timeseriesresultvalues.objects.\
+                    filter(resultid__in=resultList.values("resultid")).\
+                    annotate(Max('valuedatetime')).\
+                    order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+                methodsOnly = 'True'
+            except IndexError as e:
+                html = "<html><body>No time series data available for this site.</body></html>"
+                return HttpResponse(html)
     except ValueError as e:
             # html = "<html><body>No Data Available Yet.</body></html>"
             # return HttpResponse(html)
