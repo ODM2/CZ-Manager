@@ -2188,24 +2188,34 @@ def export_to_hydroshare(request):
                                                 'export_complete': export_complete,
                                                 'username' : username,
                                                 'resource_link': resource_link,},content_type='application/json')
+@login_required()
 def email_data_from_graph(request):
+    # print('email data')
     emailsent = False
     outEmail = ''
     entered_end_date = ''
     entered_start_date = ''
     myresultSeriesExport = []
-    if 'email_data' in request.POST and 'resultidu[]' in request.POST:
+    if 'email_data' in request.POST and 'resultidu[]' or 'myresultSeriesExport[]' in request.POST:
+        # print(' email data and resultid[]')
         selectedMResultSeries = request.POST.getlist('myresultSeriesExport[]')
-        resultid = request.POST.getlist('resultidu[]')
-        try:
+        # print(selectedMResultSeries)
+        # resultids = request.POST.getlist('resultidu[]')
+        # try:
             # print(resultidu)
-            resultidu = [int(selectedMResultSeries)]
-        except:
-            resultids = re.findall(r'\d+',request.POST.getlist('myresultSeriesExport[]')) # re.findall(r'\d+',request.POST['myresultSeriesExport[]'])
-            resultidu = []
-            mergeResults = 'true'
-            for results in resultids:
-                resultidu.append(int(results))
+            # resultidu = [int(selectedMResultSeries)]
+        # except TypeError:
+         #    resultids = re.findall(r'\d+',request.POST.getlist('myresultSeriesExport[]')) # re.findall(r'\d+',request.POST['myresultSeriesExport[]'])
+        resultidu = []
+        # mergeResults = 'true'
+        for results in selectedMResultSeries:
+            ids = re.findall(r'\d+', results)
+            for id in ids:
+                resultidu.append(int(id))
+        # for results in resultids:
+        #     ids = re.findall(r'\d+', results)
+        #     for id in ids:
+        #         resultidu.append(int(reidsults))
         selectedMResultSeries = resultidu
         myresultSeriesExport = None
         if request.POST['useDates'] == 'true':
@@ -2225,6 +2235,7 @@ def email_data_from_graph(request):
         else:
             myresultSeriesExport = Timeseriesresultvaluesextwannotations.objects.all() \
                     .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
+        # print('email spreadsheet')
         emailspreadsheet2(request, myresultSeriesExport, False) # for command str_selectedresultid_ids
         
         # .after_response    
@@ -3129,7 +3140,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
         tolist.append(str(outgoingemail))
         # print(tolist)
 
-        myfile = StringIO.StringIO()
+        myfile = StringIO()
          # raise ValidationError(resultValues)
         k = 0
         variablesAndUnits = []
@@ -3262,6 +3273,10 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
             k += 1
         # response = StreamingHttpResponse(myfile.getvalue(), content_type='text/csv')
         # response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
+        # print('email!!!!')
+        # print(settings.EMAIL_FROM_ADDRESS)
+        # print(emailtext)
+        # print(tolist)
         email = EmailMessage(emailtitle,emailtext,
                              settings.EMAIL_FROM_ADDRESS, tolist)
         email.attach('mydata.csv', myfile.getvalue(),'text/csv')
