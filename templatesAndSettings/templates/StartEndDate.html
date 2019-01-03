@@ -172,11 +172,12 @@ $(document).ready(function(){
 			<!--Password: <input id="hydrosharePassword" maxlength="100" name="hydrosharePassword" type="password"></input>-->
 			<!--<button  type="button" name="to_hydroshare"  id="to_hydroshare"/>Upload To Hydroshare</button>-->
 			<!--</td></tr>-->
+			{% if authenticated %}
 			<tr><td><div class="g-recaptcha" data-sitekey="6Lc8RA8UAAAAAOG9JmCk7CSGIZG-js4PkmB8xFL9"></div>
 			use dates to filter data in email: <input id="useDates" type="checkbox" name="useDates" checked></input>
 			&nbsp; &nbsp; Send data to this email address: <input id="outEmail" maxlength="100" name="outEmail" type="text"> </input>
-			<button type="button" id="email_data" name="email_data">Email Data</button>
-			
+				<button type="button" id="email_data" name="email_data">Email Data</button>
+			{% endif %}
 			</td></tr>
 	
 {% if emailsent %}
