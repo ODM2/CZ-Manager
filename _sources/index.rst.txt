@@ -109,7 +109,7 @@ instance, hosted on the CUAHSI cloud, contact leonmi@sas.upenn.edu
 Another deployment for demonstration porposes is available, see the :ref:'ODM2AdminDemo' for more
 information:
 
-https://odm2admin.cuahsi.org/Sandbox/
+http://odm2admin.cuahsi.org/Sandbox/
 
 Using ODM2 Admin
 ================
