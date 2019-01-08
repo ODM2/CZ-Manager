@@ -11,7 +11,7 @@ Some of the sampling features, accessible from the ODM2 Admin Demo Map contain s
 Field area Palm SJH, WS 2015 represents a set of soil pits making up a study area. Soils taken from this study area were
 analyzed for Acid phosphatase, Ammonium oxalate extractable aluminum and other compounds. A graph of these values can be
 viewed here:
-https://dev-odm2admin.cuahsi.org/Sandbox/profilegraph/selectedrelatedfeature=15/popup=true/
+https://odm2admin.cuahsi.org/Sandbox/profilegraph/selectedrelatedfeature=15/popup=true/
 Follow these steps:
 
 # Select Variable Codes: Clay, Sand, and Silt
@@ -45,7 +45,7 @@ results have  the same sampling feature.
 
 Let's look at another data export for samplingfeature PALMDYS-21, If we go to the following link:
 
-https://dev-odm2admin.cuahsi.org/Sandbox/profilegraph/selectedrelatedfeature=674/popup=true/
+https://odm2admin.cuahsi.org/Sandbox/profilegraph/selectedrelatedfeature=674/popup=true/
 
 PALMDYS-21 is a field area where 9 soil pits were dug. Again let's Select Variable Codes: Clay, Sand, and Silt,
 Click 'Update Chart' wait for the page to refresh and click 'Export Data'.

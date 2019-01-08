@@ -13,7 +13,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="The Django ORM and WOFpy" href="ManagingODM2WithTheDjangoORM.html" />
@@ -119,7 +119,7 @@
 <p>Graphs presenting ODM2 Time Series can be easily shared with formatted URL parameters. Let’s we return to the example we
 used in <a class="reference internal" href="DataQAQC.html#data-qa-qc"><span class="std std-ref">Data QAQC doc</span></a></p>
 <ul class="simple">
-<li>We looked at a timeseries with the following link: <a class="reference external" href="https://dev-odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=16657/popup=Anno/">https://dev-odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=16657/popup=Anno/</a></li>
+<li>We looked at a timeseries with the following link: <a class="reference external" href="https://odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=16657/popup=Anno/">https://odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=16657/popup=Anno/</a></li>
 </ul>
 <p>We can use the interface to select different data, selecting start and end dates, or changing or adding time series by
 selecting different items in the checkbox list.</p>
@@ -131,21 +131,21 @@ this time series we could add start and end dates into the URL like:</p>
 <ul class="simple">
 <li>startdate=2016-07-08</li>
 <li>enddate=2016-07-10</li>
-<li><a class="reference external" href="https://dev-odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=16657/startdate=2016-07-08/enddate=2016-07-10/popup=Anno/">https://dev-odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=16657/startdate=2016-07-08/enddate=2016-07-10/popup=Anno/</a></li>
+<li><a class="reference external" href="https://odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=16657/startdate=2016-07-08/enddate=2016-07-10/popup=Anno/">https://odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=16657/startdate=2016-07-08/enddate=2016-07-10/popup=Anno/</a></li>
 </ul>
 <p>We can also change the time series with the resultidu URL parameter to select conductivity set it like:</p>
 <ul class="simple">
 <li>resultidu=14</li>
-<li><a class="reference external" href="https://dev-odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=14/startdate=2016-07-08/enddate=2016-07-10/popup=Anno/">https://dev-odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=14/startdate=2016-07-08/enddate=2016-07-10/popup=Anno/</a></li>
+<li><a class="reference external" href="https://odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=14/startdate=2016-07-08/enddate=2016-07-10/popup=Anno/">https://odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=14/startdate=2016-07-08/enddate=2016-07-10/popup=Anno/</a></li>
 </ul>
 <p>Based on the URL we can see that the sampling feature used here has an id of 776:</p>
-<p>Which is here: <a class="reference external" href="https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/samplingfeatures/776/change/">https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/samplingfeatures/776/change/</a></p>
+<p>Which is here: <a class="reference external" href="https://odm2admin.cuahsi.org/Sandbox/odm2admin/samplingfeatures/776/change/">https://odm2admin.cuahsi.org/Sandbox/odm2admin/samplingfeatures/776/change/</a></p>
 <p>We could also find the site by searching for Rio Espritu Santo Stream House in the sampling features search page:</p>
-<p><a class="reference external" href="https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/samplingfeatures/?q=Rio+Espiritu+Santo+Stream+House">https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/samplingfeatures/?q=Rio+Espiritu+Santo+Stream+House</a></p>
+<p><a class="reference external" href="https://odm2admin.cuahsi.org/Sandbox/odm2admin/samplingfeatures/?q=Rio+Espiritu+Santo+Stream+House">https://odm2admin.cuahsi.org/Sandbox/odm2admin/samplingfeatures/?q=Rio+Espiritu+Santo+Stream+House</a></p>
 <p>Similarly we can find the data result and associated time series result with id 16657:</p>
-<p><a class="reference external" href="https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/results/16657/change/">https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/results/16657/change/</a></p>
+<p><a class="reference external" href="https://odm2admin.cuahsi.org/Sandbox/odm2admin/results/16657/change/">https://odm2admin.cuahsi.org/Sandbox/odm2admin/results/16657/change/</a></p>
 <p>or we can search for Rio Espiritu Santo Stream House Water Temperature</p>
-<p><a class="reference external" href="https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/results/?q=Rio+Espiritu+Santo+Stream+House+Water+Temperature">https://dev-odm2admin.cuahsi.org/Sandbox/odm2admin/results/?q=Rio+Espiritu+Santo+Stream+House+Water+Temperature</a></p>
+<p><a class="reference external" href="https://odm2admin.cuahsi.org/Sandbox/odm2admin/results/?q=Rio+Espiritu+Santo+Stream+House+Water+Temperature">https://odm2admin.cuahsi.org/Sandbox/odm2admin/results/?q=Rio+Espiritu+Santo+Stream+House+Water+Temperature</a></p>
 <p>In this case we see that water temperature is recorded by three instruments a Water level, Dissolved Oxygen (DO), and
 Water Conductivity sensor.</p>
 <blockquote>
@@ -169,7 +169,7 @@ Water Conductivity sensor.</p>
       &copy;2017, Miguel Leon.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.1</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
