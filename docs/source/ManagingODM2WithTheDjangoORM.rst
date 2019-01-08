@@ -21,7 +21,7 @@ WOFpy
 ODM2 Admin can also be used with WOFpy and water one flow webservices can be registered with CUAHSI HIS central.
 
 WOFpy REST API test page for the Luquillo CZO:
-http://dev-odm2admin.cuahsi.org/odm2lczo/odm2lczo/rest_1_1/
+http://odm2admin.cuahsi.org/odm2lczo/odm2lczo/rest_1_1/
 
 This is still in testing an initial implementation has been registered with the HIS central QA system:
 
