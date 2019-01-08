@@ -11,7 +11,7 @@ in an annotation. The annotation can then also indicate the reason why the value
 instrument was out of calibration.
 
 Let's try it out, we are going to visit the data annotation page for a measurement of water temperature
-at the Rio Espiritu Santo Stream House (RESSH), from the `map <https://odm2admin.cuahsi.org/Sandbox/mapdata.html>`_
+at the Rio Espiritu Santo Stream House (RESSH), from the `map <http://odm2admin.cuahsi.org/Sandbox/mapdata.html>`_
 this is a sampling feature of type 'Stream Gage' labeled RESSH.
 
    .. image:: /images/RioEspirituSantoStreamGage.png
@@ -21,7 +21,7 @@ From Here follow the link to the water temperture read by either the pressure tr
 
    .. image:: /images/SelectWaterTempToAnnotate.png
 
-https://odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=16657/popup=Anno/
+http://odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=16657/popup=Anno/
 
 You can select some of the points by dragging a selection box around them, it should look like this:
 
