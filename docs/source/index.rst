@@ -102,14 +102,14 @@ instance, hosted on the CUAHSI cloud, contact leonmi@sas.upenn.edu
 * http://odm2admin.cuahsi.org/TRACE/TRACE/mapdata.html
 * http://odm2admin.cuahsi.org/CJCZO/mapdata.html
 * http://msu-odm2admin.cuahsi.org/MSU/mapdata.html
-* https://dev-odm2admin.cuahsi.org/CZIMEA/mapdata.html
+* https://odm2admin.cuahsi.org/CZIMEA/mapdata.html
 
 .. image:: /images/CUAHSI-Logo-with-URL---Transparent_(RESIZED).png
 
 Another deployment for demonstration porposes is available, see the :ref:'ODM2AdminDemo' for more
 information:
 
-https://dev-odm2admin.cuahsi.org/Sandbox/
+https://odm2admin.cuahsi.org/Sandbox/
 
 Using ODM2 Admin
 ================

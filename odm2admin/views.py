@@ -19,8 +19,8 @@ import sys
 import os
 import subprocess
 import re
-import pandas as pd
-import numpy
+# import pandas as pd
+# import numpy
 from colour import Color
 # from celery import shared_task
 # import odm2admin.tasks as tasks
@@ -627,21 +627,27 @@ def get_features(request, sf_type="all", ds_ids="all"):
 
         # Get Site Attr
         if sf.sampling_feature_type.name == 'Site':
-            site = Sites.objects.get(samplingfeatureid=sf.samplingfeatureid)
-            feat.update({
-                'sitetype': site.sitetypecv.name,
-                'sitetypeurl': site.sitetypecv.sourcevocabularyuri
-            })
+            try:
+                site = Sites.objects.get(samplingfeatureid=sf.samplingfeatureid)
+                feat.update({
+                    'sitetype': site.sitetypecv.name,
+                    'sitetypeurl': site.sitetypecv.sourcevocabularyuri
+                })
+            except Sites.DoesNotExist:
+                site = None
 
         # Get Specimen Attr
         if sf.sampling_feature_type.name == 'Specimen':
-            specimen = Specimens.objects.get(samplingfeatureid=sf.samplingfeatureid)
-            feat.update({
-                'specimentype': specimen.specimentypecv.name,
-                'specimentypeurl': specimen.specimentypecv.sourcevocabularyuri,
-                'specimenmedium': specimen.specimenmediumcv.name,
-                'specimenmediumurl': specimen.specimenmediumcv.sourcevocabularyuri,
-            })
+            try:
+                specimen = Specimens.objects.get(samplingfeatureid=sf.samplingfeatureid)
+                feat.update({
+                    'specimentype': specimen.specimentypecv.name,
+                    'specimentypeurl': specimen.specimentypecv.sourcevocabularyuri,
+                    'specimenmedium': specimen.specimenmediumcv.name,
+                    'specimenmediumurl': specimen.specimenmediumcv.sourcevocabularyuri,
+                })
+            except Specimens.DoesNotExist:
+                specimen = None
         # Get Relations
         relationship = get_relations(sf)
         if all(value == [] for value in relationship.values()):
@@ -1493,23 +1499,30 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
         except IndexError as e:
             # html = "<html><body>No Data Available Yet.</body></html>"
             # return HttpResponse(html)
-            startdate = Timeseriesresultvalues.objects.\
-                filter(resultid__in=resultList.values("resultid")).\
-                annotate(Min('valuedatetime')).\
-                order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-            enddate = Timeseriesresultvalues.objects.\
-                filter(resultid__in=resultList.values("resultid")).\
-                annotate(Max('valuedatetime')).\
-                order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-            methodsOnly = 'True'
+            try:
+                startdate = Timeseriesresultvalues.objects.\
+                    filter(resultid__in=resultList.values("resultid")).\
+                    annotate(Min('valuedatetime')).\
+                    order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+                enddate = Timeseriesresultvalues.objects.\
+                    filter(resultid__in=resultList.values("resultid")).\
+                    annotate(Max('valuedatetime')).\
+                    order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+                methodsOnly = 'True'
+            except IndexError as e:
+                html = "<html><body>No time series data available for this site.</body></html>"
+                return HttpResponse(html)
     except ValueError as e:
             # html = "<html><body>No Data Available Yet.</body></html>"
             # return HttpResponse(html)
             methodsOnly = 'True'
     for result in resultList:
-        tsr = Timeseriesresults.objects.filter(resultid=result).get()
-        result.timeintervalunits = tsr.intendedtimespacingunitsid
-        result.timeinterval = tsr.intendedtimespacing
+        try:
+            tsr = Timeseriesresults.objects.filter(resultid=result).get()
+            result.timeintervalunits = tsr.intendedtimespacingunitsid
+            result.timeinterval = tsr.intendedtimespacing
+        except:
+            pass
     processing_level__in = settings.MAP_CONFIG['result_value_processing_levels_to_display']
     return TemplateResponse(request, template, {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'useSamplingFeature': useSamplingFeature,
@@ -2175,24 +2188,34 @@ def export_to_hydroshare(request):
                                                 'export_complete': export_complete,
                                                 'username' : username,
                                                 'resource_link': resource_link,},content_type='application/json')
+@login_required()
 def email_data_from_graph(request):
+    # print('email data')
     emailsent = False
     outEmail = ''
     entered_end_date = ''
     entered_start_date = ''
     myresultSeriesExport = []
-    if 'email_data' in request.POST and 'resultidu[]' in request.POST:
+    if 'email_data' in request.POST and 'resultidu[]' or 'myresultSeriesExport[]' in request.POST:
+        # print(' email data and resultid[]')
         selectedMResultSeries = request.POST.getlist('myresultSeriesExport[]')
-        resultid = request.POST.getlist('resultidu[]')
-        try:
+        # print(selectedMResultSeries)
+        # resultids = request.POST.getlist('resultidu[]')
+        # try:
             # print(resultidu)
-            resultidu = [int(selectedMResultSeries)]
-        except:
-            resultids = re.findall(r'\d+',request.POST.getlist('myresultSeriesExport[]')) # re.findall(r'\d+',request.POST['myresultSeriesExport[]'])
-            resultidu = []
-            mergeResults = 'true'
-            for results in resultids:
-                resultidu.append(int(results))
+            # resultidu = [int(selectedMResultSeries)]
+        # except TypeError:
+         #    resultids = re.findall(r'\d+',request.POST.getlist('myresultSeriesExport[]')) # re.findall(r'\d+',request.POST['myresultSeriesExport[]'])
+        resultidu = []
+        # mergeResults = 'true'
+        for results in selectedMResultSeries:
+            ids = re.findall(r'\d+', results)
+            for id in ids:
+                resultidu.append(int(id))
+        # for results in resultids:
+        #     ids = re.findall(r'\d+', results)
+        #     for id in ids:
+        #         resultidu.append(int(reidsults))
         selectedMResultSeries = resultidu
         myresultSeriesExport = None
         if request.POST['useDates'] == 'true':
@@ -2212,6 +2235,7 @@ def email_data_from_graph(request):
         else:
             myresultSeriesExport = Timeseriesresultvaluesextwannotations.objects.all() \
                     .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime')
+        # print('email spreadsheet')
         emailspreadsheet2(request, myresultSeriesExport, False) # for command str_selectedresultid_ids
         
         # .after_response    
@@ -2224,127 +2248,6 @@ def email_data_from_graph(request):
 
 def hysterisisMetrics(discharge,response):
     hystdict = {}
-    maxdischarge = discharge.aggregate(Max('datavalue'))
-    hystdict['max_discharge'] = maxdischarge['datavalue__max']
-    hystdict['discharge_units'] = discharge[0].resultid.resultid.unitsid.unitsabbreviation
-    if maxdischarge:
-        # print(maxdischarge['datavalue__max'])
-        # normalize discharge
-        maxdischargerecord = discharge.order_by('-datavalue')[0]# .get(datavalue=float(maxdischarge['datavalue__max']))
-        mindischargerecord = discharge.order_by('datavalue')[0]
-        # dischargenorm = []
-        dischargepdf = pd.DataFrame(list(discharge.values()))
-        dischargepdf['datavalue'] = (dischargepdf['datavalue']- mindischargerecord.datavalue)/(maxdischargerecord.datavalue - mindischargerecord.datavalue)
-        # print(dischargepdf['datavalue'])
-        maxdisrow = dischargepdf.loc[dischargepdf['datavalue'].idxmax()]
-        mindisrow = dischargepdf.loc[dischargepdf['datavalue'].idxmin()]
-        maxnormdischargerecord = maxdisrow['datavalue']
-        maxnormdischargedate = maxdisrow['valuedatetime']
-        minnormdischargerecord = mindisrow['datavalue']
-        minnormdischargedate = mindisrow['valuedatetime']
-
-        # print('discharge norm max: ' + str(maxnormdischargerecord))
-        # print('discharge norm min: ' + str(minnormdischargerecord))
-        # normalize response
-        print(response.count())
-        maxresponse = response.order_by('-datavalue')[0]# .get(datavalue=float(maxdischarge['datavalue__max']))
-        minresponse = response.order_by('datavalue')[0]
-        # responsenorm = []
-        responsenormpdf = pd.DataFrame(list(response.values()))
-        responsenormpdf['datavalue'] = (responsenormpdf['datavalue']- minresponse.datavalue)/(maxresponse.datavalue - minresponse.datavalue)
-
-        responsetsr = Timeseriesresults.objects.filter(resultid=response[0].resultid.resultid).get()
-        timeagg =responsetsr.intendedtimespacing
-        timeaggunit = responsetsr.intendedtimespacingunitsid.unitsname
-        if 'minute' in timeaggunit:
-            responsenormpdf['valuedatetime'] = responsenormpdf['valuedatetime'].apply(lambda dt: datetime(dt.year, dt.month, dt.day, dt.hour,
-                                                                           int(timeagg * round((float(dt.minute) + float(
-                                                                               dt.second) / 60) / timeagg))))
-        if 'hour' in timeaggunit:
-            timeagg = timeagg * 60
-            responsenormpdf['valuedatetime'] = responsenormpdf['valuedatetime'].apply(lambda dt: datetime(dt.year, dt.month, dt.day, dt.hour,
-                                                                           int(timeagg * round((float(dt.minute) + float(
-                                                                               dt.second) / 60) / timeagg))))
-        # print(maxdischargerecord)
-        # print(maxdischargerecord.valuedatetime)
-
-        raisinglimbresponse = responsenormpdf[(responsenormpdf['valuedatetime'] <= maxnormdischargedate)] # response.filter(valuedatetime__lte=maxdischargerecord.valuedatetime)
-        fallinglimbresponse = responsenormpdf[(responsenormpdf['valuedatetime'] > maxnormdischargedate)]  # response.filter(valuedatetime__gt=maxdischargerecord.valuedatetime)
-        # pd.DataFrame(list(raisinglimbresponse.values()))
-        # print('falling limb val count: ' + str(len(fallinglimbresponse.index)))
-        # print('raising limb val count: ' + str(len(raisinglimbresponse.index)))
-        hystIndex = []
-        # 5% intervals of discharge for hysteresis index 20 buckets
-        if not len(raisinglimbresponse.index) == 0 and not len(fallinglimbresponse.index) == 0:
-
-            dischargerange = maxnormdischargerecord- minnormdischargerecord
-            dischargeinterval = dischargerange / 50
-            hystIndex = {}
-            for i in range(1,50):
-                if i == 1:
-                    lastinterval = 0
-                else:
-                    lastinterval = interval
-                interval = dischargeinterval*i
-                #dischargeintervalvals = discharge.filter(datavalue__lte=interval).filter(datavalue__gte=lastinterval)
-                dischargeintervalvals = dischargepdf[(dischargepdf['datavalue'] <= interval) & (dischargepdf['datavalue'] > lastinterval)]
-                # find matching response records
-                # keys = list(dischargeintervalvals['valuedatetime'])
-                dischargeandraisingresponse = pd.merge(dischargeintervalvals, raisinglimbresponse, on='valuedatetime', how='left', suffixes=('dis','raising'))
-                dischargeandfallingresponse = pd.merge(dischargeintervalvals, fallinglimbresponse, on='valuedatetime', how='left', suffixes=('dis','falling'))
-                # print('for interval: ' + str(interval))
-                # print('raising response ' + str(len(dischargeandraisingresponse.index)))
-                # print(dischargeandraisingresponse['datavalueraising'])
-                # print(dischargeandraisingresponse.head(1))
-                # print('falling response ' + str(len(dischargeandfallingresponse.index)))
-                # print(dischargeandfallingresponse['datavaluefalling'])
-                closestraisingrow = None
-                closestfallingrow = None
-                closestraisingdistance = None
-                closestfallingdistance = None
-                for index, raisingrow in dischargeandraisingresponse.iterrows():
-                    # print(raisingrow)
-                    if raisingrow['datavalueraising'] > 0:
-                        if closestraisingdistance:
-                            if abs(interval - raisingrow['datavaluedis']) < closestraisingdistance:
-                                closestraisingdistance =  abs(interval - raisingrow['datavaluedis'])
-                                closestraisingrow = raisingrow
-                        else:
-                            closestraisingdistance =  abs(interval - raisingrow['datavaluedis'])
-                            closestraisingrow = raisingrow
-                for index2, fallingrow in dischargeandfallingresponse.iterrows():
-                    if fallingrow['datavaluefalling'] > 0: #and raisingrow['datavalueraising'] == fallingrow['datavaluefalling'] :
-                        if closestfallingdistance:
-                            if abs(interval - fallingrow['datavaluedis']) < closestfallingdistance:
-                                closestfallingdistance = abs(interval - raisingrow['datavaluedis'])
-                                closestfallingrow = fallingrow
-                        else:
-                            closestfallingdistance = abs(interval - raisingrow['datavaluedis'])
-                            closestfallingrow = fallingrow
-                       # print(raisingrow)
-                       # print(fallingrow)
-                if not closestraisingrow is None and not closestfallingrow is None:
-                    tmp = closestraisingrow['datavalueraising'] - closestfallingrow['datavaluefalling']
-                    hystIndex['HI for ' + str(i*2) + '% discharge'] = tmp
-                print(hystIndex)
-            HIs = []
-            for key, values in hystIndex.items():
-                HIs.append(values)
-                if 'Hysteresis_Index' in hystdict:
-                    hystdict['Hysteresis_Index'][key] = values
-                else:
-                    tmpdict = {}
-                    tmpdict[key ] = values
-                    hystdict['Hysteresis_Index'] = tmpdict
-            hystAvg = numpy.mean(HIs) #sum(values) / float(len(values))
-            hystStd = numpy.std(HIs)
-            # print("HI mean: " + str(hystAvg))
-            # print("HI standard deviation: " + str(hystStd))
-
-            hystdict["HI_mean"] = hystAvg
-            hystdict["HI_standard_deviation"] = hystStd
-            # hystdict['Hysteresis_Index'].append([key + " values: ", values])
-            # print(hystdict)
 
     return hystdict
 
@@ -3237,7 +3140,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
         tolist.append(str(outgoingemail))
         # print(tolist)
 
-        myfile = StringIO.StringIO()
+        myfile = StringIO()
          # raise ValidationError(resultValues)
         k = 0
         variablesAndUnits = []
@@ -3370,6 +3273,10 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
             k += 1
         # response = StreamingHttpResponse(myfile.getvalue(), content_type='text/csv')
         # response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
+        # print('email!!!!')
+        # print(settings.EMAIL_FROM_ADDRESS)
+        # print(emailtext)
+        # print(tolist)
         email = EmailMessage(emailtitle,emailtext,
                              settings.EMAIL_FROM_ADDRESS, tolist)
         email.attach('mydata.csv', myfile.getvalue(),'text/csv')

@@ -10,7 +10,7 @@ version of ODM2 Admin populated with data from the `Luquillo Critical Zone Obser
 and hosted by `CUAHSI <https://www.cuahsi.org/>`_   . If you would like to access the sandbox please email
 leonmi@sas.upenn.edu
 
-You can login to  the sandbox here: https://dev-odm2admin.cuahsi.org/Sandbox/
+You can login to  the sandbox here: https://odm2admin.cuahsi.org/Sandbox/
 
 After logging in you will see the ODM2 Admin Home page:
 

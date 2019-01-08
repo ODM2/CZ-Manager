@@ -21,6 +21,7 @@ option {
 
 //$.getJSON('/er/poll/'+question_id ,function(data) {
 $(document).ready(function(){
+    jQuery.ajaxSettings.traditional = true;
 	$('#to_hydroshare').click(function(){
 	    console.log('hydro share button');
 	    var startDate = $("#startDate").val();
@@ -70,7 +71,9 @@ $(document).ready(function(){
 		var useDateselm =  document.getElementById("useDates"); //$("#useDates").val();
 		var useDates = useDateselm.checked;
 		var hydrosharebutton = document.getElementById("to_hydroshare"); 
-		console.log(hydrosharebutton);
+		//console.log(hydrosharebutton);
+		//console.log('result series');
+		//console.log(resultSeriesExport);
 		hydrosharebutton.firstChild.data = "exporting to hydroshare";
 		var resultSeriesExport = [];
 		$(".action-checkbox-column:checked").each(function(){
@@ -98,6 +101,7 @@ $(document).ready(function(){
 		});
 	});
 	$('#email_data').click(function(){
+		//console.log('email button pushed');
 		var outEmail = $("#outEmail").val();
 		var startDate = $("#startDate").val();
 		var email_data = true;
@@ -110,8 +114,11 @@ $(document).ready(function(){
 		$(".action-checkbox-column:checked").each(function(){
 			resultSeriesExport.push($(this).val());
 		});
+		//console.log('result series');
+		//console.log(resultSeriesExport);
 		var emailbutton = document.getElementById("email_data"); //$("#email_data");
 		emailbutton.firstChild.data = "emailing data";
+        //console.log('emailing');
 		$.ajax({
 				url: "{{prefixpath}}../emaildata/",
 				type: "POST",
@@ -123,9 +130,10 @@ $(document).ready(function(){
 					'useDates': useDates,
 					'g_recaptcha_response': g_recaptcha_response,
 					'myresultSeriesExport[]': resultSeriesExport,
-					'csrfmiddlewaretoken': '{{ csrf_token }}', 
+					'csrfmiddlewaretoken': '{{ csrf_token }}',
 				},
 				complete : function(json) {
+                    //console.log('email sent');
 					var emailbutton = document.getElementById("email_data"); //$("#email_data");
 					emailbutton.firstChild.data = "email sent";
         },
@@ -159,16 +167,17 @@ $(document).ready(function(){
 			
 			<button  type="button" name="to_publish"  id="to_publish"/>Publish Data</button>
 			</td></tr>
-			<tr><td>
-			Username: <input id="hydroshareUsername" maxlength="100" name="hydroshareUsername" type="text"></input>
-			Password: <input id="hydrosharePassword" maxlength="100" name="hydrosharePassword" type="password"></input>
-			<button  type="button" name="to_hydroshare"  id="to_hydroshare"/>Upload To Hydroshare</button>
-			</td></tr>
-			<tr><td><div class="g-recaptcha" data-sitekey="6LdYnQ8UAAAAAI38kvlrKy4kF28VMYWnGO4dDjPA"></div>
+			<!--<tr><td>-->
+			<!--Username: <input id="hydroshareUsername" maxlength="100" name="hydroshareUsername" type="text"></input>-->
+			<!--Password: <input id="hydrosharePassword" maxlength="100" name="hydrosharePassword" type="password"></input>-->
+			<!--<button  type="button" name="to_hydroshare"  id="to_hydroshare"/>Upload To Hydroshare</button>-->
+			<!--</td></tr>-->
+			{% if authenticated %}
+			<tr><td><div class="g-recaptcha" data-sitekey="6Lc8RA8UAAAAAOG9JmCk7CSGIZG-js4PkmB8xFL9"></div>
 			use dates to filter data in email: <input id="useDates" type="checkbox" name="useDates" checked></input>
 			&nbsp; &nbsp; Send data to this email address: <input id="outEmail" maxlength="100" name="outEmail" type="text"> </input>
-			<button type="button" id="email_data" name="email_data">Email Data</button>
-			
+				<button type="button" id="email_data" name="email_data">Email Data</button>
+			{% endif %}
 			</td></tr>
 	
 {% if emailsent %}
