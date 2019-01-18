@@ -12,7 +12,8 @@ DEBUG = True
 """ EXTRA VARIABLES CONFIGURATION -"""
 EXPORTDB = False #  if set to true this will use Camel case table names for SQLite
 UTC_OFFSET = -4
-PYTHON_PATH = ''
+#Needed for Hydroshare integration
+PYTHON_EXEC='/home/bitnami/miniconda3/envs/odm2adminenv/bin/python'
 """ EXTRA VARIABLES CONFIGURATION """
 
 """ TRAVIS CONFIGURATION """

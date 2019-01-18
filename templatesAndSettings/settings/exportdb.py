@@ -7,6 +7,7 @@ from .base import *
 """ DEBUG CONFIGURATION """
 # Disable debugging by default.
 DEBUG = True
+EXPORTDB =True
 """ END DEBUG CONFIGURATION """
 
 """ ALLOWED HOSTS CONFIGURATION """
@@ -30,7 +31,7 @@ EMAIL_PORT = 123
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '../../ODM2SQliteBlank.db',
+        'NAME': TEMPLATE_DIR + '/ODM2SQliteBlank.db',
     },
 }
 # DATABASES = {

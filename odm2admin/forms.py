@@ -5,6 +5,7 @@ import os
 import stat
 import subprocess
 import sys
+import datetime as datetime
 from django.utils.crypto import get_random_string
 from django.core import management
 from django.core import serializers
@@ -1589,6 +1590,8 @@ def createODM2SQLiteFile(results,dataset):
     #command = ['python',  '/home/azureadmin/webapps/ODM2-AdminLCZO/manageexport.py', 'create_sqlite_export', tmploc1, tmploc2]
     command = 'cp ' + dbfilepath + ' ' + str(dbfile2)
     # print(command)
+    # print('DB FILE PATH')
+    # print(dbfilepath)
     response = subprocess.check_call(command,shell=True)
     #write an extra settings file instead - have it contain just DATABASES; remove databases from exportdb.py and import new file. 2
     exportdb.DATABASES['default']['NAME'] = dbfile2
@@ -1601,7 +1604,7 @@ def createODM2SQLiteFile(results,dataset):
     # sys.stdout = sysout
     commandstring = ''
 
-    commandstring +=sys.executable + ' '
+    commandstring += settings.PYTHON_EXEC+ ' ' # sys.executable
 
     commandstring += path + '/manageexport.py'
     commandstring += ' create_sqlite_export2 '
@@ -1612,7 +1615,7 @@ def createODM2SQLiteFile(results,dataset):
         commandstring +=loc + tmpfixture1 + ' '
         fixturelist.append(loc + tmpfixture1)
 
-    commandstring +=  ' %>> ' + settings.BASE_DIR +'/logging/sqlite_export.log'
+    # commandstring +=  ' %>> ' + settings.BASE_DIR +'/logging/sqlite_export.log'
     print(commandstring)
     command = settings.BASE_DIR + '/scripts/create_sqlite_file2.sh' # + dbfile2 + ' %>> ' + settings.BASE_DIR +'/logging/sqlite_export.log'
     st = os.stat(command)
@@ -1673,12 +1676,20 @@ def export_to_hydroshare(request,results, datasets):
     keywords = ['ODM2']
     rtype = 'GenericResource'
     fpath = str(exportdb.DATABASES['default']['NAME'])
+    try:
+        startdate = datetime.datetime.strptime(str(startdate), '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+    except ValueError:
+        startdate = datetime.datetime.strptime(str(startdate), '%Y-%m-%d %H:%M:%S.$f').strftime('%Y-%m-%d')
+    try:
+        enddate = datetime.datetime.strptime(str(enddate), '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+    except ValueError:
+        enddate = datetime.datetime.strptime(str(enddate), '%Y-%m-%d %H:%M:%S.$f').strftime('%Y-%m-%d')
+
     # # print(fpath)
     # #metadata = '[{"coverage":{"type":"period", "value":{"start":"'+entered_start_date +'", "end":"'+ entered_end_date +'"}}}, {"creator":{"name":"Miguel Leon"}}]'
     metadata = '[{"coverage":{"type":"period", "value":{"start":"' + str(startdate) +  '", "end":"' + str(enddate) + '"}}}, ' \
                 '{"creator":{"name":"' +user.get_full_name() +'"}}]'
     extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
-    #
     # #abstract = 'My abstract'
     # #title = 'My resource'
     # #keywords = ('my keyword 1', 'my keyword 2')
