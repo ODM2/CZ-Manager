@@ -7,6 +7,7 @@ import os
 
 """ NAMES CONFIGURATION """
 APP_NAME = "odm2admin" # This has to match the name of the folder that the app is saved
+SITE_NAME = "odm2admin" # sometimes you might need the Django app name to be different from your URL path (this is the URL path name).             
 VERBOSE_NAME = "ODM2 Admin"
 
 SITE_HEADER = "ODM2 Admin"
@@ -104,18 +105,18 @@ USE_TZ = True
 
 """ MEDIA CONFIGURATION """
 # Absolute filesystem path to the directory that will hold user-uploaded files.
-MEDIA_ROOT = '{}/{}/upfiles/'.format(BASE_DIR, APP_NAME)
+MEDIA_ROOT = '{}/{}/upfiles/'.format(BASE_DIR, SITE_NAME)
 #  URL that handles the media served from MEDIA_ROOT.
 MEDIA_URL = '/{}/{}/media/'.format(os.path.basename(BASE_DIR), APP_NAME)
 """ END MEDIA CONFIGURATION """
 # Absolute filesystem path to the directory that will hold database export and import files
-FIXTURE_DIR = '{}/{}/fixtures/'.format(BASE_DIR, APP_NAME)
+FIXTURE_DIR = '{}/fixtures/'.format(BASE_DIR)
 
 """ STATIC FILE CONFIGURATION """
 # Absolute path to the directory static files should be collected to. Don't put
 # anything in this directory yourself; store your static files in apps' static/
 # subdirectories and in STATICFILES_DIRS.
-STATIC_ROOT = '{}/{}/static'.format(BASE_DIR, APP_NAME)
+STATIC_ROOT = '{}/{}/static'.format(BASE_DIR, SITE_NAME)
 # URL prefix for static files.
 STATIC_URL = '/static/'
 """ END STATIC FILE CONFIGURATION """
@@ -193,7 +194,6 @@ INSTALLED_APPS = (
 )
 """ END APP CONFIGURATION """
 
-
 """ ADMIN SHORTCUTS CONFIGURATION """
 ADMIN_SHORTCUTS = [
     {
@@ -201,37 +201,37 @@ ADMIN_SHORTCUTS = [
         'shortcuts': [
             {
                 'url': CUSTOM_TEMPLATE_PATH,
-                'app_name': '{}'.format(APP_NAME),
+                'app_name': '{}'.format(SITE_NAME),
                 'title': '{}'.format(VERBOSE_NAME),
                 'icon': 'cogs',
             },
             {
-                'url': '/' + 'AddSensor',
-                'app_name': '{}'.format(APP_NAME),
+                'url': '/' + SITE_NAME + '/' + 'AddSensor',
+                'app_name': '{}'.format(SITE_NAME),
                 'title': 'Add Sensor Data',
                 'icon': 'wrench', # tool
             },
             {
-                'url': '/' + 'AddProfile',
-                'app_name': '{}'.format(APP_NAME),
+                'url': '/' + SITE_NAME + '/' + 'AddProfile',
+                'app_name': '{}'.format(SITE_NAME),
                 'title': 'Add Soil Profile Data',
                 'icon': 'flag',
             },
             {
-                'url': '/' + 'RecordAction',
-                'app_name': '{}'.format(APP_NAME),
+                'url': '/' + SITE_NAME + '/' + 'RecordAction',
+                'app_name': '{}'.format(SITE_NAME),
                 'title': 'Record an Action',
                 'icon': 'sticky-note',
             },
             {
-                'url': '/' + 'ManageCitations',
-                'app_name': '{}'.format(APP_NAME),
+                'url': '/' + SITE_NAME + '/' + 'ManageCitations',
+                'app_name': '{}'.format(SITE_NAME),
                 'title': 'Manage Citations',
                 'icon': 'edit',
             },
             {
-                'url': '/' + 'chartIndex',
-                'app_name': '{}'.format(APP_NAME),
+                'url': '/' + SITE_NAME + '/' + 'chartIndex',
+                'app_name': '{}'.format(SITE_NAME),
                 'title': 'Map My Data',
                 'icon': 'map-marked-alt',
             },
