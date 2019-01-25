@@ -6,7 +6,7 @@ django-import-export
 django-jquery
 # django-kronos
 #django-ajax-selects is not working with django 2.1.2 or 2.1.1
-django==2.0.8
+django==2.0.10
 # Pinned to 0.2.7 to preserve page style.
 djangocms-admin-style==0.2.7
 psycopg2
@@ -24,4 +24,4 @@ social-auth-app-django
 # djutils
 # uwsgi
 celery
-colour
+# colour
