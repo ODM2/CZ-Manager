@@ -21,6 +21,7 @@ from odm2admin.models import Samplingfeatures
 from odm2admin.models import Methods
 from odm2admin.models import Actions
 from odm2admin.models import Results
+from odm2admin.models import Extensionproperties
 from odm2admin.models import Resultextensionpropertyvalues
 from odm2admin.models import Dataloggerfilecolumns
 from odm2admin.models import Timeseriesresultvalues
@@ -240,12 +241,15 @@ class Command(BaseCommand):
                                 foundColumn = False
                                 resultid = dloggerfileColumn.resultid
                                 results.append(dloggerfileColumn)
+                                StartDateProperty = Extensionproperties.objects.get(
+                                    propertyname__icontains="start date")
+                                EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
                                 startdateODM = Resultextensionpropertyvalues.objects.filter(
                                     resultid=resultid).filter(
-                                    propertyid=1).get()  # DBSession.query(ResultExtensionPropertyValues).filter(
+                                    propertyid=StartDateProperty).get()  # DBSession.query(ResultExtensionPropertyValues).filter(
                                 # ResultExtensionPropertyValues.ResultID == resultids[0]).filter(ResultExtensionPropertyValues.PropertyID == 1)
                                 enddateODM = Resultextensionpropertyvalues.objects.filter(
-                                    resultid=resultid).filter(propertyid=2).get()
+                                    resultid=resultid).filter(propertyid=EndDateProperty).get()
                                 sdopd = str(startdateODM.propertyvalue)
                                 edopd = str(enddateODM.propertyvalue)
                                 # print(dloggerfileColumn)
