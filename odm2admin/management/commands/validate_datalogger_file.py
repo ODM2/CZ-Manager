@@ -41,13 +41,12 @@ def get_results(fileid):
 # def check for existing data, check greater than start, less than end, and if size equal to all new data
 def check_existing_data(sr_, startdate_, enddate_,stdout):
     for surface_result in sr_:
-        resultid = surface_result.resultid
-
         time_series_values_ = Timeseriesresultvalues.objects.filter(valuedatetime__lte= enddate_).filter(
-            valuedatetime__gte= startdate_).filter(resultid=surface_result.resultid)
+            valuedatetime__gte= startdate_).filter(resultid=surface_result.resultid.resultid)
 
         valuecounts_ = time_series_values_.count()
-
+        stdout.write('values already exist in the database for result: ' + str(surface_result))
+        stdout.write('The number of existing database values between the file start data and end date is: ' + str(valuecounts_))
     return valuecounts_
 
 
@@ -204,6 +203,7 @@ class Command(BaseCommand):
         bulkcount = 0
         alldate = []
         fields = ['datetime']
+        dateTimeColNum = 0
         try:
             with io.open(file, 'rt', encoding='ascii') as f:
                 with io.open(new_file, 'w', encoding='ascii') as outfile:
@@ -376,6 +376,7 @@ class Command(BaseCommand):
                             value = value[:start_index] + value[end_index:]
                     elif edODMF >= enddateNEWDT and sdODMF < startdateNEWDT:
                         counts = check_existing_data(results, alldate[0], alldate[-1],self.stdout)
+                        self.stdout.write('The number of rows in the file you are checking is: ' + str(len(alldate)))
                         if len(alldate) == counts:
                             self.stdout.write("All %d values are redundant" % (counts))
                             self.stdout.write("All data are already in the database, no need to ingest the data again.")
