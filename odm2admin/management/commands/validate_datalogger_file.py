@@ -81,18 +81,21 @@ def check_duplicate_dates(resultids_, checkdate_,alldata,stdout):
 
         for rid in resultids_:
             time_series_values =Timeseriesresultvalues.objects.filter(
-                valuedatetime = d).filter(ResultID=rid)  # Need to get ResultID automatically still
+                valuedatetime = d).filter(resultid=rid.resultid.resultid)  # Need to get ResultID automatically still
             # ResultID=surface_result.ResultID)
             value_check.append(time_series_values.count())
 
         # if sum(value_check) == len(resultids_):
         # Newdates_[i] = np.nan
         for resultid, value in alldata.items():
-            newdatetime = value[0]
-            newvalue = value[1]
+            # print('value!!!')
+            # print(value)
+            val = value[0]
+            newdatetime = val[0]
+            newvalue = val[1]
             if rid == resultid and newdatetime == d:
-                stdout.write('duplicate data on: ' + str(d) + 'duplicate value:' + str(value[1]) + ' for result: ' +str(rid))
-                value[1] = float('NaN')# np.nan
+                stdout.write('duplicate data on: ' + str(d) + 'duplicate value:' + str(val[1]) + ' for result: ' +str(rid))
+                val[1] = float('NaN')# np.nan
 
         i += 1
     return Newdates_,alldata
