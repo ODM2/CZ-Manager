@@ -1,0 +1,246 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>ODM2 Admin Settings &#8212; ODM2-Admin 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ODM2 Admin Walkthrough" href="ODM2AdminDemo.html" />
+    <link rel="prev" title="Getting Started With ODM2 Admin" href="GettingStartedInODM2Admin.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=ODM2&repo=ODM2-Admin&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+    
+
+<p>
+<a class="badge" href="https://travis-ci.org/ODM2/ODM2-Admin">
+    <img
+        alt="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
+        src="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
+    />
+</a>
+</p>
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="InstallODM2AdminWithDocker.html">ODM2 Admin Docker Image Creation</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ODM2Adminbackground.html">Motivation for ODM2 Admin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GettingStartedInODM2Admin.html">Getting Started With ODM2 Admin</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">configuring ODM2 Admin Settings</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ODM2AdminDemo.html">ODM2 Admin Walkthrough</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="GettingStartedInODM2Admin.html" title="previous chapter">Getting Started With ODM2 Admin</a></li>
+      <li>Next: <a href="ODM2AdminDemo.html" title="next chapter">ODM2 Admin Walkthrough</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="odm2-admin-settings">
+<span id="id1"></span><h1>ODM2 Admin Settings<a class="headerlink" href="#odm2-admin-settings" title="Permalink to this headline">¶</a></h1>
+<p>To configure ODM2 Admin for your site you will want to change the some of settings in the file:</p>
+<p>templateAndSettings/settings/development.py
+(<a class="reference external" href="https://github.com/ODM2/ODM2-Admin/blob/master/templatesAndSettings/settings/development.py">https://github.com/ODM2/ODM2-Admin/blob/master/templatesAndSettings/settings/development.py</a>)</p>
+<p>Many of these settings are described in the Django documentation
+<a class="reference external" href="https://docs.djangoproject.com/en/1.10/ref/settings/#databases">https://docs.djangoproject.com/en/1.10/ref/settings/#databases</a>
+see <a class="reference external" href="https://docs.djangoproject.com/en/1.10/topics/settings/">https://docs.djangoproject.com/en/1.10/topics/settings/</a> documentation for information about the following settings:</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DEBUG</span><span class="o">=</span><span class="n">TRUE</span>
+<span class="n">ALLOWED_HOSTS</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,]</span>
+</pre></div>
+</div>
+<p>For information on databases see <a class="reference external" href="https://docs.djangoproject.com/en/1.10/ref/settings/#databases">https://docs.djangoproject.com/en/1.10/ref/settings/#databases</a></p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+ <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
+     <span class="s1">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s1">&#39;django.contrib.gis.db.backends.postgis&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;NAME&#39;</span><span class="p">:</span> <span class="s1">&#39;db_name&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;USER&#39;</span><span class="p">:</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;PASSWORD&#39;</span><span class="p">:</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;HOST&#39;</span><span class="p">:</span> <span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;PORT&#39;</span><span class="p">:</span> <span class="s1">&#39;5432&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;OPTIONS&#39;</span><span class="p">:</span> <span class="p">{</span>
+         <span class="s1">&#39;options&#39;</span><span class="p">:</span> <span class="s1">&#39;-c search_path=public,admin,odm2,odm2extra&#39;</span>
+     <span class="p">}</span>
+ <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For information on email settings see <a class="reference external" href="https://docs.djangoproject.com/en/1.10/ref/settings/#email-backend">https://docs.djangoproject.com/en/1.10/ref/settings/#email-backend</a></p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EMAIL_HOST</span> <span class="o">=</span> <span class="s1">&#39;smtp.host&#39;</span>
+<span class="n">EMAIL_HOST_USER</span> <span class="o">=</span> <span class="s1">&#39;user&#39;</span>
+<span class="n">EMAIL_HOST_PASSWORD</span> <span class="o">=</span> <span class="s1">&#39;password&#39;</span>
+<span class="n">EMAIL_FROM_ADDRESS</span> <span class="o">=</span> <span class="s1">&#39;do-not-reply-ODM2-Admin@cuahsi.org&#39;</span>
+</pre></div>
+</div>
+<div class="section" id="rd-party-django-package-settings">
+<h2>3rd Party Django Package settings<a class="headerlink" href="#rd-party-django-package-settings" title="Permalink to this headline">¶</a></h2>
+<p>For recaptcha settings information see <a class="reference external" href="https://github.com/praekelt/django-recaptcha">https://github.com/praekelt/django-recaptcha</a></p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RECAPTCHA_PUBLIC_KEY</span> <span class="o">=</span> <span class="s1">&#39;googlerecaptchakey&#39;</span>
+<span class="n">RECAPTCHA_PRIVATE_KEY</span> <span class="o">=</span> <span class="s1">&#39;googlerecaptchaprivatekey&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="custom-odm2-admin-settings">
+<h2>Custom ODM2 Admin settings<a class="headerlink" href="#custom-odm2-admin-settings" title="Permalink to this headline">¶</a></h2>
+<p>MAP_CONFIG defines properties of the ODM2 Admin map /mapdata.html in an ODM2 Admin instance, also found under the
+shortcut Graph My Data -&gt; Map Sample Locations</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MAP_CONFIG</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;lat&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">&quot;lon&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s2">&quot;zoom&quot;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span>
+    <span class="s2">&quot;cluster_feature_types&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Profile&#39;</span><span class="p">,</span><span class="s1">&#39;Specimen&#39;</span><span class="p">,</span><span class="s1">&#39;Excavation&#39;</span><span class="p">,</span><span class="s1">&#39;Field area&#39;</span><span class="p">],</span>
+    <span class="s2">&quot;time_series_months&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;display_titles&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">&quot;MapBox&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;access_token&quot;</span><span class="p">:</span> <span class="s1">&#39;mapbox accessToken&#39;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;result_value_processing_levels_to_display&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+    <span class="s2">&quot;feature_types&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Site&#39;</span><span class="p">,</span><span class="s1">&#39;Profile&#39;</span><span class="p">,</span><span class="s1">&#39;Specimen&#39;</span><span class="p">,</span><span class="s1">&#39;Excavation&#39;</span><span class="p">,</span><span class="s1">&#39;Field area&#39;</span><span class="p">,</span><span class="s1">&#39;Ecological land classification&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;Weather station&#39;</span><span class="p">,</span><span class="s1">&#39;Observation well&#39;</span><span class="p">,</span><span class="s1">&#39;Stream gage&#39;</span><span class="p">,</span><span class="s1">&#39;Transect&#39;</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>lat and lon define the center of the map and the zoom level indicates the initial zoom level of the map.
+cluster_feature_types indicates which features should be grouped into clusters.</p>
+<img alt="_images/ClusteredSite.png" src="_images/ClusteredSite.png" />
+<p>A group of clustered sites</p>
+<img alt="_images/NotClustered.png" src="_images/NotClustered.png" />
+<p>EP1 is not clustered due to the sampling feature type Observation well not being listed in the cluster_feature_types
+map setting.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;MapBox&quot;</span><span class="p">:</span> <span class="p">{</span>
+  <span class="s2">&quot;access_token&quot;</span><span class="p">:</span> <span class="s1">&#39;mapbox accessToken&#39;</span>
+<span class="p">},</span>
+</pre></div>
+</div>
+<p>Visit MapBox to get an access token.</p>
+<p><a class="reference external" href="https://www.mapbox.com/help/how-access-tokens-work/#mapbox-tokens-api">https://www.mapbox.com/help/how-access-tokens-work/#mapbox-tokens-api</a></p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DATA_DISCLAIMER</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;text&quot;</span> <span class="p">:</span> <span class="s2">&quot;Add a link discribing where your data come from&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;linktext&quot;</span> <span class="p">:</span> <span class="s2">&quot;The name of my site&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;link&quot;</span> <span class="p">:</span> <span class="s2">&quot;http://mysiteswegpage.page/&quot;</span>
+
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Add general information about the organization that generated the data. This will appear on publicily available pages
+where your data are viewable.</p>
+<div class="code python highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">SENSOR_DASHBOARD</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;time_series_days&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+    <span class="s2">&quot;featureactionids&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1699</span><span class="p">,</span> <span class="mi">1784</span><span class="p">,</span><span class="mi">1782</span><span class="p">,</span><span class="mi">1780</span><span class="p">,</span><span class="mi">1701</span><span class="p">,</span><span class="mi">1707</span><span class="p">,</span><span class="mi">1778</span><span class="p">,</span><span class="mi">1779</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In the Sensor dashboard configuration “featureactionids” add sampling feature actions, related to sensor time series
+results, to the sensor dashboard. Feature actions listed here will be present in a drop down list on the sensor
+dashboard page.</p>
+<p>The sensor dashboard can be found by visiting ‘Graph My Data’ -&gt; ‘Sensor Dashboard’.</p>
+<ul class="simple">
+<li><a class="reference internal" href="index.html#odm2-admin"><span class="std std-ref">ODM2 Admin docs home page</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search the docs</span></a></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2017, Miguel Leon.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/ODM2AdminSettings.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+    <a href="https://github.com/ODM2/ODM2-Admin" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>
