@@ -11,6 +11,7 @@ import xlrd
 import datetime
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import settings
 from django.utils.crypto import get_random_string
 import sys
@@ -30,6 +31,29 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "templatesAndSettings.settings")
 
 parser = argparse.ArgumentParser(description='validate dates in datalogger file.')
 
+
+
+def getStartDateEndDate(results,stdout):
+    StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
+    EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
+    # result = results#.objects.get(resultid=results.resultid.resultid)
+    repvstart = None
+    repvend = None
+    try:
+        # raise CommandError(" start date "str(startdate)))
+        #
+        repvstart= Resultextensionpropertyvalues.objects.filter(resultid=results.resultid.resultid).filter(
+            propertyid=StartDateProperty).get() #.update(propertyvalue=startdate)
+        repvend = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid.resultid).filter(
+            propertyid=EndDateProperty).get() #.update(propertyvalue=enddate)
+        return repvstart,repvend
+    except ObjectDoesNotExist:
+        tsrvs = Timeseriesresultvalues.objects.filter(resultid=results.resultid.resultid)
+        tsrvscount = len(tsrvs)
+        stdout.write('the time series with resultid ' + str(results.resultid.resultid)
+                     + ' has no start date or end date the number of time series values in the database is: '
+                     + str(tsrvscount))
+        return repvstart, repvend
 
 def get_results(fileid):
     dataloggerfilecolumnSet = Dataloggerfilecolumns.objects.filter(
@@ -238,32 +262,24 @@ class Command(BaseCommand):
                         # print(i)
                         # print(columnheaderson)
                         if i == columnheaderson:
-                            print('data logger file cols')
-                            print(row)
                             for dloggerfileColumn in DataloggerfilecolumnSet:
                                 foundColumn = False
                                 resultid = dloggerfileColumn.resultid
                                 results.append(dloggerfileColumn)
-                                StartDateProperty = Extensionproperties.objects.get(
-                                    propertyname__icontains="start date")
-                                EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
-                                startdateODM = Resultextensionpropertyvalues.objects.filter(
-                                    resultid=resultid).filter(
-                                    propertyid=StartDateProperty).get()  # DBSession.query(ResultExtensionPropertyValues).filter(
-                                # ResultExtensionPropertyValues.ResultID == resultids[0]).filter(ResultExtensionPropertyValues.PropertyID == 1)
-                                enddateODM = Resultextensionpropertyvalues.objects.filter(
-                                    resultid=resultid).filter(propertyid=EndDateProperty).get()
-                                sdopd = str(startdateODM.propertyvalue)
-                                edopd = str(enddateODM.propertyvalue)
-                                # print(dloggerfileColumn)
-                                # print(sdODMF)
-                                # print()
-                                sdODMF = datetime.datetime.strptime(sdopd[:16], "%Y-%m-%d %H:%M")
-                                edODMF = datetime.datetime.strptime(edopd[:16], "%Y-%m-%d %H:%M")
-                                startdateODMstring = sdODMF.strftime("%Y-%m-%d %H:%M:%S")
-                                enddateODMstring = edODMF.strftime("%Y-%m-%d %H:%M:%S")
-                                ODM2startdates.append(startdateODMstring)
-                                ODM2enddates.append(enddateODMstring)
+
+                                startdateODM,enddateODM= getStartDateEndDate(dloggerfileColumn, self.stdout)
+                                if startdateODM and enddateODM:
+                                    sdopd = str(startdateODM.propertyvalue)
+                                    edopd = str(enddateODM.propertyvalue)
+                                    # print(dloggerfileColumn)
+                                    # print(sdODMF)
+                                    # print()
+                                    sdODMF = datetime.datetime.strptime(sdopd[:16], "%Y-%m-%d %H:%M")
+                                    edODMF = datetime.datetime.strptime(edopd[:16], "%Y-%m-%d %H:%M")
+                                    startdateODMstring = sdODMF.strftime("%Y-%m-%d %H:%M:%S")
+                                    enddateODMstring = edODMF.strftime("%Y-%m-%d %H:%M:%S")
+                                    ODM2startdates.append(startdateODMstring)
+                                    ODM2enddates.append(enddateODMstring)
                                 lastResult = resultid
                                 for j in range(numCols):
                                     # print('match Columns')
@@ -363,53 +379,54 @@ class Command(BaseCommand):
 
                     startdateNEWDT = datetime.datetime.strptime(startdateNEW, "%Y-%m-%d %H:%M:%S")
                     enddateNEWDT = datetime.datetime.strptime(enddateNEW, "%Y-%m-%d %H:%M:%S")
-                    if sdODMF > startdateNEWDT and edODMF < enddateNEWDT:
-                        self.stdout.write("ODM2 start date in database " + str(sdODMF) +
-                                          " is greater then the start date in the new file: " + str(startdateNEWDT))
-                        self.stdout.write("ODM2 end date in database " + str(edODMF) +
-                                          " is less then the end date in the new file: " + str(enddateNEWDT))
-                        self.stdout.write("The file contains data both before the time series in the database begin and" +
-                            " after data in the database end. Consider uploading two seperate files, one for older " +
-                                          " data you are back filling and one for new data.")
-                        # call fctn to get index of start and end
-                        start_index = get_start_index(alldate,startdateODMstring,self.stdout)
-                        end_index = get_end_index(alldate,enddateODMstring,self.stdout)
-                        end_index = end_index + 1  # add one since the index at the new start would overlap
-                        for resultid, value in alldata.items():
-                            value = value[:start_index] + value[end_index:]
-                    elif edODMF >= enddateNEWDT and sdODMF < startdateNEWDT:
-                        counts = check_existing_data(results, alldate[0], alldate[-1],self.stdout)
-                        self.stdout.write('The number of rows in the file you are checking is: ' + str(len(alldate)))
-                        if len(alldate) == counts:
-                            self.stdout.write("All %d values are redundant" % (counts))
-                            self.stdout.write("All data are already in the database, no need to ingest the data again.")
-                        elif counts < len(alldate) and counts != 0:
-                            self.stdout.write("All data overlap with the existing time series. But there are more time series values in the file" +
-                                              " then in the database, perhaps you are trying to gap fill some time series?")
-                            self.stdout.write("The Number of datetimes already in the database is: %d " % (counts))
-                            self.stdout.write("The Number of datetimes in the file is: %d " % len(alldate))
-                            self.stdout.write("Proceeding to check each value...")
-                            dates, alldata2 = check_duplicate_dates(results, alldate,alldataanddates,self.stdout)
-                    elif edODMF < enddateNEWDT and sdODMF < startdateNEWDT:
-                        end_index = get_end_index(alldate,enddateODMstring,self.stdout)
-                        end_index = end_index + 1  # add one since the index at the new start would overlap
-                        for resultid, value in alldata.items():
-                            value = value[end_index:]
-                    elif edODMF < startdateNEWDT:
-                        self.stdout.write("All new data are after end date of data in the database, proceed to process")
-                    elif sdODMF > enddateNEWDT:
-                        self.stdout.write("All new data are before start date of data in the database, proceed to process")
-                    elif edODMF >= enddateNEWDT:
-                        self.stdout.write("data base end date: " + str(edODMF) +
-                                          " is greater then or equal to file end date "+
-                                          str(enddateNEWDT) + ", some values overlap")
-                    # This condition is always ok actually.
-                    # elif sdODMF <= startdateNEWDT:
-                    #     self.stdout.write("data base start date: " + str(sdODMF) +
-                    #                       " is less then or equal to the file end date "+
-                    #                       str(startdateNEWDT) + ", some values overlap")
-                    # alldata['datetime'] = alldate
-                    # writefile not working yet.
-                    # writefile(alldata,alldate,w,new_file_name,self.stdout)
+                    if sdODMF and edODMF:
+                        if sdODMF > startdateNEWDT and edODMF < enddateNEWDT:
+                            self.stdout.write("ODM2 start date in database " + str(sdODMF) +
+                                              " is greater then the start date in the new file: " + str(startdateNEWDT))
+                            self.stdout.write("ODM2 end date in database " + str(edODMF) +
+                                              " is less then the end date in the new file: " + str(enddateNEWDT))
+                            self.stdout.write("The file contains data both before the time series in the database begin and" +
+                                " after data in the database end. Consider uploading two seperate files, one for older " +
+                                              " data you are back filling and one for new data.")
+                            # call fctn to get index of start and end
+                            start_index = get_start_index(alldate,startdateODMstring,self.stdout)
+                            end_index = get_end_index(alldate,enddateODMstring,self.stdout)
+                            end_index = end_index + 1  # add one since the index at the new start would overlap
+                            for resultid, value in alldata.items():
+                                value = value[:start_index] + value[end_index:]
+                        elif edODMF >= enddateNEWDT and sdODMF < startdateNEWDT:
+                            counts = check_existing_data(results, alldate[0], alldate[-1],self.stdout)
+                            self.stdout.write('The number of rows in the file you are checking is: ' + str(len(alldate)))
+                            if len(alldate) == counts:
+                                self.stdout.write("All %d values are redundant" % (counts))
+                                self.stdout.write("All data are already in the database, no need to ingest the data again.")
+                            elif counts < len(alldate) and counts != 0:
+                                self.stdout.write("All data overlap with the existing time series. But there are more time series values in the file" +
+                                                  " then in the database, perhaps you are trying to gap fill some time series?")
+                                self.stdout.write("The Number of datetimes already in the database is: %d " % (counts))
+                                self.stdout.write("The Number of datetimes in the file is: %d " % len(alldate))
+                                self.stdout.write("Proceeding to check each value...")
+                                dates, alldata2 = check_duplicate_dates(results, alldate,alldataanddates,self.stdout)
+                        elif edODMF < enddateNEWDT and sdODMF < startdateNEWDT:
+                            end_index = get_end_index(alldate,enddateODMstring,self.stdout)
+                            end_index = end_index + 1  # add one since the index at the new start would overlap
+                            for resultid, value in alldata.items():
+                                value = value[end_index:]
+                        elif edODMF < startdateNEWDT:
+                            self.stdout.write("All new data are after end date of data in the database, proceed to process")
+                        elif sdODMF > enddateNEWDT:
+                            self.stdout.write("All new data are before start date of data in the database, proceed to process")
+                        elif edODMF >= enddateNEWDT:
+                            self.stdout.write("data base end date: " + str(edODMF) +
+                                              " is greater then or equal to file end date "+
+                                              str(enddateNEWDT) + ", some values overlap")
+                        # This condition is always ok actually.
+                        # elif sdODMF <= startdateNEWDT:
+                        #     self.stdout.write("data base start date: " + str(sdODMF) +
+                        #                       " is less then or equal to the file end date "+
+                        #                       str(startdateNEWDT) + ", some values overlap")
+                        # alldata['datetime'] = alldate
+                        # writefile not working yet.
+                        # writefile(alldata,alldate,w,new_file_name,self.stdout)
         except IndexError:
             raise ValidationError('encountered a problem with row ' + str(i) for i in row)
