@@ -73,7 +73,7 @@ script:
       conda install doctr ;
       pushd docs ;
       make clean html ;
-      popd ;
+      # popd ;
       python -m doctr deploy --sync .;
       python -m doctr deploy --sync --no-require-master  --built-docs docs/build/html "docs-$TRAVIS_BRANCH" ;
     fi
