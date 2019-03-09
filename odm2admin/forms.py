@@ -1803,8 +1803,9 @@ class ActionsAdmin(ReadOnlyAdmin):
     inlines_list = [FeatureActionsInline, actionByInLine]
 
     def method_link(self, obj):
-        return u'<a href="{0}methods/{1}/">{2}</a>'.format(settings.CUSTOM_TEMPLATE_PATH,
-                                                            obj.method.methodid, obj.method.methodname)
+        return format_html('<a href="{0}methods/{1}/">{2}</a>'.format(settings.CUSTOM_TEMPLATE_PATH,
+                                                            obj.method.methodid, obj.method.methodname))
+
 
     list_display = ('action_type', 'method_link', 'begindatetime', 'enddatetime')
     list_display_links = ('action_type',)

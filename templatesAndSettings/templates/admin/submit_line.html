@@ -7,6 +7,61 @@
 <script>
     var $ = django.jQuery;
 $(document).ready(function(){
+	$('#validate_logger_file_b').click(function(){ //'.submit_row._save'
+	    //console.log('clicked save');
+		var savebutton = $("#validate_logger_file_b"); //$("#email_data");
+		var check_dates_box = $("#check_dates"); //$("#email_data");
+		var check_dates = 'False';
+		if(check_dates_box[0].checked == true){
+		    check_dates = 'True';
+		}
+        savebutton[0].value= "Validating data";
+        savebutton[0].disabled = true;
+        //var extra = {{extra_context}};
+        spinner = new Spinner().spin();
+		spin=document.getElementById("spinner");
+		spin.appendChild(spinner.el);
+        var $self = $(this);
+        //console.log($self);
+        var $thisForm = $self.parents('form:first');
+        var formData = $thisForm.serializeArray();
+        formData[$self.attr('name')] = $self.attr('value');
+        formData.push({name: $self.attr('name'), value: $self.attr('value')});
+        //formData.push({$self.attr('name'): $self.attr('value')});
+        //console.log(formData);
+        $.ajax({
+            url: "{% settings_value 'CUSTOM_TEMPLATE_PATH' %}../preprocessdlfile/",
+            type: "POST",
+            timeout: 0,
+            async: false,
+            data: {
+                'formData': formData,
+                'dataloggerfileid' : formData[1]['value'],
+                'check_dates': check_dates,
+                'processingCode': formData[2]['value'],
+                'databeginson': formData[3]['value'],
+                'columnheaderson': formData[4]['value'],
+                'csrfmiddlewaretoken': '{{ csrf_token }}',
+            },
+            success : function(json) {
+                spinner.stop();
+                console.log('success');
+                var savebutton = $("#validate_logger_file_b"); //$("#email_data");
+                savebutton[0].value = "Data validated";
+                console.log(json.validatemessage);
+                $("#validation > p").append("<h3> Data Validation</h3>");
+                $("#validation > p").append(json.validatemessage.replace(/\r/g, '').replace(/\n/g, '<br>'));
+                //$("#validation > p").innerHTML = trustedText;
+                //savebutton.defaultValue = json.dataloggerfileid + " Processed"; //json.dataloggerfileid
+                //alert(json.responseText);
+            },
+            error : function(json) {
+                alert(json.responseText);
+            },
+		});
+		//console.log('after ajax');
+	});
+
 	$('#process_logger_file_b').click(function(){ //'.submit_row._save'
 	    //console.log('clicked save');
 		var savebutton = $("#process_logger_file_b"); //$("#email_data");
@@ -73,6 +128,14 @@ $(document).ready(function(){
     {% else %}
     <input type="button" value="{% trans 'Process data' %}" name="process_logger_file_b" id="process_logger_file_b" {{ onclick_attrib }} />
     {% endif %}
+    <input type="button" value="{% trans 'Validate data' %}" name="validate_logger_file_b" id="validate_logger_file_b" {{ onclick_attrib }} />
     <input id="check_dates" class="asdf" type="checkbox" name="check_dates"  {{ onclick_attrib }}>check dates to prevent duplicates? (slower)</input>
+
+    
     {% endif %}
 </div>
+{% if opts.model_name == 'processdataloggerfile' %}
+    <div id="validation">
+     <p></p>
+     </div>
+     {% endif %}

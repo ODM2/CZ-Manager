@@ -21,7 +21,7 @@ import subprocess
 import re
 # import pandas as pd
 # import numpy
-from colour import Color
+# from colour import Color
 # from celery import shared_task
 # import odm2admin.tasks as tasks
 from urllib.parse import urlparse
@@ -1815,6 +1815,49 @@ def add_annotation(request):
 
 # def on_raw_message(body):
 #    print(body)
+def preProcDataLoggerFile(request):
+    response_data = {}
+    formData = None
+    dataloggerfileid = None
+    processingCode = None
+    databeginson = None
+    columnheaderson = None
+    check_dates = False
+    # print('in view')
+    # print(request.POST)
+    if 'dataloggerfileid' in request.POST:
+        dataloggerfileid = int(request.POST['dataloggerfileid'])
+        # print(dataloggerfileid)
+    if 'processingCode' in request.POST:
+        processingCode = request.POST['processingCode']
+        # print(processingCode)
+    if 'databeginson' in request.POST:
+        databeginson = int(request.POST['databeginson'])
+        # print(databeginson)
+    if 'columnheaderson' in request.POST:
+        columnheaderson = int(request.POST['columnheaderson'])
+        # print(columnheaderson)
+    if 'check_dates' in request.POST:
+        if request.POST['check_dates'] == 'True':
+            check_dates = True
+
+    dlf = Dataloggerfiles.objects.get(dataloggerfileid=dataloggerfileid)
+    pdlf = ProcessDataloggerfile.objects.get(dataloggerfileid=dataloggerfileid)
+    linkname = str(dlf.dataloggerfilelinkname())
+    fileid = dlf.dataloggerfileid
+    out = StringIO()
+    try:
+        management.call_command('validate_datalogger_file', linkname, str(fileid)
+                                , str(databeginson), str(columnheaderson), stdout=out)
+        # messages = 'complete '
+        messages = out.getvalue()
+        response_data['validatemessage'] = str(messages)  # e.with_traceback()
+        response = HttpResponse(json.dumps(response_data), content_type='application/json')
+    except CommandError as e:
+        response_data['error_message'] = str(e) #e.with_traceback()
+        response = HttpResponse(json.dumps(response_data), content_type='application/json')
+        response.status_code = 400
+    return response
 
 # @shared_task
 def procDataLoggerFile(request):
@@ -3000,7 +3043,7 @@ def scatter_plot(request):
 
 
 def exportcitations(request, citations, csv):
-    myfile = StringIO.StringIO()
+    myfile = StringIO()
     first = True
     citationpropvalues = Citationextensionpropertyvalues.objects.filter(
         citationid__in=citations).order_by("propertyid")
