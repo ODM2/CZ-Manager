@@ -114,12 +114,12 @@
             
   <div class="section" id="odm2-admin-docker-image-creation">
 <h1>ODM2 Admin Docker Image Creation<a class="headerlink" href="#odm2-admin-docker-image-creation" title="Permalink to this headline">¶</a></h1>
-<p>Requirements to run [docker image](<a class="reference external" href="https://hub.docker.com/r/lsetiawan/odm2admin/">https://hub.docker.com/r/lsetiawan/odm2admin/</a>):</p>
+<p>Requirements to run [docker image](<a class="reference external" href="https://cloud.docker.com/repository/docker/miguelcleon/odm2-admin">https://cloud.docker.com/repository/docker/miguelcleon/odm2-admin</a>):</p>
 <ol class="arabic simple">
 <li>Docker installed on Linux, MacOS, or Windows.</li>
 </ol>
 <p>To run:</p>
-<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ docker run -d -p 8010:8010 --name odm2admintest lsetiawan/odm2admin:latest
+<div class="code bash highlight-default notranslate"><div class="highlight"><pre><span></span>$ docker run -d -p 8010:8010 --name odm2admintest miguelcleon/odm2-admin:latest
 </pre></div>
 </div>
 <p>Next, in order to login you will need to create a Django superuser login
@@ -151,7 +151,7 @@ a web browser at 127.0.0.1:8010 with your new account.</p>
       &copy;2017, Miguel Leon.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.4</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
