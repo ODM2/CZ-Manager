@@ -1,7 +1,7 @@
 ODM2 Admin Docker Image Creation
 ================================
 
-Requirements to run [docker image](https://hub.docker.com/r/lsetiawan/odm2admin/):
+Requirements to run [docker image](https://cloud.docker.com/repository/docker/miguelcleon/odm2-admin):
 
 1. Docker installed on Linux, MacOS, or Windows.
 
@@ -9,7 +9,7 @@ To run:
 
 .. code:: bash
 
-   $ docker run -d -p 8010:8010 --name odm2admintest lsetiawan/odm2admin:latest
+   $ docker run -d -p 8010:8010 --name odm2admintest miguelcleon/odm2-admin:latest
 
 Next, in order to login you will need to create a Django superuser login
 To do that first you will need to attach bash to the container, then
