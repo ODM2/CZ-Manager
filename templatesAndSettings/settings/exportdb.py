@@ -7,13 +7,26 @@ from .base import *
 """ DEBUG CONFIGURATION """
 # Disable debugging by default.
 DEBUG = True
-EXPORTDB =True
+EXPORTDB =False
+USE_TZ = False
 """ END DEBUG CONFIGURATION """
 
 """ ALLOWED HOSTS CONFIGURATION """
 ALLOWED_HOSTS = ['127.0.0.1',]
 """ END ALLOWED HOSTS CONFIGURATION """
 
+""" HYDROSHARE API CONFIGURATION """
+PYTHON_EXEC='/home/bitnami/miniconda3/envs/odm2adminenv/bin/python'
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY ='xxx.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET ='xxx'
+SOCIAL_AUTH_HYDROSHARE_KEY ='xxx'
+SOCIAL_AUTH_HYDROSHARE_SECRET ='xxx'
+
+SOCIAL_AUTH_HYDROSHARE_UP_KEY = 'xxx'
+SOCIAL_AUTH_HYDROSHARE_UP_SECRET = 'xxx'
+
+""" END HYDROSHARE API CONFIGURATION """
 
 """ EMAIL CONFIGURATION """
 EMAIL_HOST = 'smtp.host'
@@ -25,24 +38,6 @@ RECAPTCHA_PRIVATE_KEY = 'googlerecaptchaprivatekey'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 123
 """ EMAIL CONFIGURATION """
-
-
-""" DATABASE CONFIGURATION """
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': TEMPLATE_DIR + '/ODM2SQliteBlank.db',
-    },
-}
-# DATABASES = {
-#      'default': {
-#          'ENGINE': 'django.db.backends.sqlite3',
-#          'NAME': 'ODM2SQliteBlank.db',
-#      }
-# }
-""" END DATABASE CONFIGURATION """
-
-""" END DATABASE CONFIGURATION """
 
 """ SENSOR DASHBOARD CONFIGURATION """
 
@@ -78,3 +73,10 @@ DATA_DISCLAIMER = {
 
 }
 """ END DATA DISCLAIMER CONFIGURATION """
+
+""" DATABASE CONFIGURATION """
+DATABASES = {
+'default': {
+'ENGINE': 'django.db.backends.sqlite3','NAME':'',}, 'export': {'ENGINE': 'django.db.backends.sqlite3','NAME':'',}}
+
+""" END DATABASE CONFIGURATION """
