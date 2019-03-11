@@ -13,6 +13,7 @@ from django.core.management import settings
 from templatesAndSettings.settings import exportdb
 from django.http import HttpResponse
 from hs_restclient import HydroShare, HydroShareAuthOAuth2
+# from odm2admin.tasks import create_sqlite_export_celery
 
 from django.contrib.gis import forms, admin
 from django.contrib.gis.geos import GEOSGeometry
@@ -1466,14 +1467,12 @@ class FeatureactionsAdmin(ReadOnlyAdmin):
     search_fields = ['action__method__methodname', 'samplingfeatureid__samplingfeaturename']
 
 
-
-def createODM2SQLiteFile(results,dataset):
-
+def createODM2SQLiteFile(results, dataset,request, username, password):
     myresultSeriesExport = []
 
-    #for result in results:
+    # for result in results:
     # emailspreadsheet2(request, myresultSeriesExport, False)
-    #management.call_command('dump_object', 'odm2admin.Timeseriesresults', 17160, 17162, kitchensink=True)
+    # management.call_command('dump_object', 'odm2admin.Timeseriesresults', 17160, 17162, kitchensink=True)
     sysout = sys.stdout
     loc = settings.FIXTURE_DIR
     # print(myresultSeriesExport.first())
@@ -1484,10 +1483,16 @@ def createODM2SQLiteFile(results,dataset):
     fixturecount = 0
     # print('looping results')
     for result in results:
-        myresultSeriesExport = Timeseriesresultvalues.objects.filter(resultid=result.resultid)
+        myresultSeriesExport = Timeseriesresultvalues.objects.filter(resultid=result.resultid).order_by('valuedatetime')
         # print('result count for:')
         # print(result)
         # print(myresultSeriesExport.count())
+        fixturecount += 1
+        tmpfixture1 = 'tmp' + str(fixturecount) + '.json'  # + random_string
+        sys.stdout = open(loc + tmpfixture1, 'w')
+        management.call_command('dump_object', 'odm2admin.CvOrganizationtype', '*', kitchensink=False)
+        sys.stdout.close()
+
         fixturecount += 1
         tmpfixture1 = 'tmp' + str(fixturecount) + '.json'  # + random_string
         sys.stdout = open(loc + tmpfixture1, 'w')
@@ -1509,7 +1514,7 @@ def createODM2SQLiteFile(results,dataset):
             #     sys.stdout = open(loc + tmpfixture1, 'w')
             #     management.call_command('dump_object', 'odm2admin.Sites', '*', kitchensink=True)
             #
-                #sys.stdout.close()
+            # sys.stdout.close()
             # lastsite = site
         else:
             myresultSeriesExport = Profileresultvalues.objects.filter(resultid=result.resultid)
@@ -1519,6 +1524,8 @@ def createODM2SQLiteFile(results,dataset):
                 management.call_command('dump_object', 'odm2admin.Profileresultvalues',
                                         myresultSeriesExport.first().valueid, kitchensink=True)
         sys.stdout.close()
+
+
 
     fixturecount += 1
     tmpfixture1 = 'tmp' + str(fixturecount) + '.json'  # + random_string
@@ -1555,7 +1562,7 @@ def createODM2SQLiteFile(results,dataset):
         myresultSeriesExport = Timeseriesresultvalues.objects.filter(resultid=result.resultid)
         if myresultSeriesExport.count() > 0:
             sys.stdout.write(serializers.serialize("json", myresultSeriesExport[1:], indent=4,
-                                                   use_natural_foreign_keys=False,use_natural_primary_keys=False))
+                                                   use_natural_foreign_keys=False, use_natural_primary_keys=False))
         else:
             myresultSeriesExport = Profileresultvalues.objects.filter(resultid=result.resultid)
             if myresultSeriesExport.count() > 0:
@@ -1565,117 +1572,69 @@ def createODM2SQLiteFile(results,dataset):
         sys.stdout.close()
     sys.stdout = sysout
 
-    #settings.MAP_CONFIG['result_value_processing_levels_to_display']
-    #db_name = exportdb.DATABASES['export']['NAME']
-    #print(db_name)
+    # settings.MAP_CONFIG['result_value_processing_levels_to_display']
+    # db_name = exportdb.DATABASES['export']['NAME']
+    # print(db_name)
     # print(tmploc1)
     database = ''
 
-    #management.call_command('loaddata',
+    # management.call_command('loaddata',
     #                        tmploc1 ,database=database)  # ,database='export'
     # print('finished first file')
-    #management.call_command('loaddata',
+    # management.call_command('loaddata',
     #                        tmploc2,database=database)
-    #export_data.send(sender= Timeseriesresultvalues,tmploc1=tmploc1,tmploc2=tmploc2)
-    #management.call_command('create_sqlite_export',tmploc1,tmploc2, settings=exportdb)
+    # export_data.send(sender= Timeseriesresultvalues,tmploc1=tmploc1,tmploc2=tmploc2)
+    # management.call_command('create_sqlite_export',tmploc1,tmploc2, settings=exportdb)
     # call('../')
     # print(tmploc1)
     # print(tmploc2)
-    dbfilepath = exportdb.DATABASES['default']['NAME']
+    dbfilepath = settings.TEMPLATE_DIR + '/ODM2SQliteBlank.sqlite'  # exportdb.DATABASES['default']['NAME']
     path = os.path.dirname(dbfilepath)
     dbfile = os.path.basename(dbfilepath)
     dbfilename = os.path.splitext(dbfile)[0]
     random_string = get_random_string(length=5)
-    dbfile2 = path +"/" + dbfilename +  random_string + ".db"
-    #command = ['python',  '/home/azureadmin/webapps/ODM2-AdminLCZO/manageexport.py', 'create_sqlite_export', tmploc1, tmploc2]
+    dbfilename2 = dbfilename + random_string + ".sqlite"
+    dbfile2 = path + "/" + dbfilename + random_string + ".sqlite"
+    # command = ['python',  '/home/azureadmin/webapps/ODM2-AdminLCZO/manageexport.py', 'create_sqlite_export', tmploc1, tmploc2]
+    command = 'cp ' + dbfilepath + ' ' + dbfile2
+
+    response = subprocess.check_call(command, shell=True)
+    # write an extra settings file instead - have it contain just DATABASES; remove databases from exportdb.py and import new file. 2
+    # exportdb.DATABASES['export']['NAME'] = dbfile2
+    # print(sys.path)
+    # oldexportdb = path + '/templatesAndSettings/settings/exportdb.py'
+    # copyexportdb = path + '/templatesAndSettings/settings/exportdbold.py'
+    # command = 'cp ' + oldexportdb + ' ' + copyexportdb
+
+    # response = subprocess.check_call(command, shell=True)
+    # sys.stdout = open(oldexportdb)
     command = 'cp ' + dbfilepath + ' ' + str(dbfile2)
-    # print(command)
-    # print('DB FILE PATH')
-    # print(dbfilepath)
-    response = subprocess.check_call(command,shell=True)
-    #write an extra settings file instead - have it contain just DATABASES; remove databases from exportdb.py and import new file. 2
-    exportdb.DATABASES['default']['NAME'] = dbfile2
-    # print(dbfile2)
-    #print(sys.path)
-
-    sys.stdout = open(settings.BASE_DIR + '/scripts/create_sqlite_file2.sh', 'w')
-    #/ home / miguelcleon / webapps / odm2admin2 / manageexport.py
-    #create_sqlite_export
+    # exportsettings = "DATABASES = { \n" + \
+    #                  "'default': { \n" + \
+    #                  "'ENGINE': 'django.db.backends.sqlite3','NAME':'" + settings.TEMPLATE_DIR + dbfile2 + "',}, 'export': {'ENGINE': 'django.db.backends.sqlite3','NAME':'" + settings.TEMPLATE_DIR + dbfile2 + "',}}"
+    # print(exportsettings)
+    sys.stdout = sysout
+    sys.stdout = open(path + '/templatesAndSettings/scripts/create_sqlite_file2.sh', 'w')
+    # / home / miguelcleon / webapps / odm2admin2 / manageexport.py
+    # create_sqlite_export
     # sys.stdout = sysout
-    commandstring = ''
+    commandstring = '#!/usr/bin/env bash \n'
 
-    commandstring += settings.PYTHON_EXEC+ ' ' # sys.executable
+    commandstring += settings.PYTHON_EXEC + ' '  # sys.executable
 
     commandstring += path + '/manageexport.py'
     commandstring += ' create_sqlite_export2 '
     commandstring += dbfile2 + ' '
     fixturelist = []
-    for x in range(1,fixturecount):
+    for x in range(1, fixturecount + 1):
         tmpfixture1 = 'tmp' + str(x) + '.json'  # + random_string
-        commandstring +=loc + tmpfixture1 + ' '
+        commandstring += loc + tmpfixture1 + ' '
         fixturelist.append(loc + tmpfixture1)
 
-    # commandstring +=  ' %>> ' + settings.BASE_DIR +'/logging/sqlite_export.log'
+    commandstring += ' > ' + path + '/templatesAndSettings/logging/sqlite_export.log \n'
     print(commandstring)
-    command = settings.BASE_DIR + '/scripts/create_sqlite_file2.sh' # + dbfile2 + ' %>> ' + settings.BASE_DIR +'/logging/sqlite_export.log'
-    st = os.stat(command)
-    try:
-        os.chmod(command, st.st_mode | stat.S_IEXEC)
-    except OSError as e:
-        pass
-    # print(command)
-    sys.stdout = sysout
-    print(commandstring)
-    response = subprocess.check_call(command,shell=True) #
-    # print("response")
-    # print(response)
-    # print(exportdb.DATABASES['default']['NAME'])
+    user = request.user.get_full_name()
 
-    return myresultSeriesExport, startdate, enddate,fixturecount
-
-def export_to_hydroshare(request,results, datasets):
-    username = None
-    password = None
-    auth = None
-
-    valuestoexport,startdate,enddate,fixturecount = createODM2SQLiteFile(results,datasets)
-    if 'hydroshareUsername' in request.POST and 'hydrosharePassword' in request.POST:
-        hs_client_id = settings.SOCIAL_AUTH_HYDROSHARE_UP_KEY
-        hs_client_secret = settings.SOCIAL_AUTH_HYDROSHARE_UP_SECRET
-        username = request.POST['hydroshareUsername']
-        password =  request.POST['hydrosharePassword']
-        auth = HydroShareAuthOAuth2(hs_client_id, hs_client_secret,
-                                    username=username, password=password)
-    # print(username)
-    # print(password)
-    export_complete = True
-    resource_link = ''
-    user = request.user
-    # print(request.POST['hydroshareusername'])
-
-    #hs = get_oauth_hs(request)
-    #userInfo = hs.getUserInfo()
-    #
-    # token = None
-    #if 'code' in request.POST:
-    #    print(request.POST['code'])
-    #    token = request.POST['code']
-    #print('expires in ' + str(token['expires_in']))
-
-    #auth = HydroShareAuthOAuth2(client_id, client_secret,
-    #                            username='', password='')
-    hs = HydroShare(auth=auth)
-    # username = hs.getUserInfo()
-    # print(username)
-    abstracttext = ''
-    title = ''
-
-    abstracttext += 'ODM2 Admin dataset: ' + str(datasets.datasettitle)
-    title += 'ODM2 Admin dataset ' + str(datasets.datasettitle)
-    abstract = abstracttext
-    keywords = ['ODM2']
-    rtype = 'GenericResource'
-    fpath = str(exportdb.DATABASES['default']['NAME'])
     try:
         startdate = datetime.datetime.strptime(str(startdate), '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
     except ValueError:
@@ -1685,28 +1644,69 @@ def export_to_hydroshare(request,results, datasets):
     except ValueError:
         enddate = datetime.datetime.strptime(str(enddate), '%Y-%m-%d %H:%M:%S.$f').strftime('%Y-%m-%d')
 
-    # # print(fpath)
-    # #metadata = '[{"coverage":{"type":"period", "value":{"start":"'+entered_start_date +'", "end":"'+ entered_end_date +'"}}}, {"creator":{"name":"Miguel Leon"}}]'
-    metadata = '[{"coverage":{"type":"period", "value":{"start":"' + str(startdate) +  '", "end":"' + str(enddate) + '"}}}, ' \
-                '{"creator":{"name":"' +user.get_full_name() +'"}}]'
-    extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
-    # #abstract = 'My abstract'
-    # #title = 'My resource'
-    # #keywords = ('my keyword 1', 'my keyword 2')
-    # #rtype = 'GenericResource'
-    # #fpath = 'C:/Users/leonmi/Google Drive/ODM2AdminLT2/ODM2SQliteBlank.db'
-    # #metadata = '[{"coverage":{"type":"period", "value":{"start":"01/01/2000", "end":"12/12/2010"}}}, {"creator":{"name":"John Smith"}}, {"creator":{"name":"Lisa Miller"}}]'
-    # #extra_metadata = '{"key-1": "value-1", "key-2": "value-2"}'
-    resource_id = hs.createResource(rtype, title, resource_file=fpath,
-                                    resource_filename='ODM2SQLiteDB', keywords=keywords,
-                                    abstract=abstract,metadata=metadata, extra_metadata=extra_metadata)
-    # print(resource_id)
-    # for resource in hs.getResourceList():
-    #     print(resource)
+    hydrosharecommand = settings.PYTHON_EXEC + ' '  # sys.executable
+
+    hydrosharecommand += path + "/manageexport.py"
+    hydrosharecommand += " create_hydroshare_resource '" + username + "' '" + password + "' '" +\
+                         user + "' '" + dataset.datasettitle + "' '" + startdate + "' '" + enddate +\
+                         "' " + dbfile2 + " " + dbfilename2
+    hydrosharecommand += ' > ' + path + '/templatesAndSettings/logging/hydroshare_export.log \n'
+    print(hydrosharecommand)
+    # cpcommand = 'cp ' + copyexportdb  + ' ' +  oldexportdb
+    # print(cpcommand)
+    command = path + '/templatesAndSettings/scripts/create_sqlite_file2.sh'  # + dbfile2 + ' %>> ' + settings.BASE_DIR +'/logging/sqlite_export.log'
+    st = os.stat(command)
+    sys.stdout = sysout
+    try:
+        os.chmod(command, st.st_mode | stat.S_IEXEC)
+    except OSError as e:
+        print(e)
+        pass
+    # print(command)
+    sys.stdout = sysout
+    print(commandstring)
+    # instead of running the .sh file here use incrontab to check if the file create_sqlite_file2.sh changed and execute it.
+
+    args = [command]
+    # os.execv('sudo bash',args) # command_path
+    # os.execv(settings.PYTHON_EXEC, [settings.PYTHON_EXEC] +commandstring)
+    # print("response")
+    # print(response)
+    # command = 'cp ' + copyexportdb + ' ' + oldexportdb
+
+    # response = subprocess.check_call(command,shell=True)
+    # print(exportdb.DATABASES['default']['NAME'])
+
+    return myresultSeriesExport, startdate, enddate, fixturecount, dbfile2, dbfilename2
+
+
+def export_to_hydroshare(request, results, datasets):
+    username = None
+    password = None
+    auth = None
+
+    if 'hydroshareUsername' in request.POST and 'hydrosharePassword' in request.POST:
+        hs_client_id = settings.SOCIAL_AUTH_HYDROSHARE_UP_KEY
+        hs_client_secret = settings.SOCIAL_AUTH_HYDROSHARE_UP_SECRET
+        username = request.POST['hydroshareUsername']
+        password = request.POST['hydrosharePassword']
+        auth = HydroShareAuthOAuth2(hs_client_id, hs_client_secret,
+                                    username=username, password=password)
+
+    valuestoexport, startdate, enddate, \
+    fixturecount, dbfiletoupload, dbfilename2 = createODM2SQLiteFile(
+        results, datasets, request, username, password)
+    # print(username)
+    # print(password)
+    export_complete = True
+    resource_link = ''
+    messages.info(request,'request in being processed. It may take a few minutes' +\
+                          ', or longer depending on the size of your dataset, for your Hydroshare resource to appear. ')
     return HttpResponse({'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
-                                                'export_complete': export_complete,
-                                                'username' : username,
-                                                'resource_link': resource_link,},content_type='application/json')
+                         'export_complete': export_complete,
+                         'username': username,
+                         'resource_link': resource_link, }, content_type='application/json')
+
 
 def publish_dataset_to_hydroshare(ModelAdmin, request, queryset):
     results = None
@@ -1716,6 +1716,7 @@ def publish_dataset_to_hydroshare(ModelAdmin, request, queryset):
         print('result count')
         print(results.count())
         export_to_hydroshare(request, results, dataset)
+
 
 publish_dataset_to_hydroshare.short_description = "export dataset results as a hydroshare resource. "
 
