@@ -109,8 +109,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         recreate_database = True # options.get('clean')
-        dfc = DataFrameClient(host='bitnami-miguel.cuahsi.org',port=18086,
-                              database='lczotest', username='miguelcleon', password='Upata7jmft')
+        dfc = DataFrameClient(host='x',port=18086,
+                              database='x', username='x', password='x')
         print('list db')
         print(dfc.get_list_database())
         helper = InfluxHelper()
