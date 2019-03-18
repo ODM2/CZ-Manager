@@ -8,11 +8,13 @@ services:
     expose:
       - "5432"
     volumes:
-      - ./dbdata:/var/lib/postgresql/data
+      - dbdata:/var/lib/postgresql/data
   app:
     container_name: odm2adminapp
     restart: always
-    build: ../odm2admin
+    build: 
+      context: ../../
+      dockerfile: ./docker/odm2admin/Dockerfile
     links:
       - db:db
       - redis:redis
@@ -20,8 +22,14 @@ services:
       - db
     ports:
       - "8000:8000"
+    environment:
+    - POSTGRES_HOST=db
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=test
+    - POSTGRES_NAME=odm2
+    - POSTGRES_PORT=5432
     volumes:
-      - ./settings:/ODM2-Admin/templatesAndSettings/settings
+      - ../../docker/docker-deploy/settings:/ODM2-Admin/templatesAndSettings/settings
 
   redis:
     container_name: odm2adminredis
@@ -29,3 +37,6 @@ services:
     image: redis:latest
     expose:
       - "6379"
+
+volumes:
+  dbdata:

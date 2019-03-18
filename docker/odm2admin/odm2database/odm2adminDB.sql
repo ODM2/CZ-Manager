@@ -26,6 +26,8 @@ CREATE EXTENSION if not exists fuzzystrmatch;
 CREATE EXTENSION if not exists postgis_tiger_geoCoder;
 
 DROP SCHEMA IF EXISTS odm2 CASCADE;
+DROP SCHEMA IF EXISTS admin CASCADE;
+DROP SCHEMA IF EXISTS odm2extra CASCADE;
 
 CREATE SCHEMA admin;
 
@@ -1131,7 +1133,7 @@ CREATE TABLE cv_samplingfeaturegeotype (
 CREATE TABLE cv_samplingfeaturetype (
     term character varying(255) NOT NULL,
     name character varying(255) NOT NULL,
-    definition character varying(1000),
+    definition character varying(10000),
     category character varying(255),
     sourcevocabularyuri character varying(255)
 );

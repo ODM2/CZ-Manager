@@ -1,8 +1,10 @@
 #!/bin/bash
 
+set -e
+
 echo "Activating environment..."
 source activate odm2adminenv
-conda install --yes -c conda-forge sqlalchemy
+conda install --yes -c conda-forge sqlalchemy pymysql pyodbc
 # pip install git+git://github.com/miguelcleon/django-admin-shortcuts --upgrade
 
 #echo "Building database..."
@@ -15,7 +17,7 @@ python manage.py migrate
 
 echo "Loading Controlled Vocabularies"
 wget https://raw.githubusercontent.com/ODM2/ODM2/master/src/load_cvs/cvload.py
-python cvload.py postgresql+psycopg2://postgres:test@db:5432/odm2
+python cvload.py postgresql+psycopg2://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_NAME
 
 echo "Running server..."
 python manage.py runserver 0.0.0.0:8000
