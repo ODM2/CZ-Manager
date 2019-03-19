@@ -17,7 +17,6 @@ from odm2admin.models import Variables, CvVariabletype, CvVariablename
 #     from odm2admin.models import Variables, CvVariabletype, CvVariablename
 # else:
 #     from ..models import Variables, CvVariabletype, CvVariablename
-
 class VariablesTest(TestCase):
     def create_variable(self, variablecode='test',variabledefinition='test', nodatavalue=-6999):
         var_type = CvVariabletype(term="test", name="test", definition="this is just a test")
