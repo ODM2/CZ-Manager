@@ -11,6 +11,7 @@ services:
       - dbdata:/var/lib/postgresql/data
   app:
     container_name: odm2adminapp
+    image: miguelcleon/odm2-admin:0.1
     restart: always
     build: 
       context: ../../
@@ -29,7 +30,8 @@ services:
     - POSTGRES_NAME=odm2
     - POSTGRES_PORT=5432
     volumes:
-      - ../../docker/docker-deploy/settings:/ODM2-Admin/templatesAndSettings/settings
+      - ../../:/ODM2-Admin/:consistent
+
 
   redis:
     container_name: odm2adminredis
