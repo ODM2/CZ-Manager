@@ -1,33 +1,46 @@
 """
-Django settings for odm2testsite project.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/1.9/topics/settings/
-
-For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.9/ref/settings/
+Common settings and globals.
 """
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import random
 import os
 
-APP_NAME = 'odm2admin'
-VERBOSE_NAME = 'ODM2CZOData'
+""" NAMES CONFIGURATION """
+APP_NAME = "odm2admin" # This has to match the name of the folder that the app is saved
+SITE_NAME = "odm2admin" # sometimes you might need the Django app name to be different from your URL path (this is the URL path name).             
+VERBOSE_NAME = "ODM2 Admin"
 
+SITE_HEADER = "ODM2 Admin"
+SITE_TITLE = "ODM2 Admin"
+""" END NAMES CONFIGURATION """
+
+
+""" PATH CONFIGURATION """
+# Absolute filesystem path to this Django project directory.
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+# Absolute path where project is located
+ROOT = os.path.dirname(BASE_DIR)# '/Volumes/Landung_2TB/Work/ODM2-Admin/'
 
-ROOT = os.path.dirname(BASE_DIR) # 'C:/Users/leonmi/Google Drive/ODM2Djangoadmin'
+# SECRET_KEY.
+SECRET_KEY = 'myRanDom_Secret_Key'
+# Application definition
+BASE_URL = '' # Enter the base url in your APACHE SETTINGS. e.g. 'ODM2ADMIN/'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+CUSTOM_TEMPLATE_PATH = '/{}{}/'.format(BASE_URL, APP_NAME)
+""" END PATH CONFIGURATION """
+
+
+""" DEBUG CONFIGURATION """
+# Disable debugging by default.
 DEBUG = True
+""" END DEBUG CONFIGURATION """
 
-TEMPLATE_DIR = os.path.dirname(__file__)
-TEMPLATE_DIR_APP = os.path.join(os.path.dirname(__file__), '..')
-TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), 'templates')
-# TEMPLATE_PATH2 = os.path.join(TEMPLATE_DIR, 'templates/odm2testapp')
-# print(TEMPLATE_PATH)
-# TEMPLATE_DIRS = [TEMPLATE_PATH, ]  # TEMPLATE_PATH2,
 
+""" TEMPLATE CONFIGURATION """
+TEMPLATE_DIR = os.path.join(ROOT)
+TEMPLATE_PATH = os.path.join(TEMPLATE_DIR, 'templatesAndSettings/templates')
+
+# List of callables that know how to import templates from various sources.
 TEMPLATES = [{
     'BACKEND': 'django.template.backends.django.DjangoTemplates',
     'DIRS': [TEMPLATE_PATH, ],
@@ -46,51 +59,129 @@ TEMPLATES = [{
             'django.template.context_processors.request',
             'django.contrib.auth.context_processors.auth',
             'django.contrib.messages.context_processors.messages',
+            'social_django.context_processors.backends',
+            'social_django.context_processors.login_redirect',
         ],
     },
 }]
+""" END TEMPLATE CONFIGURATION """
 
-# TEMPLATE_LOADERS = ('django.template.loaders.filesystem.Loader',)
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
+""" MANAGER CONFIGURATION """
+# Admin and managers for this project. These people receive private site
+# alerts.
+ADMINS = [
+    {"name": "first last",
+     "email": "email@example.com"}
+]
+""" END MANAGER CONFIGURATION """
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'random_secret_key_like_so_7472873649836'
 
-# TEMPLATE_DEBUG = TEMPLATE_DEBUG
+""" GENERAL CONFIGURATION """
+# Local time zone for this installation. Choices can be found here:
+# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name although not all
+# choices may be available on all operating systems. On Unix systems, a value
+# of None will cause Django to use the same timezone as the operating system.
+# If running in a Windows environment this must be set to the same as your
+# system time zone.
+TIME_ZONE = 'UTC'
 
-MEDIA_ROOT = '{}'.format(ROOT)
-MEDIA_URL = '/odm2testapp/upfiles/'
+# Language code for this installation. All choices can be found here:
+# http://www.i18nguy.com/unicode/language-identifiers.html.
+LANGUAGE_CODE = 'en-us'
 
-# Application definition
-CUSTOM_TEMPLATE_PATH = '/admin/{}/'.format(APP_NAME)
-# ADMIN_SHORTCUTS_PATH=admin_shortcuts_path
-URL_PATH = 'admin/'
-STATIC_ROOT = '{}/static'.format(ROOT)
+# If you set this to False, Django will make some optimizations so as not
+# to load the internationalization machinery.
+USE_I18N = True
 
-# https://github.com/mishbahr/django-modeladmin-reorder
-# {'app': 'auth', 'models': ('auth.User', 'auth.Group')},
-# ADMIN_REORDER = ('odm2testsite',
-#                  {'app':'Odm2Testapp',
-#                   'auth':'staff',
-#                   'models':("People", "Organizations","Affiliations", "Variables","Units",
-#                       "Taxonomicclassifiers","Methods","Actions","Relatedactions","Actionby","Samplingfeatures",
-#                       "Featureactions","Datatsets","Results","Datasetsresults","Processinglevels","Measurementresults",
-#                       "Measurementresultvalues","MeasurementresultvalueFile", "Dataloggerfiles",
-#                       "Dataloggerprogramfiles")},
-# )
+# If you set this to False, Django will not format dates, numbers and
+# calendars according to the current locale.
+USE_L10N = True
+
+# Time zone support is disabled by default.
+# To enable it, set USE_TZ = True
+USE_TZ = True
+""" END GENERAL CONFIGURATION """
+
+
+""" MEDIA CONFIGURATION """
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+MEDIA_ROOT = '{}/{}/upfiles/'.format(BASE_DIR, SITE_NAME)
+#  URL that handles the media served from MEDIA_ROOT.
+MEDIA_URL = '/{}/{}/media/'.format(os.path.basename(BASE_DIR), APP_NAME)
+""" END MEDIA CONFIGURATION """
+# Absolute filesystem path to the directory that will hold database export and import files
+FIXTURE_DIR = '{}/fixtures/'.format(BASE_DIR)
+
+""" STATIC FILE CONFIGURATION """
+# Absolute path to the directory static files should be collected to. Don't put
+# anything in this directory yourself; store your static files in apps' static/
+# subdirectories and in STATICFILES_DIRS.
+STATIC_ROOT = '{}/{}/static'.format(BASE_DIR, SITE_NAME)
+# URL prefix for static files.
+STATIC_URL = '/static/'
+""" END STATIC FILE CONFIGURATION """
+""" END PATH CONFIGURATION """
+
+""" MIDDLEWARE CONFIGURATION """
+MIDDLEWARE = (
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    #'corsheaders.middleware.CorsMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',
+    # 'django.contrib.auth.middleware.SessionAuthenticationMiddleware', didn't work in production
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'admin_reorder.middleware.ModelAdminReorder',
+)
+""" END MIDDLEWARE CONFIGURATION """
+
+""" OAUTH SETTINGS """
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.open_id.OpenIdAuth',
+    'social_core.backends.google.GoogleOpenId',
+    'social_core.backends.google.GoogleOAuth2',
+    #'odm2admin.hydroshare_backend.HydroShareOAuth2',
+    'social_core.backends.google.GoogleOAuth',
+    'django.contrib.auth.backends.ModelBackend',
+)
+# Oauth CORS_ORIGIN_ALLOW_ALL = True
+
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+    'social_core.pipeline.social_auth.associate_by_email',
+)
+""" END OAUTH SETTINGS """
+
+""" URL AND WSGI CONFIGURATION """
+ROOT_URLCONF = 'templatesAndSettings.urls'
+
+WSGI_APPLICATION = 'templatesAndSettings.wsgi.application'
+""" END URL CONFIGURATION"""
+
+""" APP CONFIGURATION """
 INSTALLED_APPS = (
     'jquery',
     'djangocms_admin_style',
     '{}'.format(APP_NAME),
     'import_export',
-    'admin_shortcuts',
+    'social_django',
     'daterange_filter',
     'captcha',
-    # 'kronos',
-    'djutils',
+    'fixture_magic',
+    # 'dal',
     # 'dal_select2',
     'ajax_select',
+    'admin_shortcuts',
     'django.contrib.admin',
     'django.contrib.gis',
     'django.contrib.auth',
@@ -101,53 +192,48 @@ INSTALLED_APPS = (
     # 'admin_reorder',
 
 )
-# TEMPLATE_LOADERS = (
-#     'django.template.loaders.filesystem.Loader',
-#     'django.template.loaders.app_directories.Loader',
-#     'apptemplates.Loader',
-# )
-# find icon images here https://github.com/alesdotio/
-# django-admin-shortcuts/blob/master/admin_shortcuts/
-# templatetags/admin_shortcuts_tags.py#L134
+""" END APP CONFIGURATION """
+
+""" ADMIN SHORTCUTS CONFIGURATION """
 ADMIN_SHORTCUTS = [
     {
 
         'shortcuts': [
             {
                 'url': CUSTOM_TEMPLATE_PATH,
-                'app_name': '{}'.format(APP_NAME),
-                'title': '{} Admin'.format(VERBOSE_NAME),
-                'class': 'config',
+                'app_name': '{}'.format(SITE_NAME),
+                'title': '{}'.format(VERBOSE_NAME),
+                'icon': 'cogs',
             },
             {
-                'url': '/' + URL_PATH + 'AddSensor.html',
-                'app_name': '{}'.format(APP_NAME),
+                'url': '/' + SITE_NAME + '/' + 'AddSensor',
+                'app_name': '{}'.format(SITE_NAME),
                 'title': 'Add Sensor Data',
-                'class': 'tool',
+                'icon': 'wrench', # tool
             },
             {
-                'url': '/' + URL_PATH + 'AddProfile.html',
-                'app_name': '{}'.format(APP_NAME),
+                'url': '/' + SITE_NAME + '/' + 'AddProfile',
+                'app_name': '{}'.format(SITE_NAME),
                 'title': 'Add Soil Profile Data',
-                'class': 'flag',
+                'icon': 'flag',
             },
             {
-                'url': '/' + URL_PATH + 'RecordAction.html',
-                'app_name': '{}'.format(APP_NAME),
+                'url': '/' + SITE_NAME + '/' + 'RecordAction',
+                'app_name': '{}'.format(SITE_NAME),
                 'title': 'Record an Action',
-                'class': 'notepad',
+                'icon': 'sticky-note',
             },
             {
-                'url': '/' + URL_PATH + 'ManageCitations.html',
-                'app_name': '{}'.format(APP_NAME),
+                'url': '/' + SITE_NAME + '/' + 'ManageCitations',
+                'app_name': '{}'.format(SITE_NAME),
                 'title': 'Manage Citations',
-                'class': 'pencil',
+                'icon': 'edit',
             },
             {
-                'url': '/' + URL_PATH + 'chartIndex.html',
-                'app_name': '{}'.format(APP_NAME),
-                'title': 'Graph My Data',
-                'class': 'monitor',
+                'url': '/' + SITE_NAME + '/' + 'chartIndex',
+                'app_name': '{}'.format(SITE_NAME),
+                'title': 'Map My Data',
+                'icon': 'map-marked-alt',
             },
         ]
     },
@@ -155,71 +241,50 @@ ADMIN_SHORTCUTS = [
 ADMIN_SHORTCUTS_SETTINGS = {
     'hide_app_list': False,
     'open_new_window': False,
+    'show_on_all_pages': True,
 }
+""" END ADMIN SHORTCUTS CONFIGURATION """
 
-# https://github.com/crucialfelix/django-ajax-selects
-AJAX_LOOKUP_CHANNELS = dict(
-    cv_variable_name=('{}.lookups'.format(APP_NAME), 'CvVariableNameLookup'),
-    cv_variable_type=('{}.lookups'.format(APP_NAME), 'CvVariableTypeLookup'),
-    cv_unit_type=('{}.lookups'.format(APP_NAME), 'CvUnitTypeLookup'),
-    cv_speciation=('{}.lookups'.format(APP_NAME), 'CvVariableSpeciationLookup'),
-    featureaction_lookup=('{}.lookups'.format(APP_NAME), 'FeatureactionsLookup'),
-    result_lookup=('{}.lookups'.format(APP_NAME), 'ResultsLookup'),
-    profileresult_lookup=('{}.lookups'.format(APP_NAME), 'ProfileResultsLookup'),
-    measurementresult_lookup=('{}.lookups'.format(APP_NAME), 'MeasurementResultsLookup'),
-    timeseriesresult_lookup=('{}.lookups'.format(APP_NAME), 'TimeseriesResultsLookup'),
-    cv_taxonomic_classifier_type=('{}.lookups'.format(APP_NAME), 'CvTaxonomicClassifierTypeLookup'),
-    cv_method_type=('{}.lookups'.format(APP_NAME), 'CvMethodTypeLookup'),
-    cv_action_type=('{}.lookups'.format(APP_NAME), 'CvActionTypeLookup'),
-    cv_sampling_feature_type=('{}.lookups'.format(APP_NAME), 'CvSamplingFeatureTypeLookup'),
-    cv_sampling_feature_geo_type=('{}.lookups'.format(APP_NAME), 'CvSamplingFeatureGeoTypeLookup'),
-    cv_elevation_datum=('{}.lookups'.format(APP_NAME), 'CvElevationDatumLookup'))
 
-MIDDLEWARE_CLASSES = (
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    # 'django.contrib.auth.middleware.SessionAuthenticationMiddleware', didn't work in production
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'admin_reorder.middleware.ModelAdminReorder',
-)
 
-ROOT_URLCONF = 'templatesAndSettings.urls'
+""" SAMPLING FEATURE TYPE LEGEND MAPPING """
+LEGEND_MAP = {
+        'Excavation': dict(feature_type="Excavation", icon="fa-spoon", color="darkred",
+                           style_class="awesome-marker-icon-darkred"),
+        'Field area': dict(feature_type="Field area", icon="fa-map-o", color="darkblue",
+                           style_class="awesome-marker-icon-darkblue"),
+        'Weather station': dict(feature_type="Weather station", icon="fa-cloud", color="darkblue",
+                                style_class="awesome-marker-icon-darkblue"),
+        'Ecological land classification': dict(feature_type="Ecological land classification",
+                                               icon="fa-bar-chart", color="darkpurple",
+                                               style_class="awesome-marker-icon-darkpurple"),
+        'Observation well': dict(feature_type="Observation well", icon="fa-eye", color="orange",
+                                 style_class="awesome-marker-icon-orange"),
+        'Site': dict(feature_type="Site", icon="fa-dot-circle-o", color="green",
+                     style_class="awesome-marker-icon-green"),
+        'Stream gage': dict(feature_type="Stream gage", icon="fa-tint", color="blue",
+                            style_class="awesome-marker-icon-blue"),
+        'Transect': dict(feature_type="Transect", icon="fa-area-chart", color="cadetblue",
+                         style_class="awesome-marker-icon-cadetblue"),
+        'Profile': dict(feature_type="Profile", icon="fa-database", color="purple",
+             style_class="awesome-marker-icon-purple"),
+        'Specimen': dict(feature_type="Specimen", icon="fa-flask", color="cadetblue",
+                         style_class="awesome-marker-icon-cadetblue")
+    }
+""" END SAMPLING FEATURE TYPE LEGEND MAPPING """
 
-WSGI_APPLICATION = 'templatesAndSettings.wsgi.application'
-
-# Database
-# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'odm2sample',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-        'OPTIONS': {
-            'options': '-c search_path=admin,odm2,odm2extra'
-        }
+""" REDIS CACHING CONFIGURATION """
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "odm2admin"
     }
 }
-# Internationalization
-# https://docs.djangoproject.com/en/1.9/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.9/howto/static-files/
-
-STATIC_URL = '/static/'
-# SOCIAL_AUTH_POSTGRES_JSONFIELD = True
+# Cache time to live is 15 minutes.
+CACHE_TTL = 60 * 15
+""" END REDIS CACHING CONFIGURATION"""

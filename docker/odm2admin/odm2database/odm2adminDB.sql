@@ -26,10 +26,9 @@ CREATE EXTENSION if not exists fuzzystrmatch;
 CREATE EXTENSION if not exists postgis_tiger_geoCoder;
 
 DROP SCHEMA IF EXISTS odm2 CASCADE;
-DROP SCHEMA IF EXISTS admin CASCADE;
 DROP SCHEMA IF EXISTS odm2extra CASCADE;
 
-CREATE SCHEMA admin;
+CREATE SCHEMA if not exists admin;
 
 CREATE SCHEMA odm2;
 
