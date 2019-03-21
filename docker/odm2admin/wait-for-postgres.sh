@@ -2,36 +2,24 @@
 # wait-for-postgres.sh
 
 set -e
-
-host="$1"
-shift
 cmd="$@"
 
-until psql -h "$host" -U "postgres" -c '\l'; do
-  >&2 echo "Postgres is unavailable - sleeping"
+until PGPASSWORD=$POSTGRES_PASSWORD psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -c '\l'; do
+  echo >&2 "$(date +%Y-%m-%dT%H-%M-%S) Postgres is unavailable - sleeping"
   sleep 1
 done
 
-
-
-# sql to check whether given database exist
-sql1="select count(1) from pg_catalog.pg_database where datname = 'odm2'"
-
-# depending on how PATH is set psql may require a fully qualified path
-cmd="psql -h \"$host\" -U \"postgres\" -t -c \"$sql1\""
-
-db_exists=`eval $cmd`
-
-if [ $db_exists -eq 0 ] ; then
-   # create the database, discard the output
-   >&2 echo " create odm2 db 1 time "
-   psql -v ON_ERROR_STOP=1 --host "$host" --username "postgres" -c "CREATE DATABASE odm2;"
-   eval $cmd
-fi
+until psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -c "SELECT 1 AS result FROM pg_database
+WHERE datname='$POSTGRES_NAME'" | grep -qw 1 ; do
+  echo >&2 "$(date +%Y-%m-%dT%H-%M-%S) $POSTGRES_NAME is unavailable"
+  psql -v ON_ERROR_STOP=1 --host "$POSTGRES_HOST" --username "$POSTGRES_USER" -c "CREATE DATABASE $POSTGRES_NAME;"
+  sleep 1
+done
+echo >&2 "$(date +%Y-%m-%dT%H-%M-%S) $POSTGRES_NAME has been created"
 
 
 # psql -v ON_ERROR_STOP=1 --host "$host" --username "postgres" -c "CREATE DATABASE odm2;"
-psql -v ON_ERROR_STOP=1 --host "$host" --username "postgres" --dbname "odm2" --file /odm2adminDB.sql
+psql -v ON_ERROR_STOP=1 --host "$POSTGRES_HOST" --username "$POSTGRES_USER" --dbname "$POSTGRES_NAME" --file /odm2adminDB.sql
 
 >&2 echo "Postgres is up - executing command"
 exec $cmd

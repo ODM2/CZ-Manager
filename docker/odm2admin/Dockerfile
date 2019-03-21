@@ -29,13 +29,13 @@ VOLUME templatesAndSettings/settings/
 
 RUN conda create --yes -n odm2adminenv -c conda-forge python=3.6 libgdal boost pytz gdal --file requirements.txt
 
-COPY odm2database/odm2adminDB.sql /odm2adminDB.sql
-COPY odm2database/cvload.py /cvload.py
+COPY docker/odm2admin/odm2database/odm2adminDB.sql /odm2adminDB.sql
+COPY docker/odm2admin/odm2database/cvload.py /cvload.py
 
-COPY wait-for-postgres.sh /wait-for-postgres.sh
-COPY startup.sh /startup.sh
+COPY docker/odm2admin/wait-for-postgres.sh /wait-for-postgres.sh
+COPY docker/odm2admin/startup.sh /startup.sh
 
 RUN chmod 755 /wait-for-postgres.sh
 RUN chmod 755 /startup.sh
 
-CMD ["/bin/bash", "/wait-for-postgres.sh", "db", "/startup.sh"]
+CMD ["/bin/bash", "/wait-for-postgres.sh", "/startup.sh"]
