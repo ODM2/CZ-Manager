@@ -21,7 +21,7 @@ django-redis
 django-fixture-magic
 hs_restclient
 social-auth-app-django
-# djutils
+djutils
 # uwsgi
 celery
 # django_celery_beat
