@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Data Logger Files &#8212; ODM2-Admin 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="ODM2 Admin Managing Profile Results" href="ProfileResults.html" />
+    <link rel="prev" title="ODM2 Admin Site Management" href="ODM2AdminSiteManagement.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=ODM2&repo=ODM2-Admin&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+    
+
+<p>
+<a class="badge" href="https://travis-ci.org/ODM2/ODM2-Admin">
+    <img
+        alt="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
+        src="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
+    />
+</a>
+</p>
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="InstallODM2AdminWithDocker.html">ODM2 Admin Docker Image Creation</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ODM2Adminbackground.html">Motivation for ODM2 Admin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GettingStartedInODM2Admin.html">Getting Started With ODM2 Admin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ODM2AdminSettings.html">configuring ODM2 Admin Settings</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ODM2AdminDemo.html">ODM2 Admin Walkthrough</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="ODM2AdminDemo.html">ODM2 Admin Walkthrough</a><ul>
+      <li>Previous: <a href="ODM2AdminSiteManagement.html" title="previous chapter">ODM2 Admin Site Management</a></li>
+      <li>Next: <a href="ProfileResults.html" title="next chapter">ODM2 Admin Managing Profile Results</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="data-logger-files">
+<span id="dataloggerfiles"></span><h1>Data Logger Files<a class="headerlink" href="#data-logger-files" title="Permalink to this headline">¶</a></h1>
+<p>Ingesting data by uploading and processing data logger files is a key feature of ODM2 Admin. While logged into the
+ODM2 Sandbox you can navigate to <a class="reference external" href="http://odm2admin.cuahsi.org/Sandbox/odm2admin/dataloggerfiles/">http://odm2admin.cuahsi.org/Sandbox/odm2admin/dataloggerfiles/</a></p>
+<img alt="_images/DataLoggerFiles.png" src="_images/DataLoggerFiles.png" />
+<ol class="arabic">
+<li><p>Select the first data logger file ending in QP_DO
+<a class="reference external" href="http://odm2admin.cuahsi.org/Sandbox/odm2admin/dataloggerfiles/133/change/">http://odm2admin.cuahsi.org/Sandbox/odm2admin/dataloggerfiles/133/change/</a></p></li>
+<li><p>Download and open the file, we can see that the file has 3 columns, Date Time GMT-04:00, DO Conc, and Temp
+the data logger file model correspondingly also has 3 data logger file columns.</p></li>
+<li><p>Click SHOW on the first data logger file column, this data logger file column has a data result, an insturment output
+variable and a Column label. The column label must match a column label in the file for the data logger file to be
+ingested.
+The data logger file column also has a recording interval and a recording interval units as well as an aggregation
+statistic.</p></li>
+<li><p>The Data result contains much of the information about how our time series is configured. Go to the data results page
+(<a class="reference external" href="http://odm2admin.cuahsi.org/Sandbox/odm2admin/results/">http://odm2admin.cuahsi.org/Sandbox/odm2admin/results/</a>) to find our result. If we search for Prieta, the name
+of the site, we will find our data result as in the below image.</p>
+<img alt="_images/DataResultListPage.png" src="_images/DataResultListPage.png" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</li>
+<li><p>Now select the data result, with the variable DO Concentration and ID 21
+(<a class="reference external" href="http://odm2admin.cuahsi.org/Sandbox/odm2admin/results/21/change/">http://odm2admin.cuahsi.org/Sandbox/odm2admin/results/21/change/</a>).</p></li>
+<li><p>We can see that here the sampling feature / location action is defined, the Result type (time series coverage),
+The variable, units, processing level, as well as other fields many of them optional. We also see Time Series
+Results, Measurement Results and Profile Results.
+Because this data result defines a time series it needs to have an associated time series result.</p>
+<img alt="_images/DataResultChangeView.png" src="_images/DataResultChangeView.png" />
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+</li>
+<li><p>We can click the + icon to add a variable, unit processing level or other field, we can click the pencil icon to edit
+the current item.</p></li>
+</ol>
+<div class="section" id="the-sensor-dashboard">
+<h2>The Sensor dashboard:<a class="headerlink" href="#the-sensor-dashboard" title="Permalink to this headline">¶</a></h2>
+<p>We have a dashboard view of sensors which can also be configured in the settings files.</p>
+<p>Here is an example dashboard for <a class="reference external" href="https://earth.boisestate.edu/drycreek/">DryCreek Experimental Watershed</a>.</p>
+<p><a class="reference external" href="http://odm2admin.cuahsi.org/DryCreek/sensordashboard/featureaction=20/">http://odm2admin.cuahsi.org/DryCreek/sensordashboard/featureaction=20/</a></p>
+<p><a class="reference internal" href="ProfileResults.html#profileresults"><span class="std std-ref">3) Managing Profile Results With ODM2 Admin</span></a></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="index.html#odm2-admin"><span class="std std-ref">ODM2 Admin docs home page</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search the docs</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2017, Miguel Leon.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/DataLoggerFiles.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+    <a href="https://github.com/ODM2/ODM2-Admin" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>

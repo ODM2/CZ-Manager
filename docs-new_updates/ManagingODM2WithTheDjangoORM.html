@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>The Django ORM and WOFpy &#8212; ODM2-Admin 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Data Visualization and URL parameters" href="DataVisualizationTips.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=ODM2&repo=ODM2-Admin&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+    
+
+<p>
+<a class="badge" href="https://travis-ci.org/ODM2/ODM2-Admin">
+    <img
+        alt="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
+        src="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
+    />
+</a>
+</p>
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="InstallODM2AdminWithDocker.html">ODM2 Admin Docker Image Creation</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ODM2Adminbackground.html">Motivation for ODM2 Admin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GettingStartedInODM2Admin.html">Getting Started With ODM2 Admin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ODM2AdminSettings.html">configuring ODM2 Admin Settings</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ODM2AdminDemo.html">ODM2 Admin Walkthrough</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="ODM2AdminDemo.html">ODM2 Admin Walkthrough</a><ul>
+      <li>Previous: <a href="DataVisualizationTips.html" title="previous chapter">Data Visualization and URL parameters</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="the-django-orm-and-wofpy">
+<span id="managing-odm2-with-the-django-orm"></span><h1>The Django ORM and WOFpy<a class="headerlink" href="#the-django-orm-and-wofpy" title="Permalink to this headline">¶</a></h1>
+<p>While not all of the ODM2 entities are exposed through the ODM2 Admin interface they can all be managed using Python
+scripts using either ODM2PythonAPI or the Django ORM using the models in ODM2 Admin. Two examples using the Django ORM</p>
+<blockquote>
+<div><p>are included with the source code of ODM2 Admin.</p>
+</div></blockquote>
+<p>The ODM2PythonAPI can be found here: <a class="reference external" href="https://github.com/ODM2/ODM2PythonAPI">https://github.com/ODM2/ODM2PythonAPI</a></p>
+<p>An example of merging data from a csv file to  fill a gap in a time series can be found here:
+<a class="reference external" href="https://github.com/ODM2/ODM2-Admin/blob/master/example_scripts/SonadoraNitrateFill.py">https://github.com/ODM2/ODM2-Admin/blob/master/example_scripts/SonadoraNitrateFill.py</a></p>
+<p>An example creating soil profile result values from a file can be found here:
+<a class="reference external" href="https://github.com/ODM2/ODM2-Admin/tree/master/soilsIngestionExample">https://github.com/ODM2/ODM2-Admin/tree/master/soilsIngestionExample</a></p>
+<div class="section" id="wofpy">
+<h2>WOFpy<a class="headerlink" href="#wofpy" title="Permalink to this headline">¶</a></h2>
+<p>ODM2 Admin can also be used with WOFpy and water one flow webservices can be registered with CUAHSI HIS central.</p>
+<p>WOFpy REST API test page for the Luquillo CZO:
+<a class="reference external" href="http://odm2admin.cuahsi.org/odm2lczo/odm2lczo/rest_1_1/">http://odm2admin.cuahsi.org/odm2lczo/odm2lczo/rest_1_1/</a></p>
+<p>This is still in testing an initial implementation has been registered with the HIS central QA system:</p>
+<p><a class="reference external" href="http://qa-hiscentral.cuahsi.org/testpage.aspx?n=100002">http://qa-hiscentral.cuahsi.org/testpage.aspx?n=100002</a></p>
+<p>QA HIS client:</p>
+<p><a class="reference external" href="http://qa-hiswebclient.azurewebsites.net/">http://qa-hiswebclient.azurewebsites.net/</a></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="index.html#odm2-admin"><span class="std std-ref">ODM2 Admin docs home page</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search the docs</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2017, Miguel Leon.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/ManagingODM2WithTheDjangoORM.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+    <a href="https://github.com/ODM2/ODM2-Admin" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>
