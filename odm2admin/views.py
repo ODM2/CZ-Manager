@@ -51,6 +51,7 @@ from django.template.response import TemplateResponse
 from django.core.exceptions import ObjectDoesNotExist
 # from hs_restclient_helper import get_oauth_hs
 from django.core import management
+from django.contrib import messages
 # from oauth2_provider.views.generic import ProtectedResourceView
 from django.http import HttpResponse
 from django.forms.models import model_to_dict
@@ -1895,24 +1896,66 @@ def procDataLoggerFile(request):
     ftpfile = dlf.dataloggerfiledescription
     ftpparse = urlparse(ftpfile)
     response = None
+    localbasedir = settings.TEMPLATE_DIR
+    # scriptsdir = os.path.join(localbasedir, 'templatesAndSettings/scripts/process_dataloggerfile.sh')
+    sysout = sys.stdout
+    commandstring = ''
     try:
-        if not pdlf.processingCode == 'locked' and not pdlf.processingCode=='done':
+        if not pdlf.processingCode == 'locked' and not pdlf.processingCode=='done' \
+                and not pdlf.processingCode=='ftp setup complete':
             #  pdlf.processingCode = 'locked'
             #  pdlf.save()
             if len(ftpparse.netloc) > 0:
-                ftpfrequencyhours = 24  # re.findall(r'^\D*(\d+)', self.processingCode)[0]
-                management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
-                                        , str(databeginson), str(columnheaderson),
-                                        str(ftpfrequencyhours), False)
+
+                scriptsdir = os.path.join(localbasedir, 'templatesAndSettings/scripts/process_dataloggerfileftp.sh')
+                sys.stdout = open(scriptsdir, 'w')
+                commandstring += settings.PYTHON_EXEC + ' '  # sys.executable
+                commandstring += localbasedir + '/managecli.py'
+                sysout = sys.stdout
+                sys.stdout = open(scriptsdir, 'w')
+                ftpfrequencyhours = 1  # re.findall(r'^\D*(\d+)', self.processingCode)[0]
+                try:
+                    ftpfrequencyhours = int(pdlf.processingCode)
+                except ValueError:
+                    pass
+
+                # management.call_command('update_preprocess_process_datalogger_file', linkname, str(fileid)
+                #                         , str(databeginson), str(columnheaderson),
+                #                         str(ftpfrequencyhours), False)
+                commandstring += " update_datalogger_file '" + str(linkname) + \
+                                 "' '" + str(fileid) + "' '" + str(databeginson) + "' '" + str(columnheaderson) +\
+                                 "' '" + str(ftpfrequencyhours) +  "' '" + str(False) + "' " +  " '" + str(True) + "' "
+                commandstring += " >> " + localbasedir + "/templatesAndSettings/logging/processdlfftp.log \n"
+                print(commandstring)
+                sys.stdout = sysout
+                response = HttpResponse(json.dumps(response_data), content_type='application/json')
+                #time.sleep(5)
+                # pdlf.processingCode = 'ftp setup complete'
+                # pdlf.save()
             else:
+                scriptsdir = os.path.join(localbasedir, 'templatesAndSettings/scripts/process_dataloggerfile.sh')
+                sysout = sys.stdout
+                sys.stdout = open(scriptsdir, 'w')
+                commandstring += settings.PYTHON_EXEC + ' '  # sys.executable
+                commandstring += localbasedir + '/managecli.py'
                 # print('processdataloggerfile')
                 # result = tasks.pdataloggerfile.apply_async((linkname,fileid,databeginson,columnheaderson,check_dates,False))
-                management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
-                                        , str(databeginson), str(columnheaderson),
-                                        check_dates, False, False)
+                # management.call_command('ProcessDataLoggerFile', linkname ,str(fileid)
+                #                         , str(databeginson), str(columnheaderson),
+                #                         check_dates, False, False)
+                useremail = request.user.email
+                commandstring += " ProcessDataLoggerFile '" + str(linkname) + \
+                                 "' '" + str(fileid) + "' '" + str(databeginson) + "' '" + str(columnheaderson) +\
+                                 "' '" + str(check_dates) +  "' '" + str(True) +\
+                                 "' '" + str(False) + "' '" + useremail + "' \n"
+                commandstring += " > " + localbasedir + "/templatesAndSettings/logging/processdlf.log \n"
+                print(commandstring)
+                sys.stdout = sysout
                 # print(result)
-                pdlf.processingCode = 'done'
-                pdlf.save()
+                # pdlf.processingCode = 'done'
+                # pdlf.save()
+                # messages.info(request, 'Your data logger file is being processed. It may take some time for the data to load. ' + \
+                #               'You will receive an email when the job is complete')
                 response = HttpResponse(json.dumps(response_data), content_type='application/json')
     except CommandError as e:
         response_data['error_message'] = str(e) #e.with_traceback()
@@ -1924,126 +1967,35 @@ def procDataLoggerFile(request):
     return response
 
 def addL1timeseries(request):
+    localbasedir = settings.TEMPLATE_DIR
+    scriptsdir = os.path.join(localbasedir, 'templatesAndSettings/scripts/create_L1.sh')
+    sysout = sys.stdout
+    sys.stdout = open(scriptsdir, 'w')
     resultid = None
     response_data = {}
+    email = ''
     createorupdateL1 = None
     pl1 = Processinglevels.objects.get(processinglevelid=2)
     pl0 = Processinglevels.objects.get(processinglevelid=1)
-    valuesadded = 0
+    valuesadded = 'job submitted'
     tsresultTocopyBulk = []
     if 'createorupdateL1' in request.POST:
         createorupdateL1 = str(request.POST['createorupdateL1'])
+    if 'email' in request.POST:
+        email = str(request.POST['email'])
     if 'resultidu[]' in request.POST:
         resultid = request.POST.getlist('resultidu[]')
         for result in resultid:
-            if createorupdateL1 == "create":
-        #print('create')
-                resultTocopy = Results.objects.get(resultid=result)
-                tsresultTocopy = Timeseriesresults.objects.get(resultid=result)
-                resultTocopy.resultid = None
-                resultTocopy.processing_level = pl1
-                resultTocopy.save()
-                tsrvToCopy = Timeseriesresultvalues.objects.filter(resultid=tsresultTocopy)
-                tsresultTocopy.resultid = resultTocopy
-                tsresultTocopy.save()
-                newresult = tsresultTocopy.resultid
-                # tsrvToCopy.update(resultid=tsresultTocopy)
-                for tsrv in tsrvToCopy:
-                    tsrv.resultid = tsresultTocopy
-                    try:
-                        tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
-                        tsrv.valueid = None
-                        tsrv.save()
-                        tsrva.valueid = tsrv
-                        # print(tsrv.valueid)
-                        tsrva.save()
-                    except ObjectDoesNotExist:
-                        tsrv.valueid = None
-                        tsresultTocopyBulk.append(tsrv)
-                newtsrv = Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
-
-            elif createorupdateL1 == "update":
-                print('update')
-                tsresultL1 = Timeseriesresults.objects.get(resultid=result)
-                resultL1 = Results.objects.get(resultid=result)
-                # tsrvL1 = Timeseriesresultvalues.objects.filter(resultid=tsresultL1)
-                tsrvAddToL1Bulk = []
-                relatedL0result = Results.objects.filter(
-                        featureactionid = resultL1.featureactionid).filter(
-                        variableid = resultL1.variableid
-                    ).filter(unitsid = resultL1.unitsid).filter(
-                    processing_level=pl0)
-
-                # newresult = relatedL0result.resultid
-                relateL0tsresults = Timeseriesresults.objects.filter(resultid__in= relatedL0result)
-                relateL0tsresult = None
-                for L0result in relateL0tsresults:
-                    if L0result.intendedtimespacing == tsresultL1.intendedtimespacing and L0result.intendedtimespacingunitsid == tsresultL1.intendedtimespacingunitsid:
-                        relateL0tsresult =L0result
-                tsrvL0 = Timeseriesresultvalues.objects.filter(resultid=relateL0tsresult)
-                # print(relateL0tsresult)
-                # maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
-                #        Max('valuedatetime')). \
-                #        order_by('-valuedatetime')
-                # print(relateL1tsresult)
-                # for r in maxtsrvL1:
-                #     print(r)
-                print('L1 result')
-                print(tsresultL1)
-
-                maxtsrvL0=Timeseriesresultvalues.objects.filter(resultid=relateL0tsresult).annotate(
-                        Max('valuedatetime')). \
-                        order_by('-valuedatetime')[0].valuedatetime
-                maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=tsresultL1).annotate(
-                        Max('valuedatetime')). \
-                        order_by('-valuedatetime')[0].valuedatetime
-                mintsrvL0=Timeseriesresultvalues.objects.filter(resultid=relateL0tsresult).annotate(
-                        Min('valuedatetime')). \
-                        order_by('valuedatetime')[0].valuedatetime
-                mintsrvL1=Timeseriesresultvalues.objects.filter(resultid=tsresultL1).annotate(
-                        Min('valuedatetime')). \
-                        order_by('valuedatetime')[0].valuedatetime
-                # print('max L0')
-                # print(maxtsrvL0)
-                # print('max L1')
-                # print(maxtsrvL1)
-                if maxtsrvL1 < maxtsrvL0:
-                    tsrvAddToL1 = tsrvL0.filter(valuedatetime__gt=maxtsrvL1)
-                    for tsrv in tsrvAddToL1:
-                        tsrv.resultid = tsresultL1
-                        try:
-                            tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
-                            tsrv.valueid = None
-                            tsrv.save()
-                            tsrva.valueid = tsrv
-                            # print(tsrv.valueid)
-                            tsrva.save()
-                        except ObjectDoesNotExist:
-                            # print('doesnt exist')
-                            tsrv.valueid = None
-                            tsresultTocopyBulk.append(tsrv)
-                if mintsrvL1 > mintsrvL0:
-                    tsrvAddToL1 = tsrvL0.filter(valuedatetime__lt=mintsrvL1)
-                    for tsrv in tsrvAddToL1:
-                        print(tsresultL1)
-                        tsrv.resultid = tsresultL1
-                        try:
-                            tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
-                            tsrv.valueid = None
-                            tsrv.save()
-                            tsrva.valueid = tsrv
-                            # print(tsrv.valueid)
-                            tsrva.save()
-                        except ObjectDoesNotExist:
-                            tsrv.valueid = None
-                            tsresultTocopyBulk.append(tsrv)
-                newtsrv = Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
-            valuesadded = newtsrv.__len__()
-            print(valuesadded)
-            # for tsrv in newtsrv:
-            #     print(tsrv.resultid.resultid)
-            #     print(tsrv)
             response_data['valuesadded'] = valuesadded
+            commandstring = '#!/usr/bin/env bash \n'
+
+            commandstring += settings.PYTHON_EXEC + ' '  # sys.executable
+            commandstring += localbasedir + '/managecli.py'
+            commandstring += " create_l1_timeseries '" + str(createorupdateL1) +\
+                             "' '" + str(result) + "' '" + str(email) + "' "
+            commandstring += " > " + localbasedir + "/templatesAndSettings/logging/L1_creation.log \n"
+            print(commandstring)
+            sys.stdout = sysout
             # response_data['newresultid'] = newresult
             # print(result)
     return HttpResponse(json.dumps(response_data),content_type='application/json')
@@ -3333,7 +3285,7 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
     # if the user hit the export csv button export the measurement results to csv
 
 
-    myfile = StringIO.StringIO()
+    myfile = StringIO()
      # raise ValidationError(resultValues)
     k = 0
     variablesAndUnits = []
@@ -3715,8 +3667,11 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
 
     datasetcitationlinks = {}
     for citation in citations:
-        extprop = Citationextensionpropertyvalues.objects.filter(citationid=citation).get(propertyid=linkExtProperty)
+        print(citation)
+        print(linkExtProperty)
         try:
+            extprop = Citationextensionpropertyvalues.objects.filter(citationid=citation).get(
+                propertyid=linkExtProperty)
             datasetcitationlinks[citation.title] = extprop.propertyvalue
         except ObjectDoesNotExist:
             datasetcitationlinks[citation.title] = ''
