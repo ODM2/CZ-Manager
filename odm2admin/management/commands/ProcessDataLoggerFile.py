@@ -68,10 +68,13 @@ def getEndDate(results):
     #EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
     #enddate = Resultextensionpropertyvalues.objects.filter(resultid=results.resultid).filter(
     #    propertyid=EndDateProperty).get()
-    enddate = Timeseriesresultvalues.objects.filter(resultid=results.resultid.resultid).annotate(
-        Max('valuedatetime')). \
-        order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M:%S.%f')
-
+    enddate = None
+    try:
+        enddate = Timeseriesresultvalues.objects.filter(resultid=results.resultid.resultid).annotate(
+            Max('valuedatetime')). \
+            order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M:%S.%f')
+    except IndexError:
+        return None
     return enddate
 
 
@@ -116,13 +119,19 @@ class Command(BaseCommand):
                                                ' file locking does not occur allowing for repeated execution' +
                                                 ' in a cron job or other automation')
         parser.add_argument('reversed', nargs=1, type=str, default=False)
-
+        parser.add_argument('emailaddress', nargs='?', type=str, default='')
 
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
         # cmdline = bool(options['cmdline'][0])
         filename = str(options['dataloggerfilelink'][0])
         file = str(settings.MEDIA_ROOT) + filename  # args[0].name
         fileid = int(options['dataloggerfileid'][0])
+        try:
+            print('email address')
+            emailaddress = str(options['emailaddress'])
+            print(emailaddress)
+        except IndexError:
+            emailaddress = ''
         fileid = Dataloggerfiles.objects.filter(dataloggerfileid=fileid).get()
         check_dates = False
         reversed = False
@@ -139,6 +148,7 @@ class Command(BaseCommand):
         rowColumnMap = list()
         bulktimeseriesvalues = []
         bulkcount = 0
+        valuesadded =0
         upper_bound_quality_type = CvDataqualitytype.objects.get(name='Physical limit upper bound')
         lower_bound_quality_type = CvDataqualitytype.objects.get(name='Physical limit lower bound')
         result_lower_bound = None
@@ -149,6 +159,7 @@ class Command(BaseCommand):
         exceldatetime = False
         emailtext = ""
         dateTimeColNum = 0
+
         pdlf = ProcessDataloggerfile.objects.get(dataloggerfileid=fileid)
         if not pdlf.processingCode == 'done' and not pdlf.processingCode=='locked':
             if not cmdline:
@@ -160,6 +171,7 @@ class Command(BaseCommand):
                 tolist.append(admin['email'])
             try:
                 with io.open(file, 'rt', encoding='ascii') as f:
+                    print('begin processing ' + str(pdlf))
                     # reader = csv.reader(f)
                     columnsinCSV = None
                     reader, reader2 = itertools.tee(csv.reader(f))
@@ -217,6 +229,8 @@ class Command(BaseCommand):
                         elif i >= databeginson:
                             rawdt = row[dateTimeColNum].strip()
                             # assume date is first column for the moment
+                            dateT = None
+                            datestr = ''
                             try:
                                 dateT = time.strptime(rawdt, "%m/%d/%Y %H:%M")  # '1/1/2013 0:10
                                 datestr = time.strftime("%Y-%m-%d %H:%M:%S", dateT)
@@ -265,6 +279,11 @@ class Command(BaseCommand):
                             # mrs = Results.objects.filter(
                             #         resultid__in=DataloggerfilecolumnSet.values("resultid"))
                             #     mrvs = Timeseriesresultvalues.objects.filter(resultid__in=mrs)
+                            for dlfc in rowColumnMap:
+                                if len(row) < dlfc.columnnum:
+                                    print('bad row ' +str(row))
+                                    continue
+
                             for colnum in rowColumnMap:
                                 if stop_reading_reversed:
                                     break
@@ -317,7 +336,19 @@ class Command(BaseCommand):
                                             'each column. Both results and time series ' +
                                             'results are needed.')
                                     # only one measurement result is allowed per result
-                                    value = row[colnum.columnnum]
+                                    # print('error')
+                                    # print(str(row))
+                                    # print(str(colnum.columnlabel))
+                                    # print(str(colnum.columnnum))
+                                    try:
+                                        value = row[colnum.columnnum]
+                                    except IndexError:
+                                        continue
+                                    if value == '':
+                                        # print("error")
+                                        # skip blank value
+                                        continue
+
                                     # print("value to save")
                                     # print(value)
                                     censorcode = CvCensorcode.objects.filter(name="Not censored").get()
@@ -332,9 +363,7 @@ class Command(BaseCommand):
                                         tsvrbulk = True
                                         # print(mresults)
                                         try:
-                                            if value == '':
-                                                # print("error")
-                                                raise IntegrityError
+
                                             if check_dates:
                                                 try:
                                                     enddatestr = getEndDate(mresults)
@@ -348,7 +377,7 @@ class Command(BaseCommand):
                                                         if reversed:
                                                             stop_reading_reversed = True
                                                         break
-                                                except ObjectDoesNotExist:
+                                                except (ObjectDoesNotExist, TypeError) as e:
                                                     pass
                                             try:
                                                 newdatavalue = float(row[colnum.columnnum])
@@ -357,6 +386,9 @@ class Command(BaseCommand):
                                                     newdatavalue = float('NaN')
                                                 else:
                                                     continue
+                                            if datestr == '':
+                                                print('bad date on row: ' +str(row))
+                                                raise IntegrityError
                                             qualitycode = qualitycodegood
                                             # print(newdatavalue)
                                             if dataqualitybool:
@@ -387,6 +419,7 @@ class Command(BaseCommand):
                                                         )
                                                         annotation.save()
                                                         tsvr.save()
+                                                        valuesadded +=1
                                                         tsvrbulk = False
                                                         tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                                  annotationid=annotation).save()
@@ -420,6 +453,7 @@ class Command(BaseCommand):
                                                         )
                                                         annotation.save()
                                                         tsvr.save()
+                                                        valuesadded += 1
                                                         tsvrbulk = False
                                                         tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                                  annotationid=annotation).save()
@@ -465,6 +499,7 @@ class Command(BaseCommand):
                                                             )
                                                             annotation.save()
                                                             tsvr.save()
+                                                            valuesadded += 1
                                                             tsvrbulk = False
                                                         tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
                                                                                                 annotationid=annotation).save()
@@ -511,6 +546,7 @@ class Command(BaseCommand):
                                                             )
                                                             annotation.save()
                                                             tsvr.save()
+                                                            valuesadded += 1
                                                             tsvrbulk = False
                                                         # print(tsvr)
                                                         tsrva = Timeseriesresultvalueannotations(valueid=tsvr,
@@ -546,11 +582,13 @@ class Command(BaseCommand):
                                                 if tsvrbulk:
                                                     bulktimeseriesvalues.append(tsvr)
                                                     bulkcount +=1
+                                                    valuesadded += 1
                                                 if bulkcount > 20000:
                                                     Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
                                                     del bulktimeseriesvalues[:]
+                                                    tsvr = None
                                                     bulkcount = 0
-                                                    # print("saved value")
+                                                    # print("saved value - bulk create")
                                             if tsvr is None and not tsvrbulk:
                                                 tsvr = Timeseriesresultvalues(
                                                     resultid=mresults,
@@ -565,6 +603,7 @@ class Command(BaseCommand):
                                                     .intendedtimespacingunitsid
                                                 )
                                                 tsvr.save()
+                                                valuesadded += 1
                                         except IntegrityError:
                                             pass
                                             # Timeseriesresultvalues.delete()
@@ -575,11 +614,13 @@ class Command(BaseCommand):
                             break
                         # Timeseriesresults.objects.raw("SELECT odm2.\
                         # "TimeseriesresultValsToResultsCountvalue\"()")
+                # print('last bulk create')
                 Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
-                bulktimeseriesvalues = None
+                del bulktimeseriesvalues[:]
 
             except IndexError:
-                raise ValidationError('encountered a problem with row ' + str(i) for i in row)
+                # raise ValidationError('encountered a problem with row ' + str(i) for i in row)
+                pass
             bulkpropertyvals = []
             for colnum in rowColumnMap:
                 results = Timeseriesresults.objects.filter(resultid=colnum.resultid)
@@ -598,9 +639,23 @@ class Command(BaseCommand):
                         # bulkpropertyvals.append(repvend)
             # will bulk create or update the property values
             # Resultextensionpropertyvalues.objects.bulk_create(bulkpropertyvals)
-            #print('email?')
+            # print('email?')
+            # pdlf.processingCode = 'done'
+            # pdlf.save()
             if sendemail:
                 email = EmailMessage(emailtitle, emailtext, settings.EMAIL_FROM_ADDRESS, tolist)
-                print('email')
-                print(emailtext)
+                # print('email')
+                # print(emailtext)
                 email.send()
+            emailtitle = 'ODM2 Admin - file processing complete for: ' + str(pdlf)
+            emailtext = 'ODM2 Admin - file processing complete for: ' + str(pdlf) + ' \n'
+            emailtext += 'total time series result values add: ' + str(valuesadded) + ' \n'
+            emailtext += 'These time series were updated: \n'
+            tolist.append(emailaddress)
+            for colnum in rowColumnMap:
+                results = Timeseriesresults.objects.filter(resultid=colnum.resultid)
+                for result in results:
+                    emailtext += str(result)
+            email2 = EmailMessage(emailtitle, emailtext, settings.EMAIL_FROM_ADDRESS, tolist)
+            email2.send()
+            # print('email sent')

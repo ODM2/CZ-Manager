@@ -50,23 +50,28 @@ class Command(BaseCommand):
 
         filename = dlf.dataloggerfilelinkname()
         fileid = dlf.dataloggerfileid
-        if setupcomplete == 'False':
-            try:
-                pdlf = ProcessDataloggerfile.objects.filter(dataloggerfileid=dlf.dataloggerfileid
-                                                            ).filter(processingCode__icontains='hours between download'
-                                                                     ).get()
-                raise ValidationError("This data logger file has already been setup for FTP.")
-            except ObjectDoesNotExist:
-                print('setup cron')
-                ftpfile = dlf.dataloggerfiledescription
-                management.call_command('update_datalogger_file', filename,str(fileid)
-                                        , str(databeginson), str(columnheaderson),str(ftpfrequencyhours),ftpfile,
-                                        True, False, True)
-        else:
-            filenameout = management.call_command('preprocess_datalogger_file', filename, str(fileid)
-                                    , str(databeginson), str(columnheaderson),
-                                    True)
-
-            management.call_command('ProcessDataLoggerFile', filenameout, str(fileid)
-                                    , str(databeginson), str(columnheaderson),
-                                    True, False, True)
+        # if setupcomplete == 'False':
+        #     try:
+        #         pdlf = ProcessDataloggerfile.objects.filter(dataloggerfileid=dlf.dataloggerfileid
+        #                                                     ).filter(processingCode__icontains='hours between download'
+        #                                                              ).get()
+        #         raise ValidationError("This data logger file has already been setup for FTP.")
+        #     except ObjectDoesNotExist:
+        #         print('setup cron')
+        #         ftpfile = dlf.dataloggerfiledescription
+        #         management.call_command('update_datalogger_file', filename,str(fileid)
+        #                                 , str(databeginson), str(columnheaderson),str(ftpfrequencyhours),
+        #                                 True, True)
+        # else:
+        filenameout = management.call_command('preprocess_datalogger_file', filename, str(fileid)
+                                , str(databeginson), str(columnheaderson),
+                                True)
+        print('done preprocessing')
+        print(filenameout)
+        management.call_command('ProcessDataLoggerFile', filenameout, str(fileid)
+                                , str(databeginson), str(columnheaderson),
+                                True, True, True, 'leonmi@sas.upenn.edu')
+        print('done processing')
+        pdlf = ProcessDataloggerfile.objects.get(dataloggerfileid=fileid)
+        pdlf.processingCode = 'ftp setup complete'
+        pdlf.save()

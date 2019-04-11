@@ -2,12 +2,31 @@
 Production settings and globals.
 """
 
-from base import *
+from .base import *
 
 """ DEBUG CONFIGURATION """
 # Disable debugging by default.
 DEBUG = False
 """ END DEBUG CONFIGURATION """
+
+""" EXTRA VARIABLES CONFIGURATION -"""
+EXPORTDB = False #  if set to true this will use Camel case table names for SQLite
+UTC_OFFSET = -4
+#Needed for Hydroshare integration
+PYTHON_EXEC='/bin/python'
+""" EXTRA VARIABLES CONFIGURATION """
+
+""" HYDROSHARE API CONFIGURATION """
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY ='xxx.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET ='xxx'
+SOCIAL_AUTH_HYDROSHARE_KEY ='xxx'
+SOCIAL_AUTH_HYDROSHARE_SECRET ='xxx'
+
+SOCIAL_AUTH_HYDROSHARE_UP_KEY = 'xxx'
+SOCIAL_AUTH_HYDROSHARE_UP_SECRET = 'xxx'
+
+""" END HYDROSHARE API CONFIGURATION """
 
 """ ALLOWED HOSTS CONFIGURATION """
 ALLOWED_HOSTS = ['127.0.0.1',]
