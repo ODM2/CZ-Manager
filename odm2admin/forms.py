@@ -2042,6 +2042,8 @@ class DataloggerfilecolumnsAdmin(ReadOnlyAdmin):
 
 
 class ProcessDataloggerfileAdminForm(ModelForm):
+    dataloggerfileid = AutoCompleteSelectField('dataloggerfile_lookup', required=True,
+                                       label='Data logger file',show_help_text =None)
     class Meta:
         model = ProcessDataloggerfile
         fields = '__all__'
@@ -2056,7 +2058,7 @@ class ProcessDataloggerfileAdmin(ReadOnlyAdmin):
     # For admin users
     form = ProcessDataloggerfileAdminForm
     inlines_list = list()
-
+    search_fields = [ 'dataloggerfileid__dataloggerfilename','dataloggerfileid__dataloggerfiledescription']
 
 # class MeasurementResultFilter(SimpleListFilter):
 #     title = ugettext_lazy('data values loaded')

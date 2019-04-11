@@ -1,5 +1,6 @@
 from ajax_select import register, LookupChannel
 
+from .models import Dataloggerfiles
 # ========= Import all Controlled Vocabulary Module =========#
 from .models import CvActiontype
 from .models import CvElevationdatum
@@ -137,6 +138,49 @@ class ProfileResultsLookup(LookupChannel):
 
     def get_objects(self, ids):
         obj = Profileresults.objects.filter(resultid__in=ids)
+        return obj
+
+@register('dataloggerfile_lookup')
+class DataloggerfileLookup(LookupChannel):
+    model = Results
+
+    def get_query(self, q, request):
+        qset = None
+        for part in q.split():
+            if not qset:
+                qset = Dataloggerfiles.objects.filter(
+                    Q(dataloggerfileid__icontains=part) |
+                    Q(dataloggerfilename__icontains=part) |
+                    Q(dataloggerfiledescription__icontains=part) |
+                    Q(dataloggerfilelink__icontains=part))
+
+            else:
+                qset = qset & Results.objects.filter(
+                    Q(dataloggerfileid__icontains=part) |
+                    Q(dataloggerfilename__icontains=part) |
+                    Q(dataloggerfiledescription__icontains=part) |
+                    Q(dataloggerfilelink__icontains=part))
+                # raise ValidationError(qset)
+        return qset
+
+    def get_result(self, obj):
+        return "%s- %s - %s - %s" % (
+            obj.dataloggerfileid, obj.dataloggerfilename, obj.dataloggerfiledescription,
+            obj.dataloggerfilelink)
+
+    def format_match(self, obj):
+        # return self.format_item_display(obj)
+        return "%s- %s - %s - %s" % (
+            obj.dataloggerfileid, obj.dataloggerfilename, obj.dataloggerfiledescription,
+            obj.dataloggerfilelink)
+
+    def format_item_display(self, obj):
+        return "%s- %s - %s - %s" % (
+            obj.dataloggerfileid, obj.dataloggerfilename, obj.dataloggerfiledescription,
+            obj.dataloggerfilelink)
+
+    def get_objects(self, ids):
+        obj = Dataloggerfiles.objects.filter(dataloggerfileid__in=ids)
         return obj
 
 @register('result_lookup')
