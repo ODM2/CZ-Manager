@@ -1827,7 +1827,7 @@ def preProcDataLoggerFile(request):
     # print('in view')
     # print(request.POST)
     if 'dataloggerfileid' in request.POST:
-        dataloggerfileid = int(request.POST['dataloggerfileid'])
+        dataloggerfileid = int(re.sub('[-]', '', request.POST['dataloggerfileid']))
         # print(dataloggerfileid)
     if 'processingCode' in request.POST:
         processingCode = request.POST['processingCode']
