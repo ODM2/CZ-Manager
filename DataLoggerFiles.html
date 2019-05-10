@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>Data Logger Files &#8212; ODM2-Admin 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -92,8 +90,6 @@
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
@@ -120,19 +116,16 @@
 ODM2 Sandbox you can navigate to <a class="reference external" href="http://odm2admin.cuahsi.org/Sandbox/odm2admin/dataloggerfiles/">http://odm2admin.cuahsi.org/Sandbox/odm2admin/dataloggerfiles/</a></p>
 <img alt="_images/DataLoggerFiles.png" src="_images/DataLoggerFiles.png" />
 <ol class="arabic">
-<li><p class="first">Select the first data logger file ending in QP_DO
-<a class="reference external" href="http://odm2admin.cuahsi.org/Sandbox/odm2admin/dataloggerfiles/133/change/">http://odm2admin.cuahsi.org/Sandbox/odm2admin/dataloggerfiles/133/change/</a></p>
-</li>
-<li><p class="first">Download and open the file, we can see that the file has 3 columns, Date Time GMT-04:00, DO Conc, and Temp
-the data logger file model correspondingly also has 3 data logger file columns.</p>
-</li>
-<li><p class="first">Click SHOW on the first data logger file column, this data logger file column has a data result, an insturment output
+<li><p>Select the first data logger file ending in QP_DO
+<a class="reference external" href="http://odm2admin.cuahsi.org/Sandbox/odm2admin/dataloggerfiles/133/change/">http://odm2admin.cuahsi.org/Sandbox/odm2admin/dataloggerfiles/133/change/</a></p></li>
+<li><p>Download and open the file, we can see that the file has 3 columns, Date Time GMT-04:00, DO Conc, and Temp
+the data logger file model correspondingly also has 3 data logger file columns.</p></li>
+<li><p>Click SHOW on the first data logger file column, this data logger file column has a data result, an insturment output
 variable and a Column label. The column label must match a column label in the file for the data logger file to be
 ingested.
 The data logger file column also has a recording interval and a recording interval units as well as an aggregation
-statistic.</p>
-</li>
-<li><p class="first">The Data result contains much of the information about how our time series is configured. Go to the data results page
+statistic.</p></li>
+<li><p>The Data result contains much of the information about how our time series is configured. Go to the data results page
 (<a class="reference external" href="http://odm2admin.cuahsi.org/Sandbox/odm2admin/results/">http://odm2admin.cuahsi.org/Sandbox/odm2admin/results/</a>) to find our result. If we search for Prieta, the name
 of the site, we will find our data result as in the below image.</p>
 <img alt="_images/DataResultListPage.png" src="_images/DataResultListPage.png" />
@@ -140,10 +133,9 @@ of the site, we will find our data result as in the below image.</p>
 <div class="line"><br /></div>
 </div>
 </li>
-<li><p class="first">Now select the data result, with the variable DO Concentration and ID 21
-(<a class="reference external" href="http://odm2admin.cuahsi.org/Sandbox/odm2admin/results/21/change/">http://odm2admin.cuahsi.org/Sandbox/odm2admin/results/21/change/</a>).</p>
-</li>
-<li><p class="first">We can see that here the sampling feature / location action is defined, the Result type (time series coverage),
+<li><p>Now select the data result, with the variable DO Concentration and ID 21
+(<a class="reference external" href="http://odm2admin.cuahsi.org/Sandbox/odm2admin/results/21/change/">http://odm2admin.cuahsi.org/Sandbox/odm2admin/results/21/change/</a>).</p></li>
+<li><p>We can see that here the sampling feature / location action is defined, the Result type (time series coverage),
 The variable, units, processing level, as well as other fields many of them optional. We also see Time Series
 Results, Measurement Results and Profile Results.
 Because this data result defines a time series it needs to have an associated time series result.</p>
@@ -152,9 +144,8 @@ Because this data result defines a time series it needs to have an associated ti
 <div class="line"><br /></div>
 </div>
 </li>
-<li><p class="first">We can click the + icon to add a variable, unit processing level or other field, we can click the pencil icon to edit
-the current item.</p>
-</li>
+<li><p>We can click the + icon to add a variable, unit processing level or other field, we can click the pencil icon to edit
+the current item.</p></li>
 </ol>
 <div class="section" id="the-sensor-dashboard">
 <h2>The Sensor dashboard:<a class="headerlink" href="#the-sensor-dashboard" title="Permalink to this headline">¶</a></h2>
@@ -163,8 +154,8 @@ the current item.</p>
 <p><a class="reference external" href="http://odm2admin.cuahsi.org/DryCreek/sensordashboard/featureaction=20/">http://odm2admin.cuahsi.org/DryCreek/sensordashboard/featureaction=20/</a></p>
 <p><a class="reference internal" href="ProfileResults.html#profileresults"><span class="std std-ref">3) Managing Profile Results With ODM2 Admin</span></a></p>
 <ul class="simple">
-<li><a class="reference internal" href="index.html#odm2-admin"><span class="std std-ref">ODM2 Admin docs home page</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search the docs</span></a></li>
+<li><p><a class="reference internal" href="index.html#odm2-admin"><span class="std std-ref">ODM2 Admin docs home page</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search the docs</span></a></p></li>
 </ul>
 </div>
 </div>
@@ -180,7 +171,7 @@ the current item.</p>
       &copy;2017, Miguel Leon.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
