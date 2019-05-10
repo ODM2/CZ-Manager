@@ -38,9 +38,9 @@ $(document).ready(function(){
                 'formData': formData,
                 'dataloggerfileid' : formData[1]['value'],
                 'check_dates': check_dates,
-                'processingCode': formData[2]['value'],
-                'databeginson': formData[3]['value'],
-                'columnheaderson': formData[4]['value'],
+                'processingCode': formData[3]['value'],
+                'databeginson': formData[4]['value'],
+                'columnheaderson': formData[5]['value'],
                 'csrfmiddlewaretoken': '{{ csrf_token }}',
             },
             success : function(json) {
@@ -93,16 +93,16 @@ $(document).ready(function(){
                 'formData': formData,
                 'dataloggerfileid' : formData[1]['value'],
                 'check_dates': check_dates,
-                'processingCode': formData[2]['value'],
-                'databeginson': formData[3]['value'],
-                'columnheaderson': formData[4]['value'],
+                'processingCode': formData[3]['value'],
+                'databeginson': formData[4]['value'],
+                'columnheaderson': formData[5]['value'],
                 'csrfmiddlewaretoken': '{{ csrf_token }}',
             },
             success : function(json) {
                 spinner.stop();
                 //console.log('success');
                 var savebutton = $("#process_logger_file_b"); //$("#email_data");
-                savebutton[0].value = "Data ingested";
+                savebutton[0].value = "Data processing you will receive an email on completion";
                // console.log(json);
                 //savebutton.defaultValue = json.dataloggerfileid + " Processed"; //json.dataloggerfileid
             },

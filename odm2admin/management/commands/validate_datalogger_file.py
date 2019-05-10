@@ -231,6 +231,8 @@ class Command(BaseCommand):
         alldate = []
         fields = ['datetime']
         dateTimeColNum = 0
+        sdODMF = None
+        edODMF = None
         try:
             with io.open(file, 'rt', encoding='ascii') as f:
                 with io.open(new_file, 'w', encoding='ascii') as outfile:
@@ -285,6 +287,7 @@ class Command(BaseCommand):
                                     # print('match Columns')
                                     # print(row[j])
                                     # print(dloggerfileColumn.columnlabel)
+                                    dloggerfileColumn.columnnum = -1
                                     if row[j].strip() == dloggerfileColumn.columnlabel \
                                             and dloggerfileColumn.columndescription !="skip":
                                         foundColumn = True
@@ -307,8 +310,9 @@ class Command(BaseCommand):
 
                         elif i >= databeginson:
                             rawdt = row[dateTimeColNum].strip()
-                            # print('print validation row')
-                            # print(row)
+                            print('print validation row')
+                            print(row)
+                            print(databeginson)
                             # assume date is first column for the moment
                             try:
                                 dateT = time.strptime(rawdt, "%m/%d/%Y %H:%M")  # '1/1/2013 0:10

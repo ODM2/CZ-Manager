@@ -15,7 +15,7 @@ import stat
 from contextlib import closing
 from django.core.management.base import BaseCommand
 from django.core.management import settings
-
+from django.db.models import Q
 from odm2admin.models import Dataloggerfiles
 from odm2admin.models import ProcessDataloggerfile
 
@@ -45,10 +45,10 @@ class Command(BaseCommand):
         parser.add_argument('databeginson', nargs=1, type=str)
         parser.add_argument('columnheaderson', nargs=1, type=str)
         parser.add_argument('ftpfrequencyhours', nargs=1, type=str)
-        parser.add_argument('ftpfile', nargs=1, type=bool)
+        # parser.add_argument('ftpfile', nargs=1, type=bool)
         parser.add_argument('check_dates', nargs=1, type=bool)
         parser.add_argument('cmdline', nargs=1, type=bool)
-        parser.add_argument('reversed', nargs=1, type=bool, default=False)
+        # parser.add_argument('reversed', nargs=1, type=bool, default=False)
 
     def handle(self, *args, **options):  # (f,fileid, databeginson,columnheaderson, cmd):
         cmdline = bool(options['cmdline'][0])
@@ -58,13 +58,13 @@ class Command(BaseCommand):
         columnheaderson = int(options['columnheaderson'][0])  # int(columnheaderson[0])
         check_dates = bool(options['check_dates'][0])
         ftpfrequencyhours = int(options['ftpfrequencyhours'][0])
-        reversed = bool(options['reversed'][0])
+        # reversed = bool(options['reversed'][0])
         print(ftpfrequencyhours)
         intfileid = fileid
         fileid = Dataloggerfiles.objects.filter(dataloggerfileid=fileid).get()
         ftpfile = fileid.dataloggerfiledescription
         ftpparse = urlparse(ftpfile)
-        pythonpath = settings.PYTHON_PATH
+        pythonpath = settings.PYTHON_EXEC
         apppath = settings.BASE_DIR
         # print(ftpparse.netloc)
         if len(ftpparse.netloc) > 0:
@@ -77,11 +77,16 @@ class Command(BaseCommand):
             #     with open(out_file, 'wb+') as f:
             #        shutil.copyfileobj(r, f)
             # write script file
-            pdlf = ProcessDataloggerfile.objects.filter(dataloggerfileid=fileid).\
-                 filter(processingCode__icontains='download from ftp or http')
+            pdlf = ProcessDataloggerfile.objects.filter(dataloggerfileid=fileid). \
+                filter(Q(processingCode__icontains='ftp setup complete') | Q(processingCode__icontains='done'))
+            # filter(processingCode__icontains='done')
             ftpestablished = pdlf.count()
+            localbasedir = settings.TEMPLATE_DIR
             if ftpestablished == 0:
-
+                pdlf = ProcessDataloggerfile.objects.get(dataloggerfileid=fileid)
+                pdlf.processingCode = 'ftp setup complete'
+                pdlf.save()
+                print('create ftp file')
                 #     # ProcessDataloggerfile(dataloggerfileid=fileid,
                 #     #                      processingCode=str(ftpfrequencyhours)+" hours between download",
                 #     #                      databeginson=databeginson,columnheaderson=columnheaderson)
@@ -95,21 +100,30 @@ class Command(BaseCommand):
                 #                     str(databeginson) + " " + str(columnheaderson) + " True ")
                 # file = str(settings.MEDIA_ROOT) + filename  # args[0].name
                 sysout = sys.stdout
-                sys.stdout = open(settings.BASE_DIR + '/scripts/ftp_file_download.sh', 'a')
+
+                sys.stdout = open(localbasedir + '/templatesAndSettings/scripts/ftp_file_download.sh', 'w')
                 # / home / miguelcleon / webapps / odm2admin2 / manageexport.py
                 # create_sqlite_export
                 # sys.stdout = sysout
-                intftpfrequencyhours = int(ftpfrequencyhours)
-                commandstring = ' wget -q ' +ftpfile + ' -O ' + out_file
+                commandstring = '#!/usr/bin/env bash \n '
+                # print(commandstring)
+                commandstring += 'sudo crontab -l >'+ localbasedir + '/templatesAndSettings/scripts/mycron \n '
+                # print(commandstring)
+                commandstring += 'echo "49 */' + str(ftpfrequencyhours) + ' * * * wget -q ' +ftpfile + ' -O ' + \
+                                out_file + '" >> '+ localbasedir + '/templatesAndSettings/scripts/mycron \n'
                 # commandstring += ' %>> ' + settings.BASE_DIR + '/logging/ftp_download.log'
-                print(commandstring)
-                commandstring = ''
+                # print(commandstring)
 
-                commandstring += sys.executable + ' '
-                commandstring += settings.TEMPLATE_DIR  + '/manage.py'
+                commandstring += 'echo "50 */' + str(ftpfrequencyhours) + ' * * * '
+                commandstring += pythonpath + ' '
+                commandstring += settings.TEMPLATE_DIR  + '/managecli.py'
                 commandstring += ' update_preprocess_process_datalogger_file ' + filename + ' ' \
                             +  str(intfileid) + ' ' + str(databeginson)+ ' ' + str(columnheaderson) + ' ' + str(ftpfrequencyhours) + ' ' \
                             + ' True'
+                commandstring += " &>> " + localbasedir + '/templatesAndSettings/logging/downloadftp.log " >> ' +\
+                                 localbasedir + '/templatesAndSettings/scripts/mycron \n'
+                # print(commandstring)
+                commandstring += 'sudo crontab '+ localbasedir + '/templatesAndSettings/scripts/mycron \n '
                 print(commandstring)
                 # command = settings.BASE_DIR + '/scripts/ftp_file_download.sh'  # + dbfile2 + ' %>> ' + settings.BASE_DIR +'/logging/sqlite_export.log'
                 # st = os.stat(command)
