@@ -14,7 +14,6 @@ MAP.prototype.initMap = function (map_id, initCenter, initZoom, legends, cluster
 	this.display_titles = display_titles;
 
 
-
 	var mapOptions = {
 	    center: this.initCenter,
 		zoom: this.initZoom,
@@ -24,14 +23,23 @@ MAP.prototype.initMap = function (map_id, initCenter, initZoom, legends, cluster
 	};
 
 	this.webmap = L.map(map_id, mapOptions);
-
-	this.zoomControl = L.control.zoom({position: 'topleft'}).addTo(this.webmap);
+    var sidebar = L.control.sidebar('sidebar',{
+            closeButton: true,
+            position: 'left',
+            autoPan: true,
+        }).addTo(this.webmap);
+        //this.webmap.addControl(mapsidebar);
+        //console.log('here2');
+        //sidebar.setContent('test <b>test</b> test');
+    this.sidebar = sidebar;
+	this.zoomControl = L.control.zoom({position: 'topright'}).addTo(this.webmap);
 
 	this.scale = L.control.scale().addTo(this.webmap);
 
 	this.webmap.on({
         mousemove: displayCoords
     });
+    //var mapsidebar = L.control.sidebar('sidebar', { position: 'left' });
 
 	this.webmap.on('popupopen', function (e) {
 	    // console.log(e.popup);
@@ -50,8 +58,9 @@ MAP.prototype.initMap = function (map_id, initCenter, initZoom, legends, cluster
           }
         }
     });
-
+    //map.on('click', onMapClick);
 	this.makeLegend(legends);
+
 
 };
 
@@ -116,13 +125,24 @@ MAP.prototype.getData = function (url,spinner) {
 			}
         });
         _this.markers.addTo(_this.webmap);
-        console.log('here');
+        //console.log('here');
 		spinner.stop();
-    })
+
+        //_this.closeSidebar();
+    });
 
 };
 
 
+MAP.prototype.openSidebar = function () {
+        //this.sidebar.closeButton = true;
+        this.sidebar.show();
+}
+
+
+MAP.prototype.closeSidebar = function () {
+        this.sidebar.hide();
+}
 createMarker = function (latlng, markerIcon, color, sfname,style_class,icon_str) {
 	if(this.display_titles){
 		var iconDiv = new L.DivIcon({
@@ -180,7 +200,6 @@ MAP.prototype.getMarker = function (latlng, featType, sfname,style_class,icon_st
     }
 };
 
-
 makerelation = function(relationobs) {
         var c = '<button class="accordion">Children</button>';
         var p = '<button class="accordion">Parent</button>';
@@ -188,13 +207,13 @@ makerelation = function(relationobs) {
         if (relationobs.children) {
             c = c + "<div class='panel'>" + "<p><ul>";
             relationobs.children.forEach(function (child) {
-                c = c + "<li><a href='/" + url_path + "odm2admin/samplingfeatures/" +
+                c = c + "<li><div class='panel-linktosidebar'><a id='linktosidebar' href='/" + url_path + "odm2admin/samplingfeatures/" +
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
                     "</a>, Link: <a target='_blank' href='" +
                     child['samplingfeatureexternalidentifieruri'] + "'>" +
-                    child['samplingfeatureexternalidentifier'] +"</a></li>";
+                    child['samplingfeatureexternalidentifier'] +"</a></div></li>";
             });
             c = c + "</ul></p></div>";
         } else {
@@ -203,11 +222,11 @@ makerelation = function(relationobs) {
         if (relationobs.parents) {
             p = p + "<div class='panel'>" + "<p><ul>";
             relationobs.parents.forEach(function (child) {
-                p = p + "<li><a href='/" + url_path + "odm2admin/samplingfeatures/" +
+                p = p + "<li><div class='panel-linktosidebar'><a id='linktosidebar' href='/" + url_path + "odm2admin/samplingfeatures/" +
                     child['samplingfeatureid__samplingfeatureid'] +
                     "/change/'>"+
                     child['samplingfeatureid__samplingfeaturecode'] +
-                    "</a>, Link: <a target='_blank' href='" +
+                    "</a></div>, Link: <a target='_blank' href='" +
                     child['samplingfeatureexternalidentifieruri'] + "'>" +
                     child['samplingfeatureexternalidentifier'] +"</a></li>";
             });
@@ -234,6 +253,12 @@ makerelation = function(relationobs) {
         return p + s + c;
     };
 
+//populateSidebar = function(sidebardiv, link){
+//    sidebardiv.on('click', '.smallPolygonLink', function() {
+//        this.webmap.sidebar.setContent();
+//    });
+//}
+
 maketablecontent = function (obs) {
     var sfcode = '',
         sftype = '',
@@ -246,11 +271,11 @@ maketablecontent = function (obs) {
         sptype = '',
         spmed = '',
 	sfelev = '';
-
+    //var sidebardiv = $('<div class="sidebardiv" />');
     if (obs.samplingfeaturecode) {
         sfcode = "<tr>"
             + "<td class='title'>Sampling Feature Code</td>"
-            + "<td><a href='" + obs.samplingfeatureurl + "'>" + obs.samplingfeaturecode + "</a></td>"
+            + "<td><a  id='linktosidebar' href='" + obs.samplingfeatureurl + "'>" + obs.samplingfeaturecode + "</a></td>"
             + "</tr>";
     }
     if (obs.sampling_feature_type) {
@@ -323,8 +348,10 @@ maketablecontent = function (obs) {
     };
 };
 
+
 makeMarkerPopup = function (marker, obs) {
     // console.log(obs.relationships);
+
     var header = "<br><h2>"+ obs.samplingfeaturename + "</h2>"
             + "<hr />";
     var tablestart = "<table class='table table-bordered table-hover'>"
@@ -389,7 +416,7 @@ makeMarkerPopup = function (marker, obs) {
 
 MAP.prototype.makeFilter = function () {
     var filterlegend = new L.Control.Legend({
-                        position: 'topleft',
+                        position: 'topright',
                         controlButton: {
                             title: "Filter"
                         }});

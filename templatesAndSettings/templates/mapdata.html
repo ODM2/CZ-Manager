@@ -38,10 +38,36 @@
     {% endif %}
 {% endblock %}
 
-{% block extrahead %}<script src="https://use.fontawesome.com/57b6c04fb7.js"></script>
+{% block extrahead %}
     {{ block.super }}
     {% include 'mapdata_head.html' %}
-    {% admin_shortcuts_js %}{% endblock %}
+    {% admin_shortcuts_js %}
+<script type="application/javascript">
+
+    $(document).ready(function(){
+        //console.log('here');
+
+        window.onclick = function(e) {
+            //console.log(e.target.localName);
+            if(e.target.localName=='a'){
+                e.preventDefault();
+                myMap.openSidebar();
+                var url = e.target.href; //window.location.protocol + "//" + window.location.host +path;
+                url += " #content";
+                //console.log(url);
+                $( "#insidebar" ).load(url); //odm2admin_content document.getElementById("sidebar")
+                }
+            if(e.target.localName=='close'){
+                e.preventDefault();
+                $( "#insidebar" ).innerHTML = "";
+                myMap.closeSidebar();
+             }
+        };
+
+    });
+
+    </script>
+{% endblock %}
 
 {# end changes #}
 {##}
@@ -49,10 +75,8 @@
 {##}
 {#{% block bodyclass %}{{ block.super }} dashboard{% endblock %}#}
 
-
-
-
 {% block content %}
+
     <div id="mapheader">
         {% csrf_token %}
         {% include 'ds_form.html' %}
@@ -66,9 +90,31 @@
             </p>
         </div>
     </div>
-    <div id="webmap">
+<div id="webmap" class="sidebar-map" >
 		<div id="spinner"></div>
-	</div>
+
+       <div  id="sidebar">
+           <br><br>
+            <div id="insidebar"></div>
+        </div>
+    </div>
+<!--<div id="webmap" class="sidebar-map" >
+    <div id="spinner"></div>
+    <div id="sidebar" class="sidebar collapsed">
+            <div class="sidebar-tabs">
+                <ul role="tablist">
+                    <li><a href="#home" role="tab"><i class="fa fa-bars"></i></a></li>
+
+                </ul>
+            </div>
+
+            <div class="sidebar-content">
+                <div class="sidebar-pane" id="home">
+                    <object title="ODM2 Admin content"  style="overflow:hidden; width: 95%; height: 100%" width="95%" height="100%" id="odm2admin_content" type="text/html"></object>
+                </div>
+            </div>
+     </div>
+	</div>-->
     <script type="application/javascript">
         var url_path = "{{ urlpath }}";
 		spinner = new Spinner().spin();
@@ -87,6 +133,9 @@
 
         var url = myMap.getUrl(JSON.parse('{{ selectedds|safe }}'), JSON.parse('{{ selectedtype|safe }}'));
         myMap.getData(url,spinner);
-        myMap.makeFilter();   
+        myMap.makeFilter();
+
+
     </script>
+
 {% endblock %}
