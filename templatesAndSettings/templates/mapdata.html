@@ -43,30 +43,37 @@
     {% include 'mapdata_head.html' %}
     {% admin_shortcuts_js %}
 <script type="application/javascript">
-
+window.globalurl = '';
+window.prefixpath = '{{prefixpath}}';
     $(document).ready(function(){
         //console.log('here');
-
+        // to save the form I need to do something like this https://realpython.com/django-and-ajax-form-submissions/
         window.onclick = function(e) {
-            //console.log(e.target.localName);
+            //console.log(e.target.parentNode);
             if(e.target.localName=='a'){
                 e.preventDefault();
                 myMap.openSidebar();
-                var url = e.target.href; //window.location.protocol + "//" + window.location.host +path;
-                url += " #content";
-                //console.log(url);
+                window.globalurl = e.target.href; //window.location.protocol + "//" + window.location.host +path;
+                url = window.globalurl + " #content";
+                //console.log('load divs');
                 $( "#insidebar" ).load(url); //odm2admin_content document.getElementById("sidebar")
-                }
-            if(e.target.localName=='close'){
-                e.preventDefault();
-                $( "#insidebar" ).innerHTML = "";
-                myMap.closeSidebar();
-             }
+
+                var url = '{% static "js/samplingfeaturesmap.js" %}';
+                //console.log(url);
+                $( "#jsholder" ).load(url); //odm2admin_content document.getElementById("sidebar")
+                //console.log('loaded');
+
+                };
+
+
+
         };
+
 
     });
 
     </script>
+
 {% endblock %}
 
 {# end changes #}
@@ -95,7 +102,12 @@
 
        <div  id="sidebar">
            <br><br>
-            <div id="insidebar"></div>
+
+           <div id="jsholder">
+
+           </div>
+           <div id="insidebar"></div>
+
         </div>
     </div>
 <!--<div id="webmap" class="sidebar-map" >
@@ -116,6 +128,7 @@
      </div>
 	</div>-->
     <script type="application/javascript">
+    if (loaded !== true) {
         var url_path = "{{ urlpath }}";
 		spinner = new Spinner().spin();
 		spin=document.getElementById("spinner");
@@ -134,7 +147,8 @@
         var url = myMap.getUrl(JSON.parse('{{ selectedds|safe }}'), JSON.parse('{{ selectedtype|safe }}'));
         myMap.getData(url,spinner);
         myMap.makeFilter();
-
+        var loaded = true;
+};
 
     </script>
 

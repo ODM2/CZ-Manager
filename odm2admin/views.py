@@ -67,6 +67,7 @@ import requests
 # from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DISCLAIMER
 # from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
 # from templatesAndSettings.settings import RECAPTCHA_PRIVATE_KEY
+from .forms import SamplingfeaturesAdminForm
 from .models import Actions
 from .models import Annotations
 from .models import Authorlists
@@ -74,6 +75,9 @@ from .models import Citationextensionpropertyvalues
 from .models import Citations
 from .models import CvQualitycode
 from .models import CvAnnotationtype
+from .models import CvElevationdatum
+from .models import CvSamplingfeaturetype
+from .models import CvSamplingfeaturegeotype
 from .models import Dataloggerfiles
 from .models import Datasetcitations
 from .models import Datasets
@@ -1812,6 +1816,45 @@ def add_annotation(request):
         #     lastannotationval = annotationval
     # if resultidu != 'NotSet':
     #    resultidu = int(resultidu)
+    return HttpResponse(json.dumps(response_data),content_type='application/json')
+
+def save_sf(request):
+    form = None
+    validsave = False
+    response_data = {}
+    if request.method == 'POST':
+        # print(request.POST['samplingfeatureid'])
+        print(request.POST['featureactions_set-0-samplingfeatureid'])
+        sfid = int(request.POST['featureactions_set-0-samplingfeatureid'])
+        sf = Samplingfeatures.objects.filter(samplingfeatureid=sfid).get()
+        form = SamplingfeaturesAdminForm(request.POST,sf)
+        print(request.POST)
+        # response_data['form'] = form
+        if form.is_valid():
+            # form.save()
+            print(request.POST['featureactions_set-0-samplingfeatureid'])
+            # id = form.cleaned_data['samplingfeatureid']
+            # instance = Samplingfeatures.objects.filter(samplingfeatureid=id)
+            # form2 = SamplingfeaturesAdminForm(request.POST,instance)
+            #  if form2.is_valid():
+            # form.save()
+            cvsftype = CvSamplingfeaturetype.objects.get(name=request.POST['sampling_feature_type'])
+            sf.sampling_feature_type = cvsftype
+
+            sf.samplingfeaturecode = request.POST['samplingfeaturecode']
+            sf.samplingfeaturename = request.POST['samplingfeaturename']
+            sf.samplingfeaturedescription = request.POST['samplingfeaturedescription']
+            cvsfgeotype= CvSamplingfeaturegeotype.objects.get(name=request.POST['sampling_feature_geo_type'])
+            sf.sampling_feature_geo_type = cvsfgeotype
+            sf.featuregeometrywkt = request.POST['featuregeometrywkt']
+            sf.featuregeometry = request.POST['featuregeometry']
+            sf.elevation_m = float(request.POST['elevation_m'])
+            eldatum = CvElevationdatum.objects.get(name=request.POST['elevation_datum'])
+            sf.elevation_datum = eldatum
+            sf.save()
+            validsave = True
+            print('saved vals')
+    response_data['validsave'] = validsave
     return HttpResponse(json.dumps(response_data),content_type='application/json')
 
 # def on_raw_message(body):
