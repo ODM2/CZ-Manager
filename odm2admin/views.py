@@ -38,7 +38,6 @@ from django.http import HttpResponseRedirect
 from django.http import StreamingHttpResponse
 from django.shortcuts import render
 from django.template import loader
-
 from django.contrib.auth.decorators import login_required
 # from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
@@ -593,6 +592,8 @@ def web_map(request):
         'urlpath': settings.BASE_URL
     }
     return render(request, 'mapdata.html', context)
+
+
 
 
 def get_features(request, sf_type="all", ds_ids="all"):
@@ -1848,9 +1849,13 @@ def save_sf(request):
             sf.sampling_feature_geo_type = cvsfgeotype
             sf.featuregeometrywkt = request.POST['featuregeometrywkt']
             sf.featuregeometry = request.POST['featuregeometry']
-            sf.elevation_m = float(request.POST['elevation_m'])
-            eldatum = CvElevationdatum.objects.get(name=request.POST['elevation_datum'])
-            sf.elevation_datum = eldatum
+            if request.POST['elevation_m'].isdigit():
+                sf.elevation_m = request.POST['elevation_m']
+            try:
+                eldatum = CvElevationdatum.objects.get(name=request.POST['elevation_datum'])
+                sf.elevation_datum = eldatum
+            except ObjectDoesNotExist:
+                pass
             sf.save()
             validsave = True
             print('saved vals')
@@ -1912,20 +1917,23 @@ def procDataLoggerFile(request):
     databeginson = None
     columnheaderson = None
     check_dates=False
-    # print('in view')
+    print('in view')
     # print(request.POST)
     if 'dataloggerfileid' in request.POST:
-        dataloggerfileid = int(request.POST['dataloggerfileid'])
+        dataloggerfileid = int(re.sub('[-]', '', request.POST['dataloggerfileid']))
         # print(dataloggerfileid)
     if 'processingCode' in request.POST:
         processingCode = request.POST['processingCode']
-        # print(processingCode)
+        print('processingCode')
+        print(processingCode)
     if 'databeginson' in request.POST:
         databeginson = int(request.POST['databeginson'])
-        # print(databeginson)
+        print('databeingson')
+        print(databeginson)
     if 'columnheaderson' in request.POST:
         columnheaderson = int(request.POST['columnheaderson'])
-        # print(columnheaderson)
+        print('column headers on')
+        print(columnheaderson)
     if 'check_dates' in request.POST:
         if request.POST['check_dates'] =='True':
             check_dates = True
