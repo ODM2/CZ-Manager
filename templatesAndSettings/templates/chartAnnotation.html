@@ -296,6 +296,7 @@ $(document).ready(function() {
 		var selectedResult = {{SelectedResults|safe}};
 		$("#createL1").attr("disabled", true);
 		var createL1Button = document.getElementById("createL1");
+		var email = $("#email").val();
 		createL1Button.disabled = true;
 		createL1Button.firstChild.data = "adding values";
 		$.ajax({
@@ -304,6 +305,7 @@ $(document).ready(function() {
 				data: {
 					'resultidu': selectedResult,
 					'createorupdateL1': 'create',
+					'email': email,
 					'csrfmiddlewaretoken': '{{ csrf_token }}', 
 				},
 				success : function(json) {
@@ -311,8 +313,8 @@ $(document).ready(function() {
 					//console.log(json); // log the returned json to the console
 					//console.log("success"); // another sanity check
 					var createL1Button = document.getElementById("createL1"); //$("#email_data");
-					createL1Button.firstChild.data = "Values added: "+json.valuesadded + " reloading page";
-					createL1Button.disabled = false;
+					createL1Button.firstChild.data = "emailing "+json.valuesadded + "";
+					//createL1Button.disabled = false;
 					//location.reload();
         		},
 		});
@@ -323,6 +325,7 @@ $(document).ready(function() {
 		var selectedResult = {{SelectedResults|safe}};
 		var updateL1Button = document.getElementById("updateL1");
 		updateL1Button.disabled = true;
+		var email = $("#email").val();
 		updateL1Button.firstChild.data = "adding values";
 		//console.log(updateL1Button);
 		$.ajax({
@@ -331,10 +334,14 @@ $(document).ready(function() {
 				data: {
 					'resultidu': selectedResult,
 					'createorupdateL1': 'update',
+					'email': email,
 					'csrfmiddlewaretoken': '{{ csrf_token }}', 
 				},
 				success : function(json) {
 					location.reload();
+					var updateL1Button = document.getElementById("updateL1"); //$("#email_data");
+					updateL1Button.firstChild.data = "emailing "+json.valuesadded + "";
+					//updateL1Button.disabled = false;
         },
 		});
 	});
@@ -505,10 +512,11 @@ Method- {{featureActionMethod}}
               {% endfor %}
             </select></td>
 {% if not L1exists %}
-					<td><button id="createL1">create new Level 1 QA/QC'd time series</button></td>
+					<td><button id="createL1">create new Level 1 QA/QC'd time series</button>
 				{% else %}
-					<td><button id="updateL1">add new values to Level 1 QA/QC'd series</button> Add values from start or the end of the L0 that don't yet exist in L1. </td>
+					<td><button id="updateL1">add new values to Level 1 QA/QC'd series</button> Add values from start or the end of the L0 that don't yet exist in L1.</button>
 {% endif %}
+	<td>email me when L1 series is updated or created <input id="email"  value= "" name="email" type="text"></td>
 <td>
 {% for result in resultList %}
 	{% for selectedresult in SelectedResults %}

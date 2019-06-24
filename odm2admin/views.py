@@ -917,8 +917,8 @@ def TimeSeriesGraphing(request, feature_action='All'):
         enddt = time.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f")
         dt = datetime.fromtimestamp(mktime(enddt))
         last_day_previous_month = dt - timedelta(days=30)
-        entered_start_date = last_day_previous_month.strftime('%Y-%m-%d %H:%M')
-        print(entered_start_date)
+        entered_start_date = last_day_previous_month
+        # print(entered_start_date)
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
     else:
@@ -1432,7 +1432,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                     filter(samplingfeatureid=samplingfeature).get()
                 samplingfeatureid = samplefeature.samplingfeatureid
                 featureActions = Featureactions.objects.\
-                    filter(samplingfeatureid=samplefeature).\
+                    filter(samplingfeatureid=samplefeature).filter(~Q(action_id__action_type='Site visit')).\
                     order_by("action__method")
                 resultList = Results.objects.filter(featureactionid__in=featureActions
                                                     ).order_by("featureactionid__action__method")
@@ -2272,8 +2272,18 @@ def email_data_from_graph(request):
             if 'endDate' in request.POST:
                 # print(entered_end_date)
                 entered_end_date = request.POST['endDate']
+                try:
+                    entered_end_date = time.strptime(entered_end_date, '%Y-%m-%d %H:%M')
+                except ValueError:
+                    entered_end_date = time.strptime(entered_end_date, '%Y-%m-%d')
+                entered_end_date = time.strftime("%Y-%m-%d %H:%M", entered_end_date)
             if 'startDate' in request.POST:
                 entered_start_date = request.POST['startDate']
+                try:
+                    entered_start_date = time.strptime(entered_start_date, '%Y-%m-%d %H:%M')
+                except ValueError:
+                    entered_start_date = time.strptime(entered_start_date, '%Y-%m-%d')
+                entered_start_date = time.strftime("%Y-%m-%d %H:%M", entered_start_date)
             myresultSeriesExport = Timeseriesresultvaluesextwannotations.objects.all() \
                     .filter(valuedatetime__gte=entered_start_date) \
                     .filter(valuedatetime__lte=entered_end_date) \
