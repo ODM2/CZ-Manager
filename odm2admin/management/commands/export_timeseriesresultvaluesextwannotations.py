@@ -35,7 +35,7 @@ class Command(BaseCommand):
         entered_start_date = options['startdate'][0]
         entered_end_date = options['enddate'][0]
         csvfile = StringIO.StringIO()
-        emailtitle = 'your ODM2 Admin data is attached'
+        emailtitle = 'your CZ Manager data is attached'
         emailtext = 'Attached are results for the following time series: '
         # csvwriter = csv.writer(csvfile)
         # print(timeseriesresults)

@@ -1,9 +1,9 @@
 .. _ProfileResults:
 
-ODM2 Admin Managing Profile Results
+CZ Manager Managing Profile Results
 ===================================
 
-Some of the sampling features, accessible from the ODM2 Admin Demo Map contain sampling features such as
+Some of the sampling features, accessible from the CZ Manager Demo Map contain sampling features such as
 
    .. image:: /images/FieldArea.png
 
@@ -73,5 +73,5 @@ by the Interdisciplinary Earth Data Alliance (IEDA) http://www.geosamples.org/
 :ref:`4) Time series QA/QC <Data-QA-QC>`
 
 
-* :ref:`ODM2 Admin docs home page<ODM2-Admin>`
+* :ref:`CZ Manager docs home page<ODM2-Admin>`
 * :ref:`Search the docs <search>`

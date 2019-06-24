@@ -1,4 +1,4 @@
-ODM2 Admin Docker Image Creation
+CZ Manager Docker Image Creation
 ================================
 
 Requirements to run [docker image](https://cloud.docker.com/repository/docker/miguelcleon/odm2-admin):
@@ -27,5 +27,5 @@ command.
 follow the interactive prompt, once complete you will be able to login through
 a web browser at 127.0.0.1:8010 with your new account.
 
-* :ref:`ODM2 Admin docs home page<ODM2-Admin>`
+* :ref:`CZ Manager docs home page<ODM2-Admin>`
 * :ref:`Search the docs <search>`

@@ -153,7 +153,7 @@ class Command(BaseCommand):
         lower_bound_quality_type = CvDataqualitytype.objects.get(name='Physical limit lower bound')
         result_lower_bound = None
         result_upper_bound = None
-        emailtitle = "ODM2 Admin Alarm"
+        emailtitle = "CZ Manager Alarm"
         tolist = []
         sendemail = False
         exceldatetime = False
@@ -647,8 +647,8 @@ class Command(BaseCommand):
                 # print('email')
                 # print(emailtext)
                 email.send()
-            emailtitle = 'ODM2 Admin - file processing complete for: ' + str(pdlf)
-            emailtext = 'ODM2 Admin - file processing complete for: ' + str(pdlf) + ' \n'
+            emailtitle = 'CZ Manager - file processing complete for: ' + str(pdlf)
+            emailtext = 'CZ Manager - file processing complete for: ' + str(pdlf) + ' \n'
             emailtext += 'total time series result values add: ' + str(valuesadded) + ' \n'
             emailtext += 'These time series were updated: \n'
             tolist.append(emailaddress)

@@ -65,8 +65,8 @@ class Command(BaseCommand):
         abstracttext = ''
         title = ''
 
-        abstracttext += 'ODM2 Admin dataset: ' + str(datasettitle)
-        title += 'ODM2 Admin dataset ' + str(datasettitle)
+        abstracttext += 'CZ Manager dataset: ' + str(datasettitle)
+        title += 'CZ Manager dataset ' + str(datasettitle)
         abstract = abstracttext
         keywords = ['ODM2']
         rtype = 'GenericResource'

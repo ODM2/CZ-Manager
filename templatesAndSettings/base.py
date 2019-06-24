@@ -165,6 +165,7 @@ AJAX_LOOKUP_CHANNELS = dict(
     cv_speciation=('{}.lookups'.format(APP_NAME), 'CvVariableSpeciationLookup'),
     featureaction_lookup=('{}.lookups'.format(APP_NAME), 'FeatureactionsLookup'),
     result_lookup=('{}.lookups'.format(APP_NAME), 'ResultsLookup'),
+    dataloggerfile_lookup=('{}.lookups'.format(APP_NAME), 'DataloggerfileLookup'),
     profileresult_lookup=('{}.lookups'.format(APP_NAME), 'ProfileResultsLookup'),
     measurementresult_lookup=('{}.lookups'.format(APP_NAME), 'MeasurementResultsLookup'),
     timeseriesresult_lookup=('{}.lookups'.format(APP_NAME), 'TimeseriesResultsLookup'),
@@ -222,3 +223,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+# SOCIAL_AUTH_POSTGRES_JSONFIELD = True

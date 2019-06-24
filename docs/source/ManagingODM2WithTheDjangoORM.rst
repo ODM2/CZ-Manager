@@ -3,9 +3,9 @@
 The Django ORM and WOFpy
 ========================
 
-While not all of the ODM2 entities are exposed through the ODM2 Admin interface they can all be managed using Python
-scripts using either ODM2PythonAPI or the Django ORM using the models in ODM2 Admin. Two examples using the Django ORM
- are included with the source code of ODM2 Admin.
+While not all of the ODM2 entities are exposed through the CZ Manager interface they can all be managed using Python
+scripts using either ODM2PythonAPI or the Django ORM using the models in CZ Manager. Two examples using the Django ORM
+ are included with the source code of CZ Manager.
 
 The ODM2PythonAPI can be found here: https://github.com/ODM2/ODM2PythonAPI
 
@@ -18,7 +18,7 @@ https://github.com/ODM2/ODM2-Admin/tree/master/soilsIngestionExample
 WOFpy
 -----
 
-ODM2 Admin can also be used with WOFpy and water one flow webservices can be registered with CUAHSI HIS central.
+CZ Manager can also be used with WOFpy and water one flow webservices can be registered with CUAHSI HIS central.
 
 WOFpy REST API test page for the Luquillo CZO:
 http://odm2admin.cuahsi.org/odm2lczo/odm2lczo/rest_1_1/
@@ -31,5 +31,5 @@ QA HIS client:
 
 http://qa-hiswebclient.azurewebsites.net/
 
-* :ref:`ODM2 Admin docs home page<ODM2-Admin>`
+* :ref:`CZ Manager docs home page<ODM2-Admin>`
 * :ref:`Search the docs <search>`

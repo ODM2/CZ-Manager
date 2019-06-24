@@ -50,5 +50,5 @@ Water Conductivity sensor.
 
 :ref:`6) Using the Django ORM <Managing-ODM2-With-The-Django-ORM>`
 
-* :ref:`ODM2 Admin docs home page<ODM2-Admin>`
+* :ref:`CZ Manager docs home page<ODM2-Admin>`
 * :ref:`Search the docs <search>`

@@ -2145,7 +2145,7 @@ def export_to_hydroshare(request):
     hs = HydroShare(auth=auth)
     username = hs.getUserInfo()
     # print(username)
-    abstracttext = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
+    abstracttext = 'CZ Manager Result Series ' +  str(valuestoexport.first().resultid)
     entered_start_date = None
     entered_end_date = None
     if 'startDate' in request.POST:
@@ -2157,7 +2157,7 @@ def export_to_hydroshare(request):
         abstracttext += ' ending on: ' + entered_end_date
     #
     abstract = abstracttext
-    title = 'ODM2 Admin Result Series ' +  str(valuestoexport.first().resultid)
+    title = 'CZ Manager Result Series ' +  str(valuestoexport.first().resultid)
     keywords = ['ODM2']
     rtype = 'GenericResource'
     fpath = exportdb.DATABASES['default']['NAME']
@@ -3123,7 +3123,7 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
     entered_end_date =''
     use_dates =''
     emailsent = False
-    emailtitle = 'your ODM2 Admin data is attached'
+    emailtitle = 'your CZ Manager data is attached'
     emailtext = 'Attached are results for the following time series: '
 
     if captach_status:

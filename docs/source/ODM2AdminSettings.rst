@@ -1,9 +1,9 @@
 .. _ODM2-Admin-Settings:
 
-ODM2 Admin Settings
+CZ Manager Settings
 ===================
 
-To configure ODM2 Admin for your site you will want to change the some of settings in the file:
+To configure CZ Manager for your site you will want to change the some of settings in the file:
 
 templateAndSettings/settings/development.py
 (https://github.com/ODM2/ODM2-Admin/blob/master/templatesAndSettings/settings/development.py)
@@ -57,10 +57,10 @@ For recaptcha settings information see https://github.com/praekelt/django-recapt
 
 
 
-Custom ODM2 Admin settings
+Custom CZ Manager settings
 --------------------------
 
-MAP_CONFIG defines properties of the ODM2 Admin map /mapdata.html in an ODM2 Admin instance, also found under the
+MAP_CONFIG defines properties of the CZ Manager map /mapdata.html in an CZ Manager instance, also found under the
 shortcut Graph My Data -> Map Sample Locations
 
 ..  code:: python
@@ -129,5 +129,5 @@ dashboard page.
 
 The sensor dashboard can be found by visiting 'Graph My Data' -> 'Sensor Dashboard'.
 
-* :ref:`ODM2 Admin docs home page <ODM2-Admin>`
+* :ref:`CZ Manager docs home page <ODM2-Admin>`
 * :ref:`Search the docs <search>`
