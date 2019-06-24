@@ -38,7 +38,6 @@ from django.http import HttpResponseRedirect
 from django.http import StreamingHttpResponse
 from django.shortcuts import render
 from django.template import loader
-
 from django.contrib.auth.decorators import login_required
 # from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
@@ -67,6 +66,7 @@ import requests
 # from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DISCLAIMER
 # from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
 # from templatesAndSettings.settings import RECAPTCHA_PRIVATE_KEY
+from .forms import SamplingfeaturesAdminForm
 from .models import Actions
 from .models import Annotations
 from .models import Authorlists
@@ -74,6 +74,9 @@ from .models import Citationextensionpropertyvalues
 from .models import Citations
 from .models import CvQualitycode
 from .models import CvAnnotationtype
+from .models import CvElevationdatum
+from .models import CvSamplingfeaturetype
+from .models import CvSamplingfeaturegeotype
 from .models import Dataloggerfiles
 from .models import Datasetcitations
 from .models import Datasets
@@ -591,6 +594,8 @@ def web_map(request):
     return render(request, 'mapdata.html', context)
 
 
+
+
 def get_features(request, sf_type="all", ds_ids="all"):
     if ds_ids == "all" or sf_type == "all":
         features = Samplingfeatures.objects.exclude(featuregeometry__isnull=True)
@@ -912,8 +917,8 @@ def TimeSeriesGraphing(request, feature_action='All'):
         enddt = time.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f")
         dt = datetime.fromtimestamp(mktime(enddt))
         last_day_previous_month = dt - timedelta(days=30)
-        entered_start_date = last_day_previous_month.strftime('%Y-%m-%d %H:%M')
-        print(entered_start_date)
+        entered_start_date = last_day_previous_month
+        # print(entered_start_date)
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
     else:
@@ -1427,7 +1432,7 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                     filter(samplingfeatureid=samplingfeature).get()
                 samplingfeatureid = samplefeature.samplingfeatureid
                 featureActions = Featureactions.objects.\
-                    filter(samplingfeatureid=samplefeature).\
+                    filter(samplingfeatureid=samplefeature).filter(~Q(action_id__action_type='Site visit')).\
                     order_by("action__method")
                 resultList = Results.objects.filter(featureactionid__in=featureActions
                                                     ).order_by("featureactionid__action__method")
@@ -1814,6 +1819,49 @@ def add_annotation(request):
     #    resultidu = int(resultidu)
     return HttpResponse(json.dumps(response_data),content_type='application/json')
 
+def save_sf(request):
+    form = None
+    validsave = False
+    response_data = {}
+    if request.method == 'POST':
+        # print(request.POST['samplingfeatureid'])
+        print(request.POST['featureactions_set-0-samplingfeatureid'])
+        sfid = int(request.POST['featureactions_set-0-samplingfeatureid'])
+        sf = Samplingfeatures.objects.filter(samplingfeatureid=sfid).get()
+        form = SamplingfeaturesAdminForm(request.POST,sf)
+        print(request.POST)
+        # response_data['form'] = form
+        if form.is_valid():
+            # form.save()
+            print(request.POST['featureactions_set-0-samplingfeatureid'])
+            # id = form.cleaned_data['samplingfeatureid']
+            # instance = Samplingfeatures.objects.filter(samplingfeatureid=id)
+            # form2 = SamplingfeaturesAdminForm(request.POST,instance)
+            #  if form2.is_valid():
+            # form.save()
+            cvsftype = CvSamplingfeaturetype.objects.get(name=request.POST['sampling_feature_type'])
+            sf.sampling_feature_type = cvsftype
+
+            sf.samplingfeaturecode = request.POST['samplingfeaturecode']
+            sf.samplingfeaturename = request.POST['samplingfeaturename']
+            sf.samplingfeaturedescription = request.POST['samplingfeaturedescription']
+            cvsfgeotype= CvSamplingfeaturegeotype.objects.get(name=request.POST['sampling_feature_geo_type'])
+            sf.sampling_feature_geo_type = cvsfgeotype
+            sf.featuregeometrywkt = request.POST['featuregeometrywkt']
+            sf.featuregeometry = request.POST['featuregeometry']
+            if request.POST['elevation_m'].isdigit():
+                sf.elevation_m = request.POST['elevation_m']
+            try:
+                eldatum = CvElevationdatum.objects.get(name=request.POST['elevation_datum'])
+                sf.elevation_datum = eldatum
+            except ObjectDoesNotExist:
+                pass
+            sf.save()
+            validsave = True
+            print('saved vals')
+    response_data['validsave'] = validsave
+    return HttpResponse(json.dumps(response_data),content_type='application/json')
+
 # def on_raw_message(body):
 #    print(body)
 def preProcDataLoggerFile(request):
@@ -1869,20 +1917,23 @@ def procDataLoggerFile(request):
     databeginson = None
     columnheaderson = None
     check_dates=False
-    # print('in view')
+    print('in view')
     # print(request.POST)
     if 'dataloggerfileid' in request.POST:
-        dataloggerfileid = int(request.POST['dataloggerfileid'])
+        dataloggerfileid = int(re.sub('[-]', '', request.POST['dataloggerfileid']))
         # print(dataloggerfileid)
     if 'processingCode' in request.POST:
         processingCode = request.POST['processingCode']
-        # print(processingCode)
+        print('processingCode')
+        print(processingCode)
     if 'databeginson' in request.POST:
         databeginson = int(request.POST['databeginson'])
-        # print(databeginson)
+        print('databeingson')
+        print(databeginson)
     if 'columnheaderson' in request.POST:
         columnheaderson = int(request.POST['columnheaderson'])
-        # print(columnheaderson)
+        print('column headers on')
+        print(columnheaderson)
     if 'check_dates' in request.POST:
         if request.POST['check_dates'] =='True':
             check_dates = True
@@ -2221,8 +2272,18 @@ def email_data_from_graph(request):
             if 'endDate' in request.POST:
                 # print(entered_end_date)
                 entered_end_date = request.POST['endDate']
+                try:
+                    entered_end_date = time.strptime(entered_end_date, '%Y-%m-%d %H:%M')
+                except ValueError:
+                    entered_end_date = time.strptime(entered_end_date, '%Y-%m-%d')
+                entered_end_date = time.strftime("%Y-%m-%d %H:%M", entered_end_date)
             if 'startDate' in request.POST:
                 entered_start_date = request.POST['startDate']
+                try:
+                    entered_start_date = time.strptime(entered_start_date, '%Y-%m-%d %H:%M')
+                except ValueError:
+                    entered_start_date = time.strptime(entered_start_date, '%Y-%m-%d')
+                entered_start_date = time.strftime("%Y-%m-%d %H:%M", entered_start_date)
             myresultSeriesExport = Timeseriesresultvaluesextwannotations.objects.all() \
                     .filter(valuedatetime__gte=entered_start_date) \
                     .filter(valuedatetime__lte=entered_end_date) \
