@@ -1,6 +1,7 @@
 # ODM2-Admin Docker Application
 
-Before proceeding below, make sure that you have [Docker](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
+Before proceeding below, make sure that you have [Docker](https://docs.docker.com/engine/installation/) and 
+[Docker Compose](https://docs.docker.com/compose/install/) installed.
 
 
 To deploy this application on Docker simply navigate to current directory `docker-deploy`.
