@@ -1,0 +1,257 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>CZ Manager &#8212; ODM2-Admin 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="CZ Manager Docker Image Creation" href="InstallODM2AdminWithDocker.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="#">
+    <img class="logo" src="_static/logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=ODM2&repo=ODM2-Admin&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+    
+
+<p>
+<a class="badge" href="https://travis-ci.org/ODM2/ODM2-Admin">
+    <img
+        alt="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
+        src="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
+    />
+</a>
+</p>
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="InstallODM2AdminWithDocker.html">CZ Manager Docker Image Creation</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ODM2Adminbackground.html">Motivation for CZ Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GettingStartedInODM2Admin.html">Getting Started With CZ Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ODM2AdminSettings.html">configuring CZ Manager Settings</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ODM2AdminDemo.html">CZ Manager Walkthrough</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="InstallODM2AdminWithDocker.html" title="next chapter">CZ Manager Docker Image Creation</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="cz-manager">
+<span id="odm2-admin"></span><h1>CZ Manager<a class="headerlink" href="#cz-manager" title="Permalink to this headline">¶</a></h1>
+<p>CZ Manager formerly ODM2 Admin is an application for site level data management of environmental observations using
+Observation Data Model 2 (ODM2). The application was designed for management of data from the Luquillo
+Critical Zone Observatory located in northeastern Puerto Rico. For more details about why CZ Manager was developed
+see <a class="reference internal" href="ODM2Adminbackground.html#motivation-for-odm2-admin"><span class="std std-ref">Why CZ Manager was developed</span></a></p>
+<p>ODM2 was created through National Science Foundation Grant EAR-1224638.
+Support for the development of this application comes from NSF Grant EAR-1331841 Luquillo CZO.</p>
+<p>The CZ Manager source code can be found here: <a class="reference external" href="https://github.com/ODM2/ODM2-Admin">https://github.com/ODM2/ODM2-Admin</a></p>
+<p>ODM2 can be found here: <a class="reference external" href="https://github.com/ODM2">https://github.com/ODM2</a></p>
+<p>Other ODM2 tools can be used in conjunction with CZ Manager, extensive
+testing has been done using CZ Manager with ODM2PythonAPI and WOFpy.</p>
+<p>Django ORM models exist for all ODM2 tables. Web forms for ODM2Core and
+a number of additional ODM2 tables. Sites and sampling features are mapped via a leaflet mapping interface.
+Graphing of time series result values via highcharts are implemented.
+Data logger files can be imported with properly configured data logger file columns and
+time series results results.</p>
+<div class="section" id="diagram-of-cz-manager-infrastructure">
+<h2>Diagram of CZ Manager infrastructure:<a class="headerlink" href="#diagram-of-cz-manager-infrastructure" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/ODM2AdminInfrastructure.png" src="_images/ODM2AdminInfrastructure.png" />
+<p>CZ Manager was initially developed using a postgresql version of the ODM2 data model. CZ Manager has also been used with
+Microsoft SQL and SQLite implementations of ODM2.</p>
+</div>
+<div class="section" id="extended-infrasructure-with-wofpy-web-services-and-odm2pythonapi">
+<h2>Extended infrasructure with WOFpy web services and ODM2PythonAPI<a class="headerlink" href="#extended-infrasructure-with-wofpy-web-services-and-odm2pythonapi" title="Permalink to this headline">¶</a></h2>
+<img alt="_images/Extendedinfrastructure.png" src="_images/Extendedinfrastructure.png" />
+<p>CZ Manager can be setup in conjunction with WOFpy and ODM2PythonAPI. WOFpy implements CUAHSI’s water one flow web
+services. See the <a class="reference external" href="https://github.com/ODM2/WOFpy">WOFpy github page</a> for more.
+ODM2PythoAPI is a A Python-based application programmer’s interface for the Observations Data Model 2 (ODM2).
+For more see the <a class="reference external" href="https://github.com/ODM2/ODM2PythonAPI">ODM2PythonAPI github page</a></p>
+<p>An example postgresql database named ODM2AdminExamplePostgresqlDB is
+provided, this is a custom postgresql format backup which can be
+restored to an empty database. An extrasql.sql file contains some extra
+views used for efficiently exporting data as emails.</p>
+</div>
+<div class="section" id="primary-installation">
+<h2>Primary Installation<a class="headerlink" href="#primary-installation" title="Permalink to this headline">¶</a></h2>
+<p>The fastest way to get started is to install with DockerHub:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="InstallODM2AdminWithDocker.html">CZ Manager Docker Image Creation</a></li>
+</ul>
+</div>
+<p>Alternatively you can download the source code from github (<a class="reference external" href="https://github.com/ODM2/ODM2-Admin">https://github.com/ODM2/ODM2-Admin</a>) setup a conda
+environment, create an ODM2 database, run the extrasql.sql script (found in the root directory of the source code)
+on that database, and change settings in:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ODM2-Admin-master<span class="se">\t</span>emplatesAndSettings<span class="se">\s</span>ettings<span class="se">\b</span>ase.py
+ODM2-Admin-master<span class="se">\t</span>emplatesAndSettings<span class="se">\s</span>ettings<span class="se">\d</span>evelopment.py
+</pre></div>
+</div>
+<p>When you are depolying to production you will want to change the settings in production.py instead of development.py
+You can also have the settings files point to an existing ODM2 database, you will need to run the extrasql.sql on
+the database. For more details on settings see <a class="reference internal" href="ODM2AdminSettings.html#odm2-admin-settings"><span class="std std-ref">CZ Manager Settings</span></a></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install -r requirements.txt
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda config --add channels conda-forge --force
+conda create -n ENVNAME <span class="nv">python</span><span class="o">=</span><span class="m">2</span>.7 --file requirements.txt
+</pre></div>
+</div>
+<p>or create the conda environment with the development requirements as well:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda create -n ENVNAME <span class="nv">python</span><span class="o">=</span><span class="m">2</span>.7 --file requirements.txt --file requirements-dev.txt --channel conda-forge
+</pre></div>
+</div>
+<p>You will need to run <code class="docutils literal notranslate"><span class="pre">extrasql.sql</span></code> on a postgreSQL instance of ODM2,
+a blank schema script can be found here:
+<a class="reference external" href="https://github.com/ODM2/ODM2/tree/master/src/blank_schema_scripts/postgresql">https://github.com/ODM2/ODM2/tree/master/src/blank_schema_scripts/postgresql</a></p>
+<p>Six instances of CZ Manager have been deployed and are hosted by CUAHSI. If you are interested in an CZ Manager
+instance, hosted on the CUAHSI cloud, contact <a class="reference external" href="mailto:leonmi&#37;&#52;&#48;sas&#46;upenn&#46;edu">leonmi<span>&#64;</span>sas<span>&#46;</span>upenn<span>&#46;</span>edu</a></p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://odm2admin.cuahsi.org/LCZO/mapdata.html">http://odm2admin.cuahsi.org/LCZO/mapdata.html</a></p></li>
+<li><p><a class="reference external" href="http://odm2admin.cuahsi.org/DryCreek/mapdata.html">http://odm2admin.cuahsi.org/DryCreek/mapdata.html</a></p></li>
+<li><p><a class="reference external" href="http://odm2admin.cuahsi.org/TRACE/TRACE/mapdata.html">http://odm2admin.cuahsi.org/TRACE/TRACE/mapdata.html</a></p></li>
+<li><p><a class="reference external" href="http://odm2admin.cuahsi.org/CJCZO/mapdata.html">http://odm2admin.cuahsi.org/CJCZO/mapdata.html</a></p></li>
+<li><p><a class="reference external" href="http://msu-odm2admin.cuahsi.org/MSU/mapdata.html">http://msu-odm2admin.cuahsi.org/MSU/mapdata.html</a></p></li>
+<li><p><a class="reference external" href="https://odm2admin.cuahsi.org/CZIMEA/mapdata.html">https://odm2admin.cuahsi.org/CZIMEA/mapdata.html</a></p></li>
+</ul>
+<img alt="_images/CUAHSI-Logo-with-URL---Transparent_(RESIZED).png" src="_images/CUAHSI-Logo-with-URL---Transparent_(RESIZED).png" />
+<p>Another deployment for demonstration porposes is available, see the :ref:’ODM2AdminDemo’ for more
+information:</p>
+<p><a class="reference external" href="http://odm2admin.cuahsi.org/Sandbox/">http://odm2admin.cuahsi.org/Sandbox/</a></p>
+</div>
+</div>
+<div class="section" id="using-cz-manager">
+<h1>Using CZ Manager<a class="headerlink" href="#using-cz-manager" title="Permalink to this headline">¶</a></h1>
+<p>The documents below provide instructions on using CZ Manager.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ODM2Adminbackground.html">Motivation for CZ Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GettingStartedInODM2Admin.html">Getting Started With CZ Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ODM2AdminSettings.html">configuring CZ Manager Settings</a></li>
+</ul>
+</div>
+</div>
+<div class="section" id="cz-manager-walkthrough">
+<h1>CZ Manager Walkthrough<a class="headerlink" href="#cz-manager-walkthrough" title="Permalink to this headline">¶</a></h1>
+<p>The CZ Manager Walkthrough uses a Sandbox instance of CZ Manager while also documenting the work through steps
+with detailed descriptions and images from the sandbox. Many of the features of CZ Manager are described here.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ODM2AdminDemo.html">CZ Manager Walkthrough</a></li>
+</ul>
+</div>
+<ul class="simple">
+<li><p><a class="reference internal" href="ODM2AdminAdministration.html#odm2-administration"><span class="std std-ref">CZ Manager Forms</span></a></p></li>
+<li><p><a class="reference internal" href="DataLoggerFiles.html#dataloggerfiles"><span class="std std-ref">Using Data Logger Files</span></a></p></li>
+<li><p><a class="reference internal" href="ProfileResults.html#profileresults"><span class="std std-ref">Managing Profile Results With CZ Manager</span></a></p></li>
+<li><p><a class="reference internal" href="DataQAQC.html#data-qa-qc"><span class="std std-ref">Time series QA/QC</span></a></p></li>
+<li><p><a class="reference internal" href="DataVisualizationTips.html#data-visualization"><span class="std std-ref">Data Sharing and Visualization Tips</span></a></p></li>
+<li><p><a class="reference internal" href="ManagingODM2WithTheDjangoORM.html#managing-odm2-with-the-django-orm"><span class="std std-ref">Managing ODM2 With The Django ORM</span></a></p></li>
+</ul>
+<div class="section" id="docs-home">
+<h2>Docs Home<a class="headerlink" href="#docs-home" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="#odm2-admin"><span class="std std-ref">CZ Manager docs home page</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search the docs</span></a></p></li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2017, Miguel Leon.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+    <a href="https://github.com/ODM2/ODM2-Admin" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>

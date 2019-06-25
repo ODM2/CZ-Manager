@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Time Series Data QA/QC &#8212; ODM2-Admin 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Data Visualization and URL parameters" href="DataVisualizationTips.html" />
+    <link rel="prev" title="CZ Manager Managing Profile Results" href="ProfileResults.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/logo.png" alt="Logo"/>
+    
+  </a>
+</p>
+
+
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=ODM2&repo=ODM2-Admin&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+    
+
+<p>
+<a class="badge" href="https://travis-ci.org/ODM2/ODM2-Admin">
+    <img
+        alt="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
+        src="https://secure.travis-ci.org/ODM2/ODM2-Admin.svg?branch=master"
+    />
+</a>
+</p>
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="InstallODM2AdminWithDocker.html">CZ Manager Docker Image Creation</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ODM2Adminbackground.html">Motivation for CZ Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GettingStartedInODM2Admin.html">Getting Started With CZ Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ODM2AdminSettings.html">configuring CZ Manager Settings</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="ODM2AdminDemo.html">CZ Manager Walkthrough</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="ODM2AdminDemo.html">CZ Manager Walkthrough</a><ul>
+      <li>Previous: <a href="ProfileResults.html" title="previous chapter">CZ Manager Managing Profile Results</a></li>
+      <li>Next: <a href="DataVisualizationTips.html" title="next chapter">Data Visualization and URL parameters</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="time-series-data-qa-qc">
+<span id="data-qa-qc"></span><h1>Time Series Data QA/QC<a class="headerlink" href="#time-series-data-qa-qc" title="Permalink to this headline">¶</a></h1>
+<p>CZ Manager can be used as a tool for time series data quality assurance and control. Raw time series can be
+copied and then modified with time series result annotations. Portions of time series can be selected and
+if values are known to be bad they can be set to not a number ‘NaN’ while the original values are maintained
+in an annotation. The annotation can then also indicate the reason why the value was not good, such as the
+instrument was out of calibration.</p>
+<p>Let’s try it out, we are going to visit the data annotation page for a measurement of water temperature
+at the Rio Espiritu Santo Stream House (RESSH), from the <a class="reference external" href="http://odm2admin.cuahsi.org/Sandbox/mapdata.html">map</a>
+this is a sampling feature of type ‘Stream Gage’ labeled RESSH.</p>
+<blockquote>
+<div><img alt="_images/RioEspirituSantoStreamGage.png" src="_images/RioEspirituSantoStreamGage.png" />
+</div></blockquote>
+<p>From Here follow the link to the water temperture read by either the pressure transducer or the DO probe, select the
+‘Annotate Data’ link as shown here:</p>
+<blockquote>
+<div><img alt="_images/SelectWaterTempToAnnotate.png" src="_images/SelectWaterTempToAnnotate.png" />
+</div></blockquote>
+<p><a class="reference external" href="http://odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=16657/popup=Anno/">http://odm2admin.cuahsi.org/Sandbox/graphfa/samplingfeature=776/resultidu=16657/popup=Anno/</a></p>
+<p>You can select some of the points by dragging a selection box around them, it should look like this:</p>
+<blockquote>
+<div><img alt="images/RESSH-WaterTemperatureReadings.PNG" src="images/RESSH-WaterTemperatureReadings.PNG" />
+</div></blockquote>
+<p>With the points selected we can select a new data quality code, enter an annotation, generate a L1, QA/QC level from
+a level 0 time series. From a time series that are not raw data (something other then L0) we can set values to Not A
+Number (NAN).</p>
+<blockquote>
+<div><img alt="_images/AnnotatingData.png" src="_images/AnnotatingData.png" />
+</div></blockquote>
+<p>Our Annotated data will then look something like this:</p>
+<blockquote>
+<div><img alt="_images/AnnotatedData.png" src="_images/AnnotatedData.png" />
+</div></blockquote>
+<p>You can also add or subtract an offset value to a set of points or drift correct them. Drift correcting points will
+apply a linear correction so that the first or last point (depending if you select forward or backward) will have the
+value entered. The remaining values you selected will have an offset added to them. This offset is proportional to the
+points position in the set of points selected.</p>
+<blockquote>
+<div><img alt="_images/offsetanddriftcorrect.png" src="_images/offsetanddriftcorrect.png" />
+</div></blockquote>
+<p><a class="reference internal" href="DataVisualizationTips.html#data-visualization"><span class="std std-ref">5) Data visualization and URL parameters</span></a></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="index.html#odm2-admin"><span class="std std-ref">CZ Manager docs home page</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search the docs</span></a></p></li>
+</ul>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      &copy;2017, Miguel Leon.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/DataQAQC.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+    <a href="https://github.com/ODM2/ODM2-Admin" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>
