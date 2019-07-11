@@ -35,4 +35,4 @@ views used for efficiently exporting data as emails.
 **Primary Installation**
 See Docker Folder for dockerhub installation instructions or
 
-see http://odm2.github.io/ODM2-Admin/ for local installation instructions.
+see http://odm2.github.io/CZ-Manager/ for local installation instructions.
