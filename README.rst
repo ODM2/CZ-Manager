@@ -1,10 +1,10 @@
-ODM2 Admin
+CZ Manager
 ==========
 
 .. image:: https://travis-ci.org/ODM2/ODM2-Admin.svg?branch=master
    :target: https://travis-ci.org/ODM2/ODM2-Admin
 
-This is a Django admin app for Observation Data Model 2 (ODM2). ODM2
+CZ Manager is a Django admin app for Observation Data Model 2 (ODM2). ODM2
 was created through National Science Foundation Grant EAR-1224638.
 Support for the development of this application comes
 from NSF Grant EAR-1331841 Luquillo CZO.
@@ -18,8 +18,8 @@ imported as long as data logger file columns and results are properly
 setup.
 
 
-Other ODM2 tools can be used in conjunction with ODM2 Admin, extensive
-testing has been done using ODM2 Admin with ODM2PythonAPI and WOFpy.
+Other ODM2 tools can be used in conjunction with CZ Manager, extensive
+testing has been done using CZ Manager with ODM2PythonAPI and WOFpy.
 
 This was developed using a postgresql version of
 ODM2 data model, additional modifications may be needed to make this
