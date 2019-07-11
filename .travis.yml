@@ -28,6 +28,8 @@ matrix:
   fast_finish: true
   include:
   - python: 3.6
+    env: TEST_TARGET=default
+  - python: 3.6
     env: TEST_TARGET=docs
   allow_failures:
   - python: 3.6
@@ -37,25 +39,19 @@ matrix:
 before_install:
   - psql -U postgres -c "create extension postgis"
   - psql -c "CREATE DATABASE test;" -U postgres
-  - |
-    URL="http://bit.ly/miniconda"
-    echo ""
-    if [ ! -f $HOME/miniconda/bin/conda ] ; then
-      echo "Fresh miniconda installation."
-      wget $URL -O miniconda.sh
-      rm -rf $HOME/miniconda
-      bash miniconda.sh -b -p $HOME/miniconda
-    fi
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
-  - conda update conda
+  - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b
+  - export PATH=/home/travis/miniconda/bin:$PATH
+  - conda update --yes conda
   - conda config --add channels conda-forge --force
-  - conda create --name TEST python=$TRAVIS_PYTHON_VERSION libgdal --file requirements.txt --file requirements-dev.txt
-  - source activate TEST
+
 #   - pip install --upgrade http://github.com/miguelcleon/django-admin-shortcuts/zipball/master
 
 
 install:
+  - conda create --name TEST python=$TRAVIS_PYTHON_VERSION libgdal --file requirements.txt --file requirements-dev.txt
+  - source activate TEST
   - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2admin-${version}.tar.gz && popd
 
 script:
