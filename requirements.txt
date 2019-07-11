@@ -1,4 +1,4 @@
-libarchive
+libarchive==3.3.2
 django-admin-shortcuts
 django-ajax-selects
 django-apptemplates
