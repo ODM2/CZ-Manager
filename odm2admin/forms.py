@@ -1307,7 +1307,7 @@ class DerivationequationsAdminForm(ModelForm):
     derivationequation = CharField(max_length=255, label="derivation equation",
                                    widget=forms.Textarea,
                                    help_text='use python snytax if you are using this equation to derive new' +
-                            'values in ODM2 Admin as shown here' +
+                            'values in CZ Manager as shown here' +
                             ' https://en.wikibooks.org/wiki/Python_Programming/Basic_Math' +
                             ' this currently supports 1 derived from field which should be x in the equation.' +
                             ' the derived value must be stored in a variable y')

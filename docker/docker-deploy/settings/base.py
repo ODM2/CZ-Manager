@@ -8,10 +8,10 @@ import os
 """ NAMES CONFIGURATION """
 APP_NAME = "odm2admin" # This has to match the name of the folder that the app is saved
 SITE_NAME = "odm2admin" # sometimes you might need the Django app name to be different from your URL path (this is the URL path name).             
-VERBOSE_NAME = "ODM2 Admin"
+VERBOSE_NAME = "CZ Manager"
 
-SITE_HEADER = "ODM2 Admin"
-SITE_TITLE = "ODM2 Admin"
+SITE_HEADER = "CZ Manager"
+SITE_TITLE = "CZ Manager"
 """ END NAMES CONFIGURATION """
 
 
