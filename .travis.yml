@@ -40,13 +40,17 @@ before_install:
   - psql -U postgres -c "create extension postgis"
   - psql -c "CREATE DATABASE test;" -U postgres
   - |
-  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-  - bash miniconda.sh -b -p $HOME/miniconda
+    URL="http://bit.ly/miniconda"
+    echo ""
+    if [ ! -f $HOME/miniconda/bin/conda ] ; then
+      echo "Fresh miniconda installation."
+      wget $URL -O miniconda.sh
+      rm -rf $HOME/miniconda
+      bash miniconda.sh -b -p $HOME/miniconda
+    fi
   - export PATH="$HOME/miniconda/bin:$PATH"
-  - hash -r
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  - conda info -a
+  - conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
+  - conda update conda
   - conda config --add channels conda-forge --force
   - conda create --name TEST python=$TRAVIS_PYTHON_VERSION libgdal --file requirements.txt --file requirements-dev.txt
   - source activate TEST
