@@ -1,3 +1,4 @@
+libarchive
 django-admin-shortcuts
 django-ajax-selects
 django-apptemplates
