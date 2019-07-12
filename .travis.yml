@@ -52,12 +52,13 @@ before_install:
   - conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
   - conda update conda
   - conda config --add channels conda-forge --force
-  - conda create --name TEST python=$TRAVIS_PYTHON_VERSION libgdal --file requirements.txt --file requirements-dev.txt
-  - source activate TEST
+
 #   - pip install --upgrade http://github.com/miguelcleon/django-admin-shortcuts/zipball/master
 
 
 install:
+  - conda create --name TEST python=$TRAVIS_PYTHON_VERSION libgdal --file requirements.txt --file requirements-dev.txt
+  - source activate TEST
   - python setup.py sdist && version=$(python setup.py --version) && pushd dist  && pip install odm2admin-${version}.tar.gz && popd
 
 script:
