@@ -50,7 +50,7 @@ before_install:
 #     fi
   - export PATH="$HOME/miniconda/bin:$PATH"
   - conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
-  - conda update conda
+  - conda update conda --no-update-deps
   - conda config --add channels conda-forge --force
 
 #   - pip install --upgrade http://github.com/miguelcleon/django-admin-shortcuts/zipball/master
