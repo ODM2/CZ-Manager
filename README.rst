@@ -1,8 +1,8 @@
 CZ Manager
 ==========
 
-.. image:: https://travis-ci.org/ODM2/ODM2-Admin.svg?branch=master
-   :target: https://travis-ci.org/ODM2/ODM2-Admin
+.. image:: https://travis-ci.org/ODM2/CZ-Manager.svg?branch=master
+   :target: https://travis-ci.org/ODM2/CZ-Manager
 
 CZ Manager is a Django admin app for Observation Data Model 2 (ODM2). ODM2
 was created through National Science Foundation Grant EAR-1224638.
