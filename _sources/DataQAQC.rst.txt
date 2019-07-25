@@ -4,7 +4,7 @@
 Time Series Data QA/QC
 ======================
 
-ODM2 Admin can be used as a tool for time series data quality assurance and control. Raw time series can be
+CZ Manager can be used as a tool for time series data quality assurance and control. Raw time series can be
 copied and then modified with time series result annotations. Portions of time series can be selected and
 if values are known to be bad they can be set to not a number 'NaN' while the original values are maintained
 in an annotation. The annotation can then also indicate the reason why the value was not good, such as the
@@ -46,5 +46,5 @@ points position in the set of points selected.
 
 :ref:`5) Data visualization and URL parameters <Data-Visualization>`
 
-* :ref:`ODM2 Admin docs home page<ODM2-Admin>`
+* :ref:`CZ Manager docs home page<ODM2-Admin>`
 * :ref:`Search the docs <search>`

@@ -3,7 +3,7 @@
 Data Logger Files
 =================
 
-Ingesting data by uploading and processing data logger files is a key feature of ODM2 Admin. While logged into the
+Ingesting data by uploading and processing data logger files is a key feature of CZ Manager. While logged into the
 ODM2 Sandbox you can navigate to http://odm2admin.cuahsi.org/Sandbox/odm2admin/dataloggerfiles/
 
 .. image:: /images/DataLoggerFiles.png
@@ -46,7 +46,7 @@ Here is an example dashboard for `DryCreek Experimental Watershed <https://earth
 
 http://odm2admin.cuahsi.org/DryCreek/sensordashboard/featureaction=20/
 
-:ref:`3) Managing Profile Results With ODM2 Admin <ProfileResults>`
+:ref:`3) Managing Profile Results With CZ Manager <ProfileResults>`
 
-* :ref:`ODM2 Admin docs home page<ODM2-Admin>`
+* :ref:`CZ Manager docs home page<ODM2-Admin>`
 * :ref:`Search the docs <search>`

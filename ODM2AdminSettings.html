@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>ODM2 Admin Settings &#8212; ODM2-Admin 0.1.0 documentation</title>
+    <title>CZ Manager Settings &#8212; ODM2-Admin 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -14,8 +14,8 @@
     <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="ODM2 Admin Walkthrough" href="ODM2AdminDemo.html" />
-    <link rel="prev" title="Getting Started With ODM2 Admin" href="GettingStartedInODM2Admin.html" />
+    <link rel="next" title="CZ Manager Walkthrough" href="ODM2AdminDemo.html" />
+    <link rel="prev" title="Getting Started With CZ Manager" href="GettingStartedInODM2Admin.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -62,23 +62,23 @@
 
 <h3>Navigation</h3>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="InstallODM2AdminWithDocker.html">ODM2 Admin Docker Image Creation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="InstallODM2AdminWithDocker.html">CZ Manager Docker Image Creation</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="ODM2Adminbackground.html">Motivation for ODM2 Admin</a></li>
-<li class="toctree-l1"><a class="reference internal" href="GettingStartedInODM2Admin.html">Getting Started With ODM2 Admin</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">configuring ODM2 Admin Settings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ODM2Adminbackground.html">Motivation for CZ Manager</a></li>
+<li class="toctree-l1"><a class="reference internal" href="GettingStartedInODM2Admin.html">Getting Started With CZ Manager</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">configuring CZ Manager Settings</a></li>
 </ul>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="ODM2AdminDemo.html">ODM2 Admin Walkthrough</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ODM2AdminDemo.html">CZ Manager Walkthrough</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="GettingStartedInODM2Admin.html" title="previous chapter">Getting Started With ODM2 Admin</a></li>
-      <li>Next: <a href="ODM2AdminDemo.html" title="next chapter">ODM2 Admin Walkthrough</a></li>
+      <li>Previous: <a href="GettingStartedInODM2Admin.html" title="previous chapter">Getting Started With CZ Manager</a></li>
+      <li>Next: <a href="ODM2AdminDemo.html" title="next chapter">CZ Manager Walkthrough</a></li>
   </ul></li>
 </ul>
 </div>
@@ -108,9 +108,9 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="odm2-admin-settings">
-<span id="id1"></span><h1>ODM2 Admin Settings<a class="headerlink" href="#odm2-admin-settings" title="Permalink to this headline">¶</a></h1>
-<p>To configure ODM2 Admin for your site you will want to change the some of settings in the file:</p>
+  <div class="section" id="cz-manager-settings">
+<span id="odm2-admin-settings"></span><h1>CZ Manager Settings<a class="headerlink" href="#cz-manager-settings" title="Permalink to this headline">¶</a></h1>
+<p>To configure CZ Manager for your site you will want to change the some of settings in the file:</p>
 <p>templateAndSettings/settings/development.py
 (<a class="reference external" href="https://github.com/ODM2/ODM2-Admin/blob/master/templatesAndSettings/settings/development.py">https://github.com/ODM2/ODM2-Admin/blob/master/templatesAndSettings/settings/development.py</a>)</p>
 <p>Many of these settings are described in the Django documentation
@@ -151,9 +151,9 @@ see <a class="reference external" href="https://docs.djangoproject.com/en/1.10/t
 </pre></div>
 </div>
 </div>
-<div class="section" id="custom-odm2-admin-settings">
-<h2>Custom ODM2 Admin settings<a class="headerlink" href="#custom-odm2-admin-settings" title="Permalink to this headline">¶</a></h2>
-<p>MAP_CONFIG defines properties of the ODM2 Admin map /mapdata.html in an ODM2 Admin instance, also found under the
+<div class="section" id="custom-cz-manager-settings">
+<h2>Custom CZ Manager settings<a class="headerlink" href="#custom-cz-manager-settings" title="Permalink to this headline">¶</a></h2>
+<p>MAP_CONFIG defines properties of the CZ Manager map /mapdata.html in an CZ Manager instance, also found under the
 shortcut Graph My Data -&gt; Map Sample Locations</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">MAP_CONFIG</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;lat&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
@@ -206,7 +206,7 @@ results, to the sensor dashboard. Feature actions listed here will be present in
 dashboard page.</p>
 <p>The sensor dashboard can be found by visiting ‘Graph My Data’ -&gt; ‘Sensor Dashboard’.</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="index.html#odm2-admin"><span class="std std-ref">ODM2 Admin docs home page</span></a></p></li>
+<li><p><a class="reference internal" href="index.html#odm2-admin"><span class="std std-ref">CZ Manager docs home page</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search the docs</span></a></p></li>
 </ul>
 </div>

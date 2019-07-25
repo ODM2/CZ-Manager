@@ -1,9 +1,9 @@
 .. _ODM2-Administration:
 
-ODM2 Admin Forms
+CZ Manager Forms
 ================
 
-The ODM2 entities you can administer with ODM2 Admin Forms are organized in a number of catogories.
+The ODM2 entities you can administer with CZ Manager Forms are organized in a number of catogories.
 
 * People and Organizations
 * Variables and Units
@@ -78,10 +78,10 @@ Sampling Features and Sites
 
   * Feature actions, sampling feature external identifiers, sampling feature extension property values, and sites
     are inline forms in sampling features.
-* **Related Features:** labeled as 'relate two features' in ODM2 Admin, allows you to establish relationships between
+* **Related Features:** labeled as 'relate two features' in CZ Manager, allows you to establish relationships between
   sampling features such as parent child relationships.
 
-* **Feature action:** labeled as 'Sampling feature actions' in ODM2 Admin. For more see `ODM2 Feature actions doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_featureactions.md>`_
+* **Feature action:** labeled as 'Sampling feature actions' in CZ Manager. For more see `ODM2 Feature actions doc <https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_featureactions.md>`_
 
 * **Sites** Sampling features could also be specimens if they are locations then they need to have an associated site.
 
@@ -91,7 +91,7 @@ Results
 -------
 
 * **Results:** The outcome of an action, such as sensor deployment or specimen observation. These are labeled as data
-results in ODM2 Admin. For more see `ODM2 Results doc https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_results.md`_
+results in CZ Manager. For more see `ODM2 Results doc https://github.com/ODM2/ODM2/blob/master/doc/ODM2Docs/core_results.md`_
 
 * **Datasets:** The Datasets entity is used to encode information about groups of Results that are logically related.
   A Dataset has a type, title, an abstract, and is the entity in ODM2 that would receive a citation.
@@ -123,7 +123,7 @@ Result Values
 
 * **Profile Result Values:** Values for a profile result.
 
-* **Related Results:** Results can be related to one another. In ODM2 Admin they can be used to say that one result is
+* **Related Results:** Results can be related to one another. In CZ Manager they can be used to say that one result is
   derived from another using derivation equations.
 
 * **Related Derivation Equations:** relate derivation equations and results. derived results can have derivation
@@ -181,7 +181,7 @@ External identifier systems
 
 * **External identifier systems:** Such as an IGSN or ORCiD.
 
-:ref:`2) ODM2 Admin Site Management <ODM2AdminSiteManagement>`
+:ref:`2) CZ Manager Site Management <ODM2AdminSiteManagement>`
 
-* :ref:`ODM2 Admin docs home page <ODM2-Admin>`
+* :ref:`CZ Manager docs home page <ODM2-Admin>`
 * :ref:`Search the docs <search>`
