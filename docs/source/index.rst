@@ -8,7 +8,7 @@ CZ Manager
 CZ Manager formerly ODM2 Admin is an application for site level data management of environmental observations using
 Observation Data Model 2 (ODM2). The application was designed for management of data from the Luquillo
 Critical Zone Observatory located in northeastern Puerto Rico. For more details about why CZ Manager was developed
-see :ref:`Motivation-for-ODM2-Admin`
+see :ref:`Motivation for CZ Manager`
 
 ODM2 was created through National Science Foundation Grant EAR-1224638.
 Support for the development of this application comes from NSF Grant EAR-1331841 Luquillo CZO.

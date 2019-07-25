@@ -1,4 +1,4 @@
-.. _Motivation-for-ODM2-Admin:
+.. _Motivation-for-CZ-Manager:
 
 Why CZ Manager was developed
 ============================
