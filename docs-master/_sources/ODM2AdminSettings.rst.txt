@@ -6,7 +6,7 @@ CZ Manager Settings
 To configure CZ Manager for your site you will want to change the some of settings in the file:
 
 templateAndSettings/settings/development.py
-(https://github.com/ODM2/ODM2-Admin/blob/master/templatesAndSettings/settings/development.py)
+(https://github.com/ODM2/CZ-Manager/blob/master/templatesAndSettings/settings/development.py)
 
 Many of these settings are described in the Django documentation
 https://docs.djangoproject.com/en/1.10/ref/settings/#databases
