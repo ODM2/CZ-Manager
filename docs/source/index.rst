@@ -13,7 +13,7 @@ see :ref:`Motivation for CZ Manager`
 ODM2 was created through National Science Foundation Grant EAR-1224638.
 Support for the development of this application comes from NSF Grant EAR-1331841 Luquillo CZO.
 
-The CZ Manager source code can be found here: https://github.com/ODM2/ODM2-Admin
+The CZ Manager source code can be found here: https://github.com/ODM2/CZ-Manager
 
 ODM2 can be found here: https://github.com/ODM2
 
@@ -60,14 +60,14 @@ The fastest way to get started is to install with DockerHub:
 
    InstallODM2AdminWithDocker
 
-Alternatively you can download the source code from github (https://github.com/ODM2/ODM2-Admin) setup a conda
+Alternatively you can download the source code from github (https://github.com/ODM2/CZ-Manager) setup a conda
 environment, create an ODM2 database, run the extrasql.sql script (found in the root directory of the source code)
 on that database, and change settings in:
 
 .. code:: bash
 
-   ODM2-Admin-master\templatesAndSettings\settings\base.py
-   ODM2-Admin-master\templatesAndSettings\settings\development.py
+   CZ-Managermaster\templatesAndSettings\settings\base.py
+   CZ-Manager-master\templatesAndSettings\settings\development.py
 
 When you are depolying to production you will want to change the settings in production.py instead of development.py
 You can also have the settings files point to an existing ODM2 database, you will need to run the extrasql.sql on
