@@ -1,3 +1,4 @@
+django_admin_listfilter_dropdown
 django-admin-shortcuts
 django-ajax-selects
 django-apptemplates

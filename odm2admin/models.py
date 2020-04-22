@@ -251,7 +251,7 @@ class Annotations(models.Model):
                                    on_delete=models.CASCADE)
 
     def __str__(self):
-        s = u" %s" % self.annotationtext
+        s = u" %s - %s" % (self.annotationid, self.annotationcode)
         return s
 
     class Meta:
@@ -261,7 +261,8 @@ class Annotations(models.Model):
             db_table = r'Annotations'
         else:
             db_table = r'annotations'
-
+        verbose_name = 'Annotation'
+        verbose_name_plural = 'Annotations'
 
 class Authorlists(models.Model):
     bridgeid = models.AutoField(primary_key=True)
@@ -2680,6 +2681,11 @@ class Resultannotations(models.Model):
     begindatetime = models.DateTimeField()
     enddatetime = models.DateTimeField()
 
+    def __str__(self):
+        # s = u"%s" % (self.dataloggerfileid)
+        s = u" %s, %s" % (self.resultid, self.annotationid)
+        return s
+
     class Meta:
         managed = False
         _exportdb = settings.EXPORTDB
@@ -2687,7 +2693,8 @@ class Resultannotations(models.Model):
             db_table = r'ResultAnnotations'
         else:
             db_table = r'resultannotations'
-
+        verbose_name = 'Result Annotation'
+        verbose_name_plural = 'Result Annotations'
 
 class Resultderivationequations(models.Model):
     resultid = models.OneToOneField('Results', db_column='resultid',
