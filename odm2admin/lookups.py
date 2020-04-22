@@ -15,6 +15,7 @@ from .models import CvUnitstype
 from .models import CvVariablename
 from .models import CvVariabletype
 ############################################################
+from .models import Annotations
 from .models import Featureactions
 from .models import Results
 from .models import Profileresults
@@ -182,6 +183,54 @@ class DataloggerfileLookup(LookupChannel):
     def get_objects(self, ids):
         obj = Dataloggerfiles.objects.filter(dataloggerfileid__in=ids)
         return obj
+
+
+@register('annotations_lookup')
+class AnnotationsLookup(LookupChannel):
+    model = Annotations
+
+    def get_query(self, q, request):
+        qset = None
+        for part in q.split():
+            if not qset:
+                qset = Annotations.objects.filter(
+                    Q(annotationid__icontains=part) |
+                    Q(annotationcode__icontains=part) |
+                    Q(annotationtypecv__name__icontains=part) |
+                    Q(annotationtext__icontains=part) |
+                    Q(annotatorid__personlastname__icontains=part) |
+                    Q(annotatorid__personfirstname__icontains=part) |
+                    Q(annotationdatetime__icontains=part))
+
+            else:
+                qset = qset & Annotations.objects.filter(
+                    Q(annotationid__icontains=part) |
+                    Q(annotationcode__icontains=part) |
+                    Q(annotationtypecv__name__icontains=part) |
+                    Q(annotationtext__icontains=part) |
+                    Q(annotatorid__personlastname__icontains=part) |
+                    Q(annotatorid__personfirstname__icontains=part) |
+                    Q(annotationdatetime__icontains=part))
+                # raise ValidationError(qset)
+        return qset
+
+    def get_result(self, obj):
+        return "%s- %s - %s - %s" % (
+            obj.annotationid, obj.annotationtypecv, obj.annotationcode, obj.annotationdatetime)
+
+    def format_match(self, obj):
+        # return self.format_item_display(obj)
+        return "%s- %s - %s - %s" % (
+            obj.annotationid, obj.annotationtypecv, obj.annotationcode, obj.annotationdatetime)
+
+    def format_item_display(self, obj):
+        return "%s- %s - %s - %s" % (
+            obj.annotationid, obj.annotationtypecv, obj.annotationcode, obj.annotationdatetime)
+
+    def get_objects(self, ids):
+        obj = Annotations.objects.filter(annotationid__in=ids)
+        return obj
+
 
 @register('result_lookup')
 class ResultsLookup(LookupChannel):

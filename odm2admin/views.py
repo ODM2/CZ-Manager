@@ -709,15 +709,18 @@ def truncate(f, n):
     i, p, d = s.partition('.')
     return '.'.join([i, (d+'0'*n)[:n]])
 
-def sensor_dashboard(request, feature_action='NotSet', sampling_feature='NotSet'):
+def sensor_dashboard(request, feature_action='NotSet', sampling_feature='NotSet', results='NotSet'):
     authenticated = True
     if not request.user.is_authenticated:
         # return HttpResponseRedirect('../')
         authenticated = False
     ids = settings.SENSOR_DASHBOARD['featureactionids']
+    resultids = settings.SENSOR_DASHBOARD['resultids']
     timeseriesdays = settings.SENSOR_DASHBOARD['time_series_days']
+    use_results= False
     fas = None
     allfas = None
+    results2 = None
     if not feature_action == 'NotSet':
         selected_featureactionid = int(feature_action)
         # print(selected_featureactionid)
@@ -730,19 +733,28 @@ def sensor_dashboard(request, feature_action='NotSet', sampling_feature='NotSet'
         fas = Featureactions.objects.filter(samplingfeatureid=samplingfeatureid
                                         ).order_by('-samplingfeatureid')
         allfas = Featureactions.objects.filter(featureactionid__in=ids).order_by('-samplingfeatureid')
+    elif not results == 'NotSet':
+        selected_featureactionid = 'NotSet'
+        use_results = True
+        results2 = Results.objects.filter(resultid__in=resultids)
+        fas = Featureactions.objects.filter(featureactionid__in=results2.values_list ('featureactionid')).order_by('-samplingfeatureid')
+        # print('fa count: ' + str(len(fas)))
+        allfas = fas
     else:
         selected_featureactionid = 'NotSet'
         # print(selected_featureactionid)
         fas = Featureactions.objects.filter(featureactionid__in=ids).order_by('-samplingfeatureid')
         allfas = fas
     #samplingfeatures = Samplingfeatures.filter(samplingfeatureid__in=fas)
-    results = Results.objects.filter(featureactionid__in=fas)
-    tsrs = Timeseriesresults.objects.filter(resultid__in=results)
+    if not use_results:
+        results2 = Results.objects.filter(featureactionid__in=fas)
+
+    # print(results2)
     endDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
     #calculated_result_properties={}
     #for tsr in tsrs:
         #print(tsr)
-    repvs = Resultextensionpropertyvalues.objects.filter(resultid__in=results).order_by("resultid","propertyid")
+    repvs = Resultextensionpropertyvalues.objects.filter(resultid__in=results2).order_by("resultid","propertyid")
     dcount = 0
     dmaxcount = 0
     lastResult = None
@@ -792,7 +804,7 @@ def sensor_dashboard(request, feature_action='NotSet', sampling_feature='NotSet'
         {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
          'featureactions':fas,
          'allfeatureactions':allfas,
-         'results': results,
+         'results': results2,
          'feature_action': selected_featureactionid,
          'authenticated': authenticated,
          'resultextionproperties':repvs,
@@ -1917,23 +1929,24 @@ def procDataLoggerFile(request):
     databeginson = None
     columnheaderson = None
     check_dates=False
-    print('in view')
+    # print('in view')
     # print(request.POST)
     if 'dataloggerfileid' in request.POST:
-        dataloggerfileid = int(re.sub('[-]', '', request.POST['dataloggerfileid']))
+        dataloggerfileid = re.sub('[^0-9]', '', request.POST['dataloggerfileid'])
+        dataloggerfileid = int(dataloggerfileid)
         # print(dataloggerfileid)
     if 'processingCode' in request.POST:
         processingCode = request.POST['processingCode']
-        print('processingCode')
-        print(processingCode)
+        # print('processingCode')
+        # print(processingCode)
     if 'databeginson' in request.POST:
         databeginson = int(request.POST['databeginson'])
-        print('databeingson')
-        print(databeginson)
+        # print('databeingson')
+        # print(databeginson)
     if 'columnheaderson' in request.POST:
         columnheaderson = int(request.POST['columnheaderson'])
-        print('column headers on')
-        print(columnheaderson)
+        # print('column headers on')
+        # print(columnheaderson)
     if 'check_dates' in request.POST:
         if request.POST['check_dates'] =='True':
             check_dates = True
@@ -2406,6 +2419,23 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             mergeResults = 'true'
             for results in resultids:
                 resultidu.append(int(results))
+            resultidu.sort()
+        selected_results = []
+        name_of_sampling_features = []
+        # name_of_variables = []
+        name_of_units = []
+
+        dashboardqsids = [16525, 18699, 16532, 18700, 17170, 17174, 17173]
+        qsdb = False
+        for dbid in dashboardqsids:
+            for rid in resultidu:
+                if dbid == rid:
+                    qsdb = True
+        if popup == 'smll' and qsdb:
+            resultidu.append(18699)
+            resultidu.sort()
+
+
     selected_results = []
     name_of_sampling_features = []
     # name_of_variables = []
@@ -2739,6 +2769,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
                           str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
                           "lineWidth":two,"data": data['datavalue' + str(i)], "zones": zones})
+            print(series)
             # "plotOptions": {"maker": {"enabled": true},
         if mergeResults =='true' and len(mergedResultSets) <= i:
             break

@@ -3,9 +3,11 @@ from django.contrib import admin
 from .forms import ActionByAdmin
 from .forms import ActionsAdmin
 from .forms import AffiliationsAdmin
+from .forms import AnnotationsAdmin
 from .forms import AuthorlistsAdmin
 from .forms import CitationextensionpropertyvaluesAdmin
 from .forms import CitationsAdmin
+from .forms import CVAnnotationtypeAdmin
 from .forms import DataloggerfilecolumnsAdmin
 from .forms import DataloggerfilesAdmin
 from .forms import DataloggerprogramfilesAdmin
@@ -26,6 +28,7 @@ from .forms import MethodcitationsAdmin
 from .forms import MethodsAdmin
 from .forms import OrganizationsAdmin
 from .forms import PeopleAdmin
+from .forms import ResultannotationsAdmin
 from .forms import ProfileresultsAdmin
 from .forms import ProfileresultsvaluesAdmin
 from .forms import ProcessingLevelsAdmin
@@ -48,9 +51,11 @@ from .forms import VariablesAdmin
 from .models import Actionby
 from .models import Actions
 from .models import Affiliations
+from .models import Annotations
 from .models import Authorlists
 from .models import Citationextensionpropertyvalues
 from .models import Citations
+from .models import CvAnnotationtype
 from .models import Dataloggerfilecolumns
 from .models import Dataloggerfiles
 from .models import Dataloggerprogramfiles
@@ -79,6 +84,7 @@ from .models import Profileresultvalues
 from .models import Relatedactions
 from .models import Relatedfeatures
 from .models import Relatedresults
+from .models import Resultannotations
 from .models import Results
 from .models import Resultsdataquality
 from .models import Resultderivationequations
@@ -101,7 +107,8 @@ admin.site.register(Authorlists, AuthorlistsAdmin)
 admin.site.register(Methodcitations, MethodcitationsAdmin)
 admin.site.register(Extensionproperties, ExtensionpropertiesAdmin)
 admin.site.register(Citationextensionpropertyvalues, CitationextensionpropertyvaluesAdmin)
-
+admin.site.register(Annotations, AnnotationsAdmin)
+admin.site.register(CvAnnotationtype, CVAnnotationtypeAdmin)
 admin.site.register(Profileresults, ProfileresultsAdmin)
 admin.site.register(Profileresultvalues, ProfileresultsvaluesAdmin)
 admin.site.register(Equipmentmodels, EquipmentmodelsAdmin)
@@ -126,6 +133,7 @@ admin.site.register(Results, ResultsAdmin)
 admin.site.register(Relatedactions, RelatedactionsAdmin)
 admin.site.register(Relatedresults, RelatedresultsAdmin)
 admin.site.register(Resultderivationequations, ResultderivationequationsAdmin)
+admin.site.register(Resultannotations, ResultannotationsAdmin)
 admin.site.register(Variables, VariablesAdmin)
 admin.site.register(ProcessDataloggerfile, ProcessDataloggerfileAdmin)
 admin.site.register(Externalidentifiersystems, ExternalidentifiersystemAdmin)

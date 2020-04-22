@@ -186,10 +186,11 @@ class Command(BaseCommand):
             tolist.append(admin['email'])
         tolist.append(email)
         # print(tolist)
-        email = EmailMessage(emailtitle, emailtext, settings.EMAIL_FROM_ADDRESS, tolist)
-        # print('email')
-        # print(emailtext)
-        emailout = email.send()
+        if len(email) > 0:
+            email = EmailMessage(emailtitle, emailtext, settings.EMAIL_FROM_ADDRESS, tolist)
+            # print('email')
+            # print(emailtext)
+            emailout = email.send()
         # print(str(emailout))
         # print('emailed?')
         # response_data['newresultid'] = newresult

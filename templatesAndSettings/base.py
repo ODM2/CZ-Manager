@@ -173,6 +173,7 @@ AJAX_LOOKUP_CHANNELS = dict(
     cv_method_type=('{}.lookups'.format(APP_NAME), 'CvMethodTypeLookup'),
     cv_action_type=('{}.lookups'.format(APP_NAME), 'CvActionTypeLookup'),
     cv_sampling_feature_type=('{}.lookups'.format(APP_NAME), 'CvSamplingFeatureTypeLookup'),
+    annotations_lookup=('{}.lookups'.format(APP_NAME), 'AnnotationsLookup'),
     cv_sampling_feature_geo_type=('{}.lookups'.format(APP_NAME), 'CvSamplingFeatureGeoTypeLookup'),
     cv_elevation_datum=('{}.lookups'.format(APP_NAME), 'CvElevationDatumLookup'))
 

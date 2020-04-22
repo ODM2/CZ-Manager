@@ -6,6 +6,7 @@ import stat
 import subprocess
 import sys
 import datetime as datetime
+import types
 from django.utils.crypto import get_random_string
 from django.core import management
 from django.core import serializers
@@ -34,6 +35,8 @@ from .management.commands.ProcessDataLoggerFile import updateStartDateEndDate
 from .models import Actionby, Specimens
 from .models import Actions
 from .models import Affiliations
+from .models import Annotations
+from .models import CvAnnotationtype
 from .models import Authorlists
 from .models import Citationextensionpropertyvalues
 from .models import Citationexternalidentifiers
@@ -65,6 +68,7 @@ from .models import Relatedactions
 from .models import Relatedfeatures
 from .models import Relatedresults
 from .models import Results
+from .models import Resultannotations
 from .models import Resultextensionpropertyvalues
 from .models import Resultsdataquality
 from .models import Samplingfeatureextensionpropertyvalues
@@ -89,6 +93,7 @@ from .models import Measurementresultvalues
 from .models import Profileresultvalues
 # from .views import dataloggercolumnView
 from daterange_filter.filter import DateRangeFilter
+from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedDropdownFilter, ChoiceDropdownFilter
 import re
 
 from .readonlyadmin import ReadOnlyAdmin
@@ -204,9 +209,42 @@ class ReadOnlyCitationextensionpropertyvalueInline(Citationextensionpropertyvalu
         return False
 
 
-class resultsInLine(admin.StackedInline):
+class ResultInLine(admin.StackedInline):
     model = Results
 
+class ResultAnnotationsInLineAdminForm(ModelForm):
+    resultid = AutoCompleteSelectField('result_lookup', required=True,
+                                       help_text='A data result',
+                                       label='Data result',show_help_text =None)
+    annotationid = AutoCompleteSelectField('annotations_lookup', required=True,
+                                       help_text='An annotation',
+                                       label='annotation',show_help_text =None)
+
+    class Meta:
+        model = Resultannotations
+        fields = ['bridgeid', 'annotationid', 'resultid', 'begindatetime', 'enddatetime']
+
+class ResultAnnotationsInLine(admin.StackedInline):
+    model = Resultannotations
+    form = ResultAnnotationsInLineAdminForm
+    fieldsets = (
+        ('Details', {
+            'classes': ('collapse',),
+            'fields': ('bridgeid', 'annotationid', 'resultid',
+                       'begindatetime',
+                       'enddatetime',)
+
+        }),
+    )
+    extra = 0
+
+
+class ReadOnlyResultAnnotationsInLine(ResultAnnotationsInLine):
+    readonly_fields = ResultAnnotationsInLine.fieldsets[0][1]['fields']
+    can_delete = False
+
+    def has_add_permission(self, request):
+        return False
 
 # Resultsdataquality AdminForm
 class ResultsdataqualityAdminForm(ModelForm):
@@ -445,6 +483,74 @@ class ReadOnlyDOIInline(DOIInline):
 
     def has_add_permission(self, request):
         return False
+
+class AnnotationsAdminForm(ModelForm):
+    annotationtext = forms.CharField(max_length=500, widget=forms.Textarea, label="Annotation Text")
+    # annotationtypecv = forms.Auto
+    class Meta:
+        model = Annotations
+        fields = ['annotationtypecv', 'annotationcode', 'annotationtext',
+                  'annotationdatetime', 'annotationutcoffset', 'annotationlink', 'annotatorid']
+
+
+class ResultannotationsAdminForm(ModelForm):
+    resultid = AutoCompleteSelectField('result_lookup', required=True,
+                                       help_text='A data result',
+                                       label='Data result',show_help_text =None)
+    annotationid = AutoCompleteSelectField('annotations_lookup', required=True,
+                                       help_text='An annotation',
+                                       label='annotation',show_help_text =None)
+    class Meta:
+        model = Resultannotations
+        fields = '__all__'
+
+class ResultannotationsAdmin(admin.ModelAdmin):
+    form = ResultannotationsAdminForm
+
+class CVAnnotationtypeAdmin(admin.ModelAdmin):
+    ordering = ['name']
+    search_fields = ['name', 'definition']
+    class Meta:
+        model = CvAnnotationtype
+
+class AnnotationsAdmin(admin.ModelAdmin):
+    user_readonly = [p.name for p in Annotations._meta.get_fields() if not p.one_to_many]
+    user_readonly_inlines = [ReadOnlyResultAnnotationsInLine]
+
+    form = AnnotationsAdminForm
+    inlines = [ResultAnnotationsInLine]
+    # autocomplete_fields = ['annotationtypecv']
+    list_display = ('annotationcode', 'annotationtypecv',
+                    'annotationtext', 'annotationdatetime',
+                    'annotation_author', 'results')
+    list_filter = (('annotationtypecv__name',DropdownFilter ),)
+    # list_display_links = ['annotationtext']
+
+
+    search_fields = ['annotationcode', 'annotationtypecv__name', 'annotationtypecv__definition', 'annotationtypecv__term',
+                     'annotationtext', 'annotationdatetime',
+                     'annotatorid__personlastname', 'annotatorid__personfirstname']
+    def results(self, obj):
+        resultannotations = Resultannotations.objects.filter(annotationid=obj.annotationid)
+        strresultanno = ""
+        for resultanno in resultannotations:
+            if strresultanno == "":
+                strresultanno += " " + str(resultanno.resultid)
+            else:
+                strresultanno += ", " + str(resultanno.resultid)
+        return strresultanno
+
+    def annotation_author(self, obj):
+        if obj.annotatorid is None:
+            print('None')
+            return ""
+        annotator = People.objects.filter(personid=obj.annotatorid.personid).get()
+
+        # name = annotator.personlastname
+        # print(annotator.personlastname)
+        # print(annotator.personfirstname)
+        return "{0}, {1}".format(annotator.personlastname,
+                                      annotator.personfirstname)
 
 
 class CitationsAdmin(ReadOnlyAdmin):

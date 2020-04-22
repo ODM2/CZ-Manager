@@ -176,6 +176,7 @@ INSTALLED_APPS = (
     'import_export',
     'social_django',
     'daterange_filter',
+    'django_admin_listfilter_dropdown',
     'captcha',
     'fixture_magic',
     # 'dal',
