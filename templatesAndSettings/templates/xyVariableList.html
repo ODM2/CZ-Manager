@@ -62,8 +62,15 @@ option {
 				{% endif %}
               {% endfor %}
             </select></td>
-			
-	<td><input type="submit" name="update_chart" value="Update Chart" />
+	</tr>
+		<tr>
+			<td>Reload graph with date range:</td></tr>
+		<tr>
+	<td colspan="2">	<input id="startDate" maxlength="100" value= "{{ startDate }}" name="startDate" type="text">
+			Start Date (format YYYY-MM-DD HH:MM) </input>
+			<input id="endDate" maxlength="100" value= "{{ endDate }}" name="endDate" type="text"/>
+			End Date (format YYYY-MM-DD HH:MM) </input></td><td>
+			<td><input type="submit" name="update_chart" value="Update Chart" />
 	<input type="submit" name="export_data" value="Export Data" />
 	</td></tr></table>
 	</form>

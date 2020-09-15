@@ -8,7 +8,7 @@ from .base import *
 # Disable debugging by default.
 DEBUG = True
 """ END DEBUG CONFIGURATION """
-
+ALWAYS_AUTHENTICATE = True
 """ EXTRA VARIABLES CONFIGURATION -"""
 EXPORTDB = False #  if set to true this will use Camel case table names for SQLite
 UTC_OFFSET = -4

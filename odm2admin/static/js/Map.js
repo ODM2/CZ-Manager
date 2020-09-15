@@ -8,21 +8,27 @@ MAP.prototype.initMap = function (map_id, initCenter, initZoom, legends, cluster
 	this.initCenter = initCenter;
 	this.initZoom = initZoom;
 	this.markers = L.markerClusterGroup();
+
 	this.cluster_feature_types = cluster_feature_types;
 	this.basemaps = {};
 	this.legends = legends;
 	this.display_titles = display_titles;
-
+	this.markerLayer = L.featureGroup();
 
 	var mapOptions = {
 	    center: this.initCenter,
 		zoom: this.initZoom,
-		scrollWheelZoom: false,
+		maxZoom: 20,
+		scrollWheelZoom: true,
 		worldCopyJump: true,
         zoomControl: false
 	};
 
 	this.webmap = L.map(map_id, mapOptions);
+
+	//this.webmap.addControl(controlSearch);
+    //this.webmap.addControl( new L.Control.Search({layer: searchLayer}) );
+
     var sidebar = L.control.sidebar('sidebar',{
             closeButton: true,
             position: 'left',
@@ -48,6 +54,7 @@ MAP.prototype.initMap = function (map_id, initCenter, initZoom, legends, cluster
 
         for (i = 0; i < acc.length; i++) {
           acc[i].onclick = function() {
+
             this.classList.toggle("active");
             var panel = this.nextElementSibling;
             if (panel.style.maxHeight){
@@ -80,6 +87,7 @@ MAP.prototype.makeBaseMap = function (basemap) {
 };
 
 makeURL = function (parameters) {
+
     var baseurl = '/' + url_path +'features';
     var params_arr = [];
     params_arr.push('type=' + parameters.type);
@@ -96,6 +104,7 @@ MAP.prototype.getData = function (url,spinner) {
     var style_class = '';
 	var icon_str = '';
 	var done = false;
+	var listofmarkers = [];
 	Ajax.initRequest();
     Ajax.sendAndLoad(url, function (response) {
         var samplingFeatures = JSON.parse(response);
@@ -117,17 +126,20 @@ MAP.prototype.getData = function (url,spinner) {
             done = false;
 
             if(cluster_feature_types.includes(sf['sampling_feature_type'])){
-                _this.markers.addLayer(marker);
+                _this.markers.addLayer(_this.markerLayer);
                 done=true
             }
             if(!done){
-				marker.addTo(_this.webmap);
+				//marker.addTo(_this.markerLayer);
+				listofmarkers.push(marker);
 			}
         });
-        _this.markers.addTo(_this.webmap);
+        //_this.markers.addTo(_this.markerLayer);
+        _this.markerLayer = L.layerGroup(listofmarkers).addTo(_this.webmap);
         //console.log('here');
 		spinner.stop();
-
+		makeSearch();
+        //_this.markerLayer.addTo(_this.webmap);
         //_this.closeSidebar();
     });
 
@@ -154,6 +166,7 @@ createMarker = function (latlng, markerIcon, color, sfname,style_class,icon_str)
             icon: iconDiv,
             markerColor: color,
             prefix: 'fa',
+            title: sfname,
             riseOnHover: true
 		});
 		return marker; 
@@ -351,7 +364,7 @@ maketablecontent = function (obs) {
 
 makeMarkerPopup = function (marker, obs) {
     // console.log(obs.relationships);
-
+    var title = obs.samplingfeaturecode;
     var header = "<br><h2>"+ obs.samplingfeaturename + "</h2>"
             + "<hr />";
     var tablestart = "<table class='table table-bordered table-hover'>"
@@ -371,6 +384,7 @@ makeMarkerPopup = function (marker, obs) {
     var link = null;
     if (obs.sampling_feature_type == "Site" || obs.sampling_feature_type == "Observation well" ||
         obs.sampling_feature_type == "Stream gage" || obs.sampling_feature_type == "Transect" ||
+        obs.sampling_feature_type == "Water quality station" ||
         obs.sampling_feature_type == "Weather station" || obs.sampling_feature_type == "Profile" ||
         obs.sampling_feature_type == "Specimen") {
         markerpopup = header + "<div style='height: 500px; overflow: scroll;'>" + popup
@@ -407,11 +421,43 @@ makeMarkerPopup = function (marker, obs) {
             + "<div style='height: 500px; overflow: scroll;'>"
             + popup + "</div>";
     }
-
-	marker.bindPopup(markerpopup, {
-	    maxWidth : 620
+    //marker.sfname = obs.samplingfeaturecode;
+    marker.options.title=obs.samplingfeaturecode;
+	marker.bindPopup(markerpopup,
+	{
+	    maxWidth : 620,
+	    title: obs.samplingfeaturecode,
     });
+    //marker.options.title=obs.samplingfeaturecode;
+    //for (var i = 1; i < 5; i +=1){
+    //console.log(marker);
+    //}
     return markerpopup;
+};
+
+makeSearch = function () {
+    //console.log(_this);
+	//this.searchLayer = this.markers;  //L.layerGroup().addTo(this.webmap);
+	var controlSearch = new L.Control.Search({
+		position:'topright',
+		layer: _this.markerLayer,
+		initial: false,
+		//marker: _this.markerLayer,
+		maxZoom: 20,
+		propertyName: 'title'
+
+		//propertyName: 'sfname'
+		// marker: true,
+		//propertyName: 'title'
+		//buildTip: function(text, val) {
+		//	var type = val.layer.feature.properties.sfname;
+		//	return '<a href="#" class="'+type+'">'+text+'<b>'+type+'</b></a>';
+		//}
+		//sourceData: _this.markerLayer,
+	});
+	//console.log(controlSearch);
+	_this.webmap.addControl( controlSearch );
+
 };
 
 MAP.prototype.makeFilter = function () {
@@ -425,6 +471,8 @@ MAP.prototype.makeFilter = function () {
     $(".legend-container").append( $("#dataset-filter") );
     $(".legend-toggle").append( "<i class='legend-toggle-icon fa fa-filter fa-2x' style='color: #000;margin-left:5px;'></i>" );
 };
+
+
 
 
 MAP.prototype.makeLegend = function (featureList) {

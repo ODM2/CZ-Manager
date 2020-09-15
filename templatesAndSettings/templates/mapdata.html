@@ -49,10 +49,11 @@ window.prefixpath = '{{prefixpath}}';
         //console.log('here');
         // to save the form I need to do something like this https://realpython.com/django-and-ajax-form-submissions/
         window.onclick = function(e) {
-            //console.log(e.target.parentNode);
-            if(e.target.localName=='a'){
+            //console.log(e.target.id);
+            if(e.target.localName=='a' && e.target.id == 'linktosidebar'){
                 e.preventDefault();
                 myMap.openSidebar();
+                //console.log(window.globalurl);
                 window.globalurl = e.target.href; //window.location.protocol + "//" + window.location.host +path;
                 url = window.globalurl + " #content";
                 //console.log('load divs');
@@ -62,6 +63,8 @@ window.prefixpath = '{{prefixpath}}';
                 //console.log(url);
                 $( "#jsholder" ).load(url); //odm2admin_content document.getElementById("sidebar")
                 //console.log('loaded');
+
+                }else{
 
                 };
 
@@ -147,7 +150,12 @@ window.prefixpath = '{{prefixpath}}';
         var url = myMap.getUrl(JSON.parse('{{ selectedds|safe }}'), JSON.parse('{{ selectedtype|safe }}'));
         myMap.getData(url,spinner);
         myMap.makeFilter();
+
         var loaded = true;
+        let i = 0;
+        //console.log(myMap);
+        //myMap.eachLayer(function(){ i += 1; });
+        //console.log('Map has', i, 'layers.');
 };
 
     </script>

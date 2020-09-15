@@ -64,7 +64,7 @@ color:#dddddd !important;;
 	<script src="https://code.highcharts.com/modules/exporting.js"></script>
 	 <script src="https://rawgithub.com/RolandBanguiran/highcharts-scalable-yaxis/master/scalable-yaxis.js"></script>
 	 <script src="https://highcharts.github.io/export-csv/export-csv.js"></script>
-	 
+
 	<script>
     var chart_id = 'chartid';
     var chart = {{ chart|safe }};
@@ -176,127 +176,149 @@ color:#dddddd !important;;
 			});
 		}
 	}
-	
+
 $(document).ready(function() {
 	$('#annotationButton').click(function () {
 		//console.log('hello');
-		var $report= $('#report');
-		var annotation = $("#annotation").val();
-		var cvqualitycode = $("#SelectedQualityCode").val();
-		var setNaN = document.getElementById('setNaN').checked //$("#setNaN").checked;
-		//console.log('annotate');
-		var selectedResult = {{SelectedResults|safe}};
-		//console.log(selectedResult);
-		//$report.html('annotation \'' + annotation + '\' saved.');
-		//console.log(cvqualitycode);
-		//var annotationButton = document.getElementById("annotationButton"); //$("#email_data");
-		//annotationButton.firstChild.data = "annotation saved";
-		var annotationButton = document.getElementById("annotationButton");
-		annotationButton.disabled = true;
-		annotationButton.firstChild.data = "annotating values";
-		$.ajax({
-				url: "{{prefixpath}}../addannotation/",
-				type: "POST",
-				timeout: 0,
-				data: {
-					'resultidu': selectedResult,
-					'annotationvals': annotationvals,
-					'cvqualitycode': cvqualitycode,
-					'annotation': annotation,
-					'setNaN': setNaN,
-					'csrfmiddlewaretoken': '{{ csrf_token }}', 
-				},
-				cache:false,
-				success: function(json) {
-					var annotationButton = document.getElementById("annotationButton");
-					//clearSelectPoints();
-					if (typeof json.error  != "undefined"){
-						annotationButton.firstChild.data = "Values added: "+json.error + " reloading page";
-					} else if(setNaN){
-						annotationButton.firstChild.data = "reloading page";
-					}else{
-						annotationButton.firstChild.data = "Annotation complete, add another";
-					}
-					annotationButton.disabled = false;
-					if(setNaN){
-						location.reload();
-					}
-				},
-		});
+		if(annotationvals.length > 0){
+			var report= document.getElementById('report');
+			report.firstChild.innerHTML = '';
+			var annotation = $("#annotation").val();
+			var cvqualitycode = $("#SelectedQualityCode").val();
+			var setNaN = document.getElementById('setNaN').checked //$("#setNaN").checked;
+			//console.log('annotate');
+			var selectedResult = {{SelectedResults|safe}};
+			//console.log(selectedResult);
+			//$report.html('annotation \'' + annotation + '\' saved.');
+			//console.log(cvqualitycode);
+			//var annotationButton = document.getElementById("annotationButton"); //$("#email_data");
+			//annotationButton.firstChild.data = "annotation saved";
+			var annotationButton = document.getElementById("annotationButton");
+			annotationButton.disabled = true;
+			annotationButton.firstChild.data = "annotating values";
+			$.ajax({
+					url: "{{prefixpath}}../addannotation/",
+					type: "POST",
+					timeout: 0,
+					data: {
+						'resultidu': selectedResult,
+						'annotationvals': annotationvals,
+						'cvqualitycode': cvqualitycode,
+						'annotation': annotation,
+						'setNaN': setNaN,
+						'csrfmiddlewaretoken': '{{ csrf_token }}',
+					},
+					cache:false,
+					success: function(json) {
+						var annotationButton = document.getElementById("annotationButton");
+						//clearSelectPoints();
+						if (typeof json.error  != "undefined"){
+							annotationButton.firstChild.data = "Values added: "+json.error + " reloading page";
+						} else if(setNaN){
+							annotationButton.firstChild.data = "reloading page";
+						}else{
+							annotationButton.firstChild.data = "Annotation complete, add another";
+						}
+						annotationButton.disabled = false;
+						if(setNaN){
+							location.reload();
+						}
+					},
+			});
+		} else{
+			var report= document.getElementById('report');
+			report.firstChild.innerHTML = 'you must select points to annotate above.';
+		};
 	});
 	$('#offsetButton').click(function () {
-		//console.log('hello');
-		var $report= $('#report');
-		var offset = $("#offset").val();
-		//console.log('annotate');
-		var selectedResult = {{SelectedResults|safe}};
-		//console.log(selectedResult);
-		//$report.html('annotation \'' + annotation + '\' saved.');
-		var offsetButton = document.getElementById("offsetButton");
-		offsetButton.disabled = true;
-		offsetButton.firstChild.data = "offsetting values";
-		//console.log(annotationvals);
-		$.ajax({
-				url: "{{prefixpath}}../addoffset/",
-				type: "POST",
-				cache:false,
-				data: {
-					'resultidu': selectedResult,
-					'offsetvals': annotationvals,
-					'offset': offset,
-					'csrfmiddlewaretoken': '{{ csrf_token }}',
-				},
-				success: function(json) {
-					//console.log("success");
-					var offsetButton = document.getElementById("offsetButton");
-					offsetButton.firstChild.data = "reloading page";
-					offsetButton.disabled = false;
-					//offsetPoints(parseFloat(offset));
-					//setTimeout(function(){location.reload();},100);
-					location.reload();
-        },
-		});
+		if(annotationvals.length > 0){
+			var report= document.getElementById('report');
+			report.firstChild.innerHTML = '';
+			//console.log('hello');
+			var $report= $('#report');
+			var offset = $("#offset").val();
+			//console.log('annotate');
+			var selectedResult = {{SelectedResults|safe}};
+			//console.log(selectedResult);
+			//$report.html('annotation \'' + annotation + '\' saved.');
+			var offsetButton = document.getElementById("offsetButton");
+			offsetButton.disabled = true;
+			offsetButton.firstChild.data = "offsetting values";
+			//console.log(annotationvals);
+			$.ajax({
+					url: "{{prefixpath}}../addoffset/",
+					type: "POST",
+					cache:false,
+					data: {
+						'resultidu': selectedResult,
+						'offsetvals': annotationvals,
+						'offset': offset,
+						'csrfmiddlewaretoken': '{{ csrf_token }}',
+					},
+					success: function(json) {
+						//console.log("success");
+						var offsetButton = document.getElementById("offsetButton");
+						offsetButton.firstChild.data = "reloading page";
+						offsetButton.disabled = false;
+						//offsetPoints(parseFloat(offset));
+						//setTimeout(function(){location.reload();},100);
+						location.reload();
+			},
+			});
+		} else{
+			var report= document.getElementById('report');
+			report.firstChild.innerHTML = 'you must select points to offset above.';
+
+		};
 	});
 	$('#shiftValuesButton').click(function () {
-		var $report= $('#report');
-		var shift = $("#shiftValues").val();
-		var selectedResult = {{SelectedResults|safe}};
-		var shiftValuesButton = document.getElementById("shiftValuesButton");
-		var radios = document.getElementsByName("shiftdirection");
-		var direction = "forward";
-		for (var i = 0, length = radios.length; i<length; i++){
-			if (radios[i].checked){
-				direction = radios[i].value;
+		if(annotationvals.length > 0){
+			var report= document.getElementById('report');
+			report.firstChild.innerHTML = '';
+			var $report= document.getElementById("$report");
+			var shift = $("#shiftValues").val();
+			var selectedResult = {{SelectedResults|safe}};
+			var shiftValuesButton = document.getElementById("shiftValuesButton");
+			var radios = document.getElementsByName("shiftdirection");
+			var direction = "forward";
+			for (var i = 0, length = radios.length; i<length; i++){
+				if (radios[i].checked){
+					direction = radios[i].value;
+				}
 			}
-		}
-		shiftValuesButton.disabled = true;
-		shiftValuesButton.firstChild.data = "shifting values";
 
-		$.ajax({
-				url: "{{prefixpath}}../addshiftvals/",
-				type: "POST",
-				data: {
-					'resultidu': selectedResult,
-					'shiftvals': annotationvals,
-					'shift': shift,
-					'direction' : direction,
-					'csrfmiddlewaretoken': '{{ csrf_token }}',
-				},
-				success: function(json) {
-					//console.log("success");
-					var shiftValuesButton = document.getElementById("shiftValuesButton");
-					shiftValuesButton.firstChild.data = "reloading page";
-					shiftValuesButton.disabled = false;
-					location.reload();
-        		},
-		});
+			shiftValuesButton.disabled = true;
+			shiftValuesButton.firstChild.data = "shifting values";
+
+			$.ajax({
+					url: "{{prefixpath}}../addshiftvals/",
+					type: "POST",
+					data: {
+						'resultidu': selectedResult,
+						'shiftvals': annotationvals,
+						'shift': shift,
+						'direction' : direction,
+						'csrfmiddlewaretoken': '{{ csrf_token }}',
+					},
+					success: function(json) {
+						//console.log("success");
+						var shiftValuesButton = document.getElementById("shiftValuesButton");
+						shiftValuesButton.firstChild.data = "reloading page";
+						shiftValuesButton.disabled = false;
+						location.reload();
+					},
+			});
+		} else {
+			var report= document.getElementById('report');
+			report.firstChild.innerHTML = 'you must select points to drift correct above.';
+		};
 	});
 	//createL1
 	$('#createL1').click(function () {
 		var selectedResult = {{SelectedResults|safe}};
 		$("#createL1").attr("disabled", true);
 		var createL1Button = document.getElementById("createL1");
-		var email = $("#email").val();
+
 		createL1Button.disabled = true;
 		createL1Button.firstChild.data = "adding values";
 		$.ajax({
@@ -305,16 +327,16 @@ $(document).ready(function() {
 				data: {
 					'resultidu': selectedResult,
 					'createorupdateL1': 'create',
-					'email': email,
-					'csrfmiddlewaretoken': '{{ csrf_token }}', 
+
+					'csrfmiddlewaretoken': '{{ csrf_token }}',
 				},
 				success : function(json) {
 					//$('#post-text').val(''); // remove the value from the input
 					//console.log(json); // log the returned json to the console
 					//console.log("success"); // another sanity check
 					var createL1Button = document.getElementById("createL1"); //$("#email_data");
-					createL1Button.firstChild.data = "emailing "+json.valuesadded + "";
-					//createL1Button.disabled = false;
+					createL1Button.firstChild.data = "Values added: "+json.valuesadded + " reloading page";
+					createL1Button.disabled = false;
 					//location.reload();
         		},
 		});
@@ -334,8 +356,8 @@ $(document).ready(function() {
 				data: {
 					'resultidu': selectedResult,
 					'createorupdateL1': 'update',
-					'email': email,
-					'csrfmiddlewaretoken': '{{ csrf_token }}', 
+
+					'csrfmiddlewaretoken': '{{ csrf_token }}',
 				},
 				success : function(json) {
 					location.reload();
@@ -346,29 +368,32 @@ $(document).ready(function() {
 		});
 	});
 	//updateL1
-	
+
 	var $report= $('#report');
 	var opposite2 = false;
 	yaxes = [];
-	
+
 
 
 	for (var i=0; i<series.length; i++){
+
 	data = series[i].data;
 		for(var j=0; j<data.length; j++){
-			if(data[j][1]=='null'){
-				data[j][1] = null;
+
+			if(data[j]["y"]=="null"){
+				data[j]["y"] = null;
+
 			}
 			}
 	//console.log(data);
 	data.sort();
 	//data = sortOnKeys(data);
 	}
-	
+
 	for (var i=0; i<name_of_units.length; i++) {
 		name = name_of_units[i];
 		//alert(name);
-		   
+
 		axi = {id: name,
 		scrollbar: {
         enabled: true
@@ -478,7 +503,7 @@ $(document).ready(function() {
 		});
 
 });
-	 
+
 </script>
 
 <p><h1>
@@ -494,12 +519,12 @@ Method- {{featureActionMethod}}
     <div id='content-main'> {% csrf_token %}
 	 </div>
 	<div id='chartid' class="chart" style="height:75%; width:100%; margin: 0 auto;"></div>
-	
+
 <br>
 {% if useDataset %}
 {{datasetAbstract}}
 {% endif %}
-<div id="report"  ></div>
+<div id="report"  class="deletelink"><p></p></div>
 <table>
 <th>Add an annotation for the selected points</th>
 <tr><td colspan="3">to see more details about how to add annotations see <a target="_blank" href="http://odm2.github.io/ODM2-Admin/DataQAQC.html">The CZ Manager docs</a></td></tr>
@@ -512,11 +537,11 @@ Method- {{featureActionMethod}}
               {% endfor %}
             </select></td>
 {% if not L1exists %}
-					<td><button id="createL1">create new Level 1 QA/QC'd time series</button>
+					<td><button id="createL1">create new Level 1 QA/QC'd time series</button></td>
 				{% else %}
-					<td><button id="updateL1">add new values to Level 1 QA/QC'd series</button> Add values from start or the end of the L0 that don't yet exist in L1.</button>
+					<td><button id="updateL1">add new values to Level 1 QA/QC'd series</button> Add values from start or the end of the L0 that don't yet exist in L1. </td>
 {% endif %}
-	<td>email me when L1 series is updated or created <input id="email"  value= "" name="email" type="text"></td>
+<td>email me when L1 series is updated or created <input id="email"  value= "" name="email" type="text"></td>
 <td>
 {% for result in resultList %}
 	{% for selectedresult in SelectedResults %}

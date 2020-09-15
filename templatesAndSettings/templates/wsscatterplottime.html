@@ -1,28 +1,21 @@
-<!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/
-
-
-
-
--->
 
 {% extends "admin/base_site.html" %}
 {% load admin_extras %}
 {% load static %}
 {% load i18n admin_static admin_shortcuts_tags %}
-
 {# django-admin-shortcuts changes these blocks #}
 
+ {% block extrastyle %}
 
-
- {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}
-</style>
-{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
-{% block title %}
-    Time Series | {{ "site_title"|get_title:6 }}
+{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />
 {% endblock %}
 
-{% block branding%}
-    <h1>{{ "site_header"|get_title:6 }}</h1>
+{% block title %}
+    {{ short_title }} | {{ site_title }}
+{% endblock %}
+
+{% block branding %}
+    <h1>{{ site_header }}</h1>
 {% endblock %}
 
 {% block nav-global %}
@@ -30,37 +23,25 @@
         {% include 'user-tools.html' %}
     {% endif %}
 {% endblock %}
+
 {% block breadcrumbs %}
-{% if authenticated %}
-	<div class="admin_shortcuts">
-		{% admin_shortcuts %}
-	</div>
-	{% endif %}
+ {% if authenticated %}
+        <div class="admin_shortcuts">
+            {% admin_shortcuts %}
+        </div>
+    {% endif %}
 {% endblock %}
+
 {% block extrahead %}
 {{ block.super }}
- <script src='https://www.google.com/recaptcha/api.js'></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 
-
-{% admin_shortcuts_js %}{% endblock %}
-
-{# end changes #}
-
-{% block coltype %}colM{% endblock %}
-
-{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
-
-
-
-
-{% block content %}
+	 {% block content %}
 	<script src="https://code.highcharts.com/stock/highstock.js"></script>
     <script src="https://code.highcharts.com/stock/highcharts-more.js"></script>
 	<script src="https://code.highcharts.com/modules/exporting.js"></script>
 	 <script src="https://rawgithub.com/RolandBanguiran/highcharts-scalable-yaxis/master/scalable-yaxis.js"></script>
 	 <script src="https://highcharts.github.io/export-csv/export-csv.js"></script>
-	 
+
 	<script>
     var chart_id = 'chartid';
     var chart = {{ chart|safe }};
@@ -70,9 +51,10 @@
     var series = {{ series|safe }};
 	var graphType =   '{{graphType|safe }}';
 	var name_of_units = {{name_of_units|safe}};
-	
+
+
 $(document).ready(function() {
-	
+
 	var opposite2 = false;
 	yaxes = [];
 
@@ -89,7 +71,7 @@ $(document).ready(function() {
 	for (var i=0; i<name_of_units.length; i++) {
 		name = name_of_units[i];
 		//alert(name);
-		   
+
 		axi = {id: name,
 		scrollbar: {
         enabled: false
@@ -112,7 +94,7 @@ $(document).ready(function() {
 	}
 	//yAxis[1] = yAxis2.replace('"','');
 	var chart =Highcharts.stockChart('chartid', {
-		chart: {renderTo: chart_id, 
+		chart: {renderTo: chart_id,
 		type: graphType,  zoomType: 'xy',},
 		legend: {
                             enabled: true,
@@ -146,35 +128,20 @@ $(document).ready(function() {
         split: false
     },
     });
-	
+
 	//alert(name_of_units.length);
 
-	
-	
-	});
-	 
-</script>
 
-<p><h1>
-{% if useDataset %}
-{{datasetTitle}}
-{% else %}
-Location - {{featureActionLocation}}<br>
-{% endif %}
-{% if not useSamplingFeature and not useDataset %}
-Method- {{featureActionMethod}}
-{% endif %}
-</h1>
+
+	});
+
+</script>
     <div id='content-main'> {% csrf_token %}
 	 </div>
-	<div id='chartid' class="chart" style="height:100%; width:100%; margin: 0 auto;"></div>
-	
-<br>
-{% if useDataset %}
-{{datasetAbstract}}
-{% endif %}
-{% include 'StartEndDate.html' %}
-<br><br>
+	<div id='chartid' class="chart" style="height:100%; width:100%"></div>
+
+
+{% include 'xyVariableList.html' %}
 <p>{{data_disclaimer.text}} <a href={{data_disclaimer.link}} target="_blank"> {{data_disclaimer.linktext}}</a></p>
 {% endblock %}
 

@@ -1,0 +1,312 @@
+<!--check this for options https://docs.djangoproject.com/en/1.4/obsolete/admin-css/
+
+
+
+
+-->
+
+{% extends "admin/base_site.html" %}
+{% load admin_extras %}
+{% load static %}
+{% load i18n admin_static admin_shortcuts_tags %}
+
+{# django-admin-shortcuts changes these blocks #}
+
+ {% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}</style>
+{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+
+{% block title %}
+    {{ short_title }} | {{ site_title }}
+{% endblock %}
+
+{% block branding %}
+    <h1>{{ site_header }}</h1>
+{% endblock %}
+
+{% block nav-global %}
+    {% if authenticated %}
+        {% include 'user-tools.html' %}
+    {% endif %}
+{% endblock %}
+
+{% block breadcrumbs %}
+ {% if authenticated %}
+        <div class="admin_shortcuts">
+            {% admin_shortcuts %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="https://code.highcharts.com/highcharts.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
+	<script src="https://highcharts.github.io/export-csv/export-csv.js"></script>
+
+	 <script>
+    var chart_id = 'chartid'
+    var chart = {{ chart|safe }}
+    var title2 = {{ title2|safe }}
+    var yAxis = {{ yAxis|safe }}
+	var xAxis = {{ xAxis|safe }}
+	var xdata = {{ xdata|safe }}
+	var ydata = {{ ydata|safe }}
+	//var desired = stringToReplace.replace(/[^\w\s]/gi, '')
+    var xlocation = {{ xlocation|safe }}
+	var ylocation = {{ ylocation|safe }}
+	var None = null
+	len = xdata.length;
+	xprefix = '[';
+	yprefix=',';
+	end=']';
+
+
+//var series = generateData(xdata, xlocation, ydata)sdfas
+//console.log(xdata);
+//console.log(xlocation);
+//console.log(ydata);
+xydata = sortData(xdata, xlocation, ydata);
+xdata=xydata[0];
+ydata=xydata[1];
+xlocation = xydata[2];
+
+function sortData(x, names, y) {
+
+	var xlen = x.length;
+	var ylen = y.length;
+	var nameslen= names.length;
+	var xsorted = [];
+	var ysorted = [];
+	var namesorted=[];
+	var xysorted=[];
+	var xfound;
+	var yfound;
+	var xnamefound;
+	var ynamefound;
+	for (var i = 0; i < nameslen; i++) {
+		var namevals=names[i].split(";");
+		yfoundmatch= false;
+		xfoundmatch= false;
+		xnamecount=0;
+		ynamecount=0;
+		yfound=null;
+		xfound=null;
+		for(var k=0;k<xlen;k++){
+			var xname = x[k].split(";");
+			//if(k<20){
+			//    console.log(xname);
+			//    console.log(namevals);
+			//}
+			if ( xname[1] == namevals[1] & xname[2] == namevals[0]){
+					xsorted.push(x[k]);
+					xfound=x[k];
+					xfoundmatch = true;
+					xnamecount+=1;
+					xnamefound=String(namevals[0]+";"+xname[1])
+					namesorted.push(xnamefound);
+
+				}
+			}
+
+		for (var j = 0; j < ylen; j++) {
+			var yname = y[j].split(";");
+
+			if ( yname[1] == namevals[1] & yname[2] == namevals[0]){
+
+				ysorted.push(y[j]);
+				yfound=y[j];
+				yfoundmatch = true;
+				ynamecount+=1;
+				ynamefound=String(namevals[0]+";"+yname[1]);
+				xnamecheck=xnamefound.split(";");
+				if (namevals[1] != xnamecheck[1]){ //see if this is a different depth
+					//resort=namesorted.pop()
+					namesorted.push(ynamefound);
+					//namesorted.push(resort);
+				}
+			}
+		}
+		if(ynamecount>xnamecount){
+			for(var l=0;l<ynamecount-xnamecount;l++){
+				if (xfound != null) {
+				//xsorted.push("null;"+namevals[1]+";"+namevals[2]+";"+namevals[3]);//xfound
+					xsorted.push(xfound);
+					namesorted.push(namevals[0]+";"+namevals[1]);//xnamefound
+				}else{
+					xsorted.push("null;"+namevals[1]);//xfound
+					namesorted.push(namevals[0]+";"+namevals[1]);
+					//ysorted.pop()
+					//namesorted.pop()
+				}
+			}
+		}
+		if(xnamecount>ynamecount){
+			for(var l=0;l<xnamecount-ynamecount;l++){
+				if (yfound != null) {
+					ysorted.push(yfound);
+					//ysorted.push("null;"+namevals[1]+";"+namevals[2]+";"+namevals[3]);
+				//namesorted.push(namevals[0]+";"+namevals[1]);
+				}else{
+					ysorted.push("null;"+namevals[1]);
+					//xsorted.pop()
+					//namesorted.pop()
+				}
+			}
+		}
+		//for(var g=0;g<namecount;g++){
+		//namesorted.push(names[i]);
+		//}
+	}
+	//console.log(xsorted);
+	//console.log(ysorted);
+	//console.log(namesorted);
+	//console.log(names);
+	xysorted[0] = xsorted;
+	xysorted[1] = ysorted;
+	xysorted[2] = namesorted;
+	return xysorted;
+	}
+
+var series =generateData(xdata, xlocation, ydata);
+function generateData(x, names, y) { //x, names, y
+    var ret = {},
+        ps = [],
+        series = [],
+        len = x.length;
+
+    //concat to get points
+    for (var i = 0; i < len; i++) {
+		//var seriesnames=[];
+		//if(xdepth[i]==10){
+		//color="green";
+		//}else{
+		//color="blue";
+		//}
+		var xname=x[i].split(";");
+		var yname=y[i].split(";");
+		xtmp= parseFloat(xname[0]);
+		if(xname[0]=="null")  xtmp=null;
+		ytmp= parseFloat(yname[0]);
+		if(yname[0]=="null")  ytmp=null;
+
+        ps[i] = {
+            x: xtmp,
+            y: ytmp,
+            name: names[i],//xname[1] + " " + yname[1], //concat unit names
+			//marker:{ fillColor: color}
+        };
+    }
+    var names = [];
+	// marker:{ fillColor: 'red'}
+    //generate series and split points
+    for (i = 0; i < len; i++) {
+		var xname=x[i].split(";")[1];
+		var yname=y[i].split(";")[1];
+		var xval=x[i].split(";")[0];
+		var yval=y[i].split(";")[0];
+		var name = xname+" - "+yname;
+        sIndex = $.inArray(name, names);
+		var p = ps[i];
+		if (!(xval=="null" | yval=="null")){
+			if (sIndex < 0 ) {
+				sIndex = names.push(name) - 1; //should be name instead of n but this is not working as intended at the moment.
+				series.push({
+					name: name,
+					data: [],
+				});
+			}
+			series[sIndex].data.push(p);
+		}
+    }
+    return series;
+}
+
+	var graphType =   '{{graphType|safe }}'
+
+$(document).ready(function() {
+
+	var chart =$('#chartid').highcharts({
+		chart: {renderTo: chart_id, type: graphType,  zoomType: 'xy',},
+        title: title2,
+		series: series,
+
+        yAxis:yAxis,
+		xAxis:xAxis,
+		//series: [{
+        //    data: xyArray,
+		//	name: title2,
+        // }],
+        plotOptions: {
+        	series:{
+        		turboThreshold:99999
+        		},
+            scatter: {
+                  marker: {
+                       radius: 5,
+                       states: {
+                           hover: {
+                               enabled: true,
+                               lineColor: 'rgb(100,100,100)'
+                           }
+                       }
+                   }}
+                  },
+
+		tooltip: {
+    formatter: function() {
+		var name=String(this.point.name).split(";"); //string name, xunits,x.zlocation, samplingfeaturename
+		var seriesname = String(this.series.name).split(";");
+		//var len = ydata.length;
+		//var yunit ="";
+		//for (var i = 0; i < len; i++) {
+		//	var yname=ydata[i] //value;units;zlocation;samplingfeaturename
+		//	if (name[1] == yname[1] & name[2] == yname[2] & name[3] == yname[3]){
+		//		yunit=yname[1]
+		//	}
+		//}
+        return ''+ name[0]+' <br> x: '  +this.x + ' x unit: '+seriesname[0] +', y: ' + this.y+ ' y unit: '+seriesname[0] ; //' max depth: '+ this.z + ' x unit:'+ name[1]+ +' y unit:'+ name[4]
+    }
+},
+    });
+	});
+
+	//var chart = $('#chartid').highcharts();
+	//alert(name_of_units.length);
+
+	//alert(len);
+
+</script>
+{% admin_shortcuts_js %}{% endblock %}
+
+{# end changes #}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+
+
+
+{% block content %}
+
+
+
+    <div id='content-main'> {% csrf_token %}
+	 </div>
+	<div id='chartid' class="chart" style="height:75%; width:100%"></div>
+
+<p>x data length: {{xdata|length}}</p>
+<p>y data length: {{ydata|length}}</p>
+{% include 'xyVariableList.html' %}
+<p>{{data_disclaimer.text}} <a href={{data_disclaimer.link}} target="_blank"> {{data_disclaimer.linktext}}</a></p>
+{% endblock %}
+
+
+{% block overwrite %}
+<!-- Overwrite the base.html jQuery load and put in head for Highcharts to work -->
+{% endblock %}
+{% block extrajs %}
+<!-- Maps the Python template context variables from views.py to the Highchart js variables -->
+
+{% endblock %}

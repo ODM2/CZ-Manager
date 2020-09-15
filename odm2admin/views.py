@@ -58,6 +58,7 @@ from django.utils.crypto import get_random_string
 # from django.contrib.gis.geos import GEOSGeometry
 # import hs_restclient as hs_r
 from hs_restclient import HydroShare, HydroShareAuthOAuth2
+from django.contrib.auth.decorators import user_passes_test
 # from oauthlib.oauth2 import TokenExpiredError
 # from oauthlib.oauth2 import InvalidGrantError, InvalidClientError
 
@@ -70,8 +71,10 @@ from .forms import SamplingfeaturesAdminForm
 from .models import Actions
 from .models import Annotations
 from .models import Authorlists
+from .models import Categoricalresults
 from .models import Citationextensionpropertyvalues
 from .models import Citations
+from .models import CvAggregationstatistic
 from .models import CvQualitycode
 from .models import CvAnnotationtype
 from .models import CvElevationdatum
@@ -268,6 +271,8 @@ __author__ = 'leonmi'
 #     return TemplateResponse(request, 'publications2.html',{'citation_form':citation_form,
 # 'author_forms':author_forms,'citation_property_forms':citation_property_forms,})
 
+
+
 @login_required()
 def oauth_view(request, *args, **kwargs):
     return HttpResponse('Secret contents!', status=200)
@@ -427,14 +432,14 @@ def get_name_of_sampling_feature(selected_result):
 
 
 def get_name_of_variable(selected_result):
-    title_variables = Variables.objects.filter(variableid=selected_result.variableid)
+    title_variables = Variables.objects.filter(variableid=selected_result.variableid.variableid).get()
     # s = str(title_variables.values_list('variablecode', flat=True))
     name_of_variable = title_variables.variablecode # s.split('\'')[1]
     return name_of_variable
 
 
 def get_name_of_units(selected_result):
-    title_units = Units.objects.filter(unitsid=selected_result.values('unitsid'))
+    title_units = Units.objects.filter(unitsid=selected_result.unitsid.unitsid).get()
     # s = str(title_units.values_list('unitsname', flat=True))
     name_of_units = title_units.unitsname # s.split('\'')[1]
     return name_of_units
@@ -453,7 +458,7 @@ def relatedFeaturesFilter(request, done, selected_resultid, featureaction,
             relatedFeatureListLong = Relatedfeatures.objects.filter(relatedfeatureid=int(
                 selected_relatedfeatid))
             # .select_related('samplingfeatureid','relationshiptypecv','relatedfeatureid')
-            samplingfeatids = relatedFeatureListLong.values_list('samplingfeatureid', flat=True)
+            samplingfeatids  = relatedFeatureListLong.values_list('samplingfeatureid', flat=True)
             if featureaction == 'All':
                 resultList = Results.objects.filter(
                     featureactionid__in=Featureactions.objects.filter(
@@ -482,16 +487,19 @@ def relatedFeaturesFilter(request, done, selected_resultid, featureaction,
             resultList = Results.objects.filter(
                 result_type=resultType)  # remove slice just for testing [:25]
         else:
-            resultList = Results.objects.filter(result_type=resultType).filter(
-                featureactionid=featureaction)
+            resultList = Results.objects.filter(result_type=resultType)# .filter(
+              #   featureactionid=featureaction)
     return selected_relatedfeatid, done, resultList, selected_resultid
 
 
 def web_map(request):
-    if request.user.is_authenticated:
-        authenticated = True
-    else:
+    if not request.user.is_authenticated:
+        # return HttpResponseRedirect('../')
         authenticated = False
+        if settings.ALWAYS_AUTHENTICATE:
+            return HttpResponseRedirect('../')
+    else:
+        authenticated = True
     map_config = settings.MAP_CONFIG
     data_disclaimer = settings.DATA_DISCLAIMER
 
@@ -598,7 +606,18 @@ def web_map(request):
 
 def get_features(request, sf_type="all", ds_ids="all"):
     if ds_ids == "all" or sf_type == "all":
-        features = Samplingfeatures.objects.exclude(featuregeometry__isnull=True)
+        # with result values
+        # fas = Featureactions.objects.all()
+        tsr = Timeseriesresultvalues.objects.values('resultid').distinct()
+        rs = Results.objects.filter(resultid__in=tsr)
+        fas = Featureactions.objects.filter(featureactionid__in=rs.values('featureactionid'))
+        features = Samplingfeatures.objects.filter(samplingfeatureid__in=fas.values('samplingfeatureid')
+                                                   ).exclude(featuregeometry__isnull=True)
+        # features2 = Samplingfeatures.objects.exclude(featuregeometry__isnull=True)
+        # print('features with values')
+        # print(len(features))
+        # print('all features')
+        # print(len(features2))
     elif sf_type == 'filtered':
         dataset_ids = list(ds_ids.split(','))
         datasetresults = Datasetsresults.objects.filter(datasetid__in=dataset_ids)
@@ -714,6 +733,9 @@ def sensor_dashboard(request, feature_action='NotSet', sampling_feature='NotSet'
     if not request.user.is_authenticated:
         # return HttpResponseRedirect('../')
         authenticated = False
+        if settings.ALWAYS_AUTHENTICATE:
+            return HttpResponseRedirect('../')
+
     ids = settings.SENSOR_DASHBOARD['featureactionids']
     resultids = settings.SENSOR_DASHBOARD['resultids']
     timeseriesdays = settings.SENSOR_DASHBOARD['time_series_days']
@@ -859,9 +881,18 @@ def get_relations(s):
 
 def TimeSeriesGraphing(request, feature_action='All'):
     authenticated = True
+
     if not request.user.is_authenticated:
         return HttpResponseRedirect('../')
 
+    authenticated = False
+    if not request.user.is_authenticated:
+        # return HttpResponseRedirect('../')
+        authenticated = False
+        if settings.ALWAYS_AUTHENTICATE:
+            return HttpResponseRedirect(settings.CUSTOM_TEMPLATE_PATH)
+    else:
+        authenticated = True
     template = loader.get_template('chart.html')
     selected_relatedfeatid = None
     selected_resultid = None
@@ -929,7 +960,7 @@ def TimeSeriesGraphing(request, feature_action='All'):
         enddt = time.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f")
         dt = datetime.fromtimestamp(mktime(enddt))
         last_day_previous_month = dt - timedelta(days=30)
-        entered_start_date = last_day_previous_month
+        entered_start_date = last_day_previous_month.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f").strftime("%Y-%m-%d %H:%M")
         # print(entered_start_date)
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
@@ -948,7 +979,8 @@ def TimeSeriesGraphing(request, feature_action='All'):
         enddt = time.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f")
         dt = datetime.fromtimestamp(mktime(enddt))
         last_day_previous_month = dt - timedelta(days=30)
-        entered_start_date = last_day_previous_month.strftime('%Y-%m-%d %H:%M')
+
+        entered_start_date = last_day_previous_month.strptime(end_date, "%Y-%m-%d %H:%M:%S.%f").strftime("%Y-%m-%d %H:%M")
         # entered_start_date = "2016-01-01"
 
     selected_results = []
@@ -1065,7 +1097,8 @@ def TimeSeriesGraphing(request, feature_action='All'):
     chartID = 'chart_id'
     chart = {"renderTo": chartID, "type": 'scatter', "zoomType": 'xy'}
     title2 = {"text": titleStr}
-    xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
+    xAxis = {"type": 'datetime', "title": {"text": 'Date'
+                                                   ''}}
     yAxis = {"title": {"text": seriesStr}}
     graphType = 'scatter'
 
@@ -1403,9 +1436,12 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                    resultidu='NotSet',
                    startdate='NotSet', enddate='NotSet', popup='NotSet'):
     # print("HERE")
+    authenticated = False
     if not request.user.is_authenticated:
         # return HttpResponseRedirect('../')
         authenticated = False
+        if settings.ALWAYS_AUTHENTICATE:
+            return HttpResponseRedirect(settings.CUSTOM_TEMPLATE_PATH)
     else:
         authenticated = True
     if popup == 'NotSet':
@@ -1521,12 +1557,12 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                 startdate = Timeseriesresultvalues.objects.\
                     filter(resultid__in=resultList.values("resultid")).\
                     annotate(Min('valuedatetime')).\
-                    order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+                    order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M:%S')
                 enddate = Timeseriesresultvalues.objects.\
                     filter(resultid__in=resultList.values("resultid")).\
                     annotate(Max('valuedatetime')).\
-                    order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-                methodsOnly = 'True'
+                    order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M:%S')
+                methodsOnly = 'False'
             except IndexError as e:
                 html = "<html><body>No time series data available for this site.</body></html>"
                 return HttpResponse(html)
@@ -2011,8 +2047,8 @@ def procDataLoggerFile(request):
                 commandstring += " ProcessDataLoggerFile '" + str(linkname) + \
                                  "' '" + str(fileid) + "' '" + str(databeginson) + "' '" + str(columnheaderson) +\
                                  "' '" + str(check_dates) +  "' '" + str(True) +\
-                                 "' '" + str(False) + "' '" + useremail + "' \n"
-                commandstring += " > " + localbasedir + "/templatesAndSettings/logging/processdlf.log \n"
+                                 "' '" + str(False) + "' '" + useremail + "' "
+                commandstring += " >> " + localbasedir + "/templatesAndSettings/logging/processdlf.log \n"
                 print(commandstring)
                 sys.stdout = sysout
                 # print(result)
@@ -2377,6 +2413,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     if not request.user.is_authenticated:
         # return HttpResponseRedirect('../')
         authenticated = False
+        if settings.ALWAYS_AUTHENTICATE:
+            return HttpResponseRedirect(settings.CUSTOM_TEMPLATE_PATH)
     if popup == 'NotSet':
         template = loader.get_template('chart2.html')
     elif  popup == 'smll':
@@ -2455,9 +2493,12 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         if useSamplingFeature:
             samplefeature = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
             feature_actions = Featureactions.objects.filter(samplingfeatureid=samplefeature)
+
             resultList = Results.objects.filter(featureactionid__in=feature_actions).filter(
                  processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
                  ).order_by("featureactionid","resultid")
+            catresults = Categoricalresults.objects.filter(resultid__in=resultList)
+            resultList = resultList.filter(~Q(resultid__in=catresults))
             resultListGrouped = groupResultsByVariable(samplefeature)
             actions = Actions.objects.filter(actionid__in=feature_actions.values("action"))
             methods = Methods.objects.filter(methodid__in=actions.values("method"))
@@ -2466,6 +2507,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             resultList = Results.objects.filter(featureactionid=feature_action).filter(
                  processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
                  ).order_by("featureactionid","resultid")
+            catresults = Categoricalresults.objects.filter(resultid__in=resultList)
+            resultList = resultList.filter(~Q(resultid__in=catresults))
             featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
             featureActionLocation = featureAction.samplingfeatureid.samplingfeaturename
             resultListGrouped = groupResultsByVariable(featureAction.samplingfeatureid)
@@ -2478,6 +2521,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid")).filter(
              processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
              ).order_by("featureactionid","resultid")
+        catresults = Categoricalresults.objects.filter(resultid__in=resultList)
+        resultList = resultList.filter(~Q(resultid__in=catresults))
         datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
         datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
     numresults = resultList.count()
@@ -2626,7 +2671,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     for myresults in myresultSeries:
         i += 1
         resultannotationsexist = False
-        print('response count ' + str(myresults.count()))
+        # print('response count ' + str(myresults.count()))
         # print('1st result')
         # print(myresults[0])
         if popup == 'hyst':
@@ -2659,7 +2704,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                     dataval = 'null'
                 else:
                     dataval = result.datavalue
-                # print(data.keys())
+
                 if popup == 'Anno':
                     data['datavalue' + str(i)].append(
                         {'x': mills, 'y': dataval, 'id': str(result.valueid)})
@@ -2681,7 +2726,6 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             valcount = len(myresults)
             colors = linear_gradient('#BF001B','#00E5C4',n=valcount)# ['#00E5C4','#00E17D','#00DD38','#09D900','#49D500','#86D200','#C2CE00','#CA9900','#C65A00','#C21E00',]
             hexcolors = colors['hex']
-            print(valcount)
             k=0
 
             for result, discharge in zip(myresults,tsrvdischarge):
@@ -2709,6 +2753,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     # print(data)
     i = 0
     seriesStr = ''
+    print(data)
     unit = ''
     location = ''
     variable = ''
@@ -2890,6 +2935,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     return TemplateResponse(request, template, responsedict, )
 
 
+
 #
 # From http://stackoverflow.com/questions/8200342/removing-duplicate-strings-from-a-list-in-python
 def removeDupsFromListOfStrings(listOfStrings):
@@ -2901,11 +2947,395 @@ def removeDupsFromListOfStrings(listOfStrings):
             result.append(item)
     return result
 
+def water_sample_scatter_plot(request):
+    authenticated = True
+    if not request.user.is_authenticated:
+        # return HttpResponseRedirect('../')
+        authenticated = False
+        if settings.ALWAYS_AUTHENTICATE:
+            return HttpResponseRedirect('../')
+    else:
+        authenticated = True
+    xVariableSelection = yVariableSelection = fieldarea1 = fieldarea2 = filteredFeatures = None
+    xVar = None
+    yVar = None
+    title = None
+    if 'fieldarea1' in request.POST and 'fieldarea2' not in request.POST:
+        if not request.POST['fieldarea1'] == 'All':
+            fieldarea1 = request.POST['fieldarea1']
+            fieldarea1RF = Relatedfeatures.objects.filter(relatedfeatureid=fieldarea1)
+            filteredFeatures = Samplingfeatures.objects.filter(
+                samplingfeatureid__in=fieldarea1RF.values("samplingfeatureid"))
+            fieldarea1 = Samplingfeatures.objects.filter(samplingfeatureid=fieldarea1).get()
+    if 'fieldarea1' in request.POST and 'fieldarea2' in request.POST:
+        if not request.POST['fieldarea1'] == 'All' and not request.POST['fieldarea2'] == 'All':
+            fieldarea1 = request.POST['fieldarea1']
+            fieldarea2 = request.POST['fieldarea2']
+            fieldareaRF1 = Relatedfeatures.objects.filter(relatedfeatureid=fieldarea1)
+            fieldareaRF2 = Relatedfeatures.objects.filter(relatedfeatureid=fieldarea2)
+            # fieldareaRF = fieldarea1RF & fieldarea2RF #only sampling features in 1 and 2
+
+            filteredFeatures = Samplingfeatures.objects.filter(
+                samplingfeatureid__in=fieldareaRF1.values("samplingfeatureid")) \
+                .filter(samplingfeatureid__in=fieldareaRF2.values("samplingfeatureid"))
+            fieldarea1 = Samplingfeatures.objects.filter(samplingfeatureid=fieldarea1).get()
+            fieldarea2 = Samplingfeatures.objects.filter(samplingfeatureid=fieldarea2).get()
+            title = str(fieldarea1.samplingfeaturecode) + " - " + str(
+                fieldarea2.samplingfeaturecode) + " : "
+    if 'xVariableSelection' and 'yVariableSelection' in request.POST:
+        xVariableSelection = request.POST['xVariableSelection']
+        yVariableSelection = request.POST['yVariableSelection']
+        xVar = Variables.objects.filter(variableid=xVariableSelection).get()
+        yVar = Variables.objects.filter(variableid=yVariableSelection).get()
+        xVariableSelection = Variables.objects.filter(variableid=xVariableSelection).get()
+        yVariableSelection = Variables.objects.filter(variableid=yVariableSelection).get()
+        if title:
+            title = title + str(xVar.variablecode) + " - " + str(yVar.variablecode)
+        else:
+            title = str(xVar.variablecode) + " - " + str(yVar.variablecode)
+    aggstat = CvAggregationstatistic.objects.get(name='Continuous')
+    tsr = Timeseriesresults.objects.filter(aggregationstatisticcv=aggstat)
+    # second filter = exclude summary results attached to field areas
+    pr = Results.objects.filter(resultid__in=tsr)
+    # variables is the list to pass to the html template
+    variables = Variables.objects.filter(variableid__in=pr.values("variableid"))
+    # fieldareas = Samplingfeatures.objects.filter(
+    #     sampling_feature_type="Ecological land classification")  # Field area
+    xlocation = []
+    ylocation = []
+    xdata = []
+    ydata = []
+    prvx = prvy = xlocs = ylocs = None
+    if xVar and yVar:
+        rvx = pr.filter(variableid=xVar).values('resultid')
+        prvx = Timeseriesresultvalues.objects.filter(~Q(datavalue=-6999)) \
+            .filter(~Q(datavalue=-888.88)).filter(resultid__in=rvx).order_by(
+            "resultid__resultid__unitsid",
+            "resultid__resultid__featureactionid__samplingfeatureid")
+        rvy = pr.filter(variableid=yVar).values('resultid')
+        prvy = Timeseriesresultvalues.objects.filter(~Q(datavalue=-6999)) \
+            .filter(~Q(datavalue=-888.88)).filter(resultid__in=rvy).order_by(
+            "resultid__resultid__unitsid",
+            "resultid__resultid__featureactionid__samplingfeatureid")
+
+        xr = Results.objects.filter(resultid__in=prvx.values("resultid"))
+        xfa = Featureactions.objects.filter(featureactionid__in=xr.values("featureactionid"))
+        if filteredFeatures:
+            xlocs = Samplingfeatures.objects.filter(
+                samplingfeatureid__in=xfa.values("samplingfeatureid")).filter(
+                samplingfeatureid__in=filteredFeatures)
+        else:
+            xlocs = Samplingfeatures.objects.filter(
+                samplingfeatureid__in=xfa.values("samplingfeatureid"))
+
+        # xlocation = re.sub('[^A-Za-z0-9]+', '', xlocation)
+        yr = Results.objects.filter(resultid__in=prvy.values("resultid"))
+        yfa = Featureactions.objects.filter(featureactionid__in=yr.values("featureactionid"))
+        if filteredFeatures:
+            ylocs = Samplingfeatures.objects.filter(
+                samplingfeatureid__in=yfa.values("samplingfeatureid")).filter(
+                samplingfeatureid__in=filteredFeatures)
+        else:
+            ylocs = Samplingfeatures.objects.filter(
+                samplingfeatureid__in=yfa.values("samplingfeatureid"))
+    if prvx and prvx:
+        prvx = prvx.filter(resultid__resultid__featureactionid__samplingfeatureid__in=xlocs)
+        prvy = prvy.filter(resultid__resultid__featureactionid__samplingfeatureid__in=ylocs)
+        for x in prvx:
+            xdata.append(
+                str(
+                    x.datavalue
+                ) + ";" + str(
+                    x.resultid.resultid.unitsid.unitsabbreviation
+                )  + ";" + str(
+                    x.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturecode
+                )
+            )
+
+            tmpLoc = "{0};{1}".format(str(
+                x.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturecode
+            ), str(
+                x.resultid.resultid.unitsid.unitsabbreviation
+            ))
+            xlocation.append(tmpLoc)
+
+        for y in prvy:
+            ydata.append(
+                str(y.datavalue) + ";" + str(
+                    y.resultid.resultid.unitsid.unitsabbreviation) + ";" + str(
+                    y.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturecode))
+            foundloc = False
+            for x in prvx:
+                if  x.resultid.resultid.featureactionid \
+                        .samplingfeatureid.samplingfeaturecode == y.resultid.resultid \
+                        .featureactionid.samplingfeatureid.samplingfeaturecode:
+                    foundloc = True
+                    tmpLoc = "{0};{1}".format(
+                        str(
+                            y.resultid.resultid
+                            .featureactionid.samplingfeatureid.samplingfeaturecode
+                        ),
+                        str(y.resultid.resultid.unitsid.unitsabbreviation)
+                    )
+            if not foundloc:
+                xlocation.append(tmpLoc)
+                # xlocation.append(tmpLoc)
+    chartID = 'chart_id'
+    chart = {"renderTo": chartID, "type": 'scatter', "zoomType": 'xy'}
+    title2 = {"text": title}
+    # xAxis = {"categories":xAxisCategories,} #"type": 'category',
+    # "title": {"text": xAxisCategories},
+    yAxis = {"title": {"text": str(yVar)}}
+    xAxis = {"title": {"text": str(xVar)}}
+    graphType = 'scatter'
+    if 'export_data' in request.POST:
+        resultValuesSeries = prvx | prvy
+        response = exportspreadsheet(request, resultValuesSeries, False)
+        return response
+    return TemplateResponse(request, 'wsscatterplot.html',
+                            {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+                             'data_disclaimer': settings.DATA_DISCLAIMER,
+                             'xVariables': variables, 'yVariables': variables,
+                             'authenticated': authenticated,
+                             'xVariableSelection': xVariableSelection,
+                             'yVariableSelection': yVariableSelection,
+                             'fieldarea1': fieldarea1, 'fieldarea2': fieldarea2,
+                             # 'fieldareas': fieldareas,
+                             'chartID': chartID, 'chart': chart, 'title2': title2,
+                             'graphType': graphType,
+                             'yAxis': yAxis, 'xAxis': xAxis, 'xdata': xdata, 'ydata': ydata,
+                             'ylocation': ylocation,
+                             'xlocation': xlocation, 'name': request.user,
+                             'site_title': admin.site.site_title,
+                             'site_header': admin.site.site_header,
+                             'short_title': 'Water Sample Scatter Plot'}, )
+
+
+
+def water_sample_scatter_plot_time(request):
+    authenticated = True
+    if not request.user.is_authenticated:
+        # return HttpResponseRedirect('../')
+        authenticated = False
+        if settings.ALWAYS_AUTHENTICATE:
+            return HttpResponseRedirect('../')
+    else:
+        authenticated = True
+    xVariableSelection = yVariableSelection = fieldarea1 = fieldarea2 = filteredFeatures = None
+    xVar = None
+    yVar = None
+    title = ''
+    if 'fieldarea1' in request.POST and 'fieldarea2' not in request.POST:
+        if not request.POST['fieldarea1'] == 'All':
+            fieldarea1 = request.POST['fieldarea1']
+            fieldarea1RF = Relatedfeatures.objects.filter(relatedfeatureid=fieldarea1)
+            filteredFeatures = Samplingfeatures.objects.filter(
+                samplingfeatureid__in=fieldarea1RF.values("samplingfeatureid"))
+            fieldarea1 = Samplingfeatures.objects.filter(samplingfeatureid=fieldarea1).get()
+    if 'fieldarea1' in request.POST and 'fieldarea2' in request.POST:
+        if not request.POST['fieldarea1'] == 'All' and not request.POST['fieldarea2'] == 'All':
+            fieldarea1 = request.POST['fieldarea1']
+            fieldarea2 = request.POST['fieldarea2']
+            fieldareaRF1 = Relatedfeatures.objects.filter(relatedfeatureid=fieldarea1)
+            fieldareaRF2 = Relatedfeatures.objects.filter(relatedfeatureid=fieldarea2)
+            # fieldareaRF = fieldarea1RF & fieldarea2RF #only sampling features in 1 and 2
+
+            filteredFeatures = Samplingfeatures.objects.filter(
+                samplingfeatureid__in=fieldareaRF1.values("samplingfeatureid")) \
+                .filter(samplingfeatureid__in=fieldareaRF2.values("samplingfeatureid"))
+            fieldarea1 = Samplingfeatures.objects.filter(samplingfeatureid=fieldarea1).get()
+            fieldarea2 = Samplingfeatures.objects.filter(samplingfeatureid=fieldarea2).get()
+            title = str(fieldarea1.samplingfeaturecode) + " - " + str(
+                fieldarea2.samplingfeaturecode) + " : "
+    if 'xVariableSelection' and 'yVariableSelection' in request.POST:
+        xVariableSelection = request.POST['xVariableSelection']
+        yVariableSelection = request.POST['yVariableSelection']
+        xVar = Variables.objects.filter(variableid=xVariableSelection).get()
+        yVar = Variables.objects.filter(variableid=yVariableSelection).get()
+        xVariableSelection = Variables.objects.filter(variableid=xVariableSelection).get()
+        yVariableSelection = Variables.objects.filter(variableid=yVariableSelection).get()
+        if title:
+            title = title + str(xVar.variablecode) + " - " + str(yVar.variablecode)
+        else:
+            title = str(xVar.variablecode) + " - " + str(yVar.variablecode)
+    aggstat = CvAggregationstatistic.objects.get(name='Continuous')
+    tsr = Timeseriesresults.objects.filter(aggregationstatisticcv=aggstat)
+    # second filter = exclude summary results attached to field areas
+    pr = Results.objects.filter(resultid__in=tsr)
+    # variables is the list to pass to the html template
+    variables = Variables.objects.filter(variableid__in=pr.values("variableid"))
+    # fieldareas = Samplingfeatures.objects.filter(
+    #     sampling_feature_type="Ecological land classification")  # Field area
+    xlocation = []
+    ylocation = []
+    xdata = []
+    ydata = {}
+    prvx = prvy = xlocs = ylocs = None
+    if xVar and yVar:
+        rvx = pr.filter(variableid=xVar).values('resultid')
+        prvx = Timeseriesresultvalues.objects.filter(~Q(datavalue=-6999)) \
+            .filter(~Q(datavalue=-888.88)).filter(resultid__in=rvx).order_by(
+            "resultid__resultid__unitsid",
+            "resultid__resultid__featureactionid__samplingfeatureid")
+        rvy = pr.filter(variableid=yVar).values('resultid')
+        prvy = Timeseriesresultvalues.objects.filter(~Q(datavalue=-6999)) \
+            .filter(~Q(datavalue=-888.88)).filter(resultid__in=rvy).order_by(
+            "resultid__resultid__unitsid",
+            "resultid__resultid__featureactionid__samplingfeatureid")
+
+        xr = Results.objects.filter(resultid__in=prvx.values("resultid"))
+        xfa = Featureactions.objects.filter(featureactionid__in=xr.values("featureactionid"))
+        if filteredFeatures:
+            xlocs = Samplingfeatures.objects.filter(
+                samplingfeatureid__in=xfa.values("samplingfeatureid")).filter(
+                samplingfeatureid__in=filteredFeatures)
+        else:
+            xlocs = Samplingfeatures.objects.filter(
+                samplingfeatureid__in=xfa.values("samplingfeatureid"))
+
+        # xlocation = re.sub('[^A-Za-z0-9]+', '', xlocation)
+        yr = Results.objects.filter(resultid__in=prvy.values("resultid"))
+        yfa = Featureactions.objects.filter(featureactionid__in=yr.values("featureactionid"))
+        if filteredFeatures:
+            ylocs = Samplingfeatures.objects.filter(
+                samplingfeatureid__in=yfa.values("samplingfeatureid")).filter(
+                samplingfeatureid__in=filteredFeatures)
+        else:
+            ylocs = Samplingfeatures.objects.filter(
+                samplingfeatureid__in=yfa.values("samplingfeatureid"))
+    if prvx and prvx:
+        prvx = prvx.filter(resultid__resultid__featureactionid__samplingfeatureid__in=xlocs)
+        prvy = prvy.filter(resultid__resultid__featureactionid__samplingfeatureid__in=ylocs)
+        datalist = []
+        j = 0
+        for x in prvx:
+            j+=1
+            serieskey =x.resultid.resultid.unitsid.unitsabbreviation + ";" + str(
+                x.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturecode)
+            start = datetime(1970, 1, 1)
+            delta = x.valuedatetime - start
+            mills = delta.total_seconds() * 1000
+            if not ydata.has_key(serieskey):
+                tmplist = datalist.copy()
+                datalist.append([mills, y.datavalue])
+                datalist = tmplist
+            else:
+                ydata[serieskey].append([mills, x.datavalue])
+
+            tmpLoc = "{0};{1}".format(str(
+                x.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturecode
+            ), str(
+                x.resultid.resultid.unitsid.unitsabbreviation
+            ))
+            xlocation.append(tmpLoc)
+
+        for y in prvy:
+            datalist = []
+            j = 0
+            for x in prvx:
+                j += 1
+                serieskey = y.resultid.resultid.unitsid.unitsabbreviation + ";" + str(
+                    y.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturecode)
+                start = datetime(1970, 1, 1)
+                delta = y.valuedatetime - start
+                mills = delta.total_seconds() * 1000
+                if not ydata.has_key(serieskey):
+                    tmplist = datalist.copy()
+                    datalist.append([mills, y.datavalue])
+                    datalist = tmplist
+                    ydata[serieskey].append([mills, x.datavalue])
+                else:
+                    ydata[serieskey].append([mills, x.datavalue])
+            # ydata.append(
+            #    str([y.datavalue) + ";" + str(
+            #         y.resultid.resultid.unitsid.unitsabbreviation) + ";" + str(
+            #         y.resultid.resultid.featureactionid.samplingfeatureid.samplingfeaturename), y.valuedatetime])
+            foundloc = False
+            for x in prvx:
+                if  x.resultid.resultid.featureactionid \
+                        .samplingfeatureid.samplingfeaturecode == y.resultid.resultid \
+                        .featureactionid.samplingfeatureid.samplingfeaturecode:
+                    foundloc = True
+                    tmpLoc = "{0};{1}".format(
+                        str(
+                            y.resultid.resultid
+                            .featureactionid.samplingfeatureid.samplingfeaturecode
+                        ),
+                        str(y.resultid.resultid.unitsid.unitsabbreviation)
+                    )
+            if not foundloc:
+                xlocation.append(tmpLoc)
+                # xlocation.append(tmpLoc)
+    chartID = 'chart_id'
+    chart = {"renderTo": chartID, "type": 'scatter', "zoomType": 'xy'}
+    title2 = {"text": title}
+    # xAxis = {"categories":xAxisCategories,} #"type": 'category',
+    # "title": {"text": xAxisCategories},
+    # yAxis = {"title": {"text": str(yVar)}}
+    seriesStr = ''
+    name_of_units = []
+    series = []
+    i = 0
+    for selectedMResult in pr:
+        i += 1
+        tsr = Timeseriesresults.objects.get(resultid=selectedMResult)
+        aggStatistic = tsr.aggregationstatisticcv
+        unit = selectedMResult.unitsid.unitsabbreviation
+        variable = selectedMResult.variableid.variable_name
+        location = selectedMResult.featureactionid.samplingfeatureid.samplingfeaturecode
+        if i == 1 and not unit == '':
+            seriesStr += str(unit)
+            name_of_units.append(str(unit))
+        elif not unit == '':
+            seriesStr += ' - ' + str(unit)
+            name_of_units.append(str(unit))
+        # print('series unit and var')
+        # print(str(unit) + ' - ' + str(variable))
+        # print(len(mergedResultSets))
+        # data = ydata[selectedMResult.unitsid.unitsabbreviation + ";" + str(
+        #     selectedMResult.featureactionid.samplingfeatureid.samplingfeaturename)]
+        series.append({"name": selectedMResult.unitsid.unitsabbreviation + ";" + str(
+            selectedMResult.featureactionid.samplingfeatureid.samplingfeaturecode), "allowPointSelect": "true", "yAxis": str(unit),
+                      "data": ydata, "point": { }})
+
+    yAxis = {"title": {"text": title}}
+
+    xAxis = {"title": {"text": "date time"}}
+    graphType = 'scatter'
+    title2 = {"text": title}
+    if 'export_data' in request.POST:
+        resultValuesSeries = prvx | prvy
+        response = exportspreadsheet(request, resultValuesSeries, False)
+        return response
+    return TemplateResponse(request, 'wsscatterplottime.html',
+                            {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+                             'data_disclaimer': settings.DATA_DISCLAIMER,
+                             'xVariables': variables, 'yVariables': variables,
+                             'authenticated': authenticated,
+                             'xVariableSelection': xVariableSelection,
+                             'yVariableSelection': yVariableSelection,
+                             'fieldarea1': fieldarea1, 'fieldarea2': fieldarea2,
+                             # 'fieldareas': fieldareas,
+                             'chartID': chartID, 'chart': chart, 'title2': title2,
+                             'graphType': graphType,
+                             'name_of_units': name_of_units,
+                             'yAxis': yAxis, 'xAxis': xAxis, 'xdata': xdata, 'ydata': ydata,
+                             'series': series,
+                             'ylocation': ylocation,
+                             'xlocation': xlocation, 'name': request.user,
+                             'site_title': admin.site.site_title,
+                             'site_header': admin.site.site_header,
+                             'short_title': 'Water Sample Scatter Plot'}, )
 
 def scatter_plot(request):
     authenticated = True
     if not request.user.is_authenticated:
+        # return HttpResponseRedirect('../')
         authenticated = False
+        if settings.ALWAYS_AUTHENTICATE:
+            return HttpResponseRedirect('../')
+    else:
+        authenticated = True
     xVariableSelection = yVariableSelection = fieldarea1 = fieldarea2 = filteredFeatures = None
     xVar = None
     yVar = None
@@ -3510,7 +3940,12 @@ def exportspreadsheet(request, resultValuesSeries, profileResult=True):
 def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet', popup='NotSet'):
     authenticated = True
     if not request.user.is_authenticated:
+        # return HttpResponseRedirect('../')
         authenticated = False
+        if settings.ALWAYS_AUTHENTICATE:
+            return HttpResponseRedirect('../')
+    else:
+        authenticated = True
     if popup == 'NotSet':
         template = loader.get_template('chartVariableAndFeature.html')
     else:

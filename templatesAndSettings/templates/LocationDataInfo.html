@@ -13,19 +13,28 @@ option {
           border: solid 1px #DDDDDD; 
 }
 /* Add icon to external links */
-a[target="_blank"]:after {
+a[target="_blank"]::after {
+
     font-family: 'Font Awesome 5 Free';
-    content: "\f35d";
-     font-weight: 400;
+    background-image: url('css/external-link-alt-solid.svg');
+    font-weight: 400;
+    background-size: 10px 10px;
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    content: "";
+
+}
 }
 </style>
 
     
 	<form action="" method="post">
 	{% csrf_token %}
-	<table >
+	<table>
 	{% ifequal methodsOnly "False" %}
 		<p>Data available from: {{startDate}} to: {{endDate}} </p>
+
         <table >
         {% for varname,results in resultListGrouped.items %}
                 {% if not done == 1 %}
@@ -39,7 +48,7 @@ a[target="_blank"]:after {
                 <tr class="row1">
                             <td width="20%">{{results}}</td>
                             <td width="40%">{{varname}}</td>
-                            <td ><a target="_blank", href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{samplingfeatureid}}/resultidu&#61;{{results}}"> View Time Series </a></td>
+                            <td ><a target='_blank', href=" {{prefixpath}}../graphfa/samplingfeature&#61;{{samplingfeatureid}}/resultidu&#61;{{results}}"> View Time Series </a></td>
                 </tr>
         {% endfor %}
         </table>
@@ -47,6 +56,7 @@ a[target="_blank"]:after {
 
 	{% assign done 0 %}
 	{% assign done2 0 %}
+
 	{% for featureAction in featureActions %}
 		{% if not useDataset %}
 
@@ -55,7 +65,7 @@ a[target="_blank"]:after {
 				{% if not lastMethod == featureAction.action.method   %}
 					<th scope="col"  class="sortable column-resultid">method name</th>
 					<th scope="col"  class="sortable column-resultid">description</th>
-					<th scope="col"  class="sortable column-resultid">link</th>
+					<th scope="col"  class="sortable column-resultid">sampling feature</th>
 					</tr>
 					<tr class="row1">
 				<td width="20%">{{ featureAction.action.method.methodname }} </td>
@@ -65,10 +75,10 @@ a[target="_blank"]:after {
                     </a>
                 </td>
 				<td width="20%">
-                    {% if featureAction.action.method.methodlink is None or featureAction.action.method.methodlink == '' %}
+                    {% if featureAction.samplingfeatureid is None %}
                         N/A
                     {% else %}
-                        <a target="_blank" href='{{featureAction.action.method.methodlink}}'> Documentation </a>
+                        <a target="_blank" href='{{prefixpath}}../odm2admin/methods/{{featureAction.samplingfeature}}.change'> featureAction.samplingfeature.samplingfeaturenamee </a>
                     {% endif %}
                 </td>
 				</tr>
@@ -162,7 +172,7 @@ a[target="_blank"]:after {
 					{% endif %}
 				{% endfor %}
 
-			 </table>	
+			 </table>
 		{% endifequal %}
 	{% endif %}
 </td></tr>
@@ -170,7 +180,7 @@ a[target="_blank"]:after {
 {% endfor %}
 </table>
 
-
+</table>
 
 			<br>
 			
