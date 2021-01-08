@@ -618,8 +618,10 @@ class Command(BaseCommand):
                 Timeseriesresultvalues.objects.bulk_create(bulktimeseriesvalues)
                 del bulktimeseriesvalues[:]
 
-            except IndexError:
-                # raise ValidationError('encountered a problem with row ' + str(i) for i in row)
+            except Exception as e:
+                print('Error')
+                print(row)
+                print(e)
                 pass
             bulkpropertyvals = []
             for colnum in rowColumnMap:

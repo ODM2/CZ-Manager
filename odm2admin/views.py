@@ -110,7 +110,7 @@ from .models import Extensionproperties
 # from .forms import LoginForm
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate, login
-
+from django.urls import reverse
 
 register = template.Library()
 
@@ -556,6 +556,24 @@ def web_map(request):
             },
             'group': 'ESRI Basemaps'
         },
+
+        {
+            'name': 'MapBox_RunBikeHike',
+            'url': 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?'
+                   'access_token={accessToken}',
+            'options': {
+                'maxZoom': 20,
+                'attribution': '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a>' +
+                               ' © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap' +
+                               '</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">' +
+                               'Improve this map</a></strong>',
+                'tileSize': 512,
+                'zoomOffset': -1,
+                'id': 'mapbox/outdoors-v11',
+                'accessToken': map_config['MapBox']['access_token']
+            },
+            'group': 'OpenStreetMap Basemaps'
+        },
         {
             'name': 'Esri_WorldTopoMap',
             'url': 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/'
@@ -567,25 +585,9 @@ def web_map(request):
                                'the GIS User Community'
             },
             'group': 'ESRI Basemaps'
-        },
-        {
-            'name': 'MapBox_RunBikeHike',
-            'url': 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?'
-                   'access_token={accessToken}',
-            'options': {
-                'maxZoom': 20,
-                'attribution': 'Map data &copy; '
-                               '<a href="http://openstreetmap.org">OpenStreetMap</a> '
-                               'contributors, <a href="http://creativecommons.org/licenses/'
-                               'by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; '
-                               '<a href="http://mapbox.com">Mapbox</a>',
-                'id': 'mapbox.run-bike-hike',
-                'accessToken': map_config['MapBox']['access_token']
-            },
-            'group': 'OpenStreetMap Basemaps'
         }
     ]
-
+    # print(len(features))
     context = {
         'prefixpath': settings.CUSTOM_TEMPLATE_PATH, 'legends': json.dumps(legend_ref),
         'features': features,
@@ -717,7 +719,7 @@ def get_features(request, sf_type="all", ds_ids="all"):
                 'crs': epsg
             }
             feats_filtered.append(feat)
-
+            # print(len(feat))
     return HttpResponse(json.dumps(feats_filtered))
 
 def truncate(f, n):
@@ -1563,6 +1565,9 @@ def mappopuploader(request, feature_action='NotSet', samplingfeature='NotSet', d
                     annotate(Max('valuedatetime')).\
                     order_by('-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M:%S')
                 methodsOnly = 'False'
+            except ValueError:
+                startdate = Timeseriesresultvalues.objects.get(resultid=resultList.values("resultid")).valuedatetime.strftime('%Y-%m-%d %H:%M:%S.%f')
+                startdate = enddate
             except IndexError as e:
                 html = "<html><body>No time series data available for this site.</body></html>"
                 return HttpResponse(html)
@@ -1719,7 +1724,7 @@ def add_offset(request):
 
         tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valueid__in=idvals)# .filter(datavalue__in=valstochange).filter(valuedatetime__gte=firstdate).filter(
             # valuedatetime__lte=lastdate).filter(datavalue__in=valstochange)
-        print(tsrvs.query)
+        # print(tsrvs.query)
         for tsrv in tsrvs:
             tsrv.datavalue = Decimal(tsrv.datavalue) + offset
             tsrv.save()
@@ -1737,6 +1742,7 @@ def add_annotation(request):
     cvqualitycode = False
     response_data = {}
     annotationobj = None
+    annotationFromUser = None
     anno = None
     if 'resultidu[]' in request.POST:
         resultid = request.POST.getlist('resultidu[]')
@@ -1766,6 +1772,30 @@ def add_annotation(request):
         qualitycode = CvQualitycode.objects.get(name=cvqualitycode)
     # annotator = People.objects.filter(personfirstname='Miguel').filter(personlastname='Leon')
 
+    return HttpResponseRedirect(reverse('createannotation',
+                        args=(resultid, setNaN, cvqualitycode, annotationFromUser, annotationvals)))
+
+
+# 'resultidu': selectedResult,
+# 'annotationvals': annotationvals,
+# 'cvqualitycode': cvqualitycode,
+# 'annotation': annotation,
+# 'setNaN': setNaN,
+def createannotation(request, resultid,setNaN,cvqualitycode,annotationFromUser,annotationvals):
+    # print('annotate')
+    # resultid = resultidu
+    # annotationvals = None
+    annotation = None
+    setNaNstr = None
+    response_data = {}
+    annotationobj = None
+    anno = None
+    response_data['annotation'] = annotationFromUser
+    annotationtype = CvAnnotationtype.objects.get(name='Time series result value annotation')
+    if cvqualitycode:
+        qualitycode = CvQualitycode.objects.get(name=cvqualitycode)
+    # annotator = People.objects.filter(personfirstname='Miguel').filter(personlastname='Leon')
+
     lastannotationval = None
     for rid in resultid:
         intrid = int(rid)
@@ -1774,12 +1804,13 @@ def add_annotation(request):
         idvals = []
         i = 0
         for annotationval in annotationvals:
-            # print(offsetval)
+            # print(annotationval)
             # if i % 3 == 0:
             #     datevals.append(datetime.strptime(offsetval, '%Y-%m-%d %H:%M:%S'))
-            if i % 3 == 2:
-                idvals.append(int(annotationval))
-            i += 1
+            if isinstance(annotationval,int):
+                if i % 3 == 2:
+                    idvals.append(int(annotationval))
+                i += 1
 
         # firstdate = annotationvals[0]
         # lastdate = annotationvals[-2]
@@ -1867,21 +1898,22 @@ def add_annotation(request):
     #    resultidu = int(resultidu)
     return HttpResponse(json.dumps(response_data),content_type='application/json')
 
+
 def save_sf(request):
     form = None
     validsave = False
     response_data = {}
     if request.method == 'POST':
         # print(request.POST['samplingfeatureid'])
-        print(request.POST['featureactions_set-0-samplingfeatureid'])
+        # print(request.POST['featureactions_set-0-samplingfeatureid'])
         sfid = int(request.POST['featureactions_set-0-samplingfeatureid'])
         sf = Samplingfeatures.objects.filter(samplingfeatureid=sfid).get()
         form = SamplingfeaturesAdminForm(request.POST,sf)
-        print(request.POST)
+        # print(request.POST)
         # response_data['form'] = form
         if form.is_valid():
             # form.save()
-            print(request.POST['featureactions_set-0-samplingfeatureid'])
+            # print(request.POST['featureactions_set-0-samplingfeatureid'])
             # id = form.cleaned_data['samplingfeatureid']
             # instance = Samplingfeatures.objects.filter(samplingfeatureid=id)
             # form2 = SamplingfeaturesAdminForm(request.POST,instance)
@@ -1906,7 +1938,7 @@ def save_sf(request):
                 pass
             sf.save()
             validsave = True
-            print('saved vals')
+            # print('saved vals')
     response_data['validsave'] = validsave
     return HttpResponse(json.dumps(response_data),content_type='application/json')
 
@@ -2026,7 +2058,7 @@ def procDataLoggerFile(request):
                                  "' '" + str(fileid) + "' '" + str(databeginson) + "' '" + str(columnheaderson) +\
                                  "' '" + str(ftpfrequencyhours) +  "' '" + str(False) + "' " +  " '" + str(True) + "' "
                 commandstring += " >> " + localbasedir + "/templatesAndSettings/logging/processdlfftp.log \n"
-                print(commandstring)
+                # print(commandstring)
                 sys.stdout = sysout
                 response = HttpResponse(json.dumps(response_data), content_type='application/json')
                 #time.sleep(5)
@@ -2049,7 +2081,7 @@ def procDataLoggerFile(request):
                                  "' '" + str(check_dates) +  "' '" + str(True) +\
                                  "' '" + str(False) + "' '" + useremail + "' "
                 commandstring += " >> " + localbasedir + "/templatesAndSettings/logging/processdlf.log \n"
-                print(commandstring)
+                # print(commandstring)
                 sys.stdout = sysout
                 # print(result)
                 # pdlf.processingCode = 'done'
@@ -2094,7 +2126,7 @@ def addL1timeseries(request):
             commandstring += " create_l1_timeseries '" + str(createorupdateL1) +\
                              "' '" + str(result) + "' '" + str(email) + "' "
             commandstring += " > " + localbasedir + "/templatesAndSettings/logging/L1_creation.log \n"
-            print(commandstring)
+            # print(commandstring)
             sys.stdout = sysout
             # response_data['newresultid'] = newresult
             # print(result)
@@ -2403,6 +2435,472 @@ def linear_gradient(start_hex, finish_hex="#FFFFFF", n=10):
   return color_dict(RGB_list)
 
 
+def TimeSeriesGraphingCat(request, feature_action='NotSet', samplingfeature='NotSet',
+                            dataset='NotSet',dischargeresult='NotSet',
+                            resultidu='NotSet', startdate='NotSet', enddate='NotSet',
+                            popup='NotSet'):  # ,startdate='',enddate=''
+    mergeResults='true'
+    authenticated = True
+    hystdict = None
+    if not request.user.is_authenticated:
+        # return HttpResponseRedirect('../')
+        authenticated = False
+        if settings.ALWAYS_AUTHENTICATE:
+            return HttpResponseRedirect(settings.CUSTOM_TEMPLATE_PATH)
+    if popup == 'NotSet':
+        template = loader.get_template('wsscatterplottime2.html')
+    data_disclaimer = settings.DATA_DISCLAIMER
+    map_config = settings.MAP_CONFIG
+    useDataset = False
+    defaultvar = 1439
+    useDefaultVar = False
+    # samplingfeature = None
+    # if 'annotation' in request.POST:
+    # pass
+    # raise ValidationError(request.POST['annotation'])
+    if dataset == 'NotSet':
+        useDefaultVar = True
+    else:
+        useDataset = True
+        dataset = int(dataset)
+
+    if resultidu != 'NotSet':
+        try:
+            # print(resultidu)
+            resultidu = [int(resultidu)]
+        except:
+            resultids = re.findall(r'\d+',resultidu)
+            resultidu = []
+            mergeResults = 'true'
+            for results in resultids:
+                resultidu.append(int(results))
+            resultidu.sort()
+        selected_results = []
+        name_of_sampling_features = []
+        # name_of_variables = []
+        name_of_units = []
+
+        dashboardqsids = [16525, 18699, 16532, 18700, 17170, 17174, 17173]
+        qsdb = False
+        for dbid in dashboardqsids:
+            for rid in resultidu:
+                if dbid == rid:
+                    qsdb = True
+        if popup == 'smll' and qsdb:
+            resultidu.append(18699)
+            resultidu.sort()
+
+
+    selected_results = []
+    name_of_sampling_features = []
+    # name_of_variables = []
+    name_of_units = []
+
+    myresultSeries = []
+
+    data = {}
+    featureActionLocation = None
+    featureActionMethod = None
+    datasetTitle = None
+    datasetAbstract = None
+    methods = None
+    resultListGrouped = None
+    # print(settings.MAP_CONFIG['result_value_processing_levels_to_display'])
+    if not useDataset:
+        if useDefaultVar:
+            # samplefeature = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
+            # feature_actions = Featureactions.objects.filter(samplingfeatureid=samplefeature)
+
+            resultList = Results.objects.filter(variableid=defaultvar).order_by("featureactionid","resultid")
+            catresults = Categoricalresults.objects.filter(resultid__in=resultList)
+            resultList = resultList.filter(~Q(resultid__in=catresults))
+            # resultListGrouped = groupResultsByVariable(samplefeature)
+            # actions = Actions.objects.filter(actionid__in=feature_actions.values("action"))
+            # methods = Methods.objects.filter(methodid__in=actions.values("method"))
+            # featureActionLocation = samplefeature.samplingfeaturename
+        else:
+            resultList = Results.objects.filter(featureactionid=feature_action).filter(
+                 processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
+                 ).order_by("featureactionid","resultid")
+            catresults = Categoricalresults.objects.filter(resultid__in=resultList)
+            resultList = resultList.filter(~Q(resultid__in=catresults))
+            featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
+            featureActionLocation = featureAction.samplingfeatureid.samplingfeaturename
+            resultListGrouped = groupResultsByVariable(featureAction.samplingfeatureid)
+            featureActionMethod = featureAction.action.method.methodname
+            action = Actions.objects.filter(actionid=featureAction.action.actionid).get()
+            methods = Methods.objects.filter(methodid=action.method.methodid)
+
+    else:
+        datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
+        resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid")).filter(
+             processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
+             ).order_by("variableid")
+        catresults = Categoricalresults.objects.filter(resultid__in=resultList)
+        resultList = resultList.filter(~Q(resultid__in=catresults))
+        datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
+        datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
+    numresults = resultList.count()
+    print(numresults)
+    selectedMResultSeries = Timeseriesresults.objects.filter(resultid__in=resultList)
+    mergedResultSets = []
+
+    # selectedMResultSeries = Results.objects.filter(featureactionid=feature_action)
+    i = 0
+    print('selected results')
+    print(selectedMResultSeries)
+    if selectedMResultSeries.__len__() == 0:
+        if resultidu == 'NotSet':
+            try:
+                selectedMResultSeries.append(resultList[0].resultid)
+            except IndexError:
+                html = "<html><body>No Data Available Yet.</body></html>"
+                return HttpResponse(html)
+        else:
+            try:
+                for resultid in resultidu:
+                    selectedMResultSeries.append(resultid)
+            except ObjectDoesNotExist:
+                html = "<html><body>No Data Available Yet.</body></html>"
+                return HttpResponse(html)
+
+    if 'endDate' in request.POST:
+        entered_end_date = request.POST['endDate']
+    elif not enddate == 'NotSet':
+        entered_end_date = enddate
+    else:
+        entered_end_date = \
+            Timeseriesresultvalues.objects.filter(resultid__in=selectedMResultSeries).exclude(datavalue=float('nan')).annotate(
+                Max('valuedatetime')).order_by(
+                '-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+        print(entered_end_date)
+    if 'startDate' in request.POST:
+        entered_start_date = request.POST['startDate']
+    elif not startdate == 'NotSet':
+        entered_start_date = startdate
+    else:
+        # entered_start_date= Measurementresultvalues.objects.
+        # filter(resultid__in=selectedMResultSeries).annotate(Min('valuedatetime')).\
+        # order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
+        # .annotate(Min('price')).order_by('price')[0]
+        datetime_entered_end_date = datetime.strptime(entered_end_date, '%Y-%m-%d %H:%M')
+        if popup == 'smll':
+            entered_start_date = datetime_entered_end_date - timedelta(
+                settings.SENSOR_DASHBOARD['time_series_days'])
+        elif popup =='Anno' or popup =='hyst':
+            entered_start_date = datetime_entered_end_date - timedelta(
+                settings.SENSOR_DASHBOARD['time_series_days'])
+        else:
+            entered_start_date = datetime_entered_end_date - timedelta(
+                (map_config['time_series_months']* 600) * 365 / 12)  # .strftime('%Y-%m-%d %H:%M')
+        entered_start_date = entered_start_date.strftime('%Y-%m-%d %H:%M')
+
+            # print(mergedResultSets)
+
+        variables = []
+        mergedResultSets = []
+        mset = []
+        for selectedMResult in resultList:
+            variable = selectedMResult.variableid.variable_name
+            vtype = selectedMResult.variableid.variable_type
+            loc = selectedMResult.featureactionid.samplingfeatureid.samplingfeaturename
+            # print(variable)
+            foundvar = False
+            for var in variables:
+                if variable == var:
+                    for set in mergedResultSets:
+                        if set[0].variableid.variable_name == variable and set[0].variableid.variable_type == vtype \
+                                and set[0].featureactionid.samplingfeatureid.samplingfeaturename == loc:
+                            set.append(selectedMResult)
+                            foundvar = True
+                            # print('here')
+
+            if not foundvar or len(mergedResultSets) ==0:
+                variables.append(variable)
+                mset.append(selectedMResult)
+                mergedResultSets.append(mset)
+                mset = list()
+                # print('new result set')
+        i = 0
+        for mergedResultSet in mergedResultSets:
+
+            i += 1
+            ids = []
+            for mresult in mergedResultSet:
+                ids.append(mresult.resultid)
+            print(ids)
+            selected_result = Results.objects.filter(resultid__in=ids).first()
+            # print('result set')
+            # print(mergedResultSet)
+            # print(selected_result)
+            selected_results.append(selected_result)
+            # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
+
+            tmpname = get_name_of_sampling_feature(selected_result)
+            name_of_sampling_features.append(tmpname)
+            myresultSeries.append(Timeseriesresultvalues.objects.all()
+                                  .filter(~Q(datavalue__lte=selected_result.variableid.nodatavalue))
+                                  .exclude(datavalue=float('nan'))
+                                  .filter(valuedatetime__gte=entered_start_date)
+                                  .filter(valuedatetime__lte=entered_end_date)
+                                  .filter(resultid__in=ids).order_by('-valuedatetime'))
+            data.update({'datavalue' + str(i): []})
+
+
+
+    i = 0
+    annotationsexist = False
+
+
+    for myresults in myresultSeries:
+        i = 1
+        resultannotationsexist = False
+        for result in myresults:
+            start = datetime(1970, 1, 1)
+            delta = result.valuedatetime - start
+            mills = delta.total_seconds() * 1000
+            if math.isnan(result.datavalue):
+                dataval = 'null'
+            else:
+                dataval = result.datavalue
+                data['datavalue' + str(i)].append(
+                    [mills,dataval])
+
+
+
+    timeseriesresults = Timeseriesresults.objects.\
+        filter(resultid__in=resultList.values("resultid")).\
+        order_by("resultid__variableid", "aggregationstatisticcv")
+    # build strings for graph labels
+    # print('data')
+    # print(data)
+    i = 0
+    seriesStr = ''
+    # (data)
+    unit = ''
+    location = ''
+    variable = ''
+    aggStatistic = ''
+    series = []
+    # print('selected result series')
+    # print(selectedMResultSeries)
+    ids = []
+    for mergedResult in mergedResultSets:
+        for mresult in mergedResult:
+            ids.append(mresult.resultid)
+    print('number of results')
+    print(len(ids))
+    r = Results.objects.filter(resultid__in=ids)\
+        .order_by("featureactionid","resultid")  # .order_by("unitsid")
+
+    tsrs = Timeseriesresults.objects.filter(resultid__in=ids)\
+        .order_by("resultid__resultid__featureactionid","resultid")
+    L1exists = False
+    variables = []
+    for selectedMResult in r:
+        variable = selectedMResult.variableid.variable_name
+        foundvar = False
+        for var in variables:
+            if variable == var:
+                foundvar = True
+                break
+            else:
+                variables.append(variable)
+        if foundvar:
+            break
+        i += 1
+        tsr = tsrs.get(resultid=selectedMResult)
+        vtype = selectedMResult.variableid.variable_type.name
+        aggStatistic = tsr.aggregationstatisticcv
+        unit = selectedMResult.unitsid.unitsabbreviation
+
+        location = selectedMResult.featureactionid.samplingfeatureid.samplingfeaturename
+        print(location)
+        print(i)
+        if i == 1 and not unit == '':
+            seriesStr += str(unit)
+            name_of_units.append(str(unit))
+        elif not unit == '':
+            seriesStr += ' - ' + str(unit)
+            name_of_units.append(str(unit))
+        # print('series unit and var')
+        # print(str(unit) + ' - ' + str(variable))
+        # print(len(mergedResultSets))
+        if not popup=='hyst':
+            series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' + vtype + ' - ' +
+                          str(location), "allowPointSelect": "true", "yAxis": str(unit),
+                          "data": data['datavalue' + str(i)], "point": { }})
+        else: # build color zones
+            vals = len(data['datavalue' + str(i)])
+            ii=0
+            j=10
+            thresholds = []
+            # print(vals)
+            for datum in data['datavalue' + str(i)]:
+                ii+=1
+                # print(ii)
+                # print(int(round(vals/j)))
+                if ii== int(round(vals/j)):
+                    j-=1
+                    thresholds.append(datum['y'])
+            zones = []
+            # print(thresholds)
+            for ii in range(1, len(thresholds)):
+                threshold = thresholds.pop()
+                if not threshold == 'null':
+                    dict = {'value':float(threshold),'className':'zone-'+str(ii)}
+                    zones.append(dict)
+            # print('zones')
+            # print(zones)
+            true = 'true'
+            two = 2
+            series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
+                          str(aggStatistic), "allowPointSelect": "true", "yAxis": str(unit),
+                          "lineWidth":two,"data": data['datavalue' + str(i)], "zones": zones})
+            # print(series)
+            # "plotOptions": {"maker": {"enabled": true},
+        if mergeResults =='true' and len(mergedResultSets) <= i:
+            break
+
+
+    # "point": { "events": {'click': 'selectPointsByClick'}}
+    i = 0
+    titleStr = ''
+    # print(series)
+    i = 0
+    # name_of_sampling_features = set(name_of_sampling_features)
+
+    for var in variables:
+        i += 1
+        if i == 1:
+            titleStr += var  # + ', ' +name_of_variable
+        else:
+            titleStr += ' - ' + var  # +name_of_variable+ ', '
+
+    chartID = 'chart_id'
+    chart = {"renderTo": chartID, "type": 'scatter', "zoomType": 'xy'}
+    title2 = {"text": titleStr}
+    graphType = 'scatter'
+    if not popup=='hyst':
+        xAxis = {"type": 'datetime', "title": {"text": 'Date'}}
+    else:
+        xAxis = {"title": {"text": 'Discharge'}} # "dateTimeLabelFormats":{}
+        chart = {"renderTo": chartID, "type": 'scatter', "zoomType": 'xy'}
+        graphType = 'scatter'
+    yAxis = {"title": {"text": seriesStr}}
+
+
+    int_selectedresultid_ids = []
+    str_selectedresultid_ids = []
+    for int_selectedresultid in selectedMResultSeries:
+        int_selectedresultid_ids.append(int(int_selectedresultid.resultid.resultid))
+        str_selectedresultid_ids.append(str(int_selectedresultid.resultid.resultid))
+    csvexport = False
+    cvqualitycode = None
+    if popup == 'Anno':
+        cvqualitycode = CvQualitycode.objects.all().order_by('definition')
+
+        # csvexport = True
+        # k=0
+        # myfile = StringIO.StringIO()
+        # for myresults in myresultSeriesExport:
+        #     for result in myresults:
+        #         if k==0:
+        #             myfile.write(result.csvheader())
+        #             myfile.write('\n')
+        #         myfile.write(result.csvoutput())
+        #         myfile.write('\n')
+        #         k+=1
+        # response = HttpResponse(myfile.getvalue(),content_type='text/csv')
+        # response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
+    # if csvexport:
+    #     return response
+    # else:
+        # raise ValidationError(relatedFeatureList)
+    for result in resultList:
+        tsr = Timeseriesresults.objects.filter(resultid=result).get()
+        result.timeintervalunits = tsr.intendedtimespacingunitsid
+        result.timeinterval = tsr.intendedtimespacing
+        StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
+        EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
+        startdate = Resultextensionpropertyvalues.objects.filter()
+        try:
+            result.startdate = Resultextensionpropertyvalues.objects.filter(resultid=result.resultid).filter(
+                propertyid=StartDateProperty).first().propertyvalue
+            if len(result.startdate) == 16:
+                result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
+            elif len(result.startdate) == 19:
+                result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+            else:
+                result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
+            result.enddate = Resultextensionpropertyvalues.objects.filter(resultid=result.resultid).filter(
+                propertyid=EndDateProperty).first().propertyvalue
+            if len(result.enddate) == 16:
+                result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
+            elif len(result.enddate) == 19:
+                result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+            else:
+                result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
+        except (ObjectDoesNotExist, AttributeError) as e:
+            try:
+                result.startdate = Timeseriesresultvalues.objects.filter(resultid=result.resultid).annotate(
+                    Min('valuedatetime')). \
+                    order_by('valuedatetime')[0].valuedatetime
+                if len(result.startdate) == 16:
+                    result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
+                elif len(result.startdate) == 19:
+                    result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+                else:
+                    result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
+                result.enddate = Timeseriesresultvalues.objects.filter(resultid=result.resultid).annotate(
+                    Max('valuedatetime')). \
+                    order_by('-valuedatetime')[0].valuedatetime
+                if len(result.enddate) == 16:
+                    result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
+                elif len(result.enddate) == 19:
+                    result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+                else:
+                    result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
+            except (ValueError, IndexError) as e:
+                result.startdate = None
+                result.enddate = None
+
+    responsedict = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
+                                                'startDate': entered_start_date,
+                                                'endDate': entered_end_date,
+                                                'popup': popup,
+                                                'mergeResults':mergeResults,
+                                                # 'resultListGrouped':resultListGrouped,
+                                                # 'emailsent': emailsent,
+                                                # 'outEmail': outEmail,
+                                                # 'useSamplingFeature': useSamplingFeature,
+                                                'featureActionMethod': featureActionMethod,
+                                                'featureActionLocation': featureActionLocation,
+                                                'cvqualitycode': cvqualitycode,
+                                                'data_disclaimer': data_disclaimer,
+                                                'datasetTitle': datasetTitle,
+                                                'datasetAbstract': datasetAbstract,
+                                                'useDataset': useDataset,
+                                                'startdate': startdate,
+                                                'enddate': enddate,
+                                                'L1exists': L1exists,
+                                                'SelectedResults': int_selectedresultid_ids,
+                                                'authenticated': authenticated,
+                                                'methods': methods,
+                                                'timeseriesresults': timeseriesresults,
+                                                'chartID': chartID, 'chart': chart,
+                                                'series': series,
+                                                'title2': title2, 'resultList': resultList,
+                                                'graphType': graphType, 'xAxis': xAxis,
+                                                'yAxis': yAxis,
+                                                'name_of_units': name_of_units}
+    if hystdict:
+        z = hystdict.copy()
+        z.update(responsedict)
+        responsedict = z
+    return TemplateResponse(request, template, responsedict, )
+
+
 def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='NotSet',
                             dataset='NotSet',dischargeresult='NotSet',
                             resultidu='NotSet', startdate='NotSet', enddate='NotSet',
@@ -2576,10 +3074,10 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         entered_end_date = enddate
     else:
         entered_end_date = \
-            Timeseriesresultvalues.objects.filter(resultid__in=selectedMResultSeries).annotate(
+            Timeseriesresultvalues.objects.filter(resultid__in=selectedMResultSeries).exclude(datavalue=float('nan')).annotate(
                 Max('valuedatetime')).order_by(
                 '-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-
+        print(entered_end_date)
     if 'startDate' in request.POST:
         entered_start_date = request.POST['startDate']
     elif not startdate == 'NotSet':
@@ -2611,6 +3109,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             name_of_sampling_features.append(tmpname)
             myresultSeries.append(Timeseriesresultvalues.objects.all()
                                   .filter(~Q(datavalue__lte=selected_result.variableid.nodatavalue))
+                                  .exclude(datavalue=float('nan'))
                                   .filter(valuedatetime__gte=entered_start_date)
                                   .filter(valuedatetime__lte=entered_end_date)
                                   .filter(resultid=selectedMResult).order_by('-valuedatetime'))
@@ -2632,6 +3131,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
                 name_of_sampling_features.append(tmpname)
                 myresultSeries.append(Timeseriesresultvalues.objects.all()
                                       .filter(~Q(datavalue__lte=selected_result.variableid.nodatavalue))
+                                      .exclude(datavalue=float('nan'))
                                       .filter(valuedatetime__gte=entered_start_date)
                                       .filter(valuedatetime__lte=entered_end_date)
                                       .filter(resultid__in=mergedResultSet).order_by('-valuedatetime'))
@@ -2646,6 +3146,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             name_of_sampling_features.append(tmpname)
             myresultSeries.append(Timeseriesresultvalues.objects.all()
                                   .filter(~Q(datavalue__lte=selected_result.variableid.nodatavalue))
+                                  .exclude(datavalue=float('nan'))
                                   .filter(valuedatetime__gte=entered_start_date)
                                   .filter(valuedatetime__lte=entered_end_date)
                                   .filter(resultid__in=selectedMResultSeries).order_by('-valuedatetime'))
@@ -2688,7 +3189,8 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             dischargeR = dischargeRs.first()
             dischargeTSR = Timeseriesresults.objects.filter(resultid=dischargeR).get()
             # print(dischargeTSR)
-            tsrvdischarge = Timeseriesresultvalues.objects.filter(~Q(datavalue__lte=dischargeR.variableid.nodatavalue))\
+            tsrvdischarge = Timeseriesresultvalues.objects.filter(~Q(datavalue__lte=dischargeR.variableid.nodatavalue)) \
+                .exclude(datavalue=float('nan'))\
                 .filter(valuedatetime__gte=entered_start_date)\
                 .filter(valuedatetime__lte=entered_end_date)\
                 .filter(resultid=dischargeTSR).order_by('-valuedatetime')
@@ -2753,7 +3255,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     # print(data)
     i = 0
     seriesStr = ''
-    print(data)
+    # (data)
     unit = ''
     location = ''
     variable = ''
@@ -2814,7 +3316,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
                           str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
                           "lineWidth":two,"data": data['datavalue' + str(i)], "zones": zones})
-            print(series)
+            # print(series)
             # "plotOptions": {"maker": {"enabled": true},
         if mergeResults =='true' and len(mergedResultSets) <= i:
             break
@@ -2827,7 +3329,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             ).filter(resultid__unitsid = selectedMResult.unitsid).filter(intendedtimespacing = tsr.intendedtimespacing
                                             ).filter(intendedtimespacingunitsid = tsr.intendedtimespacingunitsid)
             relatedresults = Results.objects.filter(resultid__in=relatedtsr)
-            print(relatedresults)
+            # print(relatedresults)
             #relatedresults = Results.objects.filter(
             #    featureactionid = selectedMResult.featureactionid).filter(
             #    variableid = selectedMResult.variableid
@@ -2835,7 +3337,7 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             for rr in relatedresults:
                 if rr.processing_level.processinglevelid ==2:
                     L1exists = True
-            if annotationsexist:
+            if resultannotationsexist:
                 series.append({"name": 'Annotated ' + str(unit) + ' - ' + str(variable) + ' - ' +
                                 str(aggStatistic) + ' - ' + str(location), "allowPointSelect": "true", "yAxis": str(unit),
                                 "data": data['datavalueannotated'], "point": { }})
@@ -2898,6 +3400,49 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         tsr = Timeseriesresults.objects.filter(resultid=result).get()
         result.timeintervalunits = tsr.intendedtimespacingunitsid
         result.timeinterval = tsr.intendedtimespacing
+        StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
+        EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
+        startdate = Resultextensionpropertyvalues.objects.filter()
+        try:
+            result.startdate = Resultextensionpropertyvalues.objects.filter(resultid=result.resultid).filter(
+                propertyid=StartDateProperty).first().propertyvalue
+            if len(result.startdate) == 16:
+                result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
+            elif len(result.startdate) == 19:
+                result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+            else:
+                result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
+            result.enddate = Resultextensionpropertyvalues.objects.filter(resultid=result.resultid).filter(
+                propertyid=EndDateProperty).first().propertyvalue
+            if len(result.enddate) == 16:
+                result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
+            elif len(result.enddate) == 19:
+                result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+            else:
+                result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
+        except (ObjectDoesNotExist, AttributeError) as e:
+            try:
+                result.startdate = Timeseriesresultvalues.objects.filter(resultid=result.resultid).annotate(
+                    Min('valuedatetime')). \
+                    order_by('valuedatetime')[0].valuedatetime
+                if len(result.startdate) == 16:
+                    result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
+                elif len(result.startdate) == 19:
+                    result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+                else:
+                    result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
+                result.enddate = Timeseriesresultvalues.objects.filter(resultid=result.resultid).annotate(
+                    Max('valuedatetime')). \
+                    order_by('-valuedatetime')[0].valuedatetime
+                if len(result.enddate) == 16:
+                    result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
+                elif len(result.enddate) == 19:
+                    result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+                else:
+                    result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
+            except (ValueError, IndexError) as e:
+                result.startdate = None
+                result.enddate = None
 
     responsedict = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'startDate': entered_start_date,
@@ -2933,7 +3478,6 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
         z.update(responsedict)
         responsedict = z
     return TemplateResponse(request, template, responsedict, )
-
 
 
 #
@@ -3122,8 +3666,8 @@ def water_sample_scatter_plot_time(request):
     else:
         authenticated = True
     xVariableSelection = yVariableSelection = fieldarea1 = fieldarea2 = filteredFeatures = None
-    xVar = None
-    yVar = None
+    xVar = Variables.objects.filter(variableid=1439).get()
+    yVar = Variables.objects.filter(variableid=1442).get()
     title = ''
     if 'fieldarea1' in request.POST and 'fieldarea2' not in request.POST:
         if not request.POST['fieldarea1'] == 'All':
@@ -3215,9 +3759,9 @@ def water_sample_scatter_plot_time(request):
             start = datetime(1970, 1, 1)
             delta = x.valuedatetime - start
             mills = delta.total_seconds() * 1000
-            if not ydata.has_key(serieskey):
+            if serieskey not in ydata:
                 tmplist = datalist.copy()
-                datalist.append([mills, y.datavalue])
+                datalist.append([mills, x.datavalue])
                 datalist = tmplist
             else:
                 ydata[serieskey].append([mills, x.datavalue])
@@ -3239,7 +3783,7 @@ def water_sample_scatter_plot_time(request):
                 start = datetime(1970, 1, 1)
                 delta = y.valuedatetime - start
                 mills = delta.total_seconds() * 1000
-                if not ydata.has_key(serieskey):
+                if serieskey not in ydata:
                     tmplist = datalist.copy()
                     datalist.append([mills, y.datavalue])
                     datalist = tmplist
@@ -3790,17 +4334,17 @@ def emailspreadsheet2(request, resultValuesSeries, profileResult=True):
             k += 1
         # response = StreamingHttpResponse(myfile.getvalue(), content_type='text/csv')
         # response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
-        # print('email!!!!')
-        # print(settings.EMAIL_FROM_ADDRESS)
-        # print(emailtext)
-        # print(tolist)
+        print('email!!!!')
+        print(settings.EMAIL_FROM_ADDRESS)
+        print(emailtext)
+        print(tolist)
         email = EmailMessage(emailtitle,emailtext,
                              settings.EMAIL_FROM_ADDRESS, tolist)
         email.attach('mydata.csv', myfile.getvalue(),'text/csv')
         email.send()
         return True
     else:
-        # print("captcha not ok")
+        print("captcha not ok")
         return False
 
 def exportspreadsheet(request, resultValuesSeries, profileResult=True):
@@ -4194,8 +4738,8 @@ def graph_data(request, selectedrelatedfeature='NotSet', samplingfeature='NotSet
 
     datasetcitationlinks = {}
     for citation in citations:
-        print(citation)
-        print(linkExtProperty)
+        # print(citation)
+        # print(linkExtProperty)
         try:
             extprop = Citationextensionpropertyvalues.objects.filter(citationid=citation).get(
                 propertyid=linkExtProperty)

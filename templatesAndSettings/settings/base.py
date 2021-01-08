@@ -270,22 +270,26 @@ LEGEND_MAP = {
         'Profile': dict(feature_type="Profile", icon="fa-database", color="purple",
              style_class="awesome-marker-icon-purple"),
         'Specimen': dict(feature_type="Specimen", icon="fa-flask", color="cadetblue",
-                         style_class="awesome-marker-icon-cadetblue")
+                         style_class="awesome-marker-icon-cadetblue"),
+        'Water quality station': dict(feature_type="Water quality station", icon="fa-tint", color="darkblue",
+                     style_class="awesome-marker-icon-darkblue")
+        # Water quality statio
     }
 """ END SAMPLING FEATURE TYPE LEGEND MAPPING """
 
 """ REDIS CACHING CONFIGURATION """
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient"
-        },
-        "KEY_PREFIX": "odm2admin"
-    }
-}
-
-# Cache time to live is 15 minutes.
+# # DONT USE ON DEV
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": "redis://127.0.0.1:6379/1",
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient"
+#         },
+#         "KEY_PREFIX": "odm2admin"
+#     }
+# }
+#
+# # Cache time to live is 15 minutes.
 CACHE_TTL = 60 * 15
 """ END REDIS CACHING CONFIGURATION"""

@@ -59,7 +59,7 @@ $(document).ready(function(){
 	<form action="" method="post">
 	{% csrf_token %} 
 	
-	<table >
+<!--	<table >
 	{% for method in methods %}
 	<tr><td>
 		{% if not useDataset %}
@@ -67,7 +67,7 @@ $(document).ready(function(){
 <p>for more go to <a href="{{method.methodlink}}">{{method.methodlink}}</a>
 {% endif %}
 </td></tr>
-{% endfor %}
+{% endfor %}-->
 <table ><tr><td>
 	<tr><td>	Reload graph with date range:	<input id="startDate" maxlength="100" value= "{{ startDate }}" name="startDate" type="text">
 			Start Date (format YYYY-MM-DD HH:MM) </input>

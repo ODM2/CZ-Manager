@@ -133,6 +133,7 @@ window.prefixpath = '{{prefixpath}}';
     <script type="application/javascript">
     if (loaded !== true) {
         var url_path = "{{ urlpath }}";
+        //console.log("{{ urlpath }}");
 		spinner = new Spinner().spin();
 		spin=document.getElementById("spinner");
 		spin.appendChild(spinner.el); 
@@ -148,7 +149,9 @@ window.prefixpath = '{{prefixpath}}';
         myMap.addBaseMap(myApp.PARAMS.basemaps);
 
         var url = myMap.getUrl(JSON.parse('{{ selectedds|safe }}'), JSON.parse('{{ selectedtype|safe }}'));
+        //console.log(url);
         myMap.getData(url,spinner);
+
         myMap.makeFilter();
 
         var loaded = true;

@@ -22,10 +22,12 @@ develop-eggs
 lib
 lib64
 /odm2testsite/__pycache__
+/Dendra Metadata Examples
 __pycache__
 
 templatesAndSettings/settings.py
 templatesAndSettings/settings
+odm2admin/static/leaflet-search/examples
 .gitignore
 odm2djangoadmin.git
 omit

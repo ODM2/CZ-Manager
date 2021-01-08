@@ -60,7 +60,7 @@
 	<script src="https://code.highcharts.com/modules/exporting.js"></script>
 	 <script src="https://rawgithub.com/RolandBanguiran/highcharts-scalable-yaxis/master/scalable-yaxis.js"></script>
 	 <script src="https://highcharts.github.io/export-csv/export-csv.js"></script>
-	 
+
 	<script>
     var chart_id = 'chartid';
     var chart = {{ chart|safe }};
@@ -70,9 +70,9 @@
     var series = {{ series|safe }};
 	var graphType =   '{{graphType|safe }}';
 	var name_of_units = {{name_of_units|safe}};
-	
+
 $(document).ready(function() {
-	
+
 	var opposite2 = false;
 	yaxes = [];
 	k = 0;
@@ -91,36 +91,45 @@ $(document).ready(function() {
 	data.sort();
 	}
 	//console.log(data);
+	usednames = [];
 	for (var i=0; i<name_of_units.length; i++) {
 		name = name_of_units[i];
 		//alert(name);
-		   
-		axi = {id: name,
-		scrollbar: {
-        enabled: false
-    },
-		labels: {
-                format: '{value}',
-                style: {
-                    color: Highcharts.getOptions().colors[i]
-                }
-            },
-		title: {
-			text: name
-		},
-		//lineWidth: 2,
-        //lineColor: Highcharts.getOptions().colors[i],
-		opposite: opposite2
-		};
-		yaxes.push(axi);
-		//opposite2 = !opposite2;
+		var namesusedlen = usednames.length;
+        var used = false;
+        for(var i = 0; i < namesusedlen; i++) {
+            if (usednames[i] == name){
+            used = true;
+            }
+            if(!used){
+                axi = {id: name,
+                scrollbar: {
+                enabled: false
+                },
+                labels: {
+                        format: '{value}',
+                        style: {
+                            color: Highcharts.getOptions().colors[i]
+                        }
+                    },
+                title: {
+                    text: name
+                },
+                //lineWidth: 2,
+                //lineColor: Highcharts.getOptions().colors[i],
+                opposite: opposite2
+                };
+                yaxes.push(axi);
+                usednames.push(name);
+            }
+        }
 	}
 	//yAxis[1] = yAxis2.replace('"','');
 	var chart =Highcharts.stockChart('chartid', {
-		chart: {renderTo: chart_id, 
+		chart: {renderTo: chart_id,
 		type: graphType,  zoomType: 'xy',},
 		legend: {
-                            enabled: true,
+                            enabled: false,
                             layout: 'vertical',
                             align: 'center',
                             verticalAlign: 'top',
@@ -151,18 +160,18 @@ $(document).ready(function() {
         split: false
     },
     });
-	
+
 	//alert(name_of_units.length);
 
-	
-	
+
+
 	});
 	 Highcharts.addEvent(Highcharts.Chart, 'displayError', function (event) {
     // See https://github.com/highcharts/highcharts/blob/master/errors/errors.xml
     // for error id's
 	errortext = event.code
 	if(event.code == 14){
-		errortext = ' No data available for this time frame try a different start and end date'; 
+		errortext = ' No data available for this time frame try a different start and end date';
 	}
     Highcharts.charts[0].renderer
         .text('Chart error ' + errortext)
@@ -180,19 +189,11 @@ $(document).ready(function() {
 </script>
 
 <p><h1>
-{% if useDataset %}
-{{datasetTitle}}
-{% else %}
-Location - {{featureActionLocation}}<br>
-{% endif %}
-{% if not useSamplingFeature and not useDataset %}
-Method- {{featureActionMethod}}
-{% endif %}
 </h1>
     <div id='content-main'> {% csrf_token %}
 	 </div>
 	<div id='chartid' class="chart" style="height:600px; width:100%; margin: 0 auto;"></div>
-	
+
 <br>
 {% if useDataset %}
 {{datasetAbstract}}

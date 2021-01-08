@@ -727,11 +727,23 @@
                         <td><a href="{{ prefixpath }}profileresults/add/" class="addlink">{% trans 'Add' %}</a></td>
                         <td><a href="{{ prefixpath }}profileresults/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
+<tr>
+                        <th scope="row"><a href="{{ prefixpath }}relatedresults/">
+                            {% trans 'Related Results - relate one result to another' %}</a></th>
+                        <td><a href="{{ prefixpath }}relatedresults/add/" class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}relatedresults/" class="changelink">{% trans 'Change' %}</a></td>
+                    </tr>
                     <tr>
-                        <th scope="row"><a href="{{ prefixpath }}profileresults/">
-                            {% trans 'Profile result values- soils data values' %}</a></th>
-                        <td><a href="{{ prefixpath }}profileresults/add/" class="addlink">{% trans 'Add' %}</a></td>
-                        <td><a href="{{ prefixpath }}profileresults/" class="changelink">{% trans 'Change' %}</a></td>
+                        <th scope="row"><a href="{{ prefixpath }}resultderivationequations/">
+                            {% trans 'Related Derivation Equations - derivation equations for results' %}</a></th>
+                        <td><a href="{{ prefixpath }}resultderivationequations/add/" class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}resultderivationequations/" class="changelink">{% trans 'Change' %}</a></td>
+                    </tr>
+                     <tr>
+                        <th scope="row"><a href="{{ prefixpath }}derivationequations/">
+                            {% trans 'Define a Derivation Equation' %}</a></th>
+                        <td><a href="{{ prefixpath }}derivationequations/add/" class="addlink">{% trans 'Add' %}</a></td>
+                        <td><a href="{{ prefixpath }}derivationequations/" class="changelink">{% trans 'Change' %}</a></td>
                     </tr>
                 </table>
             </div>
@@ -1029,6 +1041,19 @@
                     <tr>
                         <th scope="row"><a href="{{ prefixpath }}profileresultvalues/">
                             {% trans 'Profile result values- soils data values' %}</a></th>
+                    </tr>
+
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}relatedresults/">
+                            {% trans 'Related Results - relate one result to another' %}</a></th>
+                    </tr>
+                    <tr>
+                        <th scope="row"><a href="{{ prefixpath }}resultderivationequations/">
+                            {% trans 'Related Derivation Equations - derivation equations for results' %}</a></th>
+                    </tr>
+                     <tr>
+                        <th scope="row"><a href="{{ prefixpath }}derivationequations/">
+                            {% trans 'Define a Derivation Equation' %}</a></th>
                     </tr>
                 </table>
             </div>

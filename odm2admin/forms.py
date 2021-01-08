@@ -1017,8 +1017,8 @@ class SamplingfeaturesAdmin(ReadOnlyAdmin):
         FeatureActionsInline,
         IGSNInline,
         SamplingfeatureextensionpropertiesInline,
-        SitesInline,
-        SpecimensInline
+        SitesInline # ,
+        # SpecimensInline
     ]
 
     def get_formsets_with_inlines(self, request, obj=None):
@@ -1559,10 +1559,10 @@ class FeatureactionsAdminForm(ModelForm):
         fields = '__all__'
 
 
-class FeatureactionsAdmin(ReadOnlyAdmin):
+class FeatureactionsAdmin(admin.ModelAdmin):
     # For readonly usergroup
-    user_readonly = [p.name for p in Featureactions._meta.get_fields() if not p.one_to_many]
-    user_readonly_inlines = list()
+    # user_readonly = [p.name for p in Featureactions._meta.get_fields() if not p.one_to_many]
+    # user_readonly_inlines = list()
 
     # For admin users
     form = FeatureactionsAdminForm

@@ -138,7 +138,7 @@ MAP.prototype.getData = function (url,spinner) {
         _this.markerLayer = L.layerGroup(listofmarkers).addTo(_this.webmap);
         //console.log('here');
 		spinner.stop();
-		makeSearch();
+		//makeSearch();
         //_this.markerLayer.addTo(_this.webmap);
         //_this.closeSidebar();
     });
@@ -190,6 +190,7 @@ MAP.prototype.drawMarker = function(obs,style_class,icon_str) {
 
 MAP.prototype.getMarker = function (latlng, featType, sfname,style_class,icon_str) {
     var markerIcon = null;
+    //console.log(featType);
     this.legends.forEach(function (l) {
         if (l.feature_type == featType){
             markerIcon = createMarker(latlng, l.icon, l.color, sfname,style_class,icon_str);

@@ -221,7 +221,8 @@ $(document).ready(function() {
 						}
 						annotationButton.disabled = false;
 						if(setNaN){
-							location.reload();
+							//location.reload();
+							window.location=window.location;
 						}
 					},
 			});
@@ -262,7 +263,9 @@ $(document).ready(function() {
 						offsetButton.disabled = false;
 						//offsetPoints(parseFloat(offset));
 						//setTimeout(function(){location.reload();},100);
-						location.reload();
+						//location.reload();
+						window.location=window.location;
+
 			},
 			});
 		} else{
@@ -305,7 +308,9 @@ $(document).ready(function() {
 						var shiftValuesButton = document.getElementById("shiftValuesButton");
 						shiftValuesButton.firstChild.data = "reloading page";
 						shiftValuesButton.disabled = false;
-						location.reload();
+						//location.reload();
+						window.location=window.location;
+
 					},
 			});
 		} else {
@@ -360,7 +365,8 @@ $(document).ready(function() {
 					'csrfmiddlewaretoken': '{{ csrf_token }}',
 				},
 				success : function(json) {
-					location.reload();
+					//location.reload();
+					window.location=window.location;
 					var updateL1Button = document.getElementById("updateL1"); //$("#email_data");
 					updateL1Button.firstChild.data = "emailing "+json.valuesadded + "";
 					//updateL1Button.disabled = false;

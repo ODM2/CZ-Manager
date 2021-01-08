@@ -49,6 +49,13 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                re_path(r'^' + 'emaildata/$', views.email_data_from_graph),
                re_path(r'^' + 'export_to_hydroshare/$', views.export_to_hydroshare),
                re_path(r'^' + 'addannotation/$', views.add_annotation),
+               # resultid, annotation, cvqualitycode,setNaN,annotationvals,annotationFromUser
+               re_path(r'^' + 'createannotation/resultid=(?P<resultid>(\d+))/' +
+                       'cvqualitycode=(?P<cvqualitycode>(\w+))/' +
+                       'setNaN=(?P<setNaN>(\w+))/' +
+                       'annotationvals=(?P<annotationvals>\[\d+(, \d+)*\])/' +
+                       'annotationFromUser=(?P<annotationFromUser>(\w+))/'
+                       , views.add_annotation),
                re_path(r'^' + 'addoffset/$', views.add_offset),
                re_path(r'^' + 'save_sf/$', views.save_sf),
                re_path(r'^' + 'addshiftvals/$', views.add_shiftvalues),
@@ -58,7 +65,8 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                re_path(r'^' + 'sensordashboard/featureaction=(?P<feature_action>(\d+))/', views.sensor_dashboard),
                re_path(r'^' + 'sensordashboard/samplingfeature=(?P<sampling_feature>(\d+))/', views.sensor_dashboard),
                re_path(r'^' + 'sensordashboard/$', views.sensor_dashboard),
-
+               # TimeSeriesGraphingCat
+               re_path(r'^' + 'plotallvals/$', views.TimeSeriesGraphingCat),
                re_path(r'^' + 'graphfa/featureaction=(?P<feature_action>(\d+))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                re_path(

@@ -125,7 +125,7 @@ class Command(BaseCommand):
             #     print(r)
             # print('L1 result')
             # print(tsresultL1)
-
+            # print(relateL0tsresult)
             maxtsrvL0=Timeseriesresultvalues.objects.filter(resultid=relateL0tsresult).annotate(
                     Max('valuedatetime')). \
                     order_by('-valuedatetime')[0].valuedatetime
