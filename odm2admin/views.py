@@ -37,6 +37,7 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.http import StreamingHttpResponse
 from django.shortcuts import render
+from django.shortcuts import redirect
 from django.template import loader
 from django.contrib.auth.decorators import login_required
 # from django.contrib.auth.models import User
@@ -44,6 +45,7 @@ from django.core.mail import EmailMessage
 # from django.core import mail
 from django.core.management.base import CommandError
 from django.core import serializers
+from django.urls.exceptions import NoReverseMatch
 from django.core.management import settings
 from templatesAndSettings.settings import exportdb
 from django.template.response import TemplateResponse
@@ -55,6 +57,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.forms.models import model_to_dict
 from django.utils.crypto import get_random_string
+from django.views.generic.edit import FormView
 # from django.contrib.gis.geos import GEOSGeometry
 # import hs_restclient as hs_r
 from hs_restclient import HydroShare, HydroShareAuthOAuth2
@@ -67,7 +70,7 @@ import requests
 # from templatesAndSettings.settings import DATA_DISCLAIMER as DATA_DISCLAIMER
 # from templatesAndSettings.settings import MAP_CONFIG as MAP_CONFIG
 # from templatesAndSettings.settings import RECAPTCHA_PRIVATE_KEY
-from .forms import SamplingfeaturesAdminForm
+from .forms import SamplingfeaturesSelectForm
 from .models import Actions
 from .models import Annotations
 from .models import Authorlists
@@ -899,7 +902,8 @@ def TimeSeriesGraphing(request, feature_action='All'):
     selected_relatedfeatid = None
     selected_resultid = None
     if feature_action == 'All':
-        selected_featureactionid = 1
+        selected_featureactionid = Featureactions.objects.last().featureactionid
+        print(selected_featureactionid)
         result = Results.objects.filter(featureactionid=selected_featureactionid).first()
         selected_resultid = result.resultid
 
@@ -1621,78 +1625,84 @@ def precision_and_scale(x):
         frac_digits /= 10
     scale = int(math.log10(frac_digits))
     return (magnitude + scale, scale)
-
-def add_shiftvalues(request):
-    shift=None
-    error = None
+def addshiftvalues(request):
     resultid = None
     shiftvals = None
-    lastshiftval = None
-    firstshiftval = None
-    realshiftvals = []
-    response_data = {}
-    forwardshift = True
+    shift=None
+    direction = ''
     if 'direction' in request.POST:
-        if request.POST['direction'] == 'backward':
-            forwardshift = False
+        direction = request.POST.getlist('direction')
     if 'shift' in request.POST:
         shift = Decimal(request.POST['shift'])
         # print(offset)
     if 'shiftvals[]' in request.POST:
         shiftvals = request.POST.getlist('shiftvals[]')
         # print(annotationvals)
-    if 'resultidu[]' in request.POST:
-        resultid = request.POST.getlist('resultidu[]')
+    if 'resultid' in request.POST:
+        resultid = request.POST['resultid']
         # print('resultid: ' + str(resultid))
+        return redirect('createshiftvalues', resultid=resultid, direction=direction,
+                        shift=shift, shiftvals=shiftvals)
+def createshiftvalues(request, resultid,direction, shift,shiftvals ):
+    error = None
+    lastshiftval = None
+    firstshiftval = None
+    realshiftvals = []
+    response_data = {}
+    forwardshift = True
+    if direction == 'backward':
+        forwardshift = False
 
-    for rid in resultid:
-        intrid = int(rid)
+    # for rid in resultid:
+    intrid = int(resultid)
+    shift = Decimal(shift)
+    # print('shift')
+    # print(shift)
         # print('result id')
         # print(rid)
         # firstdate = shiftvals[0]
         # lastdate = shiftvals[-2]
-        idvals = []
-        i=0
-        for offsetval in shiftvals:
-            # print(offsetval)
-            # if i % 3 == 0:
-            #     datevals.append(datetime.strptime(offsetval, '%Y-%m-%d %H:%M:%S'))
-            if i % 3 == 2:
-                idvals.append(int(offsetval))
-            i += 1
-        try:
-            order = ''
-            if forwardshift:
-                order = 'valuedatetime'
-            else:
-                order = '-valuedatetime'
-            tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valueid__in=idvals).order_by(order) # .filter(valuedatetime__gte=firstdate).filter(
-                # valuedatetime__lte=lastdate).filter(datavalue__in=valstochange).order_by('valuedatetime')
-            realshiftvals = tsrvs
-        except ObjectDoesNotExist:
-            response_data['error'] = 'no values found'
+    idvals = shiftvals.strip('][').strip('\'').strip('\"').split(', ')
+    intidvals = []
+    # print(idvals)
+    for id in idvals:
+        intidvals.append(int(id.strip('\'').strip('\"')))
+    try:
+        order = ''
+        if forwardshift:
+            order = 'valuedatetime'
+        else:
+            order = '-valuedatetime'
+        tsrvs = Timeseriesresultvalues.objects.filter(resultid=intrid).filter(valueid__in=intidvals).order_by(order) # .filter(valuedatetime__gte=firstdate).filter(
+            # valuedatetime__lte=lastdate).filter(datavalue__in=valstochange).order_by('valuedatetime')
+        realshiftvals = tsrvs
+    except ObjectDoesNotExist:
+        response_data['error'] = 'no values found'
     valcount = realshiftvals.count()
     precision, scale = precision_and_scale(realshiftvals.last().datavalue)
     getcontext().prec = precision
+    # print(precision)
+    # print(scale)
     normshift = shift - Decimal(realshiftvals.last().datavalue)
-    shiftval = normshift / valcount
+    # print(normshift)
+    # print(Decimal(realshiftvals.last().datavalue))
+    shiftval = normshift / Decimal(valcount)
     k = 1
     for tsrv in realshiftvals:
         if k > 1:
+            # print('d val')
+            # print(tsrv.datavalue)
+            # print(shiftval*k)
             tsrv.datavalue = float(Decimal(Decimal(tsrv.datavalue) + (shiftval*k)))
+            # print(tsrv.datavalue)
             tsrv.save()
         # print(tsrv.datavalue)
         k +=1
-
-    return HttpResponse(json.dumps(response_data),content_type='application/json')
-
-
-def add_offset(request):
-    offset=None
-    error = None
-    resultid = None
-    offsetvals = None
-    response_data = {}
+    # template = loader.get_template('StartEndDateAnnotation.html')
+    # print('done')
+    return HttpResponse(json.dumps(response_data),content_type='application/json')  # HttpResponse(request, content_type='application/json')
+# TemplateResponse(request, template, response_data, ) json.dumps(response_data),
+def addoffset(request):
     if 'offset' in request.POST:
         offset = Decimal(request.POST['offset'])
         # print('offset')
@@ -1701,36 +1711,63 @@ def add_offset(request):
         # THESE VALUES ARE NOT ORDERED CORRECTLY
         offsetvals = request.POST.getlist('offsetvals[]')
         # print(offsetvals)
-    if 'resultidu[]' in request.POST:
-        resultid = request.POST.getlist('resultidu[]')
+    if 'resultid' in request.POST:
+        resultid = request.POST['resultid']
         # print('resultid: ' + str(resultid))
+    # try:
+    return redirect('createoffset',resultid=resultid,
+                offset=str(offset), offsetvals=offsetvals)
+    # except NoReverseMatch as e:
+    #     print(e)
+# return HttpResponseRedirect(reverse('createannotation', args=(resultid,setNaN,cvqualitycode,annotationFromUser,annotationvals)
+#                     ))
+def createoffset(request, resultid, offset, offsetvals):
+    response_data = {}
+    # print('here')
+    # print(offsetvals)
+    # print(resultid)
+    # print(offset)
+    offset = Decimal(offset.strip('\''))
     valcount = 0
+    idvals = offsetvals.strip('][').strip('\'').strip('\"').split(', ')
+    intidvals = []
+    # print(idvals)
+    for id in idvals:
+        intidvals.append(int(id.strip('\'').strip('\"')))
     i=0
+    # print(intidvals)
     # datevals = []
-    idvals = []
-    for offsetval in offsetvals:
-        # print(offsetval)
-        # if i % 3 == 0:
-        #     datevals.append(datetime.strptime(offsetval, '%Y-%m-%d %H:%M:%S'))
-        if i % 3 == 2:
-            idvals.append(int(offsetval))
-        i+=1
+    # idvals = []
+    # for offsetval in offsetvals:
+    #     print(offsetval)
+    #     # if i % 3 == 0:
+    #     #     datevals.append(datetime.strptime(offsetval, '%Y-%m-%d %H:%M:%S'))
+    #     if i % 3 == 2:
+    #         idvals.append(int(offsetval))
+    #     i+=1
     # datevals = sorted(datevals)
     # print(datevals)
     i = 0
-    for rid in resultid:
+    #for rid in resultid:
+    # print('resultid')
+    # print(resultid)
+    intrid = int(resultid)
 
-        intrid = int(rid)
-
-        tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valueid__in=idvals)# .filter(datavalue__in=valstochange).filter(valuedatetime__gte=firstdate).filter(
-            # valuedatetime__lte=lastdate).filter(datavalue__in=valstochange)
-        # print(tsrvs.query)
-        for tsrv in tsrvs:
-            tsrv.datavalue = Decimal(tsrv.datavalue) + offset
-            tsrv.save()
-            # print(tsrv.datavalue)
+    tsrvs = Timeseriesresultvalues.objects.filter(resultid=intrid).filter(valueid__in=intidvals)# .filter(datavalue__in=valstochange).filter(valuedatetime__gte=firstdate).filter(
+        # valuedatetime__lte=lastdate).filter(datavalue__in=valstochange)
+    # print(tsrvs.query)
+    for tsrv in tsrvs:
+        # print(tsrv.datavalue)
+        tsrv.datavalue = Decimal(tsrv.datavalue) + offset
+        tsrv.save()
+        valcount +=1
+        # print(tsrv.datavalue)
     response_data['valuesadded'] = valcount
+
+    # template = loader.get_template('StartEndDateAnnotation.html')
     return HttpResponse(json.dumps(response_data),content_type='application/json')
+    # return  HttpResponse(request,content_type='application/json')
+    # HttpResponse(request,content_type='application/json') # HttpResponse(json.dumps(response_data),content_type='application/json')
 
 def add_annotation(request):
     # print('annotate')
@@ -1744,11 +1781,12 @@ def add_annotation(request):
     annotationobj = None
     annotationFromUser = None
     anno = None
-    if 'resultidu[]' in request.POST:
-        resultid = request.POST.getlist('resultidu[]')
+
+    if 'resultid' in request.POST:
+        resultid = request.POST['resultid']
         # print(resultid)
-    if 'annotation' in request.POST:
-        annotationFromUser = str(request.POST['annotation'])
+    if 'annotationFromUser' in request.POST:
+        annotationFromUser = str(request.POST['annotationFromUser'])
         response_data['annotation'] = annotationFromUser
         # print(annotation)
     # annotationtype
@@ -1770,26 +1808,20 @@ def add_annotation(request):
     annotationtype = CvAnnotationtype.objects.get(name='Time series result value annotation')
     if cvqualitycode:
         qualitycode = CvQualitycode.objects.get(name=cvqualitycode)
-    # annotator = People.objects.filter(personfirstname='Miguel').filter(personlastname='Leon')
+    return redirect('createannotation',resultid=resultid,
+                    setNaN=setNaN, cvqualitycode=cvqualitycode,annotationFromUser=annotationFromUser,
+                    annotationvals=annotationvals)
+    # return HttpResponseRedirect(reverse('createannotation', args=(resultid,setNaN,cvqualitycode,annotationFromUser,annotationvals)
+    #                     ))
 
-    return HttpResponseRedirect(reverse('createannotation',
-                        args=(resultid, setNaN, cvqualitycode, annotationFromUser, annotationvals)))
 
-
-# 'resultidu': selectedResult,
-# 'annotationvals': annotationvals,
-# 'cvqualitycode': cvqualitycode,
-# 'annotation': annotation,
-# 'setNaN': setNaN,
 def createannotation(request, resultid,setNaN,cvqualitycode,annotationFromUser,annotationvals):
-    # print('annotate')
-    # resultid = resultidu
-    # annotationvals = None
     annotation = None
     setNaNstr = None
     response_data = {}
     annotationobj = None
     anno = None
+    # print(resultid)
     response_data['annotation'] = annotationFromUser
     annotationtype = CvAnnotationtype.objects.get(name='Time series result value annotation')
     if cvqualitycode:
@@ -1797,32 +1829,27 @@ def createannotation(request, resultid,setNaN,cvqualitycode,annotationFromUser,a
     # annotator = People.objects.filter(personfirstname='Miguel').filter(personlastname='Leon')
 
     lastannotationval = None
-    for rid in resultid:
-        intrid = int(rid)
-        # print('result id')
-        # print(rid)
-        idvals = []
-        i = 0
-        for annotationval in annotationvals:
-            # print(annotationval)
-            # if i % 3 == 0:
-            #     datevals.append(datetime.strptime(offsetval, '%Y-%m-%d %H:%M:%S'))
-            if isinstance(annotationval,int):
-                if i % 3 == 2:
-                    idvals.append(int(annotationval))
-                i += 1
+    # for rid in resultid:
+    rid = resultid
+    intrid = int(rid)
+    # print('result id')
+    # print(rid)
+    idvals = []
+    i = 0
+    # print(annotationvals)
 
-        # firstdate = annotationvals[0]
-        # lastdate = annotationvals[-2]
-        # print(firstdate)
-        # print(lastdate)
-        # tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valuedatetime__gte=firstdate).filter(
-        #   valuedatetime__lte=lastdate).filter(datavalue__in=valstochange)
-        tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valueid__in=idvals)
+    annotationvalslist = annotationvals.strip('][').split(', ')
+    for annotationval in annotationvalslist:
+
+        # print(type(annotationval))
+        # print(annotationval)
+        # if i % 3 == 0:
+        #     datevals.append(datetime.strptime(offsetval, '%Y-%m-%d %H:%M:%S'))
+        annoval2 = annotationval.replace("'", "")
+
+        tsrvs = Timeseriesresultvalues.objects.filter(resultid=rid).filter(valueid=int(annoval2))
         for tsrv in tsrvs:
-            # print(tsrv.datavalue)
-            # print(tsrv.valuedatetime)
-            if setNaN:
+            if setNaN=='True':
                 annotation = annotationFromUser + ' original value was ' + str(tsrv.datavalue)
                 # print(annotation)
                 if len(annotation) > 499:
@@ -1836,6 +1863,7 @@ def createannotation(request, resultid,setNaN,cvqualitycode,annotationFromUser,a
                     annotationobj.annotationdatetime = datetime.now()
                     annotationobj.annotationutcoffset = 4
                     annotationobj.save()
+                    # print(annotationobj)
                 except ObjectDoesNotExist:
                     # print('error')
                     #if not annotationobj:
@@ -1854,7 +1882,8 @@ def createannotation(request, resultid,setNaN,cvqualitycode,annotationFromUser,a
                 if cvqualitycode:
                     tsrv.qualitycodecv = qualitycode
                 tsrv.save(force_update=True)
-                # print(tsrv)
+                # print(tsrv.datavalue)
+                # print(tsrv.valuedatetime)
             elif cvqualitycode:
                 tsrv.qualitycodecv = qualitycode
                 tsrv.save(force_update=True)
@@ -1892,12 +1921,12 @@ def createannotation(request, resultid,setNaN,cvqualitycode,annotationFromUser,a
             # tsrvanno.save()
             # print(tsrvanno)
         # tsrvanno.save()
-                # print(tsrvanno.valueid)
+        # print(tsrvanno.valueid)
         #     lastannotationval = annotationval
     # if resultidu != 'NotSet':
     #    resultidu = int(resultidu)
+    # print('return')
     return HttpResponse(json.dumps(response_data),content_type='application/json')
-
 
 def save_sf(request):
     form = None
@@ -2029,6 +2058,8 @@ def procDataLoggerFile(request):
     ftpparse = urlparse(ftpfile)
     response = None
     localbasedir = settings.TEMPLATE_DIR
+    print('write script')
+    print(localbasedir)
     # scriptsdir = os.path.join(localbasedir, 'templatesAndSettings/scripts/process_dataloggerfile.sh')
     sysout = sys.stdout
     commandstring = ''
@@ -2081,8 +2112,10 @@ def procDataLoggerFile(request):
                                  "' '" + str(check_dates) +  "' '" + str(True) +\
                                  "' '" + str(False) + "' '" + useremail + "' "
                 commandstring += " >> " + localbasedir + "/templatesAndSettings/logging/processdlf.log \n"
-                # print(commandstring)
+                print(commandstring)
                 sys.stdout = sysout
+                # print(commandstring)
+                # print(scriptsdir)
                 # print(result)
                 # pdlf.processingCode = 'done'
                 # pdlf.save()
@@ -2435,61 +2468,170 @@ def linear_gradient(start_hex, finish_hex="#FFFFFF", n=10):
   return color_dict(RGB_list)
 
 
-def TimeSeriesGraphingCat(request, feature_action='NotSet', samplingfeature='NotSet',
-                            dataset='NotSet',dischargeresult='NotSet',
-                            resultidu='NotSet', startdate='NotSet', enddate='NotSet',
-                            popup='NotSet'):  # ,startdate='',enddate=''
+class SamplingFeatureSelectView(FormView):
+    template_name = 'samplingfeatureselect.html'
+    form_class = SamplingfeaturesSelectForm
+    success_url = "../plotallvals"
+    def form_valid(self, form, dataset='NotSet',dischargeresult='NotSet',
+                   resultidu='NotSet', startdate='NotSet', enddate='NotSet',
+                   popup='NotSet',variables='NotSet',sfids='NotSet'):
+        # We make sure to call the parent's form_valid() method because
+        # it might do some processing (in the case of CreateView, it will
+        # call form.save() for example).
+        template = loader.get_template('wsscatterplottime2.html')
+        response = super().form_valid(form)
+        results = []
+        variables = []
+        locs = []
+        samplesonly = False
+        # print('HERE HERE ??!!??')
+        if form.is_valid:
+            for result in form.cleaned_data['result']:
+                # print(result)
+                results.append(result.resultid)
+            for var in form.cleaned_data['variables']:
+                variables.append(var.variableid)
+            for samp in form.cleaned_data['sf']:
+                locs.append(samp.samplingfeatureid)
+            #  results = filter(lambda t: t[0] in form.cleaned_data['result'], form.fields['result'].choices)
+            samplesonly =form.cleaned_data['samplesonly']
+            print(samplesonly)
+        # print(results)
+        # print('variables')
+        # print(variables)
+        # print(self.request)
+        # if self.request.accepts('text/html'):
+        #     return response
+        # else:
+        # print(response)
+        # self.request.POST['results'] =  results
+        # print(results)
+        #  data = {
+        #     'result': results,
+        # }
+        return TimeSeriesGraphingCat(self.request,resultidu=results, variables=variables, sfids=locs,
+                                     samplesonly=samplesonly)
+        # return super().form_valid(form)
+    # return  render(request, template, responsedict, )
+# def loadTSR(request):
+#     sf = request.GET.get('samplingfeature')
+#     rs = Results.objects.filter(featureactionid__samplingfeatureid=sf)
+#     tsrs = Timeseriesresults.objects.filter(resultid__in=rs)
+#     responsedict = {'tsrs': tsrs, 'sf': sf}
+#     return render(request, 'selectsftsr.html', responsedict)
+# resultidu='NotSet', startdate='NotSet', enddate='NotSet',
+# popup='NotSet',variables='NotSet',sfids='NotSet', samplesonly=True
+
+
+def TimeSeriesGraphingCat(request, resultidu='NotSet', startdate='NotSet', enddate='NotSet',
+                            popup='NotSet',variables='NotSet',sfids='NotSet', samplesonly=True):
     mergeResults='true'
     authenticated = True
     hystdict = None
+
     if not request.user.is_authenticated:
         # return HttpResponseRedirect('../')
         authenticated = False
         if settings.ALWAYS_AUTHENTICATE:
             return HttpResponseRedirect(settings.CUSTOM_TEMPLATE_PATH)
-    if popup == 'NotSet':
-        template = loader.get_template('wsscatterplottime2.html')
+
+
+    template = loader.get_template('wsscatterplottime2.html')
     data_disclaimer = settings.DATA_DISCLAIMER
     map_config = settings.MAP_CONFIG
     useDataset = False
-    defaultvar = 1439
+    # defaultvar = 1439
     useDefaultVar = False
     # samplingfeature = None
     # if 'annotation' in request.POST:
     # pass
     # raise ValidationError(request.POST['annotation'])
-    if dataset == 'NotSet':
-        useDefaultVar = True
-    else:
-        useDataset = True
-        dataset = int(dataset)
+    passedresults = False
+    # print('resultidu')
+    # print(resultidu)
+    # print('variables')
+    # print(variables)
+    if resultidu != 'NotSet' and (variables == 'NotSet' or len(variables)==0):
 
-    if resultidu != 'NotSet':
-        try:
+        if isinstance(resultidu, int):
             # print(resultidu)
             resultidu = [int(resultidu)]
-        except:
+            # print(resultidu)
+        else:
+            if len(resultidu) > 0:
+               passedresults = True
+        if not isinstance(resultidu, list):
+            # print('here here here ')
             resultids = re.findall(r'\d+',resultidu)
             resultidu = []
             mergeResults = 'true'
             for results in resultids:
+                print(results)
                 resultidu.append(int(results))
             resultidu.sort()
-        selected_results = []
-        name_of_sampling_features = []
-        # name_of_variables = []
-        name_of_units = []
+            if len(resultidu) > 0:
+                passedresults = True
+    variableid = []
+    sfid = []
+    passedvariables = False
+    passedsfids = False
+    if 'yVariableSelection' in request.POST and not passedresults and variables == 'NotSet':
+        # print('variable')
+        yVariableSelection = request.POST['yVariableSelection']
+        yVariableSelection = Variables.objects.get(variableid=yVariableSelection)
+        yVar = yVariableSelection.variableid
+        # noyvar = False
+        # print(yVariableSelection)
+        # yVariableSelection = Variables.objects.filter(variableid=yVariableSelection).get()
+    elif not variables == 'NotSet':
+        if isinstance(variables, int):
+            # print(variables)
+            variableid = [int(variables)]
+            # print(variableid)
+            if len(variables) > 0:
+                variableid = variables
+                passedvariables = True
+        else:
+            if len(variables) > 0:
+                variableid = variables
+                passedvariables = True
+        if not isinstance(variables, list):
+            variableids = re.findall(r'\d+',variables)
+            mergeResults = 'true'
+            variableid = []
+            for var in variableids:
+                variableid.append(int(var))
+            variableid.sort()
+            if len(variableid) > 0:
+                passedvariables = True
+        # sfids
+        if isinstance(sfids, int):
+            # print(sfids)
+            sfid = [int(sfids)]
+            passedsfids = True
+            # print(sfids)
+            if len(sfids) > 0:
+                sfid = sfids
+                # passedvariables = True
+        else:
+            if len(sfids) > 0:
+                sfid = sfids
+                passedsfids = True
+                # passedvariables = True
+        if not isinstance(sfids, list):
+            sfids = re.findall(r'\d+',sfids)
+            mergeResults = 'true'
+            sfid = []
+            for var in sfids:
+                sfid.append(int(var))
+            sfid.sort()
+            if len(sfid) > 0:
+                passedsfids = True
 
-        dashboardqsids = [16525, 18699, 16532, 18700, 17170, 17174, 17173]
-        qsdb = False
-        for dbid in dashboardqsids:
-            for rid in resultidu:
-                if dbid == rid:
-                    qsdb = True
-        if popup == 'smll' and qsdb:
-            resultidu.append(18699)
-            resultidu.sort()
-
+    else:
+        # yVariableSelection = Variables.objects.get(variableid=yVariableSelection)
+        yVariableSelection = Variables.objects.filter(variableid=5).get()
+        yVar = 5
 
     selected_results = []
     name_of_sampling_features = []
@@ -2501,164 +2643,232 @@ def TimeSeriesGraphingCat(request, feature_action='NotSet', samplingfeature='Not
     data = {}
     featureActionLocation = None
     featureActionMethod = None
-    datasetTitle = None
-    datasetAbstract = None
     methods = None
     resultListGrouped = None
     # print(settings.MAP_CONFIG['result_value_processing_levels_to_display'])
-    if not useDataset:
-        if useDefaultVar:
+    #  if not useDataset:
+    #     if useDefaultVar:
             # samplefeature = Samplingfeatures.objects.filter(samplingfeatureid=samplingfeature).get()
             # feature_actions = Featureactions.objects.filter(samplingfeatureid=samplefeature)
-
-            resultList = Results.objects.filter(variableid=defaultvar).order_by("featureactionid","resultid")
-            catresults = Categoricalresults.objects.filter(resultid__in=resultList)
-            resultList = resultList.filter(~Q(resultid__in=catresults))
-            # resultListGrouped = groupResultsByVariable(samplefeature)
-            # actions = Actions.objects.filter(actionid__in=feature_actions.values("action"))
-            # methods = Methods.objects.filter(methodid__in=actions.values("method"))
-            # featureActionLocation = samplefeature.samplingfeaturename
-        else:
-            resultList = Results.objects.filter(featureactionid=feature_action).filter(
-                 processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
-                 ).order_by("featureactionid","resultid")
-            catresults = Categoricalresults.objects.filter(resultid__in=resultList)
-            resultList = resultList.filter(~Q(resultid__in=catresults))
-            featureAction = Featureactions.objects.filter(featureactionid=feature_action).get()
-            featureActionLocation = featureAction.samplingfeatureid.samplingfeaturename
-            resultListGrouped = groupResultsByVariable(featureAction.samplingfeatureid)
-            featureActionMethod = featureAction.action.method.methodname
-            action = Actions.objects.filter(actionid=featureAction.action.actionid).get()
-            methods = Methods.objects.filter(methodid=action.method.methodid)
-
+    if passedresults:
+        # print(resultidu)
+        resultList = Results.objects.filter(resultid__in=resultidu).order_by("featureactionid","resultid")
+        r1 = resultList[0]
+        yVariableSelection =Variables.objects.filter(variableid=r1.variableid.variableid).get()
+        # yVar = yVariableSelection.variableid
+    elif passedvariables >0 and len(sfids) > 0:
+        resultList = Results.objects.filter(variableid__in=variableid
+                            ).filter(featureactionid__samplingfeatureid__in=sfid).order_by("featureactionid","resultid")
+        r1 = resultList[0]
+        yVariableSelection =Variables.objects.filter(variableid=r1.variableid.variableid).get()
+        # yVar = yVariableSelection.variableid
+    elif passedvariables:
+        resultList = Results.objects.filter(variableid__in=variableid
+                                            ).order_by("featureactionid","resultid")
+        r1 = resultList[0]
+        yVariableSelection =Variables.objects.filter(variableid=r1.variableid.variableid).get()
+        # yVar = yVariableSelection.variableid
     else:
-        datasetResults = Datasetsresults.objects.filter(datasetid=dataset)
-        resultList = Results.objects.filter(resultid__in=datasetResults.values("resultid")).filter(
-             processing_level__in=settings.MAP_CONFIG['result_value_processing_levels_to_display']
-             ).order_by("variableid")
-        catresults = Categoricalresults.objects.filter(resultid__in=resultList)
-        resultList = resultList.filter(~Q(resultid__in=catresults))
-        datasetTitle = Datasets.objects.filter(datasetid=dataset).get().datasettitle
-        datasetAbstract = Datasets.objects.filter(datasetid=dataset).get().datasetabstract
-    numresults = resultList.count()
-    print(numresults)
-    selectedMResultSeries = Timeseriesresults.objects.filter(resultid__in=resultList)
-    mergedResultSets = []
+        resultList = Results.objects.filter(variableid=yVar).order_by("featureactionid","resultid")
+    # print('resultList')
+    # print(resultList.values('resultid'))
+    # catresults = Categoricalresults.objects.filter(resultid__in=resultList)
+    # print('cat count')
+    # print(catresults.count())
 
+    # resultList = resultList.filter(~Q(resultid__in=catresults))
+
+    numresults = resultList.count()
+
+    aggstat = CvAggregationstatistic.objects.get(name='Continuous')
+    if samplesonly == True:
+        selectedMResultSeries = Timeseriesresults.objects.filter(resultid__in=resultList
+                                                                 ).filter(aggregationstatisticcv=aggstat)
+        resultList = resultList.filter(resultid__in=selectedMResultSeries)
+    else:
+        selectedMResultSeries = Timeseriesresults.objects.filter(resultid__in=resultList)
+
+    mergedResultSets = []
     # selectedMResultSeries = Results.objects.filter(featureactionid=feature_action)
     i = 0
-    print('selected results')
-    print(selectedMResultSeries)
     if selectedMResultSeries.__len__() == 0:
         if resultidu == 'NotSet':
             try:
                 selectedMResultSeries.append(resultList[0].resultid)
-            except IndexError:
+            except (IndexError,AttributeError ) as e:
                 html = "<html><body>No Data Available Yet.</body></html>"
                 return HttpResponse(html)
         else:
-            try:
-                for resultid in resultidu:
-                    selectedMResultSeries.append(resultid)
-            except ObjectDoesNotExist:
-                html = "<html><body>No Data Available Yet.</body></html>"
-                return HttpResponse(html)
-
+            html = "<html><body>No Data Available Yet.</body></html>"
+            return HttpResponse(html)
+    newend = False
     if 'endDate' in request.POST:
         entered_end_date = request.POST['endDate']
+        newend = True
     elif not enddate == 'NotSet':
         entered_end_date = enddate
-    else:
-        entered_end_date = \
-            Timeseriesresultvalues.objects.filter(resultid__in=selectedMResultSeries).exclude(datavalue=float('nan')).annotate(
-                Max('valuedatetime')).order_by(
-                '-valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-        print(entered_end_date)
+        newend =True
+    # else:
+    lastedate = None
+    curedate= None
+    EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
+
+    for rid in resultList:
+        lastedate = curedate
+        try:
+            curedate = Resultextensionpropertyvalues.objects.filter(resultid=rid.resultid).filter(
+                propertyid=EndDateProperty).first().propertyvalue
+            if len(str(curedate)) == 16:
+                curedate = datetime.strptime(str(curedate), '%Y-%m-%d %H:%M')
+            elif len(str(curedate)) == 19:
+                curedate = datetime.strptime(str(curedate), '%Y-%m-%d %H:%M:%S')
+            else:
+                curedate = datetime.strptime(str(curedate), '%Y-%m-%d %H:%M:%S.%f')
+            if len(str(curedate)) ==0:
+                curedate = \
+                    Timeseriesresultvalues.objects.filter(resultid=rid).exclude(datavalue=float('nan')).annotate(
+                        Max('valuedatetime')).order_by(
+                        '-valuedatetime')[0].valuedatetime
+            rid.enddate = curedate
+        except IndexError:
+            pass
+        if lastedate and not newend:
+            if curedate < lastedate:
+                if len(str(lastedate)) == 16:
+                    entered_end_date = datetime.strptime(str(lastedate), '%Y-%m-%d %H:%M').strftime('%Y-%m-%d %H:%M')
+                elif len(str(lastedate)) == 19:
+                    entered_end_date = datetime.strptime(str(lastedate), '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d %H:%M')
+                else:
+                    entered_end_date = datetime.strptime(str(lastedate), '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d %H:%M')
+            else:
+                if len(str(curedate)) == 16:
+                    entered_end_date = datetime.strptime(str(curedate), '%Y-%m-%d %H:%M').strftime('%Y-%m-%d %H:%M')
+                elif len(str(curedate)) == 19:
+                    entered_end_date = datetime.strptime(str(curedate), '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d %H:%M')
+                else:
+                    entered_end_date = datetime.strptime(str(curedate), '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d %H:%M')
+                # entered_end_date = curedate.strftime('%Y-%m-%d %H:%M')
+        elif not newend:
+            if len(str(curedate)) == 16:
+                entered_end_date = datetime.strptime(str(curedate), '%Y-%m-%d %H:%M').strftime('%Y-%m-%d %H:%M')
+            elif len(str(curedate)) == 19:
+                entered_end_date = datetime.strptime(str(curedate), '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d %H:%M')
+            else:
+                entered_end_date = datetime.strptime(str(curedate), '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d %H:%M')
+
+        # print(entered_end_date)
     if 'startDate' in request.POST:
         entered_start_date = request.POST['startDate']
     elif not startdate == 'NotSet':
         entered_start_date = startdate
     else:
-        # entered_start_date= Measurementresultvalues.objects.
-        # filter(resultid__in=selectedMResultSeries).annotate(Min('valuedatetime')).\
-        # order_by('valuedatetime')[0].valuedatetime.strftime('%Y-%m-%d %H:%M')
-        # .annotate(Min('price')).order_by('price')[0]
         datetime_entered_end_date = datetime.strptime(entered_end_date, '%Y-%m-%d %H:%M')
-        if popup == 'smll':
+        if passedresults or passedvariables:
             entered_start_date = datetime_entered_end_date - timedelta(
-                settings.SENSOR_DASHBOARD['time_series_days'])
-        elif popup =='Anno' or popup =='hyst':
-            entered_start_date = datetime_entered_end_date - timedelta(
-                settings.SENSOR_DASHBOARD['time_series_days'])
+                (map_config['time_series_months']) * 365 / 12)  # .strftime('%Y-%m-%d %H:%M')
         else:
             entered_start_date = datetime_entered_end_date - timedelta(
-                (map_config['time_series_months']* 600) * 365 / 12)  # .strftime('%Y-%m-%d %H:%M')
+                (map_config['time_series_months']* 6) * 365 / 12)  # .strftime('%Y-%m-%d %H:%M')
         entered_start_date = entered_start_date.strftime('%Y-%m-%d %H:%M')
+    enddt = datetime.strptime(entered_end_date, '%Y-%m-%d %H:%M')
+    startdt = datetime.strptime(entered_start_date, '%Y-%m-%d %H:%M')
+    excludeids = []
+    selectedMResultSeries = []
+    for rid in resultList:
+        riddt = rid.enddate.strftime('%Y-%m-%d %H:%M')
+        if rid.enddate < startdt:
+            excludeids.append(rid.resultid)
+        else:
+            selectedMResultSeries.append(resultList[0].resultid)
+        # print(mergedResultSets)
+    resultList = resultList.exclude(resultid__in=excludeids)
+    variables3 = []
+    mergedResultSets = []
+    mset = []
+    # print('resultList 2')
+    # print(resultList)
+    for selectedMResult in resultList:
+        variable = selectedMResult.variableid.variable_name
+        vtype = selectedMResult.variableid.variable_type
+        # print(variable)
+        loc = selectedMResult.featureactionid.samplingfeatureid.samplingfeaturecode
+        # print(variable)
+        foundvar = False
+        for var in variables3:
+            if variable == var:
+                for set in mergedResultSets:
+                    if set[0].variableid.variable_name == variable and set[0].variableid.variable_type == vtype \
+                            and set[0].featureactionid.samplingfeatureid.samplingfeaturecode == loc:
+                        set.append(selectedMResult)
+                        foundvar = True
+                        # print('here')
 
-            # print(mergedResultSets)
+        if not foundvar or len(mergedResultSets) ==0:
+            variables3.append(variable)
+            mset.append(selectedMResult)
+            mergedResultSets.append(mset)
+            mset = list()
+            # print('new result set')
+    i = 1
+    # excludeids = []
+    b = 1
+    for mergedResultSet in mergedResultSets:
 
-        variables = []
-        mergedResultSets = []
-        mset = []
-        for selectedMResult in resultList:
-            variable = selectedMResult.variableid.variable_name
-            vtype = selectedMResult.variableid.variable_type
-            loc = selectedMResult.featureactionid.samplingfeatureid.samplingfeaturename
-            # print(variable)
-            foundvar = False
-            for var in variables:
-                if variable == var:
-                    for set in mergedResultSets:
-                        if set[0].variableid.variable_name == variable and set[0].variableid.variable_type == vtype \
-                                and set[0].featureactionid.samplingfeatureid.samplingfeaturename == loc:
-                            set.append(selectedMResult)
-                            foundvar = True
-                            # print('here')
 
-            if not foundvar or len(mergedResultSets) ==0:
-                variables.append(variable)
-                mset.append(selectedMResult)
-                mergedResultSets.append(mset)
-                mset = list()
-                # print('new result set')
-        i = 0
-        for mergedResultSet in mergedResultSets:
-
-            i += 1
-            ids = []
-            for mresult in mergedResultSet:
+        ids = []
+        for mresult in mergedResultSet:
+            # print('here here now')
+            # print(mresult.resultid)
+            new = False
+            for id in ids:
+                if not id == mresult.resultid:
+                    new = True
+            if new or len(ids) == 0:
                 ids.append(mresult.resultid)
-            print(ids)
+                # print(mresult.resultid)
+        if len(ids) > 0:
             selected_result = Results.objects.filter(resultid__in=ids).first()
             # print('result set')
             # print(mergedResultSet)
             # print(selected_result)
-            selected_results.append(selected_result)
+            # selected_results.append(selected_result)
             # name_of_sampling_features.append(get_name_of_sampling_feature(selected_result))
 
             tmpname = get_name_of_sampling_feature(selected_result)
-            name_of_sampling_features.append(tmpname)
-            myresultSeries.append(Timeseriesresultvalues.objects.all()
-                                  .filter(~Q(datavalue__lte=selected_result.variableid.nodatavalue))
-                                  .exclude(datavalue=float('nan'))
-                                  .filter(valuedatetime__gte=entered_start_date)
-                                  .filter(valuedatetime__lte=entered_end_date)
-                                  .filter(resultid__in=ids).order_by('-valuedatetime'))
-            data.update({'datavalue' + str(i): []})
+            print(tmpname)
+            # name_of_sampling_features.append(tmpname)
+            print(entered_start_date)
+            print(entered_end_date)
+            tmpqs = Timeseriesresultvalues.objects.filter(~Q(datavalue=selected_result.variableid.nodatavalue))\
+                .exclude(datavalue=float('nan'))\
+                .filter(valuedatetime__gte=entered_start_date)\
+                .filter(valuedatetime__lte=entered_end_date)\
+                .filter(resultid__in=ids).order_by('-valuedatetime')
+            if len(tmpqs) > 0:
+                myresultSeries.append(tmpqs)
+                data.update({'datavalue' + str(i): []})
+                i += 1
+            else:
+                for id in ids:
+                    excludeids.append(id)
+                # mergedResultSets.pop(b)
+            b += 1
 
-
-
+    # print(getList(data))
+    # for key in data.keys():
+    #     print(key)
     i = 0
     annotationsexist = False
 
 
     for myresults in myresultSeries:
-        i = 1
+        i += 1
         resultannotationsexist = False
         for result in myresults:
             start = datetime(1970, 1, 1)
             delta = result.valuedatetime - start
             mills = delta.total_seconds() * 1000
+            # print(mills)
             if math.isnan(result.datavalue):
                 dataval = 'null'
             else:
@@ -2667,14 +2877,17 @@ def TimeSeriesGraphingCat(request, feature_action='NotSet', samplingfeature='Not
                     [mills,dataval])
 
 
-
-    timeseriesresults = Timeseriesresults.objects.\
-        filter(resultid__in=resultList.values("resultid")).\
-        order_by("resultid__variableid", "aggregationstatisticcv")
+    if samplesonly == True:
+        timeseriesresults = Timeseriesresults.objects.filter(aggregationstatisticcv=aggstat).\
+            filter(resultid__in=resultList.values("resultid")).\
+            order_by("resultid__variableid")
+    else:
+        timeseriesresults = Timeseriesresults.objects. \
+            filter(resultid__in=resultList.values("resultid")). \
+            order_by("resultid__variableid", "aggregationstatisticcv")
     # build strings for graph labels
-    # print('data')
     # print(data)
-    i = 0
+    i = 1
     seriesStr = ''
     # (data)
     unit = ''
@@ -2684,83 +2897,73 @@ def TimeSeriesGraphingCat(request, feature_action='NotSet', samplingfeature='Not
     series = []
     # print('selected result series')
     # print(selectedMResultSeries)
-    ids = []
+    # ids = []
+    # for mergedResult in mergedResultSets:
+    #     for mresult in mergedResult:
+    #         ids.append(mresult.resultid)
+    # # print('number of results')
+    # # print(len(ids))
+    # r = Results.objects.filter(resultid__in=ids)\
+    #     .order_by("featureactionid","resultid")  # .order_by("unitsid")
+    newmergedResultSets = []
     for mergedResult in mergedResultSets:
-        for mresult in mergedResult:
-            ids.append(mresult.resultid)
-    print('number of results')
-    print(len(ids))
-    r = Results.objects.filter(resultid__in=ids)\
-        .order_by("featureactionid","resultid")  # .order_by("unitsid")
+        k = 0
+        rsearched = []
+        for r in mergedResult:
+            rsearched.append(r.resultid)
+            for id in excludeids:
+                if r.resultid == id:
 
-    tsrs = Timeseriesresults.objects.filter(resultid__in=ids)\
-        .order_by("resultid__resultid__featureactionid","resultid")
+                    k +=1
+        if len(mergedResult) >k:
+            newmergedResultSets.append(mergedResult)
+            # print('pop me')
+            # mergedResultSets.remove(mergedResult)
+    mergedResultSets = newmergedResultSets
     L1exists = False
-    variables = []
-    for selectedMResult in r:
-        variable = selectedMResult.variableid.variable_name
-        foundvar = False
-        for var in variables:
-            if variable == var:
-                foundvar = True
+    variables2 = []
+    for mergedResult in mergedResultSets:
+        for selectedMResult in mergedResult:
+            variable = selectedMResult.variableid.variable_name
+            foundvar = False
+            for var in variables2:
+                if variable == var:
+                    foundvar = True
+                    break
+                else:
+                    variables2.append(variable)
+            if foundvar:
                 break
-            else:
-                variables.append(variable)
-        if foundvar:
-            break
-        i += 1
-        tsr = tsrs.get(resultid=selectedMResult)
-        vtype = selectedMResult.variableid.variable_type.name
-        aggStatistic = tsr.aggregationstatisticcv
-        unit = selectedMResult.unitsid.unitsabbreviation
+            # try:
+            #     tsr = timeseriesresults.get(resultid=selectedMResult)
+            # except DoesNotExist:
+            #     continue
+            vtype = selectedMResult.variableid.variable_type.name
+            # aggStatistic = tsr.aggregationstatisticcv
+            unit = selectedMResult.unitsid.unitsabbreviation
 
-        location = selectedMResult.featureactionid.samplingfeatureid.samplingfeaturename
-        print(location)
-        print(i)
-        if i == 1 and not unit == '':
-            seriesStr += str(unit)
-            name_of_units.append(str(unit))
-        elif not unit == '':
-            seriesStr += ' - ' + str(unit)
-            name_of_units.append(str(unit))
-        # print('series unit and var')
-        # print(str(unit) + ' - ' + str(variable))
-        # print(len(mergedResultSets))
-        if not popup=='hyst':
+            location = selectedMResult.featureactionid.samplingfeatureid.samplingfeaturecode
+            # print(location)
+            # print(i)
+            if i == 1 and not unit == '':
+                seriesStr += str(unit)
+                name_of_units.append(str(unit))
+            elif not unit == '':
+                seriesStr += ' - ' + str(unit)
+                name_of_units.append(str(unit))
+            # if not popup=='hyst':
+                # print('datavalue' + str(i))
+                # print(data['datavalue' + str(i)])
+            # print(len(data['datavalue' + str(i)]))
+
             series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' + vtype + ' - ' +
                           str(location), "allowPointSelect": "true", "yAxis": str(unit),
                           "data": data['datavalue' + str(i)], "point": { }})
-        else: # build color zones
-            vals = len(data['datavalue' + str(i)])
-            ii=0
-            j=10
-            thresholds = []
-            # print(vals)
-            for datum in data['datavalue' + str(i)]:
-                ii+=1
-                # print(ii)
-                # print(int(round(vals/j)))
-                if ii== int(round(vals/j)):
-                    j-=1
-                    thresholds.append(datum['y'])
-            zones = []
-            # print(thresholds)
-            for ii in range(1, len(thresholds)):
-                threshold = thresholds.pop()
-                if not threshold == 'null':
-                    dict = {'value':float(threshold),'className':'zone-'+str(ii)}
-                    zones.append(dict)
-            # print('zones')
-            # print(zones)
-            true = 'true'
-            two = 2
-            series.append({"name": str(unit) + ' - ' + str(variable) + ' - ' +
-                          str(aggStatistic), "allowPointSelect": "true", "yAxis": str(unit),
-                          "lineWidth":two,"data": data['datavalue' + str(i)], "zones": zones})
-            # print(series)
-            # "plotOptions": {"maker": {"enabled": true},
-        if mergeResults =='true' and len(mergedResultSets) <= i:
-            break
+                # print(series)
+                # "plotOptions": {"maker": {"enabled": true},
+            # if mergeResults =='true' and len(mergedResultSets) == i:
+            #     break
+        i += 1
 
 
     # "point": { "events": {'click': 'selectPointsByClick'}}
@@ -2770,7 +2973,7 @@ def TimeSeriesGraphingCat(request, feature_action='NotSet', samplingfeature='Not
     i = 0
     # name_of_sampling_features = set(name_of_sampling_features)
 
-    for var in variables:
+    for var in variables2:
         i += 1
         if i == 1:
             titleStr += var  # + ', ' +name_of_variable
@@ -2790,101 +2993,45 @@ def TimeSeriesGraphingCat(request, feature_action='NotSet', samplingfeature='Not
     yAxis = {"title": {"text": seriesStr}}
 
 
-    int_selectedresultid_ids = []
-    str_selectedresultid_ids = []
-    for int_selectedresultid in selectedMResultSeries:
-        int_selectedresultid_ids.append(int(int_selectedresultid.resultid.resultid))
-        str_selectedresultid_ids.append(str(int_selectedresultid.resultid.resultid))
+    # int_selectedresultid_ids = []
+    # str_selectedresultid_ids = []
+    # for int_selectedresultid in selectedMResultSeries:
+    #     int_selectedresultid_ids.append(int(int_selectedresultid.resultid))
+    #     str_selectedresultid_ids.append(str(int_selectedresultid.resultid))
     csvexport = False
     cvqualitycode = None
-    if popup == 'Anno':
-        cvqualitycode = CvQualitycode.objects.all().order_by('definition')
-
-        # csvexport = True
-        # k=0
-        # myfile = StringIO.StringIO()
-        # for myresults in myresultSeriesExport:
-        #     for result in myresults:
-        #         if k==0:
-        #             myfile.write(result.csvheader())
-        #             myfile.write('\n')
-        #         myfile.write(result.csvoutput())
-        #         myfile.write('\n')
-        #         k+=1
-        # response = HttpResponse(myfile.getvalue(),content_type='text/csv')
-        # response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
-    # if csvexport:
-    #     return response
-    # else:
-        # raise ValidationError(relatedFeatureList)
-    for result in resultList:
-        tsr = Timeseriesresults.objects.filter(resultid=result).get()
-        result.timeintervalunits = tsr.intendedtimespacingunitsid
-        result.timeinterval = tsr.intendedtimespacing
-        StartDateProperty = Extensionproperties.objects.get(propertyname__icontains="start date")
-        EndDateProperty = Extensionproperties.objects.get(propertyname__icontains="end date")
-        startdate = Resultextensionpropertyvalues.objects.filter()
-        try:
-            result.startdate = Resultextensionpropertyvalues.objects.filter(resultid=result.resultid).filter(
-                propertyid=StartDateProperty).first().propertyvalue
-            if len(result.startdate) == 16:
-                result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
-            elif len(result.startdate) == 19:
-                result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
-            else:
-                result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
-            result.enddate = Resultextensionpropertyvalues.objects.filter(resultid=result.resultid).filter(
-                propertyid=EndDateProperty).first().propertyvalue
-            if len(result.enddate) == 16:
-                result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
-            elif len(result.enddate) == 19:
-                result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
-            else:
-                result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
-        except (ObjectDoesNotExist, AttributeError) as e:
-            try:
-                result.startdate = Timeseriesresultvalues.objects.filter(resultid=result.resultid).annotate(
-                    Min('valuedatetime')). \
-                    order_by('valuedatetime')[0].valuedatetime
-                if len(result.startdate) == 16:
-                    result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
-                elif len(result.startdate) == 19:
-                    result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
-                else:
-                    result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
-                result.enddate = Timeseriesresultvalues.objects.filter(resultid=result.resultid).annotate(
-                    Max('valuedatetime')). \
-                    order_by('-valuedatetime')[0].valuedatetime
-                if len(result.enddate) == 16:
-                    result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
-                elif len(result.enddate) == 19:
-                    result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
-                else:
-                    result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
-            except (ValueError, IndexError) as e:
-                result.startdate = None
-                result.enddate = None
-
+    if resultidu == 'NotSet' and passedvariables:
+        resultidu=[]
+    if variables == 'NotSet' and passedresults:
+        variables = []
+    # print(resultidu)
+    # print(variables)
+    yVariables = Variables.objects.all().order_by('variablecode') # .filter(~Q(variable_type='Water quality')).
     responsedict = {'prefixpath': settings.CUSTOM_TEMPLATE_PATH,
                                                 'startDate': entered_start_date,
                                                 'endDate': entered_end_date,
                                                 'popup': popup,
+                                                'passedvariables': passedvariables,
+                                                'passedresults': passedresults,
+                                                'samplesonly' : samplesonly,
                                                 'mergeResults':mergeResults,
+                                                'resultidu':resultidu,
+                                                'variables':variableid,
+                                                'sfids':sfid,
                                                 # 'resultListGrouped':resultListGrouped,
                                                 # 'emailsent': emailsent,
                                                 # 'outEmail': outEmail,
                                                 # 'useSamplingFeature': useSamplingFeature,
+                                                'yVariableSelection':yVariableSelection,
+                                                'yVariables': yVariables,
                                                 'featureActionMethod': featureActionMethod,
                                                 'featureActionLocation': featureActionLocation,
                                                 'cvqualitycode': cvqualitycode,
                                                 'data_disclaimer': data_disclaimer,
-                                                'datasetTitle': datasetTitle,
-                                                'datasetAbstract': datasetAbstract,
-                                                'useDataset': useDataset,
                                                 'startdate': startdate,
                                                 'enddate': enddate,
                                                 'L1exists': L1exists,
-                                                'SelectedResults': int_selectedresultid_ids,
+                                                # 'SelectedResults': int_selectedresultid_ids,
                                                 'authenticated': authenticated,
                                                 'methods': methods,
                                                 'timeseriesresults': timeseriesresults,
@@ -2898,7 +3045,7 @@ def TimeSeriesGraphingCat(request, feature_action='NotSet', samplingfeature='Not
         z = hystdict.copy()
         z.update(responsedict)
         responsedict = z
-    return TemplateResponse(request, template, responsedict, )
+    return TemplateResponse(request, template, responsedict)
 
 
 def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='NotSet',
@@ -3379,23 +3526,6 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
     if popup == 'Anno':
         cvqualitycode = CvQualitycode.objects.all().order_by('definition')
 
-        # csvexport = True
-        # k=0
-        # myfile = StringIO.StringIO()
-        # for myresults in myresultSeriesExport:
-        #     for result in myresults:
-        #         if k==0:
-        #             myfile.write(result.csvheader())
-        #             myfile.write('\n')
-        #         myfile.write(result.csvoutput())
-        #         myfile.write('\n')
-        #         k+=1
-        # response = HttpResponse(myfile.getvalue(),content_type='text/csv')
-        # response['Content-Disposition'] = 'attachment; filename="mydata.csv"'
-    # if csvexport:
-    #     return response
-    # else:
-        # raise ValidationError(relatedFeatureList)
     for result in resultList:
         tsr = Timeseriesresults.objects.filter(resultid=result).get()
         result.timeintervalunits = tsr.intendedtimespacingunitsid
@@ -3407,39 +3537,39 @@ def TimeSeriesGraphingShort(request, feature_action='NotSet', samplingfeature='N
             result.startdate = Resultextensionpropertyvalues.objects.filter(resultid=result.resultid).filter(
                 propertyid=StartDateProperty).first().propertyvalue
             if len(result.startdate) == 16:
-                result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
+                result.startdate = datetime.strptime(str(result.startdate), '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
             elif len(result.startdate) == 19:
-                result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+                result.startdate = datetime.strptime(str(result.startdate), '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
             else:
-                result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
+                result.startdate = datetime.strptime(str(result.startdate), '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
             result.enddate = Resultextensionpropertyvalues.objects.filter(resultid=result.resultid).filter(
                 propertyid=EndDateProperty).first().propertyvalue
-            if len(result.enddate) == 16:
-                result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
-            elif len(result.enddate) == 19:
-                result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+            if len(str(result.enddate)) == 16:
+                result.enddate = datetime.strptime(str(result.enddate), '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
+            elif len(str(result.enddate)) == 19:
+                result.enddate = datetime.strptime(str(result.enddate), '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
             else:
-                result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
-        except (ObjectDoesNotExist, AttributeError) as e:
+                result.enddate = datetime.strptime(str(result.enddate), '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
+        except (ObjectDoesNotExist, AttributeError, TypeError) as e:
             try:
                 result.startdate = Timeseriesresultvalues.objects.filter(resultid=result.resultid).annotate(
                     Min('valuedatetime')). \
                     order_by('valuedatetime')[0].valuedatetime
-                if len(result.startdate) == 16:
-                    result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
-                elif len(result.startdate) == 19:
-                    result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+                if len(str(result.startdate)) == 16:
+                    result.startdate = datetime.strptime(str(result.startdate), '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
+                elif len(str(result.startdate)) == 19:
+                    result.startdate = datetime.strptime(str(result.startdate), '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
                 else:
-                    result.startdate = datetime.strptime(result.startdate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
+                    result.startdate = datetime.strptime(str(result.startdate), '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
                 result.enddate = Timeseriesresultvalues.objects.filter(resultid=result.resultid).annotate(
                     Max('valuedatetime')). \
                     order_by('-valuedatetime')[0].valuedatetime
-                if len(result.enddate) == 16:
-                    result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
-                elif len(result.enddate) == 19:
-                    result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
+                if len(str(result.enddate)) == 16:
+                    result.enddate = datetime.strptime(str(result.enddate), '%Y-%m-%d %H:%M').strftime('%Y-%m-%d')
+                elif len(str(result.enddate)) == 19:
+                    result.enddate = datetime.strptime(str(result.enddate), '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d')
                 else:
-                    result.enddate = datetime.strptime(result.enddate, '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
+                    result.enddate = datetime.strptime(str(result.enddate), '%Y-%m-%d %H:%M:%S.%f').strftime('%Y-%m-%d')
             except (ValueError, IndexError) as e:
                 result.startdate = None
                 result.enddate = None
