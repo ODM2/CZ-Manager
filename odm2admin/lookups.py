@@ -2,6 +2,7 @@ from ajax_select import register, LookupChannel
 
 from .models import Dataloggerfiles
 # ========= Import all Controlled Vocabulary Module =========#
+from .models import Actions
 from .models import CvActiontype
 from .models import CvElevationdatum
 from .models import CvMethodtype
@@ -320,6 +321,48 @@ class FeatureactionsLookup(LookupChannel):
 
     def get_objects(self, ids):
         obj = Featureactions.objects.filter(featureactionid__in=ids)
+        return obj
+
+
+@register('action_lookup')
+class ActionsLookup(LookupChannel):
+    model = Actions
+
+    def get_query(self, q, request):
+        qset = None
+        for part in q.split():
+            if not qset:
+                qset = Actions.objects.filter(
+                    Q(actiondescription__icontains=part) |
+                    Q(action_type__name__icontains=part) |
+                    Q(method__methodname__icontains=part)).order_by(
+                    'actiondescription')
+            else:
+                qset = qset & Actions.objects.filter(
+                    Q(actiondescription__icontains=part) |
+                Q(action_type__name__icontains=part) |
+                Q(method__methodname__icontains=part)).order_by(
+                    'actiondescription')
+        return qset
+        # return Featureactions.objects.filter(name__icontains=q)#.order_by('name')
+
+    def get_result(self, obj):
+        # return obj.featureactionid
+        return "%s- %s" % (
+            obj.actionid, obj.actiondescription)
+        # Featureactions.objects.filter(featureactionid__in=obj.featureactionid) #
+
+    def format_match(self, obj):
+        return self.format_item_display(obj)
+        # return u"<a href= %s> %s </a>" % (escape(obj.sourcevocabularyuri), escape(obj.name))
+
+    def format_item_display(self, obj):
+        # return u"<span class='tag'>%s</span>" % obj.name
+        return "%s- %s" % (
+            obj.actionid, obj.actiondescription)
+
+    def get_objects(self, ids):
+        obj = Actions.objects.filter(actionid__in=ids)
         return obj
 
 @register('cv_variable_name')

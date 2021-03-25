@@ -35,7 +35,6 @@ from django.db.models import UUIDField
 from django.core import management
 from django.core.exceptions import ValidationError
 from django.core.management import settings
-from django.utils.encoding import python_2_unicode_compatible
 
 def handle_uploaded_file(f, id):
     destination = io.open(settings.MEDIA_ROOT + '/resultvalues/' + f.name + '.csv', 'wb+')
@@ -2751,7 +2750,6 @@ class Resultnormalizationvalues(models.Model):
         else:
             db_table = r'resultnormalizationvalues'
 
-@python_2_unicode_compatible
 class Results(models.Model):
     resultid = models.AutoField(primary_key=True, verbose_name="data result")
     resultuuid = UUIDField(default=uuid.uuid4, editable=False)
@@ -4040,8 +4038,11 @@ class Variables(models.Model):
 
     def __str__(self):
         s = "%s" % self.variablecode
+        if self.variable_type:
+            s += " - %s" % self.variable_type.name
         if self.variabledefinition:
             s += " - %s" % self.variabledefinition[:20]
+
         return s
 
     class Meta:

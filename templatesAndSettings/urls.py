@@ -50,15 +50,41 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                re_path(r'^' + 'export_to_hydroshare/$', views.export_to_hydroshare),
                re_path(r'^' + 'addannotation/$', views.add_annotation),
                # resultid, annotation, cvqualitycode,setNaN,annotationvals,annotationFromUser
-               re_path(r'^' + 'createannotation/resultid=(?P<resultid>(\d+))/' +
-                       'cvqualitycode=(?P<cvqualitycode>(\w+))/' +
-                       'setNaN=(?P<setNaN>(\w+))/' +
-                       'annotationvals=(?P<annotationvals>\[\d+(, \d+)*\])/' +
-                       'annotationFromUser=(?P<annotationFromUser>(\w+))/'
-                       , views.add_annotation),
-               re_path(r'^' + 'addoffset/$', views.add_offset),
+               re_path(r'^' + 'createannotation/resultid=(?P<resultid>(\d+))/setNaN=(?P<setNaN>(\w+))/' +
+                              'cvqualitycode=(?P<cvqualitycode>(\w+))/annotationvals=(?P<annotationvals>(.*))/' +
+                              'annotationFromUser=(?P<annotationFromUser>(.*))/$'
+                       , views.createannotation, name='createannotation'),
+               re_path(r'^' + 'createoffset/resultid=(?P<resultid>(\d+))/offset=(?P<offset>(-?\d+.?\d*))/' +
+                              'offsetvals=\[(?P<offsetvals>)\d+(, \d+)*\]/$', views.createoffset,
+                                name='createoffset'),
+               re_path(r'^' + 'createoffset/resultid=(?P<resultid>(\d+))/offset=(?P<offset>(-?\d+.?\d*))/' +
+                       'offsetvals=\[(?P<offsetvals>)\'+\d+(, \d+)*\'+\]/$', views.createoffset,
+                       name='createoffset'),
+               re_path(r'^' + 'createoffset/$', views.createoffset,
+                       name='createoffset'),
+               re_path(r'^' + 'addoffset/$', views.addoffset, name='addoffset'),
                re_path(r'^' + 'save_sf/$', views.save_sf),
-               re_path(r'^' + 'addshiftvals/$', views.add_shiftvalues),
+               # re_path(r'^' + 'createshiftvalues/$', views.createoffset),
+               # (request, resultid, shiftvals,shift, direction ):
+               re_path(r'^' + 'createshiftvalues/$',
+                       views.createshiftvalues
+                       , name='createshiftvalues'),
+               re_path(r'^' + 'createoffset/resultid=(?P<resultid>(\d+))/offset=(?P<offset>(-?\d*\.?\d*))' +
+                              '/offsetvals=(?P<offsetvals>(.*))/$',
+                       views.createoffset
+                       , name='createoffset'),
+               # re_path(r'^' + 'createoffset/resultid=.*/offsetvals.*/offset=.*/$',
+               #         views.createoffset
+               #         , name='createoffset'),
+               re_path(r'^' + 'createshiftvalues/resultid=(?P<resultid>(\d+))/' +
+                       'direction=(?P<direction>(\[[a-zA-Z]+\]))/shift=(?P<shift>(-?\d*\.?\d*))/shiftvals=(?P<shiftvals>(.*))/$',
+                       views.createshiftvalues
+                       , name='createshiftvalues'),
+               re_path(r'^' + 'createshiftvalues/resultid=(?P<resultid>(\d+))/' +
+                       'direction=(?P<direction>(.*))/shift=(?P<shift>(-?\d*\.?\d*))/shiftvals=(?P<shiftvals>(.*))/$',
+                       views.createshiftvalues
+                       , name='createshiftvalues'),
+               re_path(r'^' + 'addshiftvals/$', views.addshiftvalues, name='addshiftvals'),
                re_path(r'^' + 'addL1timeseries/$', views.addL1timeseries),
                re_path(r'^' + 'processdlfile/$', views.procDataLoggerFile),
                re_path(r'^' + 'preprocessdlfile/$', views.preProcDataLoggerFile),
@@ -66,7 +92,19 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                re_path(r'^' + 'sensordashboard/samplingfeature=(?P<sampling_feature>(\d+))/', views.sensor_dashboard),
                re_path(r'^' + 'sensordashboard/$', views.sensor_dashboard),
                # TimeSeriesGraphingCat
-               re_path(r'^' + 'plotallvals/$', views.TimeSeriesGraphingCat),
+               re_path(r'^' + 'select2/', include('django_select2.urls')),
+               re_path(r'^' + 'samplingfeatureselect/$',views.SamplingFeatureSelectView.as_view(), name='SamplingFeatureSelectView'),
+               # re_path(r'^' + 'loadtsr/$', views.loadTSR),
+               re_path(r'^' + 'plotallvals/$', views.TimeSeriesGraphingCat), # plotallvals/resultidu=NotSet/
+               re_path(r'^' + 'plotallvals/resultidu=NotSet/$', views.TimeSeriesGraphingCat), #
+               re_path(r'^' + 'plotallvals/resultidu=\[(?P<resultidu>\d+(, \d+)*\])/$', views.TimeSeriesGraphingCat),
+               re_path(r'^' + 'plotallvals/resultidu=\[(?P<resultidu>\d+(, \d+)*\])' +
+                              '/samplesonly=(?P<samplesonly>[a-zA-Z]+)/$', views.TimeSeriesGraphingCat),
+               re_path(r'^' + 'plotallvals/variables=\[(?P<variables>\d+(, \d+)*\])/sfids=\[(?P<sfids>\d*(, \d*)*\])/$', views.TimeSeriesGraphingCat),
+               re_path(r'^' + 'plotallvals/resultidu=\[(?P<resultidu>\d+(, \d+)*\])/' +
+                              'samplesonly=(?P<samplesonly>[a-zA-Z]+)/$', views.TimeSeriesGraphingCat),
+               re_path(r'^' + 'plotallvals/variables=\[(?P<variables>\d+(, \d+)*\])/sfids=\[(?P<sfids>\d*(, \d*)*\])' +
+                              '/samplesonly=(?P<samplesonly>[a-zA-Z]+)/$', views.TimeSeriesGraphingCat),
                re_path(r'^' + 'graphfa/featureaction=(?P<feature_action>(\d+))/$',
                    views.TimeSeriesGraphingShort, name="TimeSeriesGraphingShort"),
                re_path(
@@ -216,7 +254,7 @@ urlpatterns = [re_path(r'^' + '', admin.site.urls),
                re_path(r'^' + 'publications.html', views.publications,
                    name="publications"),
                re_path(r'^' + 'features/type=(?P<sf_type>([\w\s]+,?)+)&'
-                                              'datasets=(?P<ds_ids>([a-zA-Z]+)?(([0-9]+,?)+)?)', views.get_features),
+                              'datasets=(?P<ds_ids>([a-zA-Z]+)?(([0-9]+,?)+)?)', cache_page(settings.CACHE_TTL)(views.get_features)),
                # url(r'^' + 'pubview/citationid=(?P<citationid>(\d+))/$',
                # views.add_pub,
                #    name="add_pub"),

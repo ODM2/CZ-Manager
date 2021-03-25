@@ -8,7 +8,7 @@
 {% extends "admin/base_site.html" %}
 {% load admin_extras %}
 {% load static %}
-{% load i18n admin_static admin_shortcuts_tags %}
+{% load i18n static admin_shortcuts_tags %}
 
 {# django-admin-shortcuts changes these blocks #}
 
@@ -186,8 +186,15 @@ $(document).ready(function() {
 			var annotation = $("#annotation").val();
 			var cvqualitycode = $("#SelectedQualityCode").val();
 			var setNaN = document.getElementById('setNaN').checked //$("#setNaN").checked;
-			//console.log('annotate');
+			//console.log({{SelectedResults|safe}});
 			var selectedResult = {{SelectedResults|safe}};
+			rid = selectedResult[0];
+
+			var annoids = [];
+			for (i=2; i < annotationvals.length; i+=3){
+				annoids.push(annotationvals[i]);
+			}
+			console.log(annoids);
 			//console.log(selectedResult);
 			//$report.html('annotation \'' + annotation + '\' saved.');
 			//console.log(cvqualitycode);
@@ -201,11 +208,11 @@ $(document).ready(function() {
 					type: "POST",
 					timeout: 0,
 					data: {
-						'resultidu': selectedResult,
-						'annotationvals': annotationvals,
-						'cvqualitycode': cvqualitycode,
-						'annotation': annotation,
+						'resultid': rid,
 						'setNaN': setNaN,
+						'cvqualitycode': cvqualitycode,
+						'annotationFromUser': annotation,
+						'annotationvals': annoids,
 						'csrfmiddlewaretoken': '{{ csrf_token }}',
 					},
 					cache:false,
@@ -221,8 +228,7 @@ $(document).ready(function() {
 						}
 						annotationButton.disabled = false;
 						if(setNaN){
-							//location.reload();
-							window.location=window.location;
+							location.reload();
 						}
 					},
 			});
@@ -240,19 +246,25 @@ $(document).ready(function() {
 			var offset = $("#offset").val();
 			//console.log('annotate');
 			var selectedResult = {{SelectedResults|safe}};
+			rid = selectedResult[0];
+			var annoids = [];
+			for (i=2; i < annotationvals.length; i+=3){
+				annoids.push(annotationvals[i]);
+			}
 			//console.log(selectedResult);
 			//$report.html('annotation \'' + annotation + '\' saved.');
 			var offsetButton = document.getElementById("offsetButton");
 			offsetButton.disabled = true;
 			offsetButton.firstChild.data = "offsetting values";
-			//console.log(annotationvals);
+			//console.log(annoids);
 			$.ajax({
 					url: "{{prefixpath}}../addoffset/",
 					type: "POST",
 					cache:false,
+					timeout: 0,
 					data: {
-						'resultidu': selectedResult,
-						'offsetvals': annotationvals,
+						'resultid': rid,
+						'offsetvals': annoids,
 						'offset': offset,
 						'csrfmiddlewaretoken': '{{ csrf_token }}',
 					},
@@ -263,8 +275,8 @@ $(document).ready(function() {
 						offsetButton.disabled = false;
 						//offsetPoints(parseFloat(offset));
 						//setTimeout(function(){location.reload();},100);
-						//location.reload();
-						window.location=window.location;
+						location.reload();
+						//window.location=window.location;
 
 			},
 			});
@@ -276,14 +288,20 @@ $(document).ready(function() {
 	});
 	$('#shiftValuesButton').click(function () {
 		if(annotationvals.length > 0){
+			//console.log("shift");
 			var report= document.getElementById('report');
 			report.firstChild.innerHTML = '';
 			var $report= document.getElementById("$report");
 			var shift = $("#shiftValues").val();
 			var selectedResult = {{SelectedResults|safe}};
+			rid = selectedResult[0];
 			var shiftValuesButton = document.getElementById("shiftValuesButton");
 			var radios = document.getElementsByName("shiftdirection");
 			var direction = "forward";
+			var annoids = [];
+			for (i=2; i < annotationvals.length; i+=3){
+				annoids.push(annotationvals[i]);
+			}
 			for (var i = 0, length = radios.length; i<length; i++){
 				if (radios[i].checked){
 					direction = radios[i].value;
@@ -292,15 +310,17 @@ $(document).ready(function() {
 
 			shiftValuesButton.disabled = true;
 			shiftValuesButton.firstChild.data = "shifting values";
-
+			//console.log("shift 2");
 			$.ajax({
 					url: "{{prefixpath}}../addshiftvals/",
 					type: "POST",
+					cache:false,
+					timeout: 0,
 					data: {
-						'resultidu': selectedResult,
-						'shiftvals': annotationvals,
+						'resultid': rid,
 						'shift': shift,
 						'direction' : direction,
+						'shiftvals': annoids,
 						'csrfmiddlewaretoken': '{{ csrf_token }}',
 					},
 					success: function(json) {
@@ -308,8 +328,8 @@ $(document).ready(function() {
 						var shiftValuesButton = document.getElementById("shiftValuesButton");
 						shiftValuesButton.firstChild.data = "reloading page";
 						shiftValuesButton.disabled = false;
-						//location.reload();
-						window.location=window.location;
+						location.reload();
+						//window.location=window.location;
 
 					},
 			});
@@ -524,7 +544,7 @@ Method- {{featureActionMethod}}
 </h1>
     <div id='content-main'> {% csrf_token %}
 	 </div>
-	<div id='chartid' class="chart" style="height:75%; width:100%; margin: 0 auto;"></div>
+	<div id='chartid' class="chart" style="height:600px; width:100%; margin: 0 auto;"></div>
 
 <br>
 {% if useDataset %}

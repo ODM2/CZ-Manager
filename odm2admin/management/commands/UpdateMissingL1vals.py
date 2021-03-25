@@ -24,7 +24,7 @@ from django.core.mail import EmailMessage
 from django.db import IntegrityError
 from django.db import transaction
 from django.db.models import Min, Max
-from datetime import datetime
+import datetime
 
 from odm2admin.models import CvCensorcode
 from odm2admin.models import CvQualitycode
@@ -54,12 +54,18 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('createorupdateL1', nargs=1, type=str)
         parser.add_argument('resultid', nargs=1, type=str)
+        parser.add_argument('startdate', nargs=1, type=str)
+        parser.add_argument('enddate', nargs=1, type=str)
         parser.add_argument('email', nargs=1, type=str)
     def handle(self, *args, **options):
         resultid = int(options['resultid'][0])
         email = str(options['email'][0])
         # response_data = {}
         createorupdateL1 = str(options['createorupdateL1'][0])
+        startdate = str(options['startdate'][0])
+        enddate = str(options['enddate'][0])
+        startdate = datetime.datetime.strptime(str(startdate), '%Y-%m-%d %H:%M:%S')
+        enddate = datetime.datetime.strptime(str(enddate), '%Y-%m-%d %H:%M:%S')
         pl1 = Processinglevels.objects.get(processinglevelid=2)
         pl0 = Processinglevels.objects.get(processinglevelid=1)
         valuesadded = 0
@@ -72,7 +78,7 @@ class Command(BaseCommand):
         # print('email')
         # print(email)
         if createorupdateL1 == "create":
-        #print('create')
+            #print('create')
             resultTocopy = Results.objects.get(resultid=resultid)
             tsresultTocopy = Timeseriesresults.objects.get(resultid=resultid)
             resultTocopy.resultid = None
@@ -104,9 +110,9 @@ class Command(BaseCommand):
             # tsrvL1 = Timeseriesresultvalues.objects.filter(resultid=tsresultL1)
             tsrvAddToL1Bulk = []
             relatedL0result = Results.objects.filter(
-                    featureactionid = resultL1.featureactionid).filter(
-                    variableid = resultL1.variableid
-                ).filter(unitsid = resultL1.unitsid).filter(
+                featureactionid = resultL1.featureactionid).filter(
+                variableid = resultL1.variableid
+            ).filter(unitsid = resultL1.unitsid).filter(
                 processing_level=pl0)
 
             # newresult = relatedL0result.resultid
@@ -115,7 +121,10 @@ class Command(BaseCommand):
             for L0result in relateL0tsresults:
                 if L0result.intendedtimespacing == tsresultL1.intendedtimespacing and L0result.intendedtimespacingunitsid == tsresultL1.intendedtimespacingunitsid:
                     relateL0tsresult =L0result
-            tsrvL0 = Timeseriesresultvalues.objects.filter(resultid=relateL0tsresult)
+            tsrvAddToL1 = None
+            tsrvAddToL1 = Timeseriesresultvalues.objects.filter(resultid=relateL0tsresult
+                                                           ).filter(valuedatetime__gt=startdate
+                                                                    ).filter(valuedatetime__lt=enddate)
             # print(relateL0tsresult)
             # maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=relateL1tsresult).annotate(
             #        Max('valuedatetime')). \
@@ -125,84 +134,32 @@ class Command(BaseCommand):
             #     print(r)
             # print('L1 result')
             # print(tsresultL1)
-            print(relateL0tsresult)
+            # print(relateL0tsresult)
             novals = False
-            maxtsrvL0=Timeseriesresultvalues.objects.filter(resultid=relateL0tsresult).annotate(
-                    Max('valuedatetime')). \
-                    order_by('-valuedatetime')[0].valuedatetime
-            try:
-                maxtsrvL1=Timeseriesresultvalues.objects.filter(resultid=tsresultL1).annotate(
-                    Max('valuedatetime')). \
-                    order_by('-valuedatetime')[0].valuedatetime
-                mintsrvL1=Timeseriesresultvalues.objects.filter(resultid=tsresultL1).annotate(
-                    Min('valuedatetime')). \
-                    order_by('valuedatetime')[0].valuedatetime
-            except IndexError:
-                novals = True
-            mintsrvL0=Timeseriesresultvalues.objects.filter(resultid=relateL0tsresult).annotate(
-                    Min('valuedatetime')). \
-                    order_by('valuedatetime')[0].valuedatetime
+            print(relateL0tsresult)
+            print(relateL0tsresult.resultid)
+            print('vals to add')
+            print(len(tsrvAddToL1))
 
             # print('max L0')
             # print(maxtsrvL0)
             # print('max L1')
             # print(maxtsrvL1)
-            tsrvAddToL1 = None
-            if novals:
-                tsrvAddToL1 = tsrvL0
-            elif maxtsrvL1 < maxtsrvL0:
-                tsrvAddToL1 = tsrvL0.filter(valuedatetime__gt=maxtsrvL1)
-            i = 0
-            if not novals:
-                if maxtsrvL1 < maxtsrvL0:
-                    tsrvAddToL1 = tsrvL0.filter(valuedatetime__gt=maxtsrvL1)
-                    # print(len(tsrvAddToL1))
-                    for tsrv in tsrvAddToL1:
-                        i+=1
-                        valuesadded +=1
-                        tsrv.resultid = tsresultL1
-                        try:
-                            tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
-                            tsrv.valueid = None
-                            tsrv.save()
-                            tsrva.valueid = tsrv
-                            # print(tsrv.valueid)
-                            tsrva.save()
-                        except ObjectDoesNotExist:
-                            # print('doesnt exist')
-                            tsrv.valueid = None
-                            tsresultTocopyBulk.append(tsrv)
-                            if i >= 5000:
-                                Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
-                                print(tsrv.valuedatetime)
-                                del tsresultTocopyBulk[:]
-                                i = 0
-                if mintsrvL1 > mintsrvL0:
-                    tsrvAddToL1 = tsrvL0.filter(valuedatetime__lt=mintsrvL1)
-                    for tsrv in tsrvAddToL1:
-                        i+=1
-                        valuesadded +=1
-                        # print(tsresultL1)
-                        tsrv.resultid = tsresultL1
-                        try:
-                            tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
-                            tsrv.valueid = None
-                            tsrv.save()
-                            tsrva.valueid = tsrv
-                            # print(tsrv.valueid)
-                            tsrva.save()
-                        except ObjectDoesNotExist:
-                            tsrv.valueid = None
-                            tsresultTocopyBulk.append(tsrv)
-                        if i >= 5000:
-                            Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
-                            print(tsrv.valuedatetime)
-                            del tsresultTocopyBulk[:]
-                            i = 0
-        if len(tsresultTocopyBulk) > 0:
-            Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
-            print(len(tsresultTocopyBulk))
-            print('done')
+            for tsrv in tsrvAddToL1:
+                tsrv.resultid = tsresultL1
+                try:
+                    tsrva = Timeseriesresultvalueannotations.objects.get(valueid = tsrv.valueid)
+                    tsrv.valueid = None
+                    tsrv.save()
+                    tsrva.valueid = tsrv
+                    # print(tsrv.valueid)
+                    tsrva.save()
+                except ObjectDoesNotExist:
+                    # print('doesnt exist')
+                    tsrv.valueid = None
+                    tsresultTocopyBulk.append(tsrv)
+            newtsrv = Timeseriesresultvalues.objects.bulk_create(tsresultTocopyBulk)
+        valuesadded = newtsrv.__len__()
         # print('values added')
         # print(valuesadded)
         # for tsrv in newtsrv:

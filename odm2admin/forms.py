@@ -7,6 +7,7 @@ import subprocess
 import sys
 import datetime as datetime
 import types
+from functools import reduce
 from django.utils.crypto import get_random_string
 from django.core import management
 from django.core import serializers
@@ -15,7 +16,7 @@ from templatesAndSettings.settings import exportdb
 from django.http import HttpResponse
 from hs_restclient import HydroShare, HydroShareAuthOAuth2
 # from odm2admin.tasks import create_sqlite_export_celery
-
+from django_select2 import forms as s2forms
 from django.contrib.gis import forms, admin
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib import messages
@@ -24,6 +25,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.forms import CharField
 from django.forms import ModelForm
 from django.forms import TypedChoiceField
+from django.forms import BooleanField
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.utils.html import format_html, format_html_join
@@ -31,6 +33,9 @@ from import_export import resources
 from import_export.admin import ExportMixin
 from import_export.admin import ImportExportActionModelAdmin
 from django.db.models import Max
+from django.db.models import Q
+from django_select2 import forms as s2forms
+
 from .management.commands.ProcessDataLoggerFile import updateStartDateEndDate
 from .models import Actionby, Specimens
 from .models import Actions
@@ -92,7 +97,7 @@ from .models import Measurementresults
 from .models import Measurementresultvalues
 from .models import Profileresultvalues
 # from .views import dataloggercolumnView
-from daterange_filter.filter import DateRangeFilter
+# from daterange_filter.filter import DateRangeFilter
 from django_admin_listfilter_dropdown.filters import DropdownFilter, RelatedDropdownFilter, ChoiceDropdownFilter
 import re
 
@@ -818,8 +823,167 @@ class SamplingfeatureexternalidentifiersAdmin(admin.ModelAdmin):
 #              and samplingfeaturetype=='Site' and sitetypecv==None :
 #             raise ValidationError('If sampling feature is of type site it must have a related site,'+
 #                                   ' see inline forms below')
+class DependentMultipleSelectWidget(s2forms.ModelSelect2MultipleWidget):
+    def filter_queryset(self, request, term, queryset=None, **dependent_fields):
+        # The super code ignores the dependent fields with multiple values
+        dependent_fields_multi_value = {}
+        for form_field_name, model_field_name in self.dependent_fields.items():
+            if form_field_name+"[]" in request.GET and request.GET.get(form_field_name+"[]", "") != "":
+                value_list = request.GET.getlist(form_field_name+"[]")
+                dependent_fields_multi_value[model_field_name] = value_list
 
+        if queryset is None:
+            queryset = self.get_queryset()
+        search_fields = self.get_search_fields()
+        select = Q()
+        term = term.replace('\t', ' ')
+        term = term.replace('\n', ' ')
+        for t in [t for t in term.split(' ') if not t == '']:
+            select &= reduce(lambda x, y: x | Q(**{y: t}), search_fields,
+                             Q(**{search_fields[0]: t}))
+        if dependent_fields:
+            select &= Q(**dependent_fields)
+        if dependent_fields_multi_value:
+            for key,val in dependent_fields_multi_value.items():
+                select &= Q(**{"%s__in" % key: val})
+        print(select)
+        return queryset.filter(select).distinct()
 
+class VariableDependentMultipleSelectWidget(s2forms.ModelSelect2MultipleWidget):
+    def filter_queryset(self, request, term, queryset=None, **dependent_fields):
+        # The super code ignores the dependent fields with multiple values
+        dependent_fields_multi_value = {}
+        for form_field_name, model_field_name in self.dependent_fields.items():
+            if form_field_name+"[]" in request.GET and request.GET.get(form_field_name+"[]", "") != "":
+                value_list = request.GET.getlist(form_field_name+"[]")
+                dependent_fields_multi_value[model_field_name] = value_list
+
+        # if queryset is None:
+        select = Q()
+        if dependent_fields:
+            select &= Q(**dependent_fields)
+        if dependent_fields_multi_value:
+            for key,val in dependent_fields_multi_value.items():
+                select &= Q(**{"%s__in" % key: val})
+        print(select)
+        sfs = Samplingfeatures.objects.filter(select)
+        fas = Featureactions.objects.filter(samplingfeatureid__in=sfs)
+        rs = Results.objects.filter(featureactionid__in=fas)
+        # print('rs count')
+        # print(rs.count())
+        # queryset = self.get_queryset()
+        queryset = Variables.objects.filter(variableid__in=rs.values('variableid'))
+        # print('got here')
+        # print(rs.variableid)
+        search_fields = self.get_search_fields()
+        # print(search_fields)
+        select = Q()
+        term = term.replace('\t', ' ')
+        term = term.replace('\n', ' ')
+        for t in [t for t in term.split(' ') if not t == '']:
+            select &= reduce(lambda x, y: x | Q(**{y: t}), search_fields,
+                             Q(**{search_fields[0]: t}))
+        # print(select)
+        return queryset.filter(select).distinct()
+
+class SamplingfeaturesSelectForm(forms.Form):
+    # class Meta:
+    #     model = Samplingfeatures
+    #     fields = []
+    sf = forms.ModelMultipleChoiceField( # ModelMultipleChoiceField
+        queryset=Samplingfeatures.objects.all(),
+        label=u"Location",
+        required=False,
+        help_text="Type the location code from the map such as 'GRBGB'.",
+        widget=s2forms.ModelSelect2MultipleWidget( # ModelSelect2MultipleWidget
+            model=Samplingfeatures,
+            search_fields=['samplingfeaturename__icontains',
+                           'samplingfeaturecode__icontains',
+                           # 'sampling_feature_type__name__icontains',
+                           'samplingfeaturedescription__icontains',],
+            attrs={'size': 20},)
+    )
+    featureaction = forms.ModelMultipleChoiceField(
+        queryset=Featureactions.objects.all(),
+        label=u"ADD specimen or equipment at location",
+        help_text="Try entering 'specimen', or 'water' for sample based data or 'sonde' for data from sensors. " +
+                  " For sediment data try 'sed'.",
+        required=False,
+        widget=DependentMultipleSelectWidget(
+            model=Featureactions,
+            search_fields=['samplingfeatureid__samplingfeaturename__icontains',
+                           'samplingfeatureid__samplingfeaturecode__icontains',
+                           'samplingfeatureid__samplingfeaturedescription__icontains',
+                           # 'samplingfeatureid__sampling_feature_type__name__icontains',
+                           'action__method__methoddescription__icontains',
+                           'action__method__methodname__icontains',
+                           'action__method__methodtypecv__name__icontains',
+                           ],
+            dependent_fields={'sf': 'samplingfeatureid'},
+            max_results=500,
+            attrs={'size': 20},)
+    )
+    result = forms.ModelMultipleChoiceField(
+        queryset=Results.objects.all(),
+        required=False,
+        help_text="Start typing the name of the measurement your looking for so for salinity entering 'sal'  " +
+                  " should retrieve the results. For dissolved oxygen try 'oxy' or 'o2' or 'dis'.",
+        label=u"select Time series",
+        widget=DependentMultipleSelectWidget(
+            model=Results,
+            search_fields=['resultid__icontains',
+                           'featureactionid__samplingfeatureid__samplingfeaturename__icontains',
+                           'featureactionid__action__method__methodname__icontains',
+                           'variableid__variabledefinition__icontains',
+                           'variableid__variablecode__icontains',],
+            dependent_fields={'featureaction': 'featureactionid'},
+            max_results=500,
+            attrs={'style': 'height: 300px;'},
+        )
+    )
+
+    variables = forms.ModelMultipleChoiceField(
+        queryset=Variables.objects.all(),
+        required=False,
+        help_text="Start typing the name of the measurement your looking for so for salinity entering 'sal'  " +
+                  " should retrieve the results. For dissolved oxygen try 'oxy' or 'o2' or 'dis'.",
+        label=u"Select only variables and locations",
+        widget=VariableDependentMultipleSelectWidget(
+            model=Variables,
+            search_fields=['variablecode__icontains',
+                           'variable_name__name__icontains',
+                           'variabledefinition__icontains',
+                           ],
+            dependent_fields={'sf': 'samplingfeatureid'},
+            max_results=500,
+            attrs={'style': 'height: 300px;'},
+        )
+    )
+    samplesonly = forms.BooleanField(label=u"Only include values from samples?", required=False)
+    # def __init__(self, *args, **kwargs):
+    #     super(SamplingfeaturesSelectForm, self).__init__(*args, **kwargs)
+    #     self.fields['result'].widget = DependentMultipleSelectWidget(attrs={'width':'80%'})
+#  samplingfeatureid = AutoCompleteSelectMultipleField('sampling_feature_lookup', required=True, help_text='',
+#                                                 label='Sampling feature',show_help_text =None)
+#     class Meta:
+#         model = Samplingfeatures
+#         fields = ['samplingfeatureid','samplingfeaturecode']
+
+class SamplingFeatureWidget(s2forms.ModelSelect2Widget):
+    search_fields = [
+        'samplingfeaturename__icontains',
+        'samplingfeaturecode__icontains',
+        'samplingfeaturedescription__icontains',
+    ]
+
+class ResultsWidget(s2forms.ModelSelect2Widget):
+    searchfields =[
+        'resultid__icontains',
+        'featureactionid__samplingfeatureid__samplingfeaturename__icontains',
+        'featureactionid__action__method__methodname__icontains',
+        'variableid__variabledefinition__icontains',
+        'variableid__variablecode__icontains',
+    ]
 class SamplingfeaturesAdminForm(ModelForm):
     class Meta:
         model = Samplingfeatures
@@ -1014,11 +1178,12 @@ class SamplingfeaturesAdmin(ReadOnlyAdmin):
 
     form = SamplingfeaturesAdminForm
     inlines_list = [
-        FeatureActionsInline,
+
         IGSNInline,
         SamplingfeatureextensionpropertiesInline,
-        SitesInline # ,
+        # SitesInline # ,
         # SpecimensInline
+        # FeatureActionsInline,
     ]
 
     def get_formsets_with_inlines(self, request, obj=None):
@@ -1554,6 +1719,8 @@ class RelatedresultsAdmin(ReadOnlyAdmin):
 class FeatureactionsAdminForm(ModelForm):
     samplingfeatureid = AutoCompleteSelectField('sampling_feature_lookup', required=True, help_text='',
                                               label='Sampling feature',show_help_text =None)
+    # action = AutoCompleteSelectField('action_lookup', required=True, help_text='',
+    #                                             label='Action',show_help_text =None)
     class Meta:
         model = Featureactions
         fields = '__all__'
@@ -1570,7 +1737,7 @@ class FeatureactionsAdmin(admin.ModelAdmin):
 
     list_display = ['samplingfeatureid', 'action', ]
     save_as = True
-    search_fields = ['action__method__methodname', 'samplingfeatureid__samplingfeaturename']
+    search_fields = ['action__method__methodname', 'action__actiondescription', 'samplingfeatureid__samplingfeaturename']
 
 
 def createODM2SQLiteFile(results, dataset,request, username, password):
@@ -2515,7 +2682,7 @@ class TimeseriesresultvaluesAdmin(ImportExportActionModelAdmin, ReadOnlyAdmin):
     inlines_list = list()
 
     list_filter = (
-        ('valuedatetime', DateRangeFilter),
+        ('valuedatetime'),
         # MeasurementResultFilter,
 
     )
@@ -2603,7 +2770,7 @@ class MeasurementresultvaluesAdmin(ImportExportActionModelAdmin, ReadOnlyAdmin):
 
     # date time filter and list of results you can filter on
     list_filter = (
-        ('valuedatetime', DateRangeFilter),
+        ('valuedatetime'),
         # MeasurementResultFilter,
 
     )

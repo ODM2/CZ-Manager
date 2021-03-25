@@ -8,7 +8,7 @@
 {% extends "admin/base_site.html" %}
 {% load admin_extras %}
 {% load static %}
-{% load i18n admin_static admin_shortcuts_tags %}
+{% load i18n static admin_shortcuts_tags %}
 
 {# django-admin-shortcuts changes these blocks #}
 
@@ -72,7 +72,7 @@
 	var name_of_units = {{name_of_units|safe}};
 
 $(document).ready(function() {
-
+	//console.log(series);
 	var opposite2 = false;
 	yaxes = [];
 	k = 0;
@@ -95,35 +95,51 @@ $(document).ready(function() {
 	for (var i=0; i<name_of_units.length; i++) {
 		name = name_of_units[i];
 		//alert(name);
+		if (i ==0){
+			usednames.push(name);
+		}
 		var namesusedlen = usednames.length;
+
         var used = false;
-        for(var i = 0; i < namesusedlen; i++) {
-            if (usednames[i] == name){
-            used = true;
-            }
-            if(!used){
-                axi = {id: name,
-                scrollbar: {
-                enabled: false
-                },
-                labels: {
-                        format: '{value}',
-                        style: {
-                            color: Highcharts.getOptions().colors[i]
-                        }
-                    },
-                title: {
-                    text: name
-                },
-                //lineWidth: 2,
-                //lineColor: Highcharts.getOptions().colors[i],
-                opposite: opposite2
-                };
-                yaxes.push(axi);
-                usednames.push(name);
+        for(var j = 0; j < namesusedlen; j++) {
+            if (usednames[j].localeCompare(name) ==0){
+				//console.log(usednames);
+				//console.log(name);
+				//console.log(j);
+            	used = true;
             }
         }
+		if(!used || i ==0){
+			usednames.push(name);
+			//console.log(usednames[j]);
+			//console.log(name);
+			axi = {id: name,
+			scrollbar: {
+			enabled: false
+			},
+			labels: {
+					format: '{value}',
+					style: {
+						color: Highcharts.getOptions().colors[i]
+					}
+				},
+			title: {
+				text: name
+			},
+			//lineWidth: 2,
+			//lineColor: Highcharts.getOptions().colors[i],
+			opposite: opposite2
+			};
+			//console.log(axi);
+			yaxes.push(axi);
+			usednames.push(name);
+			//console.log(usednames);
+
+        }
 	}
+	//console.log(yaxes);
+	//console.log(xAxis);
+	//console.log(usednames);
 	//yAxis[1] = yAxis2.replace('"','');
 	var chart =Highcharts.stockChart('chartid', {
 		chart: {renderTo: chart_id,
@@ -170,9 +186,15 @@ $(document).ready(function() {
     // See https://github.com/highcharts/highcharts/blob/master/errors/errors.xml
     // for error id's
 	errortext = event.code
+	noError = false;
 	if(event.code == 14){
 		errortext = ' No data available for this time frame try a different start and end date';
 	}
+	if(event.code == 15){
+	errortext = ''
+	noError = true;
+	}
+	if(!noError){
     Highcharts.charts[0].renderer
         .text('Chart error ' + errortext)
         .attr({
@@ -184,6 +206,7 @@ $(document).ready(function() {
             align: 'center',
             verticalAlign: 'middle'
         }, null, 'plotBox');
+    }
 });
 
 </script>
@@ -195,10 +218,7 @@ $(document).ready(function() {
 	<div id='chartid' class="chart" style="height:600px; width:100%; margin: 0 auto;"></div>
 
 <br>
-{% if useDataset %}
-{{datasetAbstract}}
-{% endif %}
-{% include 'StartEndDate.html' %}
+{% include 'VariableList.html' %}
 <br><br>
 <p>{{data_disclaimer.text}} <a href={{data_disclaimer.link}} target="_blank"> {{data_disclaimer.linktext}}</a></p>
 {% endblock %}

@@ -1,11 +1,10 @@
 {% extends "admin/base_site.html" %}
 {% load admin_extras %}
-{% load staticfiles %}
 {% load static %}
 
 
 
-{% load i18n admin_static admin_shortcuts_tags %}
+{% load i18n static admin_shortcuts_tags %}
 
 {# django-admin-shortcuts changes these blocks #}
 
@@ -44,6 +43,7 @@
     {% admin_shortcuts_js %}
 <script type="application/javascript">
 window.globalurl = '';
+var selectedfeatures = [];
 window.prefixpath = '{{prefixpath}}';
     $(document).ready(function(){
         //console.log('here');
@@ -58,7 +58,7 @@ window.prefixpath = '{{prefixpath}}';
                 url = window.globalurl + " #content";
                 //console.log('load divs');
                 $( "#insidebar" ).load(url); //odm2admin_content document.getElementById("sidebar")
-
+                console.log(url);
                 var url = '{% static "js/samplingfeaturesmap.js" %}';
                 //console.log(url);
                 $( "#jsholder" ).load(url); //odm2admin_content document.getElementById("sidebar")

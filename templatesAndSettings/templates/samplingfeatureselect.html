@@ -1,0 +1,100 @@
+
+{% extends "admin/base_site.html" %}
+{% load admin_extras %}
+{% load i18n static admin_shortcuts_tags %}
+
+{# django-admin-shortcuts changes these blocks #}
+
+
+
+{% block extrastyle %}<style type="text/css">{% admin_shortcuts_css %}
+</style>
+{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+{% block title %}
+Time Series | {{ "site_title"|get_title:6 }}
+{% endblock %}
+
+{% block branding%}
+<h1>{{ "site_header"|get_title:6 }}</h1>
+{% endblock %}
+
+{% block nav-global %}
+{% if authenticated %}
+{% include 'user-tools.html' %}
+{% endif %}
+{% endblock %}
+{% block breadcrumbs %}
+{% if authenticated %}
+<div class="admin_shortcuts">
+    {% admin_shortcuts %}
+</div>
+{% endif %}
+{% endblock %}
+{% block extrahead %}
+{{ block.super }}
+<script src='https://www.google.com/recaptcha/api.js'></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+
+{% admin_shortcuts_js %}{% endblock %}
+
+{# end changes #}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+
+
+
+{% block content %}
+
+<h1>Select locations their associated samples or sensor based time series and
+the specific series to plot (sample or sensor based).</h1>
+<form method="POST">
+
+    {{ form.media.css }}
+    <style type="text/css">
+
+  form select[multiple] {
+        width: 80% !important;
+      max-width: 80% !important;
+      height: 100px !important;
+    },
+form select2-selection{
+height: 100px !important;
+},
+  </style>
+
+    {% csrf_token %}
+    <table class="my-vals">
+        {% for field in form.visible_fields %}
+        {% ifequal field.name "variables" %}
+        <tr class="row1"><td></td><td style="width: 900px;color:crimson;font-weight: bold;" >OR <h6>{{ field.help_text }}</h6></td></tr>
+        {% endifequal %}
+        {% ifequal field.name "result" %}
+        <tr class="row1"><td></td><td style="width: 900px;color:DarkBlue;font-weight: bold;" >AND <h6>{{ field.help_text }}</h6></td></tr>
+        {% endifequal %}
+        {% ifequal field.name "featureaction" %}
+        <tr class="row1"><td></td><td style="width: 900px;color:DarkBlue;font-weight: bold;" >AND <h6>{{ field.help_text }}</h6></td></tr>
+        {% endifequal %}
+        {% ifequal field.name "sf" %}
+        <tr class="row1"><td></td><td style="width: 900px;" ><h6>{{ field.help_text }}</h6></td></tr>
+        {% endifequal %}
+        <tr class="row2">
+            <th>{{ field.label_tag }}</th>
+            <td style="width: 85%; line-height: 100px" >
+                {{ field.errors }}
+                {{ field }}
+
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <button type="submit">plot</button>
+</form>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+{{ form.media.js }}
+{% endblock %}

@@ -1,0 +1,50 @@
+
+{% load admin_extras %}
+<style>
+select {
+    width:85%; 
+    overflow:hidden; 
+    white-space:pre; 
+    text-overflow:ellipsis;
+    
+    
+
+}
+option {
+          border: solid 1px #DDDDDD; 
+}
+</style>
+<br>
+	 {% if resultidu %}
+	<form action="{{prefixpath}}../plotallvals/resultidu={{resultidu}}/samplesonly={{samplesonly}}/" method="post">
+		{% else %}
+		<form action="{{prefixpath}}../plotallvals/variables={{variables}}/sfids={{sfids}}/samplesonly={{samplesonly}}/" method="post">
+		{% endif %}
+	{% csrf_token %}
+	<table >
+		{% if not passedresults and not passedvariables %}
+	<tr><td>
+	<select class="form-control" id="s2" name="yVariableSelection">
+              {% for variable in yVariables %}
+				{% if variable.variableid == yVariableSelection.variableid %}
+					<option selected="selected" value="{{ variable.variableid }}">{{ variable.variablecode }} -
+						{{ variable.variable_name }} - {{ variable.variable_type }}</option>
+				{% else %}
+					<option  value="{{ variable.variableid }}">{{ variable.variablecode }} -
+						{{ variable.variable_name }} - {{ variable.variable_type }}</option>
+				{% endif %}
+              {% endfor %}
+            </select></td>
+			<td>
+		{% endif %}
+		<tr>
+			<td>Reload graph with date range:</td></tr>
+		<tr>
+	<td colspan="2">	<input id="startDate" maxlength="100" value= "{{ startDate }}" name="startDate" type="text">
+			Start Date (format YYYY-MM-DD HH:MM) </input>
+			<input id="endDate" maxlength="100" value= "{{ endDate }}" name="endDate" type="text"/>
+			End Date (format YYYY-MM-DD HH:MM) </input></td><td>
+			<td><input type="submit" name="update_chart" value="Update Chart" />
+<!--	<input type="submit" name="export_data" value="Export Data" />-->
+	</td></tr></table>
+	</form>

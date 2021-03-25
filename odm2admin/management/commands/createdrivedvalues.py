@@ -112,9 +112,11 @@ class Command(BaseCommand):
             # old values sensor moved 5-26-2020
             # a = 2.51
             # b = 0.125
-            a = 1.2148
-            b = 0.290636
-            adjH =  a*(cmdepth.datavalue**b)
+            # a = 1.2148
+            # b = 0.290636
+            # adjH =  a*(cmdepth.datavalue**b)
+            H = cmdepth.datavalue
+            adjH = ((H / 30.48) +2.93011)/1.00858
             if isinstance(adjH, complex):
                 adjH = float('nan')
             tsrv = Timeseriesresultvalues(resultid=cs451depthfttsr, datavalue=adjH,
