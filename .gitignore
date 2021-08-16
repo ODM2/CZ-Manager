@@ -24,10 +24,14 @@ lib64
 /odm2testsite/__pycache__
 /Dendra Metadata Examples
 __pycache__
-
 templatesAndSettings/settings.py
-templatesAndSettings/settings
-odm2admin/static/leaflet-search/examples
+/templatesAndSettings/settings
+/templatesAndSettings/odm2admin/static/
+/templatesAndSettings/odm2admin/staticold/
+/odm2admin/static/leaflet-search/examples/
+/odm2admin/static/
+/odm2admin/static - Copy/
+/venv/
 .gitignore
 odm2djangoadmin.git
 omit
@@ -36,7 +40,6 @@ upfiles
 backup migrations
 #  Installer logs
 pip-log.txt
-
 #  Unit test / coverage reports
 .coverage
 .tox

@@ -68,9 +68,9 @@ class Command(BaseCommand):
                                 True)
         print('done preprocessing')
         print(filenameout)
-        management.call_command('ProcessDataLoggerFile', filenameout, str(fileid)
+        management.call_command('ProcessDataLoggerFileNoQualCheck', filenameout, str(fileid)
                                 , str(databeginson), str(columnheaderson),
-                                True, True, True, 'leonmi@sas.upenn.edu')
+                                True, True, True, True, 'miguel.leon@unh.edu')
         print('done processing')
         pdlf = ProcessDataloggerfile.objects.get(dataloggerfileid=fileid)
         pdlf.processingCode = 'ftp setup complete'

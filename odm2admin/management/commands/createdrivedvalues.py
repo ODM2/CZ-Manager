@@ -116,7 +116,8 @@ class Command(BaseCommand):
             # b = 0.290636
             # adjH =  a*(cmdepth.datavalue**b)
             H = cmdepth.datavalue
-            adjH = ((H / 30.48) +2.93011)/1.00858
+            # adjH = ((H / 30.48) +2.93011)/1.00858
+            adjH = ((H / 30.48) +2.163838)/1.026083
             if isinstance(adjH, complex):
                 adjH = float('nan')
             tsrv = Timeseriesresultvalues(resultid=cs451depthfttsr, datavalue=adjH,

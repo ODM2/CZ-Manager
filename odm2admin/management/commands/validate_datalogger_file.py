@@ -310,9 +310,9 @@ class Command(BaseCommand):
 
                         elif i >= databeginson:
                             rawdt = row[dateTimeColNum].strip()
-                            print('print validation row')
-                            print(row)
-                            print(databeginson)
+                            # print('print validation row')
+                            # print(row)
+                            # print(databeginson)
                             # assume date is first column for the moment
                             try:
                                 dateT = time.strptime(rawdt, "%m/%d/%Y %H:%M")  # '1/1/2013 0:10

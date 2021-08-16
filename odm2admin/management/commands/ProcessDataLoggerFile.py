@@ -159,7 +159,8 @@ class Command(BaseCommand):
         exceldatetime = False
         emailtext = ""
         dateTimeColNum = 0
-
+        alarmcount = 0
+        alarms = ""
         pdlf = ProcessDataloggerfile.objects.get(dataloggerfileid=fileid)
         if not pdlf.processingCode == 'done' and not pdlf.processingCode=='locked':
             if not cmdline:
@@ -393,6 +394,7 @@ class Command(BaseCommand):
                                             # print(newdatavalue)
                                             if dataqualitybool:
                                                 if newdatavalue > result_upper_bound.dataqualityvalue:
+                                                    alarmcount += 1
                                                     with transaction.atomic():
                                                         annotationtext = result_upper_bound.dataqualitycode + \
                                                                          " of " + str(result_upper_bound.dataqualityvalue) \
@@ -403,6 +405,7 @@ class Command(BaseCommand):
                                                                                  annotationdatetime=annotationdatetime,
                                                                                  annotationutcoffset=4,
                                                                                  annotatorid=annotatorid)
+                                                        alarms += ' ' + annotationtext
                                                         newdatavalue = float('NaN')
                                                         qualitycode = qualitycodebad
                                                         tsvr = Timeseriesresultvalues(
@@ -425,6 +428,7 @@ class Command(BaseCommand):
                                                                                                  annotationid=annotation).save()
 
                                                 elif newdatavalue < result_lower_bound.dataqualityvalue:
+                                                    alarmcount += 1
                                                     with transaction.atomic():
                                                         annotationtext = "value below " + \
                                                                          result_lower_bound.dataqualitycode + \
@@ -436,7 +440,7 @@ class Command(BaseCommand):
                                                                                  annotationdatetime=annotationdatetime,
                                                                                  annotationutcoffset=4,
                                                                                  annotatorid=annotatorid)
-
+                                                        alarms += ' ' + annotationtext
                                                         newdatavalue = float('NaN')
                                                         qualitycode = qualitycodebad
                                                         tsvr = Timeseriesresultvalues(
@@ -462,6 +466,7 @@ class Command(BaseCommand):
                                             # newdatavalue = float(row[colnum.columnnum])
                                             if dataqualityUpperAlarm:
                                                 if newdatavalue > result_upper_bound_alarm.dataqualityvalue:
+                                                    alarmcount += 1
                                                     with transaction.atomic():
                                                         annotationtext = result_upper_bound_alarm.dataqualitycode + \
                                                                          " of " + str(
@@ -473,6 +478,7 @@ class Command(BaseCommand):
                                                                                  annotationdatetime=annotationdatetime,
                                                                                  annotationutcoffset=4,
                                                                                  annotatorid=annotatorid)
+                                                        alarms += ' ' + annotationtext
                                                         #qualitycode = qualitycodebad
                                                         # already created time series result values in
                                                         # result upper bound check
@@ -511,6 +517,7 @@ class Command(BaseCommand):
                                                 else:
                                                     dataqualityUpperAlarm = False
                                             if dataqualityLowerAlarm:
+                                                alarmcount += 1
                                                 if newdatavalue < result_lower_bound_alarm.dataqualityvalue:
                                                     with transaction.atomic():
                                                         sendemail = True
@@ -525,6 +532,7 @@ class Command(BaseCommand):
                                                                                  annotationdatetime=annotationdatetime,
                                                                                  annotationutcoffset=4,
                                                                                  annotatorid=annotatorid)
+                                                        alarms += ' ' + annotationtext
                                                         #qualitycode = qualitycodebad
                                                         boundexceeded = False
                                                         if result_lower_bound:
@@ -651,6 +659,9 @@ class Command(BaseCommand):
                 email.send()
             emailtitle = 'CZ Manager - file processing complete for: ' + str(pdlf)
             emailtext = 'CZ Manager - file processing complete for: ' + str(pdlf) + ' \n'
+            emailtext += 'Alarms: ' + str(alarmcount) + ' \n'
+            if alarmcount > 0:
+                emailtext += alarms + ' \n'
             emailtext += 'total time series result values add: ' + str(valuesadded) + ' \n'
             emailtext += 'These time series were updated: \n'
             tolist.append(emailaddress)
