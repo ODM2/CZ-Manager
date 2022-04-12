@@ -28,7 +28,9 @@ from django.utils import timezone
 # from django.contrib.gis.db import models
 import csv
 import io
+import sys
 import re
+import inspect
 from urllib.parse import urlparse
 import uuid
 from django.db.models import UUIDField
@@ -1248,6 +1250,7 @@ class Dataloggerfiles(models.Model):
             db_table = r'dataloggerfiles'
         _exportdb = settings.EXPORTDB
         verbose_name = 'data logger file'
+
 
 
 class ProcessDataloggerfile(models.Model):
@@ -2810,6 +2813,10 @@ class Results(models.Model):
 
         return s
 
+    @property
+    def influx_identifier(self):
+        return 'uuid_{}'.format(str(self.resultuuid).replace('-', '_'))
+
     def email_text(self):
         s = '{0} -unit-{1}-processing level-{2} '.format(
             self.variableid.variablecode,
@@ -4054,3 +4061,652 @@ class Variables(models.Model):
         else:
             db_table = r'variables'
         verbose_name = 'variable'
+
+
+from odm2admin.querysets import AffiliationQuerySet, RelatedActionManager, ResultManager, \
+    DataLoggerFileManager, InstrumentOutputVariableManager, \
+    EquipmentManager, CalibrationReferenceEquipmentManager, EquipmentUsedManager, MaintenanceActionManager, \
+    RelatedEquipmentManager, CalibrationActionManager, ODM2QuerySet, ActionQuerySet, ActionByQuerySet, \
+    FeatureActionQuerySet, TimeSeriesValuesQuerySet, EquipmentModelQuerySet, OrganizationQuerySet
+from django.conf import settings
+from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
+
+# from __future__ import unicode_literals
+
+## 3 Create your models here.
+
+from datetime import timedelta, datetime
+from uuid import uuid4
+
+from django.db import models
+from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+from odm2admin.querysets import *
+from odm2admin.models import *
+# from dataloader.models import SamplingFeature, Affiliation, Result, TimeSeriesResultValue, EquipmentModel, Variable, \
+#     Unit, Medium, Organization
+# from dataloaderinterface.querysets import SiteRegistrationQuerySet, SensorOutputQuerySet
+
+# TODO: function to handle the file upload folder for file fields.
+
+
+# region Model Abstractions
+
+
+class ODM2Model(models.Model):
+    objects = ODM2QuerySet.as_manager()
+
+    class Meta:
+        abstract = True
+
+
+@python_2_unicode_compatible
+class ControlledVocabulary(ODM2Model):
+    term = models.CharField(db_column='term', max_length=255)
+    name = models.CharField(db_column='name', primary_key=True, max_length=255)
+    definition = models.CharField(db_column='definition', blank=True, max_length=500)
+    category = models.CharField(db_column='category', blank=True, max_length=255)
+    source_vocabulary_uri = models.CharField(db_column='sourcevocabularyuri', blank=True, max_length=255)
+
+    def __str__(self):
+        return '%s' % self.name
+
+    def __repr__(self):
+        return "<%s('%s', '%s', '%s', '%s')>" % (
+            self.__class__.__name__, self.term, self.name, self.definition, self.category
+        )
+
+    class Meta:
+        abstract = True
+
+
+@python_2_unicode_compatible
+class AnnotationBridge(models.Model):
+    bridge_id = models.AutoField(db_column='bridgeid', primary_key=True)
+
+    def __str__(self):
+        return '%s' % self.annotation
+
+    class Meta:
+        abstract = True
+
+
+@python_2_unicode_compatible
+class ExtensionPropertyBridge(models.Model):
+    bridge_id = models.AutoField(db_column='bridgeid', primary_key=True)
+    property = models.ForeignKey('ExtensionProperty', db_column='propertyid',
+    on_delete=models.CASCADE)
+    property_value = models.CharField(db_column='propertyvalue', max_length=255)
+
+    def __str__(self):
+        return '%s %s' % self.annotation, self.property_value
+
+    class Meta:
+        abstract = True
+
+
+@python_2_unicode_compatible
+class ExternalIdentifierBridge(models.Model):
+    bridge_id = models.AutoField(db_column='bridgeid', primary_key=True)
+    external_identifier_system = models.ForeignKey('ExternalIdentifierSystem', db_column='externalidentifiersystemid',
+    on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s' % self.external_identifier_system
+
+    class Meta:
+        abstract = True
+
+
+@python_2_unicode_compatible
+class ObjectRelation(models.Model):
+    relation_id = models.AutoField(db_column='relationid', primary_key=True)
+    relationship_type = models.ForeignKey('RelationshipType', db_column='relationshiptypecv',
+    on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s' % self.relationship_type_id
+
+    class Meta:
+        abstract = True
+
+# region Result Abstractions
+
+
+@python_2_unicode_compatible
+class ExtendedResult(models.Model):
+    result = models.OneToOneField('Result', db_column='resultid', primary_key=True,
+    on_delete=models.CASCADE)
+    spatial_reference = models.ForeignKey('SpatialReference', db_column='spatialreferenceid', blank=True, null=True,
+    on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s' % self.result
+
+    def __repr__(self):
+        return "<%s('%s', '%s', SpatialReference['%s', '%s'])>" % (
+            self.__class__.__name__, self.result_id, self.result, self.spatial_reference_id, self.spatial_reference
+        )
+
+    class Meta:
+        abstract = True
+
+
+@python_2_unicode_compatible
+class ResultValue(models.Model):
+    value_id = models.BigAutoField(db_column='valueid', primary_key=True)
+    value_datetime = models.DateTimeField(db_column='valuedatetime')
+    value_datetime_utc_offset = models.IntegerField(db_column='valuedatetimeutcoffset')
+
+    def __str__(self):
+        return '%s %s' % (self.value_datetime, self.data_value)
+
+    def __repr__(self):
+        return "<%s('%s', '%s', Result['%s', '%s'], '%s')>" % (
+            self.__class__.__name__, self.value_id, self.value_datetime, self.result_id, self.result, self.data_value
+        )
+
+    class Meta:
+        abstract = True
+
+
+@python_2_unicode_compatible
+class ResultValueAnnotation(models.Model):
+    bridge_id = models.AutoField(db_column='bridgeid', primary_key=True)
+    annotation = models.ForeignKey('Annotation', db_column='annotationid',
+    on_delete=models.CASCADE)
+
+    def __str__(self):
+        return '%s %s' % (self.value_datetime, self.data_value)
+
+    def __repr__(self):
+        return "<%s('%s', Annotation['%s', '%s'], ResultValue['%s', '%s')>" % (
+            self.__class__.__name__, self.bridge_id, self.annotation_id, self.annotation, self.value_id, self.value
+        )
+
+    class Meta:
+        abstract = True
+
+
+class AggregatedComponent(models.Model):
+    aggregation_statistic = models.ForeignKey('AggregationStatistic', db_column='aggregationstatisticcv',
+    on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class TimeAggregationComponent(models.Model):
+    time_aggregation_interval = models.FloatField(db_column='timeaggregationinterval')
+    time_aggregation_interval_unit = models.ForeignKey('Unit', related_name='+', db_column='timeaggregationintervalunitsid', blank=True, null=True,
+    on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class XOffsetComponent(models.Model):
+    x_location = models.FloatField(db_column='xlocation')
+    x_location_unit = models.ForeignKey('Unit', related_name='+', db_column='xlocationunitsid', blank=True, null=True,
+    on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class YOffsetComponent(models.Model):
+    y_location = models.FloatField(db_column='ylocation')
+    y_location_unit = models.ForeignKey('Unit', related_name='+', db_column='ylocationunitsid', blank=True, null=True,
+    on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class ZOffsetComponent(models.Model):
+    z_location = models.FloatField(db_column='zlocation')
+    z_location_unit = models.ForeignKey('Unit', related_name='+', db_column='zlocationunitsid', blank=True, null=True,
+    on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class XIntendedComponent(models.Model):
+    intended_x_spacing = models.FloatField(db_column='intendedxspacing')
+    intended_x_spacing_unit = models.ForeignKey('Unit', related_name='+', db_column='intendedxspacingunitsid', blank=True, null=True,
+    on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class YIntendedComponent(models.Model):
+    intended_y_spacing = models.FloatField(db_column='intendedyspacing', blank=True, null=True)
+    intended_y_spacing_unit = models.ForeignKey('Unit', related_name='+', db_column='intendedyspacingunitsid', blank=True, null=True,
+    on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class ZIntendedComponent(models.Model):
+    intended_z_spacing = models.FloatField(db_column='intendedzspacing', blank=True, null=True)
+    intended_z_spacing_unit = models.ForeignKey('Unit', related_name='+', db_column='intendedzspacingunitsid', blank=True, null=True,
+    on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class TimeIntendedComponent(models.Model):
+    intended_time_spacing = models.FloatField(db_column='intendedtimespacing', blank=True, null=True)
+    intended_time_spacing_unit = models.ForeignKey('Unit', related_name='+', db_column='intendedtimespacingunitsid', blank=True, null=True,
+    on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+class QualityControlComponent(models.Model):
+    censor_code = models.ForeignKey('CensorCode', db_column='censorcodecv',
+    on_delete=models.CASCADE)
+    quality_code = models.ForeignKey('QualityCode', db_column='qualitycodecv',
+    on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+
+# endregion
+
+# endregion
+
+# region ODM2 Controlled Vocabulary models
+
+
+class ActionType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_actiontype'
+
+
+class AggregationStatistic(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_aggregationstatistic'
+
+
+class AnnotationType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_annotationtype'
+
+
+class CensorCode(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_censorcode'
+
+
+class DataQualityType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_dataqualitytype'
+
+
+class DataSetType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_datasettype'
+
+
+class DeploymentType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_deploymenttype'
+
+
+class DirectiveType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_directivetype'
+
+
+class ElevationDatum(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_elevationdatum'
+        ordering = ['name']
+
+
+class EquipmentType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_equipmenttype'
+
+
+class Medium(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_medium'
+        ordering = ['name']
+
+
+class MethodType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_methodtype'
+        ordering = ['name']
+
+
+class OrganizationType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_organizationtype'
+        ordering = ['name']
+
+
+class PropertyDataType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_propertydatatype'
+
+
+class QualityCode(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_qualitycode'
+
+
+class ResultType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_resulttype'
+
+
+class RelationshipType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_relationshiptype'
+
+
+class SamplingFeatureGeoType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_samplingfeaturegeotype'
+
+
+class SamplingFeatureType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_samplingfeaturetype'
+
+
+class SpatialOffsetType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_spatialoffsettype'
+
+
+class Speciation(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_speciation'
+
+
+class SpecimenType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_specimentype'
+
+
+class SiteType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_sitetype'
+        ordering = ['name']
+
+
+class Status(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_status'
+
+
+class TaxonomicClassifierType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_taxonomicclassifiertype'
+
+
+class UnitsType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_unitstype'
+        ordering = ['name']
+
+
+class VariableName(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_variablename'
+        ordering = ['name']
+
+
+class VariableType(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_variabletype'
+        ordering = ['name']
+
+
+class ReferenceMaterialMedium(ControlledVocabulary):
+    class Meta:
+        db_table = 'cv_referencematerialmedium'
+
+# endregion
+
+# region ODM2 Core models
+
+
+
+
+# TODO: make something more sophisticated than this later on
+sql_schema_fix = 'odm2].['   # for SQL databases
+psql_schema_fix = 'odm2"."'  # for postgres databases
+clsmembers = inspect.getmembers(sys.modules[__name__], inspect.isclass)
+classes = [model for name, model in clsmembers if issubclass(model, models.Model)]
+database_manager = settings.DATABASES['default']['ENGINE']
+
+for model in classes:
+    if database_manager == u'sql_server.pyodbc':
+        model._meta.db_table = sql_schema_fix.upper() + model._meta.db_table
+    elif database_manager == u'django.db.backends.postgresql_psycopg2':
+        model._meta.db_table = psql_schema_fix + model._meta.db_table
+
+            # can add more fixes there depending on the database engine
+
+
+class SiteRegistration(models.Model):
+    registration_id = models.AutoField(primary_key=True, db_column='RegistrationID')
+    registration_token = models.CharField(max_length=64, editable=False, db_column='RegistrationToken', unique=True, default=uuid4)
+
+    registration_date = models.DateTimeField(db_column='RegistrationDate', default=datetime.datetime.utcnow)
+    deployment_date = models.DateTimeField(db_column='DeploymentDate', blank=True, null=True)
+
+    django_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, db_column='User', related_name='deployed_sites')
+    affiliation_id = models.IntegerField(db_column='AffiliationID')
+
+    person_id = models.IntegerField(db_column='PersonID', null=True)
+    person_first_name = models.CharField(max_length=255, db_column='PersonFirstName', blank=True, null=True)
+    person_last_name = models.CharField(max_length=255, db_column='PersonLastName', blank=True, null=True)
+
+    organization_id = models.IntegerField(db_column='OrganizationID', null=True)
+    organization_code = models.CharField(db_column='OrganizationCode', max_length=50, blank=True, null=True)
+    organization_name = models.CharField(max_length=255, db_column='OrganizationName', blank=True, null=True)
+
+    sampling_feature_id = models.IntegerField(db_column='SamplingFeatureID', null=True)
+    sampling_feature_code = models.CharField(max_length=50, unique=True, db_column='SamplingFeatureCode')
+    sampling_feature_name = models.CharField(max_length=255, db_column='SamplingFeatureName')
+    elevation_m = models.FloatField(blank=True, null=True, db_column='Elevation')
+    elevation_datum = models.CharField(max_length=255, db_column='ElevationDatum', blank=True, null=True)
+
+    latitude = models.FloatField(db_column='Latitude')
+    longitude = models.FloatField(db_column='Longitude')
+    site_type = models.CharField(max_length=255, db_column='SiteType')
+
+    stream_name = models.CharField(max_length=255, db_column='StreamName', blank=True, null=True)
+    major_watershed = models.CharField(max_length=255, db_column='MajorWatershed', blank=True, null=True)
+    sub_basin = models.CharField(max_length=255, db_column='SubBasin', blank=True, null=True)
+    closest_town = models.CharField(max_length=255, db_column='ClosestTown', blank=True, null=True)
+
+    site_notes = models.TextField(db_column='SiteNotes', blank=True, null=True)
+
+    followed_by = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='followed_sites')
+    alert_listeners = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='+', through='SiteAlert')
+
+    objects = SiteRegistrationQuerySet.as_manager()
+
+    @property
+    def latest_measurement(self):
+        if not hasattr(self, 'latest_measurement_id'):
+            return
+        try:
+            last_updated_sensor = [sensor for sensor in self.sensors.all() if sensor.last_measurement.pk == self.latest_measurement_id].pop()
+        except IndexError:
+            return None
+
+        return last_updated_sensor.last_measurement
+
+    @property
+    def organization(self):
+        return Organizations.objects.filter(organization_id=self.organization_id).first()
+
+    @property
+    def sampling_feature(self):
+        try:
+            return Samplingfeatures.objects.get(pk=self.sampling_feature_id)
+        except ObjectDoesNotExist:
+            return None
+
+    @property
+    def odm2_affiliation(self):
+        try:
+            return Affiliations.objects.get(pk=self.affiliation_id)
+        except ObjectDoesNotExist:
+            return None
+
+    def __str__(self):
+        return '%s' % self.sampling_feature_code
+
+    def __repr__(self):
+        return "<SiteRegistration('%s', '%s', '%s')>" % (
+            self.registration_id, self.registration_date, self.sampling_feature_code
+        )
+
+
+class SensorMeasurement(models.Model):
+    sensor = models.OneToOneField('SiteSensor', related_name='last_measurement', primary_key=True,
+    on_delete=models.CASCADE)
+    value_datetime = models.DateTimeField()
+    value_datetime_utc_offset = models.DurationField()
+    data_value = models.FloatField()
+
+    @property
+    def value_local_datetime(self):
+        return self.value_datetime + self.value_datetime_utc_offset
+
+    @property
+    def utc_offset_hours_display(self):
+        total = int(self.value_datetime_utc_offset.total_seconds() / 3600)
+        return "(UTC{sign}{hours}:00)".format(sign=["-", "+"][total > 0], hours=str(abs(self.utc_offset_hours)).zfill(2))
+
+    @property
+    def utc_offset_hours(self):
+        return int(self.value_datetime_utc_offset.total_seconds() / 3600)
+
+    def __str__(self):
+        return '%s: %s' % (self.value_datetime, self.data_value)
+
+    def __repr__(self):
+        return "<SensorMeasurement('%s', %s, '%s', '%s')>" % (
+            self.sensor, self.value_datetime, self.value_datetime_utc_offset, self.data_value
+        )
+
+
+class SensorOutput(models.Model):
+    instrument_output_variable_id = models.IntegerField(db_index=True)
+
+    model_id = models.IntegerField()
+    model_name = models.CharField(max_length=255)
+    model_manufacturer = models.CharField(max_length=255)
+
+    variable_id = models.IntegerField()
+    variable_name = models.CharField(max_length=255)
+    variable_code = models.CharField(max_length=50)
+
+    unit_id = models.IntegerField()
+    unit_name = models.CharField(max_length=255)
+    unit_abbreviation = models.CharField(max_length=255)
+
+    sampled_medium = models.CharField(max_length=255, null=True)
+
+    objects = SensorOutputQuerySet.as_manager()
+
+    @property
+    def variable(self):
+        return Variables.objects.filter(variable_id=self.variable_id).first()
+
+    @property
+    def unit(self):
+        return Units.objects.filter(unit_id=self.unit_id).first()
+
+    def __str__(self):
+        return '%s %s %s %s %s' % (self.model_manufacturer, self.model_name, self.variable_code, self.unit_name, self.sampled_medium)
+
+    def __repr__(self):
+        return "<SensorOutput('%s', [%s], ['%s'], ['%s'], ['%s'])>" % (
+            self.pk, self.model_name, self.variable_code, self.unit_name, self.sampled_medium
+        )
+
+
+class SiteSensor(models.Model):
+    registration = models.ForeignKey('SiteRegistration', db_column='RegistrationID', related_name='sensors',
+    on_delete=models.CASCADE)
+
+    result_id = models.IntegerField(db_column='ResultID', unique=True, null=True)
+    result_uuid = models.UUIDField(db_column='ResultUUID', unique=True, null=True)
+
+    height = models.FloatField(blank=True, null=True)
+    sensor_notes = models.TextField(blank=True, null=True)
+    sensor_output = models.ForeignKey('SensorOutput', related_name='sensor_instances', null=True,
+    on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['result_id']
+
+    @property
+    def result(self):
+        return Results.objects.filter(pk=self.result_id).first()
+
+    @property
+    def make_model(self):
+        return "{0}_{1}".format(self.sensor_output.model_manufacturer, self.sensor_output.model_name)
+
+    @property
+    def sensor_identity(self):
+        return "{0}_{1}_{2}".format(self.registration.sampling_feature_code, self.sensor_output.variable_code, self.result_id)
+
+    @property
+    def influx_url(self):
+        if not self.last_measurement:
+            return
+
+        return settings.INFLUX_URL_QUERY.format(
+            result_uuid=self.influx_identifier,
+            last_measurement=self.last_measurement.value_datetime.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            days_of_data=settings.SENSOR_DATA_PERIOD
+        )
+
+    @property
+    def influx_identifier(self):
+        return 'uuid_{}'.format(str(self.result_uuid).replace('-', '_'))
+
+    def __str__(self):
+        return '%s' % (self.sensor_identity)
+
+    def __repr__(self):
+        return "<SiteSensor('%s', [%s], '%s')>" % (
+            self.id, self.registration, self.result_id
+        )
+
+
+class SiteAlert(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, db_column='User', related_name='site_alerts',
+    on_delete=models.CASCADE)
+    site_registration = models.ForeignKey('SiteRegistration', db_column='RegistrationID', related_name='alerts',
+    on_delete=models.CASCADE)
+    last_alerted = models.DateTimeField(db_column='LastAlerted', blank=True, null=True)
+    hours_threshold = models.DurationField(db_column='HoursThreshold', default=timedelta(hours=1))
+
+    def __str__(self):
+        return '%s %s' % (self.site_registration.sampling_feature_code, self.hours_threshold)
+
+    def __repr__(self):
+        return "<SiteAlert('%s', [%s], '%s', '%s')>" % (
+            self.id, self.site_registration.sampling_feature_code, self.last_alerted, self.hours_threshold,
+        )
